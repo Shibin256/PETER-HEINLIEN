@@ -1,20 +1,17 @@
 import { useState } from 'react';
-import { FaPaperclip, FaGoogle } from 'react-icons/fa';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import { FaPaperclip} from 'react-icons/fa';
 import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import usePasswordVal from '../usePasswordVal';
-import HeroSection from '../components/HeroSection';
+//google button getting
+import { GoogleLogin } from '@react-oauth/google';
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(false);
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,27 +21,29 @@ const Signup = () => {
     gender: 'male',
     file: null,
   });
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
     }));
 
+    //validating password
     if (name === 'password') {
       const validationMsg = usePasswordVal(value);
       setError(validationMsg);
-      setIsPasswordValid(!validationMsg); // valid if empty string
+      setIsPasswordValid(!validationMsg); 
     }
-
     if (name === 'confirmPassword') {
       if (!isPasswordValid) {
         setError('Enter a valid password first.');
         return;
       }
 
+    //comparing password
       if (formData.password !== value) {
         setError('Passwords do not match');
       } else {
@@ -56,7 +55,6 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       if (
         !formData.name ||
@@ -69,6 +67,7 @@ const Signup = () => {
         return;
       }
 
+      //confirming password is valid
       const validationMsg = usePasswordVal(formData.password);
       if (validationMsg) {
         setError(validationMsg);
@@ -85,6 +84,7 @@ const Signup = () => {
 
       const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
       if (response) {
+        //navigate to verify otp with formdata
         navigate('/verify-otp', {
             state: {
               formData
@@ -98,6 +98,21 @@ const Signup = () => {
       setLoading(false);
     }
   };
+
+
+  //google auth
+  const handleLoginSuccess=async(credentialResponse)=>{
+    const idToken=credentialResponse.credential;
+    // Send Google id_token to your backend
+    const res = await axios.post(`${baseUrl}/api/auth/google`, {idToken});
+    console.log('res========',res)
+    if(res){
+    const yourJWT=res.data.token
+     // Store your JWT (not the Google one)
+    localStorage.setItem('token', yourJWT);
+    navigate('/')
+      }
+  }
 
   return (
     <>
@@ -240,17 +255,17 @@ const Signup = () => {
               <div className="h-px bg-gray-300 flex-1"></div>
             </div>
 
-            <button
-              type="button"
-              className="w-full flex items-center justify-center space-x-2 border border-gray-300 py-3 rounded-md hover:bg-gray-50 transition-colors font-medium"
-            >
-              <FaGoogle className="text-red-500" />
-              <span>Continue with Google</span>
-            </button>
 
+            <div>
+                  <GoogleLogin
+            onSuccess={handleLoginSuccess}
+            onError={() => console.log('Login Failed')}
+          />
+            </div>
+          
             <p className="text-center text-sm text-gray-600">
               Already have an account?{' '}
-              <a href="#" className="text-teal-700 hover:underline">Log in</a>
+              <Link to='/login' className='text-blue-500'>Log in</Link>
             </p>
           </form>
         </div>

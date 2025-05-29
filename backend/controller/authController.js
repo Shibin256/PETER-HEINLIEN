@@ -6,6 +6,10 @@ import nodemailer from 'nodemailer'
 import Otp from '../model/otpModel.js'
 const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 
+//google authontication
+import { OAuth2Client } from 'google-auth-library';
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 //generate otp with random 6 digit number
 function genarateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString()
@@ -87,6 +91,7 @@ export const register = async (req, res) => {
     //generate and sending otp
     const otp = genarateOtp()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    console.log('otp is:----',otp)
 
     await Otp.findOneAndDelete({ email }); // Remove any previous OTP
     await Otp.create({ email, otp,expiresAt });
@@ -156,4 +161,80 @@ export const verifyOTP = async (req, res) => {
     console.log(error)
   }
   
+}
+
+//google auth
+export const googleAuth=async(req,res)=>{
+      const{idToken}=req.body
+      try {
+        const ticket=await client.verifyIdToken({
+          idToken,
+          audience:process.env.GOOGLE_CLIENT_ID,
+        })
+
+        const payload=ticket.getPayload()
+        const { sub, email, name, picture,gender } = payload;
+        
+        let user = await User.findOne({ googleId: sub });
+
+        if (!user) {
+      user = await User.create({
+        googleId: sub,
+        username: name,
+        email: email,
+        avatar: picture,
+        gender: 'other'
+      });
+    }
+
+     const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).json({ token, user });
+
+      } catch (error) {
+         console.error('Google login failed:', error);
+         res.status(401).json({ error: 'Invalid Google token' });
+      }
+}
+
+
+
+
+export const login=async(req,res)=>{
+    try {
+      const {email,password}=req.body
+      const user = await User.findOne({ email })
+      console.log(user)
+       if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "30d" })
+
+    // Send response with user data
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        _id: user._id,
+        name: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+
+    } catch (error) {
+       console.error("Login error:", error);
+        res.status(500).json({ message: "Error logging in" });
+    }
+
 }

@@ -3,27 +3,63 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 const  baseUrl= import.meta.env.VITE_API_BASE_URL;
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const OTPForm = () => {
   const navigate=useNavigate()
   const location = useLocation();
   const formData = location.state?.formData;
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(600);
   const [isExpired, setIsExpired] = useState(false);
   const [userOTP, setUserOTP] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
+
+  //prevent restart timer from reload
+  useEffect(()=>{
+    const storedExpiry=localStorage.getItem('otpExpiry')
+    if(storedExpiry){
+      const timeRemaining = Math.floor((Number(storedExpiry) - Date.now()) / 1000);
+      if(timeRemaining>0){
+        setTimeLeft(timeRemaining);
+      }else{
+         setIsExpired(true);
+      }
+   }else{
+     setIsExpired(true);
+   }
+  },[])
+
+  
   useEffect(() => {
     if (timeLeft <= 0) {
-      setIsExpired(true);
+      setIsExpired(true); 
       return;
     }
-
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
   }, [timeLeft]);
+
+
+
+  const handleResend=async()=>{
+      try {
+        const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
+        if(response){
+          const expiry = Date.now() + 600000; // 10 minutes from now
+          localStorage.setItem('otpExpiry', expiry);
+          setTimeLeft(600)
+          setIsExpired(false);
+          toast.success('OTP send to the email adress')
+          console.log('resended otp')
+        }
+      } catch (error) {
+        console.log(error)
+      }
+  }
+
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -32,11 +68,10 @@ const OTPForm = () => {
   };
 
   const handleChange = (e, index) => {
-    const val = e.target.value.replace(/\D/, ''); // Only digits
+    const val = e.target.value.replace(/\D/, '');
     const newOTP = [...userOTP];
     newOTP[index] = val;
     setUserOTP(newOTP);
-
     // Move focus to next input if value is not empty and not the last box
     if (val && index < inputRefs.current.length - 1) {
       inputRefs.current[index + 1].focus();
@@ -91,7 +126,7 @@ const OTPForm = () => {
             Verify
           </button>
           <div className="text-center text-sm text-blue-500">
-            <a href="#" className="hover:underline">Resend OTP</a>
+            <a onClick={handleResend} className="cursor-pointer">Resend OTP</a>
           </div>
         </div>
       </div>

@@ -8,14 +8,22 @@ export const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique:true
     },
     phone:{
         type:Number,
-        required:true
+        required:false,
+        unique:true,
+        sparse:true,
+        default:null
+    },
+    googleId:{
+        type:String,
+        unique:true
     },
     password: {
         type: String,
-        required: true,
+        required: false,
     },
     profileImage: {
         type: String,

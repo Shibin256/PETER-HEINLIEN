@@ -13,15 +13,19 @@ import authRoutes from './routes/authRouter.js'
 import cors from 'cors'
 
 //connecting the DB file
-import ConnectDB from "./db/connectDB.js";
-import router from './routes/authRouter.js';
+import ConnectDB from "./config/connectDB.js";
+
 
 ConnectDB()
 
 app.use(express.json())
 
-//enabling cors
-app.use(cors())
+//enabling cors with port
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
+
 
 app.use('/api/auth',authRoutes)
 
