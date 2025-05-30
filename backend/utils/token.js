@@ -1,0 +1,14 @@
+//jet token creating so it can use anyware by calling
+import jwt from 'jsonwebtoken'
+
+//access token creation
+export const generateAccessToken=(user)=>{
+    return jwt.sign({_id:user.id},process.env.JWT_ACCESS_SECRET,{expiresIn: '15m',})
+}
+
+//refresh token creation
+export const generateRefreshToken= (user)=>{
+    return jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: '7d',
+  });
+}

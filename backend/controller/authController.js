@@ -8,6 +8,7 @@ const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 
 //google authontication
 import { OAuth2Client } from 'google-auth-library';
+import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //generate otp with random 6 digit number
@@ -51,7 +52,6 @@ async function sendVerificationEmail(email, otp) {
           </div>
   `
     });
-
     return info.accepted.length > 0
   } catch (error) {
     console.log(error)
@@ -68,7 +68,6 @@ export const register = async (req, res) => {
       password,
       confirmPassword,
       phone,
-      gender,
       file,
     } = req.body;
 
@@ -88,21 +87,26 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    const phoneExist = await User.findOne({ phone });
+    if (phoneExist && phoneExist.phone != null) {
+      return res.status(400).json({ message: "The mobile number is already exists" });
+    }
     //generate and sending otp
     const otp = genarateOtp()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    console.log('otp is:----',otp)
+    console.log('otp is:----', otp)
+    // Remove any previous OTP
+    await Otp.findOneAndDelete({ email });
+    await Otp.create({ email, otp, expiresAt });
 
-    await Otp.findOneAndDelete({ email }); // Remove any previous OTP
-    await Otp.create({ email, otp,expiresAt });
-
+    //Otp sending to the corresponding email
     const emailSend = await sendVerificationEmail(email, otp)
-
     if (!emailSend) {
       return res.status(400).json({ message: "otp not send email error" });
     }
 
-    return res.status(200).json({email})
+    return res.status(200).json(
+      { message: 'The otp send to the email', email })
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ message: "Server error" });
@@ -115,69 +119,61 @@ export const register = async (req, res) => {
 //verify otp
 export const verifyOTP = async (req, res) => {
   try {
-  console.log(req.body)
-  const { formData,otp } = req.body;
-  const {name,email,password,isAdmin,phone,gender,profileImage}=formData
-  console.log('====name',name)
-  const record = await Otp.findOne({ email, otp });
-  console.log('--------',record)
-  if (record) {
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, saltround);
-    // Create new user
-    const user = await User.create({
-      username: name,
-      email,
-      password: hashedPassword,
-      isAdmin: false,
-      phone,
-      gender,
-      profileImage, // Handle profile image upload if applicable
-    });
+    const { formData, otp } = req.body;
+    const { name, email, password, phone, gender, profileImage } = formData
+    const record = await Otp.findOne({ email, otp });
+    if (record) {
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, saltround);
+      // Create new user
+      const user = await User.create({
+        username: name,
+        email,
+        password: hashedPassword,
+        isAdmin: false,
+        phone,
+        gender,
+        profileImage,
+      });
 
-    // // // Create token
-    // // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    // //   expiresIn: "30d",
-    // // });
-    // console.log(token)
+      // Send response
+      res.status(201).json({
+        message: "User registered successfully",
+        user: {
+          _id: user._id,
+          name: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      });
 
-    // Send response
-    res.status(201).json({
-      message: "User registered successfully",
-      // token,
-      user: {
-        _id: user._id,
-        name: user.username,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-    });
-
-  }
-    
+    } else {
+      console.log('The otp is not matching')
+      res.status(400).json({ message: "The otp is not matching" })
+    }
   } catch (error) {
     console.log(error)
+    res.status(500).json({ message: "Error logging in" });
   }
-  
 }
 
 //google auth
-export const googleAuth=async(req,res)=>{
-      const{idToken}=req.body
-      try {
-        const ticket=await client.verifyIdToken({
-          idToken,
-          audience:process.env.GOOGLE_CLIENT_ID,
-        })
+export const googleAuth = async (req, res) => {
+  const { idToken } = req.body
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    })
 
-        const payload=ticket.getPayload()
-        const { sub, email, name, picture,gender } = payload;
-        
-        let user = await User.findOne({ googleId: sub });
+    const payload = ticket.getPayload()
+    const { sub, email, name, picture } = payload;
 
-        if (!user) {
+    let user = await User.findOne({ googleId: sub });
+
+    if (!user) {
       user = await User.create({
         googleId: sub,
         username: name,
@@ -187,43 +183,58 @@ export const googleAuth=async(req,res)=>{
       });
     }
 
-     const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
 
-    res.status(200).json({ token, user });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
 
-      } catch (error) {
-         console.error('Google login failed:', error);
-         res.status(401).json({ error: 'Invalid Google token' });
-      }
+    res.status(200).json({ accessToken, user });
+  } catch (error) {
+    console.error('Google login failed:', error);
+    res.status(401).json({ error: 'Invalid Google token' });
+  }
 }
 
 
 
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const user = await User.findOne({ email })
 
-export const login=async(req,res)=>{
-    try {
-      const {email,password}=req.body
-      const user = await User.findOne({ email })
-      console.log(user)
-       if (!user) {
+    if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+    if (user.isAdmin) {
+      return res.status(401).json({ message: 'The user is admin, cant join thorugh this' })
+    }
+    //creation of access and refresh Token when user log in
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
+    console.log('your access token is-------------------===++++====', accessToken)
+    console.log('your refrsh token is??////////////////', refreshToken)
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "30d" })
+    //storing refreshToken into cookies
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
 
     // Send response with user data
     res.json({
       message: "Login successful",
-      token,
+      accessToken,
       user: {
         _id: user._id,
         name: user.username,
@@ -231,10 +242,77 @@ export const login=async(req,res)=>{
         isAdmin: user.isAdmin,
       },
     });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Error logging in" });
+  }
+}
 
-    } catch (error) {
-       console.error("Login error:", error);
-        res.status(500).json({ message: "Error logging in" });
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body
+    console.log("Admin login attempt for email:", email);
+
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      console.log('Admin login failed: User not found');
+      return res.status(401).json({ message: 'admin not found in this email' })
     }
 
+    if (!user.isAdmin) {
+      console.log('The user is not an admin')
+      return res.status(401).json({ message: 'user is not an admin' })
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+      console.log('Admin login is failed, the password not match')
+      return res.status(401).json({ message: 'admin login is failed, password not matches' })
+    }
+
+    console.log('admin login is successfull')
+
+    //creation of access and refresh Token when user log in
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
+    console.log('your access token is-------------------===++++====', accessToken)
+    console.log('your refrsh token is??////////////////', refreshToken)
+
+    //storing refreshToken into cookies
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+
+    res.json({
+      message: 'admin login is successfull',
+      accessToken,
+      user: {
+        _id: user._id,
+        email: user.email,
+        isAdmin: true
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Error logging in" });
+  }
 }
+
+
+//refresh accessToken from cokies without asking the user to log again
+export const refreshAccessToken = (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.sendStatus(401);
+
+  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+    if (err) return res.sendStatus(403);
+
+    const newAccessToken = generateAccessToken({ _id: decoded.id });
+    res.json({ accessToken: newAccessToken });
+  });
+};

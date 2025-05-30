@@ -1,24 +1,39 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { HiLockClosed, HiMail } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate=useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Add your authentication logic here
-    console.log('Login attempt with:', { email, password });
-    
-    // Simple validation
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }   
     setError('');
-    alert('Login successful! Redirecting to dashboard...');
-    // Typically you would use: navigate('/dashboard');
+    try {
+      const response=await axios.post(`${baseUrl}/api/auth/admin-login`,{email,password})
+      console.log(response)
+      
+      const yourJWT=response.data.accessToken
+      localStorage.setItem('accessToken',yourJWT)
+
+      if(response){
+        toast.success(response.data.message)
+        navigate('/dashboard')
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || 'error hapened' )
+    }
   };
 
   return (

@@ -1,9 +1,9 @@
 import { GoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
 import { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom'
+import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
+import axiosInstance from '../../api/axiosInstance';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -25,11 +25,16 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`${baseUrl}/api/auth/login`, formData);
-      const user=response.data
+      const response = await axiosInstance.post(`${baseUrl}/api/auth/login`, formData);
+      //getting access token
+      const yourJWT=response.data.accessToken
+      localStorage.setItem('accessToken',yourJWT)
+      console.log('your access token is-------------------===++++====',yourJWT)
+      toast.success(response.data.message)
       navigate('/')
     } catch (error) {
       console.log(error)
+      toast.error(error.response?.data?.message || 'error hapened' )
     }finally{
       setLoading(false)
     }
@@ -39,10 +44,11 @@ const Login = () => {
   const handleLoginSuccess=async(credentialResponse)=>{
     const idToken=credentialResponse.credential;
     // Send Google id_token to your backend
-    const res = await axios.post(`${baseUrl}/api/auth/google`, {idToken});
+    const res = await axiosInstance.post(`${baseUrl}/api/auth/google`, {idToken});
     console.log('res========',res)
     if(res){
-    const yourJWT=res.data.token
+    const yourJWT=res.data.accessToken
+    console.log(yourJWT)
      // Store your JWT (not the Google one)
     localStorage.setItem('token', yourJWT);
     navigate('/login')

@@ -15,19 +15,32 @@ const OTPForm = () => {
   const inputRefs = useRef([]);
 
   //prevent restart timer from reload
-  useEffect(()=>{
-    const storedExpiry=localStorage.getItem('otpExpiry')
-    if(storedExpiry){
-      const timeRemaining = Math.floor((Number(storedExpiry) - Date.now()) / 1000);
-      if(timeRemaining>0){
-        setTimeLeft(timeRemaining);
-      }else{
-         setIsExpired(true);
-      }
-   }else{
-     setIsExpired(true);
-   }
-  },[])
+  useEffect(() => {
+  const storedExpiry = localStorage.getItem("otpExpiry");
+  const now = Date.now();
+
+  if (storedExpiry) {
+    const expiry = Number(storedExpiry);
+    const timeRemaining = Math.floor((expiry - now) / 1000);
+
+    if (timeRemaining > 0) {
+      setTimeLeft(timeRemaining);
+      setIsExpired(false);
+    } else {
+      setIsExpired(true);
+      localStorage.removeItem("otpExpiry");
+    }
+  } else if (formData) {
+    // First-time visit or new OTP session
+    const newExpiry = now + 600000; // 10 minutes
+    localStorage.setItem("otpExpiry", newExpiry.toString());
+    setTimeLeft(600);
+    setIsExpired(false);
+  } else {
+    setIsExpired(true);
+  }
+}, [formData]);
+
 
   
   useEffect(() => {
@@ -49,7 +62,7 @@ const OTPForm = () => {
         const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
         if(response){
           const expiry = Date.now() + 600000; // 10 minutes from now
-          localStorage.setItem('otpExpiry', expiry);
+          localStorage.setItem('otpExpiry', expiry.toString());
           setTimeLeft(600)
           setIsExpired(false);
           toast.success('OTP send to the email adress')
@@ -86,12 +99,19 @@ const OTPForm = () => {
   };
 
   const handleSubmit = async() => {
-    const otp = userOTP.join('');
+    try {
+      const otp = userOTP.join('');
     console.log('Submitted OTP:', otp);
     const response=await axios.post(`${baseUrl}/api/auth/verifyOTP`,{formData,otp})
     const {user}=response.data
     console.log("User registered:", user);
+    toast.success(response.data.message)
+    localStorage.removeItem("otpExpiry");
     navigate('/login')
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || 'error hapened')
+    }
   };
 
   return (
