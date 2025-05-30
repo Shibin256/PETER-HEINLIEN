@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import usePasswordVal from '../usePasswordVal';
+import usePasswordVal from '../../usePasswordVal';
 //google button getting
 import { GoogleLogin } from '@react-oauth/google';
 
