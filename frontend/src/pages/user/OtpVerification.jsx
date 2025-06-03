@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { useNavigate } from 'react-router-dom';
 const  baseUrl= import.meta.env.VITE_API_BASE_URL;
 import { useLocation } from 'react-router-dom';
@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 const OTPForm = () => {
   const navigate=useNavigate()
   const location = useLocation();
+  const [loading,setLoading]=useState(false)
+  const [sendcount,setSendCount]=useState(localStorage.getItem('ResendCount'))
   const formData = location.state?.formData;
   const [timeLeft, setTimeLeft] = useState(600);
   const [isExpired, setIsExpired] = useState(false);
@@ -22,7 +24,6 @@ const OTPForm = () => {
   if (storedExpiry) {
     const expiry = Number(storedExpiry);
     const timeRemaining = Math.floor((expiry - now) / 1000);
-
     if (timeRemaining > 0) {
       setTimeLeft(timeRemaining);
       setIsExpired(false);
@@ -32,16 +33,14 @@ const OTPForm = () => {
     }
   } else if (formData) {
     // First-time visit or new OTP session
-    const newExpiry = now + 600000; // 10 minutes
+    const newExpiry = now + 180000; // 10 minutes
     localStorage.setItem("otpExpiry", newExpiry.toString());
-    setTimeLeft(600);
+    setTimeLeft(180);
     setIsExpired(false);
   } else {
     setIsExpired(true);
-  }
+  } 
 }, [formData]);
-
-
   
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -58,19 +57,26 @@ const OTPForm = () => {
 
 
   const handleResend=async()=>{
+    setLoading(true)
       try {
         const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
         if(response){
           const expiry = Date.now() + 600000; // 10 minutes from now
           localStorage.setItem('otpExpiry', expiry.toString());
-          setTimeLeft(600)
+          setTimeLeft(180)
           setIsExpired(false);
           toast.success('OTP send to the email adress')
           console.log('resended otp')
+          setSendCount(true)
+          localStorage.setItem('ResendCount',true)
         }
       } catch (error) {
         console.log(error)
       }
+      finally{
+        setLoading(false)
+      }
+
   }
 
 
@@ -145,8 +151,8 @@ const OTPForm = () => {
           >
             Verify
           </button>
-          <div className="text-center text-sm text-blue-500">
-            <a onClick={handleResend} className="cursor-pointer">Resend OTP</a>
+          <div className="text-center text-sm ">
+            {sendcount ? <p className="cursor-pointer">"OTP limit exceeded"</p> : <a onClick={handleResend} className="cursor-pointer text-blue-500">{loading?'Sending' :'Resend OTP'}</a>}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes, FaUser } from 'react-icons/fa';
-import navlogo from '../assets/navlogo.png';
+import navlogo from '../../assets/navlogo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

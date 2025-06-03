@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { HiLockClosed, HiMail } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import AuthInput from '../../components/common/AuthInput';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -10,29 +11,29 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
-    }   
+    }
     setError('');
     try {
-      const response=await axios.post(`${baseUrl}/api/auth/admin-login`,{email,password})
+      const response = await axios.post(`${baseUrl}/api/auth/admin-login`, { email, password })
       console.log(response)
-      
-      const yourJWT=response.data.accessToken
-      localStorage.setItem('accessToken',yourJWT)
 
-      if(response){
+      const yourJWT = response.data.accessToken
+      localStorage.setItem('accessToken', yourJWT)
+
+      if (response) {
         toast.success(response.data.message)
         navigate('/dashboard')
       }
     } catch (error) {
       console.log(error)
-      toast.error(error.response?.data?.message || 'error hapened' )
+      toast.error(error.response?.data?.message || 'error hapened')
     }
   };
 
@@ -54,51 +55,35 @@ const AdminLogin = () => {
               {error}
             </div>
           )}
-          
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                Email address
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <HiMail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-gray-700 text-white py-2 pl-10 pr-3 block w-full rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="admin@example.com"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <HiLockClosed className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-gray-700 text-white py-2 pl-10 pr-3 block w-full rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+
+            <AuthInput
+              label="Email"
+              type='email'
+              name='email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder='your@email.com'
+              width='w-full'
+              Textcolor='text-gray-300'
+              bgcolor='bg-gray-700'
+              borderColor='border-gray-600'
+            />
+
+            <AuthInput
+              label="Password"
+              type='password'
+              name='password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder='••••••••'
+              width='w-full'
+              Textcolor='text-gray-300'
+              bgcolor='bg-gray-700'
+              borderColor='border-gray-600'
+              
+            />
 
             <div>
               <button

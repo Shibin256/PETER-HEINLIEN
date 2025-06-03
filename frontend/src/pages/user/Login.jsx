@@ -1,9 +1,15 @@
-import { GoogleLogin } from '@react-oauth/google';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom'
 import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 import axiosInstance from '../../api/axiosInstance';
+import {useDispatch, useSelector} from 'react-redux'
+import { setUser } from '../../features/auth/authSlice';
+import AuthInput from '../../components/common/AuthInput';
+import AuthLayout from '../../components/common/AuhLayout';
+import AuthDivider from '../../components/common/AuthDivder';
+import GoogleAuthButton from '../../components/common/GoogleAuthButton';
+import MainThemeButton from '../../components/common/MainThemeButton';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +18,15 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-   
+  const dispatch=useDispatch()
+  const {isAuthenticated}=useSelector((state)=>state.auth)
+
+  useEffect(()=>{
+    if(isAuthenticated){
+      navigate('/',{replace:true})
+    }
+  },[isAuthenticated,navigate])
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -26,10 +40,13 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.post(`${baseUrl}/api/auth/login`, formData);
-      //getting access token
-      const yourJWT=response.data.accessToken
-      localStorage.setItem('accessToken',yourJWT)
-      console.log('your access token is-------------------===++++====',yourJWT)
+
+      //getting access token & user
+      const token=response.data.accessToken
+      const user=JSON.stringify(response.data.user)
+      dispatch(setUser({token,user}))
+      localStorage.setItem('accessToken',token)
+      localStorage.setItem('user',user)
       toast.success(response.data.message)
       navigate('/')
     } catch (error) {
@@ -45,80 +62,62 @@ const Login = () => {
     const idToken=credentialResponse.credential;
     // Send Google id_token to your backend
     const res = await axiosInstance.post(`${baseUrl}/api/auth/google`, {idToken});
-    console.log('res========',res)
-    if(res){
-    const yourJWT=res.data.accessToken
-    console.log(yourJWT)
-     // Store your JWT (not the Google one)
-    localStorage.setItem('token', yourJWT);
-    navigate('/login')
-      }
+
+    const token=res.data.accessToken
+    const user=JSON.stringify(res.data.user)
+    dispatch(setUser(token,user))
+    localStorage.setItem('accessToken',token)
+    localStorage.setItem('user',user)
+    toast.success('user register using google is successfull')
+    navigate('/')
   }
 
 
   return (
     <>
-    <main className="flex-grow flex items-center justify-center py-12 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md border border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Create Your Account</h2>
-        
+        <AuthLayout title="Create Your Account">
         <form onSubmit={handleSubmit} className="space-y-5">
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
+            <AuthInput
+              label="Email"
+              type='email'
+              name='email'
               value={formData.email}
               onChange={handleChange}
-              placeholder="your@email.com"
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
-              required
+              placeholder='your@email.com'
+              width='w-full'
+              Textcolor='text-gray-700'
+              borderColor='border-gray-300'
             />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
+
+              <AuthInput
+              label="Password"
+              type='password'
+              name='password'
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••••"
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
-              required
+              placeholder='••••••••'
+              width='w-full'
+              Textcolor='text-gray-700'
+              borderColor='border-gray-300'
             />
-          </div>
-
-          
-          <button 
-            type="submit" 
-            className="w-full bg-teal-700 text-white py-3 rounded-md hover:bg-teal-800 transition-colors font-medium"
-             style={{ backgroundColor: '#266b7d' }}
-          >
-            {loading ? 'loading':'Login Account'}
-          </button>
-
-          <div className="flex items-center justify-center space-x-2 text-gray-400">
-            <div className="h-px bg-gray-300 flex-1"></div>
-            <span>OR</span>
-            <div className="h-px bg-gray-300 flex-1"></div>
-          </div>
-
-          <div>
-          <GoogleLogin
-            onSuccess={handleLoginSuccess}
-            onError={() => console.log('Login Failed')}
+              
+          <MainThemeButton 
+          loading={loading}
+          page='Login Account'
+          width='w-full'
+          type='submit'
           />
-            </div>
+
+          <AuthDivider/>
+
+          <GoogleAuthButton onSuccess={handleLoginSuccess} />
 
           <p className="text-center text-sm text-gray-600">
             New to The App?{' '}
             <Link to='/register' className='text-blue-500'>SignUp</Link>
           </p>
         </form>
-      </div>
-    </main>
+        </AuthLayout>
     </>
   );
 };

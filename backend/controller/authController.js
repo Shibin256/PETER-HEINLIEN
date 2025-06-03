@@ -68,7 +68,6 @@ export const register = async (req, res) => {
       password,
       confirmPassword,
       phone,
-      file,
     } = req.body;
 
     // Check if all required fields are present
@@ -120,7 +119,7 @@ export const register = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   try {
     const { formData, otp } = req.body;
-    const { name, email, password, phone, gender, profileImage } = formData
+    const { name, email, password, phone, gender} = formData
     const record = await Otp.findOne({ email, otp });
     if (record) {
       // Hash password
@@ -133,7 +132,6 @@ export const verifyOTP = async (req, res) => {
         isAdmin: false,
         phone,
         gender,
-        profileImage,
       });
 
       // Send response
@@ -185,6 +183,7 @@ export const googleAuth = async (req, res) => {
 
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
+    
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -205,6 +204,7 @@ export const googleAuth = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body
+
     const user = await User.findOne({ email })
 
     if (!user) {
@@ -220,9 +220,6 @@ export const login = async (req, res) => {
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
-    console.log('your access token is-------------------===++++====', accessToken)
-    console.log('your refrsh token is??////////////////', refreshToken)
-
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -277,9 +274,6 @@ export const adminLogin = async (req, res) => {
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
-    console.log('your access token is-------------------===++++====', accessToken)
-    console.log('your refrsh token is??////////////////', refreshToken)
-
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -288,6 +282,10 @@ export const adminLogin = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
+    
+    //store cookkie in db tooo
+
+    
     res.json({
       message: 'admin login is successfull',
       accessToken,
