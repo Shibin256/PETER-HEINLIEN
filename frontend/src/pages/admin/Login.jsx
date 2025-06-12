@@ -29,7 +29,7 @@ const AdminLogin = () => {
 
       if (response) {
         toast.success(response.data.message)
-        navigate('/dashboard')
+        navigate('/admin/dashboard')
       }
     } catch (error) {
       console.log(error)

@@ -12,6 +12,8 @@ dotenv.config()
 //importing the routers to handle request
 import authRoutes from './routes/authRouter.js'
 
+import productRoutes from './routes/productRoutes.js'
+
 //cors for react can send req from diff port
 import cors from 'cors'
 
@@ -29,6 +31,7 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use("/api/products", productRoutes);
 
 app.use('/api/auth',authRoutes)
 
