@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 
 const GenericTable = ({ title, columns, data, renderActions }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    const lower = searchTerm.toLowerCase();
+    return data.filter((item) =>
+      columns.some((col) => {
+        const val = item[col.key];
+        return typeof val === 'string' && val.toLowerCase().includes(lower);
+      })
+    );
+  }, [searchTerm, data, columns]);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
+
+      {/* Search bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="border px-4 py-2 rounded w-full md:w-1/3"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
@@ -19,16 +44,17 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
             </tr>
           </thead>
           <tbody>
-            {data.length > 0 ? (
-              data.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => (
+                <tr key={item._id || item.id} className="hover:bg-gray-50">
                   {columns.map((column) => (
-                    <td key={column.key} className="py-2 px-4 border-b">
+                    <td key={`${item._id || item.id}-${column.key}`} className="py-2 px-4 border-b">
                       {column.render
                         ? column.render(item[column.key], item)
                         : item[column.key]}
                     </td>
                   ))}
+
                   {renderActions && (
                     <td className="py-2 px-4 border-b">
                       {renderActions(item)}
@@ -42,7 +68,7 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
                   colSpan={columns.length + (renderActions ? 1 : 0)}
                   className="py-2 px-4 border-b text-center"
                 >
-                  No data available
+                  No data found.
                 </td>
               </tr>
             )}

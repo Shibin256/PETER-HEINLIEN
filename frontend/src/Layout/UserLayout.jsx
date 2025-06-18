@@ -9,6 +9,7 @@ const UserLayout = () => {
        <main className="flex-grow">
         <Outlet />
       </main>
+      <br />
       <Footer/>
     </div>
   )

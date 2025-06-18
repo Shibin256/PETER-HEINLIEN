@@ -1,13 +1,15 @@
+// image Croping utils
 export const getCroppedImg = (imageSrc, pixelCrop) => {
   return new Promise((resolve) => {
     const image = new Image();
     image.src = imageSrc;
+    // wait untill fully loaded
     image.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = pixelCrop.width;
       canvas.height = pixelCrop.height;
-
+      
       ctx.drawImage(
         image,
         pixelCrop.x,
@@ -20,6 +22,7 @@ export const getCroppedImg = (imageSrc, pixelCrop) => {
         pixelCrop.height
       );
 
+      //convert the canvas into file
       canvas.toBlob((blob) => {
         const file = new File([blob], `cropped_${Date.now()}.jpeg`, { type: 'image/jpeg' });
         resolve({

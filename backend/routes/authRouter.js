@@ -1,5 +1,5 @@
 import express from 'express'
-import { adminLogin, googleAuth, login, refreshAccessToken, register, verifyOTP } from "../controller/authController.js";
+import { adminLogin, changePassword, forgotPass, googleAuth, login, refreshAccessToken, register, verifyOTP, verifyOTPForgotpass } from "../controller/authController.js";
 
 const router=express.Router()
 router.post('/register',register)
@@ -8,4 +8,7 @@ router.post('/google',googleAuth)
 router.post('/login',login)
 router.post('/admin-login',adminLogin)
 router.post('/refresh-token',refreshAccessToken)
+router.post('/forgotpass',forgotPass)
+router.post('/verifyOTPForgotpass',verifyOTPForgotpass)
+router.patch('/changePassword',changePassword)
 export default router

@@ -116,12 +116,6 @@ const Signup = () => {
         return;
       }
 
-      // if(formData.password =='0000000000'){
-      //    toast.error('dont give 0s only');
-      //    setLoading(false);
-      //    return;
-      // }
-
       const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
       if (response) {
         //navigate to verify otp with formdata

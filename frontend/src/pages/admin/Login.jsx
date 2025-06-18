@@ -13,6 +13,7 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate()
 
+  //handling admin login
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -24,6 +25,7 @@ const AdminLogin = () => {
       const response = await axios.post(`${baseUrl}/api/auth/admin-login`, { email, password })
       console.log(response)
 
+      // settong access token to the local storage
       const yourJWT = response.data.accessToken
       localStorage.setItem('accessToken', yourJWT)
 

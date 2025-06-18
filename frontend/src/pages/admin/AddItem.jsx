@@ -1,29 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthInput from '../../components/common/AuthInput';
 import SelectInput from '../../components/common/SelectInput';
 import { toast } from 'react-toastify';
-import { addProduct, resetProductState } from '../../features/products/productSlice';
+import { addProduct, getBrandAndCollection, resetProductState } from '../../features/products/productSlice';
 import CropModal from '../../components/common/CropModel';
 
 function AddItem() {
   const dispatch = useDispatch();
-  const [images, setImages] = useState([]); // Array of { file, preview }
+  const [images, setImages] = useState([]);
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [tags, setTags] = useState('');
   const [brand, setBrand] = useState('');
   const [price, setPrice] = useState('');
-  const [quantity,setQuantity]=useState(0)
+  const [quantity, setQuantity] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    dispatch(getBrandAndCollection());
+  }, [])
 
-  const [pendingFiles, setPendingFiles] = useState([]); // files waiting to crop
+  const { brands, categories, loading, error } = useSelector(state => state.products);
+  const { currency } = useSelector(state => state.global)
+  // files waiting to crop
+  const [pendingFiles, setPendingFiles] = useState([]);
   const [currentFileURL, setCurrentFileURL] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
 
-
+  //handiling the images upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     const total = images.length + files.length;
@@ -40,13 +46,14 @@ function AddItem() {
     }
   };
 
-
+  // remove images if not needed
   const removeImage = (index) => {
     const newImages = [...images];
     newImages.splice(index, 1);
     setImages(newImages);
   };
 
+  //handling the crop before uploading image
   const handleCropDone = (cropped) => {
     setImages(prev => [...prev, cropped]);
     const [, ...rest] = pendingFiles;
@@ -56,10 +63,11 @@ function AddItem() {
       setCurrentFileURL(next)
     } else {
       setShowCropper(false);
-      setSelectedFile(null);
+      setCurrentFileURL(null);
     }
   };
 
+  // crop cancel option
   const handleCropCancel = () => {
     const [, ...rest] = pendingFiles;
     setPendingFiles(rest);
@@ -74,16 +82,23 @@ function AddItem() {
 
 
 
+  // handling submit of form
   const handleSubmit = async () => {
-    if (!productName || !description || !category || !tags || !brand || !price || images.length === 0) {
+    // check all fields are in
+    if (!productName || !description || !category || !tags || !brand || !price || images.length === 0 || !quantity) {
       toast.error('Please fill all fields and upload at least one image.');
       return;
     }
+    //validation for price and quantity
+    if (isNaN(price) || price <= 0) {
+      toast.error('Price must be a valid number and greater than Zero.');
+      return;
+    }
 
-      if (isNaN(price)) {
-    toast.error('Price must be a valid number.');
-    return;
-  }
+    if (isNaN(quantity) || quantity < 0) {
+      toast.error('Quantity must be a valid number.');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('name', productName);
@@ -92,6 +107,7 @@ function AddItem() {
     formData.append('tags', tags);
     formData.append('brand', brand);
     formData.append('price', price);
+    formData.append('quantity', quantity)
     images.forEach(img => formData.append('images', img.file));
 
     setIsSubmitting(true);
@@ -104,6 +120,7 @@ function AddItem() {
       setTags('');
       setBrand('');
       setPrice('');
+      setQuantity(0)
       setImages([]);
       dispatch(resetProductState());
     } catch (error) {
@@ -113,17 +130,16 @@ function AddItem() {
     }
   };
 
-  const categoryOptions = [
-    { label: "Men", value: "men" },
-    { label: "Women", value: "women" },
-    { label: "Couples", value: "couples" },
-  ];
+  //getting category and brands from database
+  const categoryOptions = categories.map((category) => ({
+    label: category.categoryName, // or brand.brandName depending on your backend
+    value: category._id
+  }))
 
-  const brandOptions = [
-    { label: "Rolex", value: "rolex" },
-    { label: "Omega", value: "omega" },
-    { label: "Casio", value: "casio" },
-  ];
+  const brandOptions = brands.map((brand) => ({
+    label: brand.name, // or brand.brandName depending on your backend
+    value: brand._id
+  }))
 
   return (
     <div className="max-w-2xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 shadow-xl rounded-2xl border border-gray-200">
@@ -215,7 +231,7 @@ function AddItem() {
         />
         <AuthInput
           label="Price"
-          type="text"
+          type="number"
           name="price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
@@ -223,8 +239,21 @@ function AddItem() {
           width="w-full"
           Textcolor="text-gray-700"
           borderColor="border-gray-300"
-          icon="$"
+          icon={currency}
         />
+
+        <AuthInput
+          label="Quantity"
+          type="number"
+          name="Quantity"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          placeholder="Enter the Quantity"
+          width="w-full"
+          Textcolor="text-gray-700"
+          borderColor="border-gray-300"
+        />
+
       </div>
 
       {/* Submit Button */}

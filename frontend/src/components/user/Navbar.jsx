@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes, FaUser } from 'react-icons/fa';
 import navlogo from '../../assets/navlogo.png';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,7 @@ const Navbar = () => {
         {/* Logo and Hamburger */}
         <div className="flex justify-between items-center w-full md:w-auto">
           <div className="flex items-center">
-            <img src={navlogo} alt="Logo" className="w-[150px] h-[50px] mr-2 object-contain" />
+            <Link to='/'><img src={navlogo} alt="Logo" className="w-[150px] h-[50px] mr-2 object-contain" /></Link>
             {/* <span className="text-xl font-semibold">PETER HEINLIEN</span> */}
           </div>
           
@@ -33,8 +34,8 @@ const Navbar = () => {
             isOpen ? 'block' : 'hidden'
           }`}
         >
-          <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">HOME</a>
-          <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">SHOP</a>
+          <a href="/" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">HOME</a>
+          <Link to={'/collection'}><a href="" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">SHOP</a></Link>
           <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">ABOUT US</a>
           <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">CONTACT US</a>
         </nav>

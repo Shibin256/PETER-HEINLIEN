@@ -1,5 +1,5 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import AdminLayout from '../Layout/AdminLayout'
 import AdminLogin from '../pages/admin/Login'
 import Dashboard from '../pages/admin/Dashboard'
@@ -7,19 +7,44 @@ import AddItem from '../pages/admin/AddItem'
 import Customer from '../pages/admin/Customer'
 import OrderAdmin from '../pages/admin/OrderAdmin'
 import ProductAdmin from '../pages/admin/ProductAdmin'
+import ProtectedAdminRoute from './ProtectedAdminRoute'
+import UserList from '../pages/admin/UserList'
 
 
 const AdminRoutes = () => {
+
+    const navigate = useNavigate();
+    const location=useLocation()
+  
+   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    const isLoginPage = location.pathname === '/admin/login';
+
+    if (token && isLoginPage) {
+      // If already logged in and trying to access login, redirect to dashboard
+      navigate('/admin/');
+    }
+  }, [location, navigate]);
+
+
   return (
     <div>
       <Routes>
         <Route path='login' element={<AdminLogin/>}/>
-        <Route path='/' element={<AdminLayout />}>
+        <Route
+        path="/"
+        element={
+          <ProtectedAdminRoute>
+            <AdminLayout />
+          </ProtectedAdminRoute>
+        }
+      >
             <Route path='dashboard' element={<Dashboard/>}/>
             <Route path='additems' element={<AddItem/>} />
             <Route path='customers' element={<Customer/>} />
             <Route path='orders' element={<OrderAdmin/>} />
             <Route path='products' element={<ProductAdmin/>} />
+            <Route path='user-list' element={<UserList/>} />
         </Route>
         </Routes>
     </div>

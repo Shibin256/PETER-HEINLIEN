@@ -1,9 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState={
-    currency:localStorage.getItem('currency')
-    ? JSON.parse(localStorage.getItem('currency'))
-    : null,
+    currency:'₹ ',
     delivaryFee:localStorage.getItem('delivaryFee')
     ? JSON.parse(localStorage.getItem('delivaryFee'))
     : null,

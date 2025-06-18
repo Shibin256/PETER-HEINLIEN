@@ -9,6 +9,7 @@ const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 //google authontication
 import { OAuth2Client } from 'google-auth-library';
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
+import Product from "../model/productModel.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //generate otp with random 6 digit number
@@ -119,7 +120,7 @@ export const register = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   try {
     const { formData, otp } = req.body;
-    const { name, email, password, phone, gender} = formData
+    const { name, email, password, phone, gender } = formData
     const record = await Otp.findOne({ email, otp });
     if (record) {
       // Hash password
@@ -171,19 +172,28 @@ export const googleAuth = async (req, res) => {
 
     let user = await User.findOne({ googleId: sub });
 
+    if (user.isBlocked) {
+      return res.status(401).json({ message: 'The user is blocked form using the site, cant join' })
+    }
+
     if (!user) {
       user = await User.create({
         googleId: sub,
         username: name,
         email: email,
         avatar: picture,
-        gender: 'other'
+        gender: 'other',
+        isAuthenticated: true
       });
+    } else {
+      user.isAuthenticated = true;
+      await user.save();
     }
 
+    //generatind access and refresh token
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
-    
+
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -217,6 +227,14 @@ export const login = async (req, res) => {
     if (user.isAdmin) {
       return res.status(401).json({ message: 'The user is admin, cant join thorugh this' })
     }
+
+    if (user.isBlocked) {
+      return res.status(401).json({ message: 'The user is blocked form using the site, cant join' })
+    }
+
+    user.isAuthenticated = true;
+    await user.save();
+
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
@@ -271,6 +289,9 @@ export const adminLogin = async (req, res) => {
 
     console.log('admin login is successfull')
 
+    user.isAuthenticated = true;
+    await user.save();
+
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
@@ -282,10 +303,10 @@ export const adminLogin = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
-    
+
     //store cookkie in db tooo
 
-    
+
     res.json({
       message: 'admin login is successfull',
       accessToken,
@@ -314,3 +335,83 @@ export const refreshAccessToken = (req, res) => {
     res.json({ accessToken: newAccessToken });
   });
 };
+
+
+
+export const forgotPass = async (req, res) => {
+  try {
+    console.log('req.body ----------', req.body);
+    const { email } = req.body; 
+    console.log('email ======', email);
+
+    const userExist = await User.findOne({ email });
+    if (!userExist) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+
+    const otp = genarateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    console.log('otp is: ----', otp);
+
+    // Remove any previous OTP
+    await Otp.findOneAndDelete({ email });
+    await Otp.create({ email, otp, expiresAt });
+
+    const emailSend = await sendVerificationEmail(email, otp);
+    if (!emailSend) {
+      return res.status(400).json({ message: "OTP not sent. Email error." });
+    }
+
+    return res.status(200).json({ message: 'The OTP has been sent to the email', email });
+
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
+export const verifyOTPForgotpass = async (req, res) => {
+  try {
+
+    const { formData, otp } = req.body;
+    const email = formData.email
+    const record = await Otp.findOne({ email, otp });
+    if (record) {
+      res.status(201).json({
+        message: "OTP verified successfully",
+      });
+    } else {
+      console.log('The otp is not matching')
+      res.status(400).json({ message: "The otp is not matching" })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Error logging in" });
+  }
+}
+
+export const changePassword = async (req, res) => {
+  try {
+    const { newPassword, email } = req.body
+    const user = await User.findOne({ email })
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.isBlocked) return res.status(404).json({ message: 'User cant access anything' });
+
+    const hashedPassword = await bcrypt.hash(newPassword, saltround);
+
+    user.password = hashedPassword
+    await user.save()
+    res.status(200).json({ message: 'User Password changed successfully' })
+
+  } catch (error) {
+    console.error('Error while changing User password:', error.message);
+    res.status(500).json({ message: 'Server error changing password' });
+
+  }
+
+}

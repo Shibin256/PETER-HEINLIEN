@@ -21,12 +21,14 @@ const Login = () => {
   const dispatch=useDispatch()
   const {isAuthenticated}=useSelector((state)=>state.auth)
 
+  //if user is in it redirect to login page
   useEffect(()=>{
     if(isAuthenticated){
       navigate('/',{replace:true})
     }
   },[isAuthenticated,navigate])
 
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -35,6 +37,7 @@ const Login = () => {
     }));
   };
 
+  // handle submit
   const handleSubmit = async(e) => {
     e.preventDefault();
     setLoading(true);
@@ -72,10 +75,9 @@ const Login = () => {
     navigate('/')
   }
 
-
   return (
     <>
-        <AuthLayout title="Create Your Account">
+        <AuthLayout title="Log in to Your Account">
         <form onSubmit={handleSubmit} className="space-y-5">
             <AuthInput
               label="Email"
@@ -101,6 +103,15 @@ const Login = () => {
               borderColor='border-gray-300'
             />
               
+            <div className="flex items-center justify-end">
+              <Link 
+                to="/reset-password" 
+                className="text-sm text-blue-500 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
           <MainThemeButton 
           loading={loading}
           page='Login Account'

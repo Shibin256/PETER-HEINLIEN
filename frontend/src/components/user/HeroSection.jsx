@@ -1,12 +1,21 @@
 import React from 'react';
 
+import heroimg from '../../assets/herosectionwatch.jpg'
+import heroimg2 from '../../assets/heroSectionWatch2.png'
+import { useNavigate } from 'react-router-dom';
+
 const HeroSection = () => {
+  const navigate=useNavigate()
+  const handleClick=()=>{
+        navigate('/collection')
+  }
+
   return (
     <section className="relative w-full bg-gray-50 overflow-hidden">
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="/images/watch-banner.jpg" // Replace with your actual image path
+          src={heroimg} // Replace with your actual image path
           alt="Luxury watches collection"
           className="w-full h-full object-cover opacity-20"
         />
@@ -26,7 +35,7 @@ const HeroSection = () => {
               <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto lg:mx-0 text-gray-600">
                 A series that celebrates the flawless accuracy and timeless elegance of classic timepieces.
               </p>
-              <button className="px-8 py-3 bg-black text-white hover:bg-gray-800 transition-colors duration-300 text-lg font-medium">
+              <button className="px-8 py-3 bg-black text-white hover:bg-gray-800 transition-colors duration-300 text-lg font-medium" onClick={handleClick}>
                 Shop the watches
               </button>
             </div>
@@ -41,12 +50,13 @@ const HeroSection = () => {
           </div>
           
           {/* Image showcase */}
-          <div className="relative">
+          <div className="relative w-full lg:w-[500px] h-[400px]">
             <div className="bg-white p-6 rounded-lg shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-500">
               <img 
-                src="/images/premium-watch.png" // Replace with your product image
+                src={heroimg2}// Replace with your product image
                 alt="Precision Collection Watch"
                 className="w-full h-auto object-contain"
+                width='120px'
               />
               <div className="absolute -bottom-5 -right-5 bg-yellow-100 px-4 py-2 rounded-lg shadow-md">
                 <span className="font-bold text-gray-800">NEW</span>
