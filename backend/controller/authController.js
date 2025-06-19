@@ -341,7 +341,7 @@ export const refreshAccessToken = (req, res) => {
 export const forgotPass = async (req, res) => {
   try {
     console.log('req.body ----------', req.body);
-    const { email } = req.body; 
+    const { email } = req.body;
     console.log('email ======', email);
 
     const userExist = await User.findOne({ email });
@@ -411,6 +411,20 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.error('Error while changing User password:', error.message);
     res.status(500).json({ message: 'Server error changing password' });
+
+  }
+
+}
+
+
+export const fetchCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: 'Server error' });
 
   }
 

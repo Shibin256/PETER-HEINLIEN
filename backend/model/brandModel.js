@@ -7,7 +7,7 @@ const brandSchema=new mongoose.Schema({
   deletedAt: Date,
   name: String,
   description: String,
-//   image: [String]
+  image: [String]
 },{ collection: 'brands' })
 
 

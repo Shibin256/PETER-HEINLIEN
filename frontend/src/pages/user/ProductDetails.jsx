@@ -4,6 +4,7 @@ import heroImg from '../../assets/herosectionwatch.jpg';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProducById } from '../../features/products/productSlice';
 import { useNavigate, useParams } from 'react-router-dom';
+import ImageZoom from '../../components/common/ImageZoom';
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -26,7 +27,6 @@ const ProductDetails = () => {
     return <div className="text-center p-10">Loading product details...</div>;
   }
 
-  console.log('dingle:', product)
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
@@ -39,7 +39,6 @@ const ProductDetails = () => {
   return (
     <div className="px-6 md:px-16 lg:px-24 py-12">
       <div className="flex flex-col lg:flex-row gap-12">
-        {/* Left - Image Gallery */}
         <div className="flex flex-col-reverse md:flex-row gap-6 w-full lg:w-1/2">
 
           {/* Thumbnails */}
@@ -61,12 +60,8 @@ const ProductDetails = () => {
 
           {/* Main Image */}
           <div className="relative flex-1">
-            <div className="aspect-square w-full bg-gray-100 rounded-xl overflow-hidden">
-              <img
-                src={product.images[currentImageIndex]}
-                alt="Main product view"
-                className="w-full h-full object-contain p-8"
-              />
+            <div className="aspect-squar w-full bg-gray-100 rounded-xl">
+                <ImageZoom imageUrl={product.images[currentImageIndex]}/>
             </div>
             {/* Navigation Arrows */}
             <button

@@ -19,7 +19,6 @@ import ProductDetails from '../pages/user/ProductDetails'
 
 
 
-
 const UserRoutes = () => {
   
   const navigate = useNavigate();

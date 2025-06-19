@@ -31,12 +31,22 @@ function AddItem() {
 
   //handiling the images upload
   const handleImageUpload = (e) => {
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     const files = Array.from(e.target.files);
     const total = images.length + files.length;
+    console.log(files)
+    for (let file of files) {
+      console.log(file)
+        if(!validImageTypes.includes(file.type)){
+          toast.error('The file need to be a image format')
+          return
+        }
+    }
     if (total > 4) {
       toast.error("You can only upload 4 images max.");
       return;
     }
+
 
     setPendingFiles(files);
     if (files.length > 0) {
@@ -109,7 +119,6 @@ function AddItem() {
     formData.append('price', price);
     formData.append('quantity', quantity)
     images.forEach(img => formData.append('images', img.file));
-
     setIsSubmitting(true);
     try {
       await dispatch(addProduct(formData)).unwrap();

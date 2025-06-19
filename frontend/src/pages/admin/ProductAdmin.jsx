@@ -14,7 +14,12 @@ const ProductAdmin = () => {
     dispatch(getBrandAndCollection());
   }, [])
 
-  const { brands, categories, products, loading, error } = useSelector((state) => state.products);
+   //fetching product form server
+  useEffect(() => {
+    dispatch(fetchProducts({ page: 1, limit: 3 }));
+  }, [dispatch]);
+
+  const { brands, categories, page, totalPages, products, loading, error } = useSelector((state) => state.products);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -25,19 +30,8 @@ const ProductAdmin = () => {
     category: '',
     brand: '',
     tags: '',
-  });
-  //states for front end side handling pagination 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = products?.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(products?.length / itemsPerPage);
+  }); 
 
-  //fetching product form server
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
   //handling edit popup
   const handleEdit = (product) => {
     setSelectedProduct(product);
@@ -113,12 +107,12 @@ const ProductAdmin = () => {
 
   //getting brands and category from the backend and using its id and name
   const categoryOptions = categories.map((category) => ({
-    label: category.categoryName, 
+    label: category.categoryName,
     value: category._id
   }))
 
   const brandOptions = brands.map((brand) => ({
-    label: brand.name, 
+    label: brand.name,
     value: brand._id
   }))
 
@@ -147,8 +141,7 @@ const ProductAdmin = () => {
             </tr>
           </thead>
           <tbody>
-            {currentProducts?.map((product) => (
-
+            {products?.map((product) => (
               <tr key={product._id} className="border-t hover:bg-gray-50">
                 <td className="px-4 py-2 ">
                   <img src={product.images[0]} alt="Product" className="w-12 h-12 object-cover rounded" />
@@ -184,30 +177,24 @@ const ProductAdmin = () => {
           </tbody>
         </table>
 
-        <div className="flex justify-center mt-4 gap-2">
+        {/* Pagination Buttons */}
+        <div className="flex justify-center items-center gap-4 mt-6">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            disabled={page <= 1}
+            onClick={() => dispatch(fetchProducts({ page: page - 1, limit: 3 }))}
+            className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
           >
             Previous
           </button>
 
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-100'
-                } hover:bg-blue-500 hover:text-white`}
-            >
-              {i + 1}
-            </button>
-          ))}
+          <span className="text-sm text-gray-700">
+            Page {page} of {totalPages}
+          </span>
 
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            disabled={page >= totalPages}
+            onClick={() => dispatch(fetchProducts({ page: page + 1, limit: 3 }))}
+            className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
           >
             Next
           </button>

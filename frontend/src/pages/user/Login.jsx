@@ -43,7 +43,6 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.post(`${baseUrl}/api/auth/login`, formData);
-
       //getting access token & user
       const token=response.data.accessToken
       const user=JSON.stringify(response.data.user)

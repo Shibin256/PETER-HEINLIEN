@@ -1,7 +1,8 @@
 import axiosInstance from "../../api/axiosInstance";
 //fetching producs
-const getProducts=async ()=>{
-    const response=await axiosInstance.get('/api/products/get')
+const getProducts=async (page, limit)=>{
+    const response=await axiosInstance.get(`/api/products/get?page=${page}&limit=${limit}`)
+    console.log(response.data)
     return response.data
 }
 //adding products
@@ -32,7 +33,6 @@ const getBrandAndCollection=async()=>{
 // fetching single product
 const getProducById=async(id)=>{
   const res=await axiosInstance.get(`/api/products/${id}`)
-  console.log('res:',res.data)
   return res.data
 }
 

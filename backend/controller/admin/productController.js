@@ -5,7 +5,7 @@ import cloudinary from "../../utils/cloudinary.js";
 
 export const createProduct = async (req, res) => {
     try {
-        let available=false
+        let available = false
         const { name, description, category, brand, tags, price, quantity } = req.body
         const uploadImage = [];
         for (const file of req.files) {
@@ -13,7 +13,7 @@ export const createProduct = async (req, res) => {
             uploadImage.push(result.secure_url)
         }
 
-        if(quantity>0) available=true
+        if (quantity > 0) available = true
         const newProduct = new Product({
             name,
             description,
@@ -22,7 +22,7 @@ export const createProduct = async (req, res) => {
             tags: tags,
             price,
             images: uploadImage,
-            availability:available,
+            availability: available,
             totalQuantity: quantity
         });
 
@@ -38,17 +38,28 @@ export const createProduct = async (req, res) => {
 }
 
 export const getAllProducts = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+
     try {
-        const products = await Product.find().sort({ createdAt: -1 })
-        .populate('brand') // Populate the brand field with data from the Brands collection
-      .populate('category');
-        res.status(200).json(products);
+        const total = await Product.countDocuments();
+        console.log(total)
+        const products = await Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit)
+            .populate('brand') // Populate the brand field with data from the Brands collection
+            .populate('category');
+        console.log(products.length)
+        res.json({
+            products,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+        });
     } catch (error) {
         console.error('Error fetching products:', error.message);
         res.status(500).json({ message: 'Server error fetching products' });
     }
 }
-
 
 export const deleteProductById = async (req, res) => {
     try {
@@ -69,9 +80,9 @@ export const deleteProductById = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try {
-        let available=true
+        let available = true
         const { id } = req.params
-        if(req.body.quantity<=0) available=false
+        if (req.body.quantity <= 0) available = false
         const updatedData = {
             name: req.body.name,
             description: req.body.description,
@@ -80,19 +91,19 @@ export const updateProduct = async (req, res) => {
             brand: req.body.brand,
             price: req.body.price,
             totalQuantity: req.body.quantity,
-            availability:available
+            availability: available
         };
-        
 
-         const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
 
-    if (!updatedProduct) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+        const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
+            new: true,
+        });
 
-    res.status(200).json(updatedProduct);
+        if (!updatedProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json(updatedProduct);
 
     } catch (error) {
         console.error('Update Product Error:', error);
@@ -100,29 +111,30 @@ export const updateProduct = async (req, res) => {
     }
 }
 
-export const getBrandsAndCollection=async(req,res)=>{
+export const getBrandsAndCollection = async (req, res) => {
     try {
-        const category=await Category.find()
-        const brands=await Brands.find().sort({name:1})
-        
-        res.status(200).json({category,brands})
+        const category = await Category.find()
+        const brands = await Brands.find().sort({ name: 1 })
+        // console.log(category)
+        const result = await Product.find()
+        res.status(200).json({ category, brands, result})
     } catch (error) {
-         console.error('Fetching brand and category  Error:', error);
+        console.error('Fetching brand and category  Error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 }
 
 
-export const getProductById=async(req,res)=>{
-  try {
-    const product = await Product.findById(req.params.id)
-    .populate('brand') // Populate the brand field with data from the Brands collection
-    .populate('category');
+export const getProductById = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id)
+            .populate('brand') // Populate the brand field with data from the Brands collection
+            .populate('category');
 
-    if(!product) return res.status(404).json({ message: 'Product not found' });
+        if (!product) return res.status(404).json({ message: 'Product not found' });
         res.status(200).json(product);
-  } catch (error) {
-      console.error('Error fetching product:', error.message);
+    } catch (error) {
+        console.error('Error fetching product:', error.message);
         res.status(500).json({ message: 'Server error fetching product' });
-  }
+    }
 }

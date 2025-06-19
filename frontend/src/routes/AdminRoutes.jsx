@@ -9,14 +9,15 @@ import OrderAdmin from '../pages/admin/OrderAdmin'
 import ProductAdmin from '../pages/admin/ProductAdmin'
 import ProtectedAdminRoute from './ProtectedAdminRoute'
 import UserList from '../pages/admin/UserList'
+import Inventory from '../pages/admin/Inventory'
 
 
 const AdminRoutes = () => {
 
-    const navigate = useNavigate();
-    const location=useLocation()
-  
-   useEffect(() => {
+  const navigate = useNavigate();
+  const location = useLocation()
+
+  useEffect(() => {
     const token = localStorage.getItem('accessToken');
     const isLoginPage = location.pathname === '/admin/login';
 
@@ -30,23 +31,25 @@ const AdminRoutes = () => {
   return (
     <div>
       <Routes>
-        <Route path='login' element={<AdminLogin/>}/>
+        <Route path='login' element={<AdminLogin />} />
         <Route
-        path="/"
-        element={
-          <ProtectedAdminRoute>
-            <AdminLayout />
-          </ProtectedAdminRoute>
-        }
-      >
-            <Route path='dashboard' element={<Dashboard/>}/>
-            <Route path='additems' element={<AddItem/>} />
-            <Route path='customers' element={<Customer/>} />
-            <Route path='orders' element={<OrderAdmin/>} />
-            <Route path='products' element={<ProductAdmin/>} />
-            <Route path='user-list' element={<UserList/>} />
+          path="/"
+          element={
+            <ProtectedAdminRoute>
+              <AdminLayout />
+            </ProtectedAdminRoute>
+          }
+        >
+          <Route path='dashboard' element={<Dashboard />} />
+          <Route path='additems' element={<AddItem />} />
+          <Route path='customers' element={<Customer />} />
+          <Route path='orders' element={<OrderAdmin />} />
+          <Route path='products' element={<ProductAdmin />} />
+          <Route path='user-list' element={<UserList />} />
+          <Route path='inventory' element={<Inventory />} />
+
         </Route>
-        </Routes>
+      </Routes>
     </div>
   )
 }

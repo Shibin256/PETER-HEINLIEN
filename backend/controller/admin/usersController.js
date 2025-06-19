@@ -3,7 +3,6 @@ import User from "../../model/userModel.js";
 export const getAllUsers = async (req, res) => {
     try {
         //pagination
-        console.log(req)
         const page=parseInt(req.query.page) || 1;
         const limit=parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;

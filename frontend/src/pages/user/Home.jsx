@@ -11,22 +11,6 @@ import AdBanner from '../../components/user/AdBanner'
 import TopRated from '../../components/user/TopRated'
 
 const Home = () => {
-  const navigate=useNavigate()
-  const dispatch=useDispatch()
-  const handleLogout=()=>{
-    dispatch(logout())
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    toast.success("Logged out successfully");
-    navigate("/login");
-  }
-  
-  // const product={
-  //   image:heroimg,
-  //   name:'shibin',
-  //   description:'  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ea tenetur omnis temporibus, illo cupiditate sapiente. Illo impedit quidem esse totam debitis odit unde, adipisci, et animi voluptas quas quis magni!',
-  //   price:200
-  // }
   return (
     <div>
       <div>
@@ -36,7 +20,6 @@ const Home = () => {
         <AdBanner/>    
         <TopRated/>
       </div>
-      <button onClick={handleLogout}>logout</button>
     </div>
   )
 }

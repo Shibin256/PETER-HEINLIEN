@@ -15,9 +15,10 @@ export const addProduct = createAsyncThunk(
 //handle fetchinng product
 export const fetchProducts = createAsyncThunk(
   'products/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async ({ page, limit }, { rejectWithValue }) => {
     try {
-      const products = await productService.getProducts()
+      console.log('tetcch sllce:', limit)
+      const products = await productService.getProducts(page, limit)
       return products
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -82,8 +83,12 @@ const productSlice = createSlice({
   name: 'products',
   initialState: {
     products: [],
+    page: 1,
+    totalPages: 1,
     brands: [],
     categories: [],
+    categoryBrandTotal: [],
+    brandTotal: [],
     singleProduct: {},
     loading: false,
     success: false,
@@ -116,14 +121,16 @@ const productSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
+
       .addCase(fetchProducts.fulfilled, (state, action) => {
+        const { products, total, page, totalPages } = action.payload;
+        state.products = products;
+        state.page = page;
+        state.totalPages = totalPages; // Add this line
+        state.hasMore = page < totalPages;
         state.loading = false;
-        state.products = action.payload;
       })
-      .addCase(fetchProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+
 
       // updateProduct
       .addCase(updateProduct.pending, (state) => {
@@ -145,10 +152,11 @@ const productSlice = createSlice({
         state.error = null;
       })
       .addCase(getBrandAndCollection.fulfilled, (state, action) => {
-        const { brands, category } = action.payload
+        const { brands, category ,result} = action.payload
         state.brands = brands
         state.categories = category
         state.loading = false;
+        state.categoryBrandTotal=result;
       })
       .addCase(getBrandAndCollection.rejected, (state, action) => {
         state.loading = false;

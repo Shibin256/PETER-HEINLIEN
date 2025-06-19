@@ -1,23 +1,37 @@
 import { useState } from 'react';
 import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes, FaUser } from 'react-icons/fa';
 import navlogo from '../../assets/navlogo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { HiArrowLeftOnRectangle } from 'react-icons/hi2';
+import { logout } from '../../features/auth/authSlice';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const handleLogout = () => {
+    dispatch(logout())
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully");
+    navigate("/login");
+  }
 
   return (
     <header className="text-white shadow-md sticky top-0 z-50" style={{ backgroundColor: '#003543' }}>
       <div className="container mx-auto flex flex-wrap md:flex-nowrap justify-between items-center px-4 sm:px-6 lg:px-20 py-4">
-        
+
         {/* Logo and Hamburger */}
         <div className="flex justify-between items-center w-full md:w-auto">
           <div className="flex items-center">
             <Link to='/'><img src={navlogo} alt="Logo" className="w-[150px] h-[50px] mr-2 object-contain" /></Link>
             {/* <span className="text-xl font-semibold">PETER HEINLIEN</span> */}
           </div>
-          
+
           {/* Hamburger button */}
           <button
             className="md:hidden text-white text-2xl focus:outline-none"
@@ -30,29 +44,28 @@ const Navbar = () => {
 
         {/* Navigation links */}
         <nav
-          className={`w-full md:w-auto md:flex md:items-center md:justify-center mt-4 md:mt-0 ${
-            isOpen ? 'block' : 'hidden'
-          }`}
+          className={`w-full md:w-auto md:flex md:items-center md:justify-center mt-4 md:mt-0 ${isOpen ? 'block' : 'hidden'
+            }`}
         >
           <a href="/" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">HOME</a>
-          <Link to={'/collection'}><a href="" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">SHOP</a></Link>
-          <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">ABOUT US</a>
-          <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">CONTACT US</a>
-        </nav>
+          <a href="/collection" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">SHOP</a>
+        <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">ABOUT US</a>
+        <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">CONTACT US</a>
+      </nav>
 
-        {/* Icons */}
-        <div
-          className={`flex space-x-5 mt-4 md:mt-0 ${
-            isOpen ? 'block w-full border-t border-teal-800 pt-4 md:border-0 md:pt-0 md:flex' : 'hidden md:flex'
+      {/* Icons */}
+      <div
+        className={`flex space-x-5 mt-4 md:mt-0 ${isOpen ? 'block w-full border-t border-teal-800 pt-4 md:border-0 md:pt-0 md:flex' : 'hidden md:flex'
           }`}
-        >
-          {/* <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaSearch /></a> */}
-          <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaUser /></a>
-          <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaShoppingCart /></a>
-          <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaHeart /></a>
-        </div>
+      >
+        {/* <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaSearch /></a> */}
+        <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaUser /></a>
+        <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaShoppingCart /></a>
+        <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaHeart /></a>
+        <button onClick={handleLogout}><HiArrowLeftOnRectangle className="hover:text-teal-200 transition-colors text-xl" /></button>
       </div>
-    </header>
+    </div>
+    </header >
   );
 };
 
