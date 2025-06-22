@@ -20,11 +20,13 @@ const addProducts=async (formData)=>{
     const response= await axiosInstance.post('/api/products/add',formData)
     return response.data
 }
+
 // deleteProduct using id
 const deleteProduct=async(id)=>{
     const response=await axiosInstance.delete(`/api/products/${id}`)
     return response.data
 }
+
 //editing product
 const updateProduct = async (id, data) => {
   const res = await axiosInstance.put(`/api/products/update/${id}`, data, {
@@ -35,11 +37,13 @@ const updateProduct = async (id, data) => {
   });
   return res.data;
 };
+
 // fetching brand and category
 const getBrandAndCollection=async()=>{
       const res=await axiosInstance.get('/api/products/getBrandsAndCollection')
       return res.data
 }
+
 // fetching single product
 const getProducById=async(id)=>{
   const res=await axiosInstance.get(`/api/products/${id}`)

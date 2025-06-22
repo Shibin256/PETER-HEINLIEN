@@ -11,6 +11,7 @@ const ProductAdmin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Fetching category and brand from server
   useEffect(() => {
     dispatch(getBrandAndCollection());
   }, []);
@@ -25,16 +26,16 @@ const ProductAdmin = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [editForm, setEditForm] = useState({
-  name: '',
-  description: '',
-  quantity: '',
-  price: '',
-  category: '',
-  brand: '',
-  tags: '',
-  images: [], // Add images array
-  newImages: [], // For newly uploaded images
-});
+    name: '',
+    description: '',
+    quantity: '',
+    price: '',
+    category: '',
+    brand: '',
+    tags: '',
+    images: [], // Add images array
+    newImages: [], // For newly uploaded images
+  });
 
   // Calculate product statistics
   const inStockCount = products?.filter(product => product.availability).length || 0;
@@ -102,36 +103,37 @@ const ProductAdmin = () => {
     }
   };
 
-const handleDelete = (id) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will permanently delete the product.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    buttonsStyling: false,
-    customClass: {
-      confirmButton:
-        'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-      cancelButton:
-        'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      dispatch(deleteProduct(id)).then((res) => {
-        if (res.type.endsWith('/fulfilled')) {
-          toast.success('✅ Product deleted successfully!');
-          dispatch(fetchProducts({ page: 1, limit: 3, search: searchTerm }));
-        } else {
-          toast.error(res.payload?.message || 'Failed to delete product.');
-        }
-      });
-    }
-  });
-};
+  //handle product delete
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will permanently delete the product.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton:
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+        cancelButton:
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteProduct(id)).then((res) => {
+          if (res.type.endsWith('/fulfilled')) {
+            toast.success('✅ Product deleted successfully!');
+            dispatch(fetchProducts({ page: 1, limit: 3, search: searchTerm }));
+          } else {
+            toast.error(res.payload?.message || 'Failed to delete product.');
+          }
+        });
+      }
+    });
+  };
 
-
+  //edit modal cancel button handle
   const closeEditModal = () => {
     setShowEditModal(false);
     setSelectedProduct(null);
@@ -154,26 +156,26 @@ const handleDelete = (id) => {
   }
 
   return (
-   <div className="px-6 py-4">
-  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-    <h2 className="text-2xl font-bold">Product Management</h2>
-    
-    <div className="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
-      {/* Product Stats - now in small cards top right */}
-      <div className="flex flex-wrap gap-2">
-        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg shadow-sm border border-blue-200 text-sm">
-          Total: <span className="font-bold">{totalProducts || 0}</span>
-        </div>
-        <div className="bg-green-100 text-green-800 px-3 py-1 rounded-lg shadow-sm border border-green-200 text-sm">
-          In Stock: <span className="font-bold">{inStockCount}</span>
-        </div>
-        <div className="bg-red-100 text-red-800 px-3 py-1 rounded-lg shadow-sm border border-red-200 text-sm">
-          Out: <span className="font-bold">{outOfStockCount}</span>
+    <div className="px-6 py-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <h2 className="text-2xl font-bold">Product Management</h2>
+
+        <div className="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
+          {/* Product Stats - now in small cards top right */}
+          <div className="flex flex-wrap gap-2">
+            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg shadow-sm border border-blue-200 text-sm">
+              Total: <span className="font-bold">{totalProducts || 0}</span>
+            </div>
+            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-lg shadow-sm border border-green-200 text-sm">
+              In Stock: <span className="font-bold">{inStockCount}</span>
+            </div>
+            <div className="bg-red-100 text-red-800 px-3 py-1 rounded-lg shadow-sm border border-red-200 text-sm">
+              Out: <span className="font-bold">{outOfStockCount}</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-      
+
       {/* Search Bar */}
       <div className="mb-6">
         <form onSubmit={handleSearch} className="flex gap-2">
@@ -207,7 +209,7 @@ const handleDelete = (id) => {
           )}
         </form>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border border-gray-200 text-left text-sm">
           <thead className="bg-gray-100">

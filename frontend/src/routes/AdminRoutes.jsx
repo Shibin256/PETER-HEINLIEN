@@ -10,6 +10,8 @@ import ProductAdmin from '../pages/admin/ProductAdmin'
 import ProtectedAdminRoute from './ProtectedAdminRoute'
 import UserList from '../pages/admin/UserList'
 import Inventory from '../pages/admin/Inventory'
+import Settings from '../pages/admin/Settings'
+import Banners from '../pages/admin/Banners'
 
 
 const AdminRoutes = () => {
@@ -47,6 +49,8 @@ const AdminRoutes = () => {
           <Route path='products' element={<ProductAdmin />} />
           <Route path='user-list' element={<UserList />} />
           <Route path='inventory' element={<Inventory />} />
+          <Route path='settings' element={<Settings />} />
+          <Route path='banners' element={<Banners />} />
 
         </Route>
       </Routes>

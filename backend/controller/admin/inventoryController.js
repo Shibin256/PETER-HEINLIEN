@@ -4,18 +4,22 @@ import Brands from "../../model/brandModel.js";
 import cloudinary from "../../utils/cloudinary.js";
 import Product from "../../model/productModel.js";
 
+//create categroy section
 export const createCategory = async (req, res) => {
     try {
         const { category } = req.body
         const categoryCheck = await Category.findOne({
             categoryName: { $regex: new RegExp(`^${category}$`, 'i') }
         });
-        if (categoryCheck) return res.status(400).json({ message: 'Category already exists' });
 
+        if (categoryCheck) return res.status(400).json({ message: 'Category already exists' });
+        
+        //creating new category with a objectId
         const newCategory = new Category({
             _id: new mongoose.Types.ObjectId(),
             categoryName: category
         });
+        //saving category
         await newCategory.save()
         res.status(201).json({ message: "Category created", category: newCategory })
     } catch (error) {
@@ -24,23 +28,29 @@ export const createCategory = async (req, res) => {
     }
 }
 
+//create brand section
 export const createBrand = async (req, res) => {
     try {
         const { name, description } = req.body
         const logo = req.file
-        console.log(logo)
 
+        //uploads the image to cloudinary
         const result = await cloudinary.uploader.upload(logo.path)
+
         const brandExists = await Brands.findOne({
             name: { $regex: new RegExp(`^${name}$`, 'i') }
         })
+
         if (brandExists) return res.status(400).json({ message: 'Brand already exists' });
+
+        //creating new brand with a objectId
         const newBrand = new Brands({
             _id: new mongoose.Types.ObjectId(),
             name,
             description,
             image: result.secure_url
         })
+
         await newBrand.save()
         res.status(201).json({ message: "brand created", brand: newBrand })
 
@@ -50,14 +60,17 @@ export const createBrand = async (req, res) => {
     }
 }
 
+//Category deleting section
 export const deleteCategory = async (req, res) => {
     try {
-        console.log(req.params.id)
         const category = await Category.findById(req.params.id)
+        //finding products respected with the category to delete
         const prdoucts = await Product.find({ category: req.params.id })
-        if (!category) return res.status(404).json({ message: 'Category not found' });
 
+        if (!category) return res.status(404).json({ message: 'Category not found' });
+        //deleting products that with the category
         const deletedProducts = await Product.deleteMany({ category: req.params.id });
+        //delete category
         await category.deleteOne();
 
         res.status(200).json({
@@ -70,15 +83,18 @@ export const deleteCategory = async (req, res) => {
     }
 }
 
+//Brand deleting section
 export const deleteBrand=async(req,res)=>{
     try {
-        console.log(req.params.id)
         const brand = await Brands.findById(req.params.id)
+        //finding products respected with the Brand to delete
         const prdoucts = await Product.find({ brand: req.params.id })
-        console.log(brand, '--------------------', prdoucts)
+
         if (!brand) return res.status(404).json({ message: 'Brand not found' });
 
+        //deleting products that with the brand
         const deletedProducts = await Product.deleteMany({ brand: req.params.id });
+        //delete brand
         await brand.deleteOne();
 
         res.status(200).json({
@@ -107,6 +123,7 @@ export const editBrand = async (req, res) => {
       updatedData.image = result.secure_url;
     }
 
+    //updating brand
     const updatedBrand = await Brands.findByIdAndUpdate(id, updatedData, {
       new: true,
     });

@@ -54,8 +54,7 @@ const OTPFormFrogotpass = () => {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-
-
+  //resend otp
   const handleResend=async()=>{
     setLoading(true)
       try {
@@ -80,12 +79,14 @@ const OTPFormFrogotpass = () => {
 
   }
 
-
+//time format
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  //handling input data
 
   const handleChange = (e, index) => {
     const val = e.target.value.replace(/\D/, '');
@@ -98,6 +99,7 @@ const OTPFormFrogotpass = () => {
     }
   };
 
+  //back space manage
   const handleKeyDown = (e, index) => {
     if (e.key === 'Backspace' && !userOTP[index] && index > 0) {
       // Move to previous input on backspace if current is empty
@@ -105,6 +107,7 @@ const OTPFormFrogotpass = () => {
     }
   };
 
+  //otp verification submit
   const handleSubmit = async() => {
     try {
       const otp = userOTP.join('');

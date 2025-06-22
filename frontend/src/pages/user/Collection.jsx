@@ -40,6 +40,7 @@ const Collection = () => {
     fetchFilteredProducts(1); // Reset to page 1 on filter/sort change
   }, [category, brand, sortType, alphabeticOrder]);
 
+  //brand and category toggle
   const toggleCategory = (e) => {
     const value = e.target.value;
     setCategory(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);

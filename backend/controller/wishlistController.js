@@ -1,6 +1,7 @@
 // controllers/wishlistController.js
 import Wishlist from '../model/wishlistModel.js';
 
+//add items to wish list
 export const addToWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
@@ -21,6 +22,7 @@ export const addToWishlist = async (req, res) => {
   }
 };
 
+// removing products from wishlist
 export const removeFromWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
@@ -35,9 +37,9 @@ export const removeFromWishlist = async (req, res) => {
   }
 };
 
+// wishlist products getting
 export const getUserWishlist = async (req, res) => {
   try {
-    console.log('wishlist')
     const { userId } = req.params;
 
     const wishlist = await Wishlist.findOne({ userId }).populate('productIds');
@@ -50,7 +52,7 @@ export const getUserWishlist = async (req, res) => {
 };
 
 
-
+// getting single products to check whishlisted or not 
 export const getWishedProduct = async (req, res) => {
   try {
     const { userId, productId } = req.params;

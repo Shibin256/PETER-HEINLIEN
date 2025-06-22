@@ -10,68 +10,82 @@ const UserList = () => {
   const dispatch = useDispatch();
   const { users, loading, error, currentPage, totalPages } = useSelector((state) => state.users);
   const [searchQuery, setSearchQuery] = useState('');
-  // pagination states
   const [page, setPage] = useState(1);
   const limit = 10;
 
+  // fetch all users
   useEffect(() => {
     dispatch(fetchUsers({ page, limit }));
   }, [dispatch, page]);
 
-  //handling block user by patch
+  // user block and unblock manage
   const handleToggleBlock = (user) => {
     const action = user.isBlocked ? 'unblock' : 'block';
-    if (window.confirm(`Are you sure you want to ${action} this user?`)) {
-      dispatch(toggleUserBlock(user._id)).then((res) => {
-        if (res.type.endsWith('/fulfilled')) {
-          toast.success(`✅ User ${action}ed successfully!`);
-          dispatch(fetchUsers({ page, limit }));
-        } else {
-          toast.error(res?.error?.message || `Failed to ${action} user.`);
-        }
-      });
-    }
+
+    Swal.fire({
+      title: `Are you sure?`,
+      text: `This will ${action} the user.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${action}!`,
+      cancelButtonText: 'Cancel',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton:
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+        cancelButton:
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(toggleUserBlock(user._id)).then((res) => {
+          if (res.type.endsWith('/fulfilled')) {
+            toast.success(`✅ User ${action}ed successfully!`);
+            dispatch(fetchUsers({ page, limit }));
+          } else {
+            toast.error(res?.error?.message || `Failed to ${action} user.`);
+          }
+        });
+      }
+    });
   };
 
-  //handle delete
-const handleDelete = (id) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will permanently delete the user.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete!',
-    cancelButtonText: 'Cancel',
-    buttonsStyling: false,
-    customClass: {
-      confirmButton:
-        'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-      cancelButton:
-        'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      dispatch(deleteUser(id)).then((res) => {
-        if (res.type.endsWith('/fulfilled')) {
-          toast.success('✅ User deleted successfully!');
-          dispatch(fetchUsers({ page, limit }));
-        } else {
-          toast.error(res?.error?.message || 'Failed to delete user.');
-        }
-      });
-    }
-  });
-};
+  // delete user
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will permanently delete the user.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton:
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+        cancelButton:
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteUser(id)).then((res) => {
+          if (res.type.endsWith('/fulfilled')) {
+            toast.success('✅ User deleted successfully!');
+            dispatch(fetchUsers({ page, limit }));
+          } else {
+            toast.error(res?.error?.message || 'Failed to delete user.');
+          }
+        });
+      }
+    });
+  };
 
-
-//Search handling using filtering users by name and id
   const filteredUsers = users?.filter(
     (user) =>
       user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  //showing the total length of blocked and total users
   const totalUsers = users?.length || 0;
   const blockedUsers = users?.filter((user) => user.isBlocked)?.length || 0;
 
@@ -85,7 +99,6 @@ const handleDelete = (id) => {
     <div className="px-6 py-4">
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
-      {/* Header with Search and Stats */}
       <div className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="w-full md:w-1/3">
           <AuthInput
@@ -110,7 +123,6 @@ const handleDelete = (id) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -129,11 +141,7 @@ const handleDelete = (id) => {
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 rounded-full border-2 border-gray-300 overflow-hidden flex items-center justify-center bg-gray-100">
                       {user.profilePic ? (
-                        <img
-                          className="h-full w-full object-cover"
-                          src={user.profilePic}
-                          alt="Profile"
-                        />
+                        <img className="h-full w-full object-cover" src={user.profilePic} alt="Profile" />
                       ) : (
                         <FaUser className="h-5 w-5 text-gray-400" />
                       )}
@@ -147,9 +155,7 @@ const handleDelete = (id) => {
                   <div className="text-sm text-gray-900">{user.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </div>
+                  <div className="text-sm text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</div>
                 </td>
                 <td className="px-1 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-3">
@@ -176,7 +182,6 @@ const handleDelete = (id) => {
           </tbody>
         </table>
 
-        {/* Pagination */}
         <div className="mt-6 flex justify-center items-center gap-3">
           <button
             disabled={page <= 1}

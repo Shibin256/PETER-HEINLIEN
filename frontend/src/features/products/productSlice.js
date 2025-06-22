@@ -12,6 +12,7 @@ export const addProduct = createAsyncThunk(
     }
   }
 )
+
 //handle fetchinng product
 export const fetchCollection = createAsyncThunk(
   'products/fetchAll',
@@ -48,9 +49,6 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-
-
-
 //handle delete
 export const deleteProduct = createAsyncThunk(
   'product/delete',
@@ -63,6 +61,7 @@ export const deleteProduct = createAsyncThunk(
     }
   }
 )
+
 // handle update product
 export const updateProduct = createAsyncThunk(
   'product/updateProduct',
@@ -75,6 +74,7 @@ export const updateProduct = createAsyncThunk(
     }
   }
 )
+
 //fetching brand and collection
 export const getBrandAndCollection = createAsyncThunk(
   'product/getBrandAndCollection',
@@ -87,6 +87,7 @@ export const getBrandAndCollection = createAsyncThunk(
     }
   }
 )
+
 //fetching single product
 export const getProducById = createAsyncThunk(
   'product/getProductById',

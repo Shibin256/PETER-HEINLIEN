@@ -86,20 +86,18 @@ const Signup = () => {
       }
 
       //phone number validation
-      if(formData.phone){
-        if(!/^\d{10}$/.test(formData.phone)){
+      if (formData.phone) {
+        if (!/^\d{10}$/.test(formData.phone)) {
           toast.error('The phone number must be 10')
           setLoading(false)
           return
         }
-        if(formData.phone==='0000000000'){
+        if (formData.phone === '0000000000') {
           toast.error('dont give zero')
           setLoading(false)
           return
         }
       }
-
-      
 
       //confirming password is valid
       const validationMsg = usePasswordVal(formData.password);

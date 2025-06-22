@@ -8,11 +8,13 @@ const router=express.Router()
 const storage=multer.diskStorage({})
 const upload=multer({storage})
 
+//products manage
 router.get('/getCollection',getCollection)
 router.post('/add',upload.array("images",4),createProduct)
 router.get('/get',getAllProducts)
 router.delete('/:id',deleteProductById)
 router.put('/update/:id', upload.none(), updateProduct)
+
 router.get('/getBrandsAndCollection',getBrandsAndCollection)
 router.get('/:id',getProductById)
 export default router

@@ -61,6 +61,7 @@ async function sendVerificationEmail(email, otp) {
 }
 
 
+// user registration 
 export const register = async (req, res) => {
   try {
     const {
@@ -116,7 +117,7 @@ export const register = async (req, res) => {
 
 
 
-//verify otp
+//verify otp after register with form data
 export const verifyOTP = async (req, res) => {
   try {
     const { formData, otp } = req.body;
@@ -158,7 +159,7 @@ export const verifyOTP = async (req, res) => {
   }
 }
 
-//google auth
+//google auth for user
 export const googleAuth = async (req, res) => {
   const { idToken } = req.body
   try {
@@ -210,7 +211,7 @@ export const googleAuth = async (req, res) => {
 }
 
 
-
+// user login section
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -220,10 +221,12 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+
     if (user.isAdmin) {
       return res.status(401).json({ message: 'The user is admin, cant join thorugh this' })
     }
@@ -263,6 +266,7 @@ export const login = async (req, res) => {
   }
 }
 
+//admin login section
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -303,10 +307,7 @@ export const adminLogin = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
-
     //store cookkie in db tooo
-
-
     res.json({
       message: 'admin login is successfull',
       accessToken,
@@ -337,10 +338,9 @@ export const refreshAccessToken = (req, res) => {
 };
 
 
-
+//forgot password manage
 export const forgotPass = async (req, res) => {
   try {
-    console.log('req.body ----------', req.body);
     const { email } = req.body;
     console.log('email ======', email);
 
@@ -370,9 +370,7 @@ export const forgotPass = async (req, res) => {
   }
 };
 
-
-
-
+//verification of forgot password with email
 export const verifyOTPForgotpass = async (req, res) => {
   try {
 
@@ -393,6 +391,7 @@ export const verifyOTPForgotpass = async (req, res) => {
   }
 }
 
+// creating new password
 export const changePassword = async (req, res) => {
   try {
     const { newPassword, email } = req.body
@@ -416,7 +415,7 @@ export const changePassword = async (req, res) => {
 
 }
 
-
+// fetch current user who logged in
 export const fetchCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');

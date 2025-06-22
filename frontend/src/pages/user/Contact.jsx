@@ -4,6 +4,7 @@ const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ success: null, message: '' });
 
+  //form submit for contact
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;

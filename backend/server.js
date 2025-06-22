@@ -11,7 +11,6 @@ dotenv.config()
 
 //importing the routers to handle request
 import authRoutes from './routes/authRouter.js'
-
 import productRoutes from './routes/productRoutes.js'
 import adminRouter from './routes/adminRouter.js'
 import userRouter from './routes/userRouter.js'

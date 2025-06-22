@@ -3,17 +3,21 @@ import Category from "../../model/categoryModel.js";
 import Product from "../../model/productModel.js";
 import cloudinary from "../../utils/cloudinary.js";
 
+//creating new product
 export const createProduct = async (req, res) => {
     try {
         let available = false
         const { name, description, category, brand, tags, price, quantity } = req.body
+        //variable to save the images 
         const uploadImage = [];
+        //one by one uploading to cloudinary
         for (const file of req.files) {
             const result = await cloudinary.uploader.upload(file.path);
             uploadImage.push(result.secure_url)
         }
 
         if (quantity > 0) available = true
+
         const newProduct = new Product({
             name,
             description,
@@ -37,13 +41,13 @@ export const createProduct = async (req, res) => {
     }
 }
 
+//fetch latest collection for home page
 export const getCollection = async (req, res) => {
     try {
-    console.log('hiiii')
         const latestCollection = await Product.find().sort({ createdAt: -1 }).limit(10)
             .populate('brand') // Populate the brand field with data from the Brands collection
             .populate('category');
-        console.log(latestCollection.length)
+
         res.json({latestCollection});
     } catch (error) {
         console.error('Error fetching products:', error.message);
@@ -51,32 +55,28 @@ export const getCollection = async (req, res) => {
     }
 }
 
-
+//fetching all products with pagination
 export const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
     const search = req.query.search || '';
 
+    // filter oprtions variables
     const categories = req.query.categories?.split(',') || [];
     const brands = req.query.brands?.split(',') || [];
     const sortField = req.query.sort || 'createdAt';
     const sortOrder = req.query.order === 'asc' ? -1 : 1;
-    
-    console.log(sortField,'---------------------')
-
 
     const filter = {};
 
     if (search) filter.name = { $regex: search, $options: 'i' };
     if (categories.length) filter['category'] = { $in: categories };
     if (brands.length) filter['brand'] = { $in: brands };
-    console.log(filter)
 
     try {
-        // console.log(filter,'filllll')
+        // getting the number of total products
         const total = await Product.countDocuments(filter);
-
 
         const products = await Product.find(filter)
             .sort({ [sortField]: sortOrder })
@@ -98,7 +98,7 @@ export const getAllProducts = async (req, res) => {
 };
 
 
-
+//product deleting section
 export const deleteProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
@@ -115,12 +115,14 @@ export const deleteProductById = async (req, res) => {
 }
 
 
-
+// product updating section
 export const updateProduct = async (req, res) => {
     try {
         let available = true
         const { id } = req.params
+        
         if (req.body.quantity <= 0) available = false
+
         const updatedData = {
             name: req.body.name,
             description: req.body.description,
@@ -149,11 +151,13 @@ export const updateProduct = async (req, res) => {
     }
 }
 
+
+//get all brands and collection form db
 export const getBrandsAndCollection = async (req, res) => {
     try {
         const category = await Category.find()
         const brands = await Brands.find().sort({ name: 1 })
-        // console.log(category)
+
         const result = await Product.find()
         res.status(200).json({ category, brands, result })
     } catch (error) {
@@ -162,7 +166,7 @@ export const getBrandsAndCollection = async (req, res) => {
     }
 }
 
-
+//get products by its Id with brands and category
 export const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)

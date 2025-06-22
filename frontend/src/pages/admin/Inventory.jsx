@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
 const Inventory = () => {
-    const [isLoading,setIsLoading]=useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [selectedOption, setSelectedOption] = useState("category");
     const [isAddingCategory, setIsAddingCategory] = useState(false);
     const [newCategory, setNewCategory] = useState("");
@@ -20,6 +20,7 @@ const Inventory = () => {
     const [logoPreview, setLogoPreview] = useState(null);
     const fileInputRef = useRef(null);
 
+    //brand editing states
     const [isEditingBrand, setIsEditingBrand] = useState(false);
     const [editingBrandId, setEditingBrandId] = useState(null);
     const [editingBrandName, setEditingBrandName] = useState("");
@@ -28,12 +29,14 @@ const Inventory = () => {
     const [editingLogoPreview, setEditingLogoPreview] = useState(null);
 
     const dispatch = useDispatch();
+    //get all collection and brands
     useEffect(() => {
         dispatch(getBrandAndCollection())
     }, [dispatch])
 
     const { brands, categories, categoryBrandTotal } = useSelector(state => state.products)
 
+    //the total category counts
     const categoryCounts = categories.map((cat) => {
         const count = categoryBrandTotal.filter(
             (product) => product.category === cat._id
@@ -45,6 +48,7 @@ const Inventory = () => {
         };
     });
 
+    //the total brand counts
     const brandCounts = brands.map((brand) => {
         const count = categoryBrandTotal.filter(
             (product) => product.brand === brand._id
@@ -56,47 +60,48 @@ const Inventory = () => {
         };
     });
 
-
-const handleCategoryDelete = (id) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will delete the category and all related products!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    buttonsStyling: false,
-    customClass: {
-      confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-      cancelButton: 'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      dispatch(deleteCategory(id)).then((res) => {
-        if (res.type.endsWith('/fulfilled')) {
-          Swal.fire(
-            'Deleted!',
-            `Category and ${res.payload.deletedProductCount} related product(s) deleted successfully.`,
-            'success'
-          );
-          dispatch(getBrandAndCollection());
-        } else {
-          Swal.fire(
-            'Error!',
-            res.payload?.message || 'Failed to delete category.',
-            'error'
-          );
-        }
-      });
-    }
-  });
-};
+    //delete categrory
+    const handleCategoryDelete = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This will delete the category and all related products!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+                cancelButton: 'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteCategory(id)).then((res) => {
+                    if (res.type.endsWith('/fulfilled')) {
+                        Swal.fire(
+                            'Deleted!',
+                            `Category and ${res.payload.deletedProductCount} related product(s) deleted successfully.`,
+                            'success'
+                        );
+                        dispatch(getBrandAndCollection());
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            res.payload?.message || 'Failed to delete category.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    };
 
     const options = [
         { value: "category", label: "Category" },
         { value: "brand", label: "Brand" },
     ];
 
+    //adding category modal popup
     const handleAddCategory = () => {
         setIsAddingBrand(false);
         setIsAddingCategory(true);
@@ -123,11 +128,13 @@ const handleCategoryDelete = (id) => {
         }
     };
 
+    //add brand modal shows
     const handleAddBrand = () => {
         setIsAddingCategory(false);
         setIsAddingBrand(true);
     }
 
+    // file change of images
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -190,14 +197,12 @@ const handleCategoryDelete = (id) => {
             }
         } catch (error) {
             toast.error(error?.message || 'Failed to add brand');
-        }finally{
+        } finally {
             setIsLoading(false)
         }
     }
 
-
-
-
+    // brand edit
     const handleBrandEdit = (brand) => {
         setEditingBrandId(brand._id);
         setEditingBrandName(brand.name);
@@ -207,8 +212,7 @@ const handleCategoryDelete = (id) => {
         setIsEditingBrand(true);
     };
 
-
-
+    // brand update
     const handleUpdateBrand = async (e) => {
         e.preventDefault();
         console.log('hiii')
@@ -222,14 +226,14 @@ const handleCategoryDelete = (id) => {
             //     toast.warning('Brand need Logo image');
             //     return;
             // }
-            console.log(editingBrandLogo,'---------')
+            // console.log(editingBrandLogo, '---------')
             const formData = new FormData();
             formData.append('name', editingBrandName);
             formData.append('description', editingBrandDescription);
             formData.append('logo', editingBrandLogo);
-            
+
             // You'll need to create an updateBrand action in your inventorySlice
-            const res = await dispatch(editBrand({ id: editingBrandId, data:formData })).unwrap();
+            const res = await dispatch(editBrand({ id: editingBrandId, data: formData })).unwrap();
 
             if (res) {
                 toast.success('Brand updated successfully');
@@ -238,49 +242,48 @@ const handleCategoryDelete = (id) => {
             }
         } catch (error) {
             toast.error(error?.message || 'Failed to update brand');
-        }finally{
+        } finally {
             setIsLoading(false)
         }
     };
 
-
-
-const handleBrandDelete = (id) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will delete the brand and all related products!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    buttonsStyling: false,
-    customClass: {
-      confirmButton:
-        'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-      cancelButton:
-        'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      dispatch(deleteBrand(id)).then((res) => {
-        if (res.type.endsWith('/fulfilled')) {
-          Swal.fire(
-            'Deleted!',
-            `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
-            'success'
-          );
-          dispatch(getBrandAndCollection());
-        } else {
-          Swal.fire(
-            'Error!',
-            res.payload?.message || 'Failed to delete brand.',
-            'error'
-          );
-        }
-      });
-    }
-  });
-};
+    //brand deletion
+    const handleBrandDelete = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This will delete the brand and all related products!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            buttonsStyling: false,
+            customClass: {
+                confirmButton:
+                    'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+                cancelButton:
+                    'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteBrand(id)).then((res) => {
+                    if (res.type.endsWith('/fulfilled')) {
+                        Swal.fire(
+                            'Deleted!',
+                            `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
+                            'success'
+                        );
+                        dispatch(getBrandAndCollection());
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            res.payload?.message || 'Failed to delete brand.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    };
 
 
     return (
@@ -292,7 +295,7 @@ const handleBrandDelete = (id) => {
                     <select
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
                         value={selectedOption}
-                        onChange={(e) =>{
+                        onChange={(e) => {
                             setSelectedOption(e.target.value)
                             setIsAddingBrand(false)
                             setIsAddingCategory(false)
@@ -419,7 +422,7 @@ const handleBrandDelete = (id) => {
                                             className="hidden"
                                             accept="image/png, image/jpeg, image/jpg"
                                             onChange={(e) => {
-                                                
+
                                                 const file = e.target.files[0];
                                                 console.log(file)
                                                 if (file) {
@@ -491,7 +494,7 @@ const handleBrandDelete = (id) => {
                                         type="submit"
                                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                                     >
-                                        {isLoading?'Loading':'Update Brand'}
+                                        {isLoading ? 'Loading' : 'Update Brand'}
                                     </button>
                                 </div>
                             </form>
@@ -540,7 +543,7 @@ const handleBrandDelete = (id) => {
                                     <div
                                         className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 overflow-hidden relative"
                                         onClick={triggerFileInput}
-                                        
+
                                     >
                                         {logoPreview ? (
                                             <img
@@ -633,7 +636,7 @@ const handleBrandDelete = (id) => {
                                         type="submit"
                                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                                     >
-                                        {isLoading ?  'Loading':'Add Brand'}
+                                        {isLoading ? 'Loading' : 'Add Brand'}
                                     </button>
                                 </div>
                             </form>

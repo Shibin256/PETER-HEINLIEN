@@ -9,12 +9,17 @@ const router=express.Router()
 const storage=multer.diskStorage({})
 const upload=multer({storage})
 
-router.get('/users/get',verifyAccessToken,getAllUsers)
-router.patch('/block-toggle/:id',verifyAccessToken, toggleUserBlock);
+// user managing
+router.get('/users/get',getAllUsers)
+router.patch('/block-toggle/:id', toggleUserBlock);
 router.delete('/delete/:id',verifyAccessToken,deleteUser)
+
+//category managing
 router.post('/addCategory',verifyAccessToken,createCategory)
-router.post('/addBrand',verifyAccessToken, upload.single('logo'), createBrand)
 router.delete('/deleteCategory/:id',verifyAccessToken,deleteCategory)
+
+//brand managing
+router.post('/addBrand',verifyAccessToken, upload.single('logo'), createBrand)
 router.delete('/deleteBrand/:id',verifyAccessToken,deleteBrand)
 router.put('/editBrand/:id',verifyAccessToken,upload.single('logo'),editBrand)
 
