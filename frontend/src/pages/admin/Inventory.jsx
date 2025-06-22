@@ -2,10 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import InventoryCard from '../../components/admin/InventoryCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
-import { addBrand, addCategory, } from '../../features/admin/inventory/inventorySlice';
+import { addBrand, addCategory, deleteBrand, deleteCategory, editBrand, } from '../../features/admin/inventory/inventorySlice';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const Inventory = () => {
+    const [isLoading,setIsLoading]=useState(false)
     const [selectedOption, setSelectedOption] = useState("category");
     const [isAddingCategory, setIsAddingCategory] = useState(false);
     const [newCategory, setNewCategory] = useState("");
@@ -17,6 +19,13 @@ const Inventory = () => {
     const [brandLogo, setBrandLogo] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
     const fileInputRef = useRef(null);
+
+    const [isEditingBrand, setIsEditingBrand] = useState(false);
+    const [editingBrandId, setEditingBrandId] = useState(null);
+    const [editingBrandName, setEditingBrandName] = useState("");
+    const [editingBrandDescription, setEditingBrandDescription] = useState("");
+    const [editingBrandLogo, setEditingBrandLogo] = useState(null);
+    const [editingLogoPreview, setEditingLogoPreview] = useState(null);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -48,6 +57,40 @@ const Inventory = () => {
     });
 
 
+const handleCategoryDelete = (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will delete the category and all related products!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+      cancelButton: 'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      dispatch(deleteCategory(id)).then((res) => {
+        if (res.type.endsWith('/fulfilled')) {
+          Swal.fire(
+            'Deleted!',
+            `Category and ${res.payload.deletedProductCount} related product(s) deleted successfully.`,
+            'success'
+          );
+          dispatch(getBrandAndCollection());
+        } else {
+          Swal.fire(
+            'Error!',
+            res.payload?.message || 'Failed to delete category.',
+            'error'
+          );
+        }
+      });
+    }
+  });
+};
 
     const options = [
         { value: "category", label: "Category" },
@@ -66,6 +109,7 @@ const Inventory = () => {
                 const res = await dispatch(addCategory(newCategory.trim()))
                 if (res.payload?.message === "Category created") {
                     toast.success("Category created successfully");
+                    dispatch(getBrandAndCollection())
                 } else if (res.payload?.message === "Category already exists") {
                     toast.warning("Category already exists");
                 } else {
@@ -114,6 +158,7 @@ const Inventory = () => {
 
     const handleSubmitBrand = async (e) => {
         e.preventDefault();
+        setIsLoading(true)
         try {
             if (!newBrand.trim()) {
                 toast.warning('Brand name is required');
@@ -134,6 +179,7 @@ const Inventory = () => {
             console.log(res)
             if (res) {
                 toast.success('Brand added successfully');
+                dispatch(getBrandAndCollection())
                 setNewBrand("");
                 setBrandDescription("");
                 setBrandLogo(null);
@@ -144,8 +190,98 @@ const Inventory = () => {
             }
         } catch (error) {
             toast.error(error?.message || 'Failed to add brand');
+        }finally{
+            setIsLoading(false)
         }
     }
+
+
+
+
+    const handleBrandEdit = (brand) => {
+        setEditingBrandId(brand._id);
+        setEditingBrandName(brand.name);
+        setEditingBrandDescription(brand.description || "");
+        setEditingLogoPreview(brand.logo?.url || null);
+        setEditingBrandLogo(null);
+        setIsEditingBrand(true);
+    };
+
+
+
+    const handleUpdateBrand = async (e) => {
+        e.preventDefault();
+        console.log('hiii')
+        setIsLoading(true)
+        try {
+            if (!editingBrandName.trim()) {
+                toast.warning('Brand name is required');
+                return;
+            }
+            // if (!editingBrandLogo) {
+            //     toast.warning('Brand need Logo image');
+            //     return;
+            // }
+            console.log(editingBrandLogo,'---------')
+            const formData = new FormData();
+            formData.append('name', editingBrandName);
+            formData.append('description', editingBrandDescription);
+            formData.append('logo', editingBrandLogo);
+            
+            // You'll need to create an updateBrand action in your inventorySlice
+            const res = await dispatch(editBrand({ id: editingBrandId, data:formData })).unwrap();
+
+            if (res) {
+                toast.success('Brand updated successfully');
+                dispatch(getBrandAndCollection());
+                setIsEditingBrand(false);
+            }
+        } catch (error) {
+            toast.error(error?.message || 'Failed to update brand');
+        }finally{
+            setIsLoading(false)
+        }
+    };
+
+
+
+const handleBrandDelete = (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will delete the brand and all related products!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton:
+        'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+      cancelButton:
+        'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      dispatch(deleteBrand(id)).then((res) => {
+        if (res.type.endsWith('/fulfilled')) {
+          Swal.fire(
+            'Deleted!',
+            `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
+            'success'
+          );
+          dispatch(getBrandAndCollection());
+        } else {
+          Swal.fire(
+            'Error!',
+            res.payload?.message || 'Failed to delete brand.',
+            'error'
+          );
+        }
+      });
+    }
+  });
+};
+
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
@@ -156,7 +292,11 @@ const Inventory = () => {
                     <select
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
                         value={selectedOption}
-                        onChange={(e) => setSelectedOption(e.target.value)}
+                        onChange={(e) =>{
+                            setSelectedOption(e.target.value)
+                            setIsAddingBrand(false)
+                            setIsAddingCategory(false)
+                        }}
                     >
                         {options.map((option) => (
                             <option
@@ -214,6 +354,166 @@ const Inventory = () => {
                 </form>
             )}
 
+
+
+
+
+
+            {isEditingBrand && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-800">Edit Brand</h2>
+                                <button
+                                    onClick={() => setIsEditingBrand(false)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleUpdateBrand}>
+                                {/* Image Upload with Preview */}
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                                        Brand Logo
+                                    </label>
+                                    <div
+                                        className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 overflow-hidden relative"
+                                        onClick={() => fileInputRef.current.click()}
+                                    >
+                                        {editingLogoPreview ? (
+                                            <img
+                                                src={editingLogoPreview}
+                                                alt="Brand logo preview"
+                                                className="w-full h-full object-contain p-2"
+                                            />
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center text-center p-4">
+                                                <svg
+                                                    className="w-10 h-10 mb-3 text-gray-400"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                    />
+                                                </svg>
+                                                <p className="mb-1 text-sm text-gray-500">
+                                                    <span className="font-semibold">Click to upload</span> or drag and drop
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    PNG, JPG (MAX. 2MB)
+                                                </p>
+                                            </div>
+                                        )}
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/png, image/jpeg, image/jpg"
+                                            onChange={(e) => {
+                                                
+                                                const file = e.target.files[0];
+                                                console.log(file)
+                                                if (file) {
+                                                    if (!file.type.match('image.*')) {
+                                                        toast.warning('Please select an image file (JPEG, PNG)');
+                                                        return;
+                                                    }
+                                                    if (file.size > 2 * 1024 * 1024) {
+                                                        toast.warning('File size should be less than 2MB');
+                                                        return;
+                                                    }
+
+                                                    setEditingBrandLogo(file);
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setEditingLogoPreview(reader.result);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    {editingBrandLogo && (
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            Selected: {editingBrandLogo.name}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Brand Name */}
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                                        Brand Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingBrandName}
+                                        onChange={(e) => setEditingBrandName(e.target.value)}
+                                        placeholder="Enter brand name"
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Description */}
+                                <div className="mb-6">
+                                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                                        Description
+                                    </label>
+                                    <textarea
+                                        placeholder="Enter brand description"
+                                        value={editingBrandDescription}
+                                        rows="3"
+                                        onChange={(e) => setEditingBrandDescription(e.target.value)}
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+
+                                {/* Buttons */}
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditingBrand(false)}
+                                        className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+                                    >
+                                        {isLoading?'Loading':'Update Brand'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             {isAddingBrand && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -240,6 +540,7 @@ const Inventory = () => {
                                     <div
                                         className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 overflow-hidden relative"
                                         onClick={triggerFileInput}
+                                        
                                     >
                                         {logoPreview ? (
                                             <img
@@ -278,7 +579,6 @@ const Inventory = () => {
                                             className="hidden"
                                             accept="image/png, image/jpeg, image/jpg"
                                             onChange={handleFileChange}
-                                            required
                                         />
                                     </div>
                                     {brandLogo && (
@@ -333,7 +633,7 @@ const Inventory = () => {
                                         type="submit"
                                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                                     >
-                                        Add Brand
+                                        {isLoading ?  'Loading':'Add Brand'}
                                     </button>
                                 </div>
                             </form>
@@ -350,6 +650,7 @@ const Inventory = () => {
                             title={`${category.categoryName} Collection`}
                             lastUpdated={new Date(category.updatedAt).toLocaleDateString()}
                             totalCollection={category.total}
+                            deleteClick={() => handleCategoryDelete(category._id)}
                         />
                     ))}
                 </div>
@@ -364,6 +665,8 @@ const Inventory = () => {
                             title={`${brand.name} Collection`}
                             lastUpdated={new Date(brand.updatedAt).toLocaleDateString()}
                             totalCollection={brand.total}
+                            editClick={() => handleBrandEdit(brand)}
+                            deleteClick={() => handleBrandDelete(brand._id)}
                         />
                     ))}
                 </div>

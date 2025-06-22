@@ -15,6 +15,8 @@ import ForgotPass from '../pages/user/ForgotPass'
 import OTPFormFrogotpass from '../pages/user/OtpVerifyForgotpass'
 import ChangePass from '../pages/user/ChangePass'
 import ProductDetails from '../pages/user/ProductDetails'
+import Contact from '../pages/user/Contact'
+import Wishlist from '../pages/user/Wishlist'
 
 
 
@@ -49,6 +51,8 @@ const UserRoutes = () => {
         <Route path='checkout' element={<ProtectedRoute><Placeorder /></ProtectedRoute>} />
         <Route path='orders' element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path='reset-password' element={<ForgotPass />} />
+        <Route path='contact' element={<Contact />} />
+        <Route path='wishlist' element={<Wishlist />} />
         
       </Route>
       </Routes>

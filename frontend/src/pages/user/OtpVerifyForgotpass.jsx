@@ -59,7 +59,8 @@ const OTPFormFrogotpass = () => {
   const handleResend=async()=>{
     setLoading(true)
       try {
-        const response = await axios.post(`${baseUrl}/api/auth/`, formData);
+        console.log()
+        const response = await axios.post(`${baseUrl}/api/auth/forgotpass`, formData);
         if(response){
           const expiry = Date.now() + 600000; // 10 minutes from now
           localStorage.setItem('otpExpiry', expiry.toString());

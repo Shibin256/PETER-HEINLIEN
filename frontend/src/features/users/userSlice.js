@@ -7,7 +7,6 @@ export const fetchUsers = createAsyncThunk(
     async ({ page = 1, limit = 10 }, thunkAPI) => {
         try {
             const res = await userService.getUsers(page, limit)
-            console.log('000000000000000000000000', res)
             return res;
         } catch (err) {
             return thunkAPI.rejectWithValue(err.response?.data?.message || 'Fetch failed');

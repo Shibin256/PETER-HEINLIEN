@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getProducById } from '../../features/products/productSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import ImageZoom from '../../components/common/ImageZoom';
+import { addToWishlist, getWishedProduct, getWishlist, removeFromWishlist } from '../../features/wishlist/wishlistSlice';
+import { toast } from 'react-toastify';
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -14,14 +16,32 @@ const ProductDetails = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const dispatch = useDispatch()
 
-  //fetching prouducts
+
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+  const { singleProduct } = useSelector(state => state.products)
+  console.log(singleProduct)
+  // First: fetch the product
   useEffect(() => {
     if (id) dispatch(getProducById(id));
   }, [id, dispatch]);
 
+  // Then: check if it's wishlisted (once product and user are available)
+  useEffect(() => {
+    console.log(singleProduct, 'chekcckdfoksdhfjsdhaf')
+    if (user && singleProduct?._id) {
+      dispatch(getWishedProduct({ userId: user._id, productId: singleProduct._id }))
+        .then((res) => {
+          if (res.payload?.wished) {
+            setIsWishlisted(true);
+          } else {
+            setIsWishlisted(false);
+          }
+        });
+    }
+  }, [user, singleProduct, dispatch]);
 
-
-  const { singleProduct } = useSelector(state => state.products)
   const product = singleProduct
   if (!product || !product.images || product.images.length === 0) {
     return <div className="text-center p-10">Loading product details...</div>;
@@ -35,6 +55,30 @@ const ProductDetails = () => {
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
   };
+
+  const handlewishClick = async (e) => {
+    e.preventDefault(); // Prevent link navigation when clicking the heart icon
+    if (!user) {
+      toast.warning('Please login to use wishlist');
+      return;
+    }
+
+    try {
+      if (!isWishlisted) {
+        dispatch(addToWishlist({ userId: user._id, productId: product._id }))
+        toast.success('Added to wishlist');
+      } else {
+        // Remove from wishlist
+        dispatch(removeFromWishlist({ userId: user._id, productId: product._id }))
+        toast.info('Removed from wishlist');
+      }
+      setIsWishlisted(!isWishlisted)
+    } catch (error) {
+      console.error('Wishlist error:', err);
+      toast.error('Something went wrong');
+    }
+
+  }
 
   return (
     <div className="px-6 md:px-16 lg:px-24 py-12">
@@ -61,7 +105,7 @@ const ProductDetails = () => {
           {/* Main Image */}
           <div className="relative flex-1">
             <div className="aspect-squar w-full bg-gray-100 rounded-xl">
-                <ImageZoom imageUrl={product.images[currentImageIndex]}/>
+              <ImageZoom imageUrl={product.images[currentImageIndex]} />
             </div>
             {/* Navigation Arrows */}
             <button
@@ -145,7 +189,7 @@ const ProductDetails = () => {
 
           {/* Wishlist */}
           <button
-            onClick={() => setIsWishlisted(!isWishlisted)}
+            onClick={handlewishClick}
             className={`flex items-center gap-2 mb-8 ${isWishlisted ? 'text-red-500' : 'text-gray-600'} transition-colors`}
           >
             <FaHeart className={isWishlisted ? 'fill-current' : ''} />

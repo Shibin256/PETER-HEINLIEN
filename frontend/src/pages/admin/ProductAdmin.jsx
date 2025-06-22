@@ -5,34 +5,48 @@ import { toast } from 'react-toastify';
 import AuthInput from '../../components/common/AuthInput';
 import SelectInput from '../../components/common/SelectInput';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const ProductAdmin = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getBrandAndCollection());
-  }, [])
+  }, []);
 
-   //fetching product form server
+  // Fetching products from server
   useEffect(() => {
     dispatch(fetchProducts({ page: 1, limit: 3 }));
   }, [dispatch]);
 
-  const { brands, categories, page, totalPages, products, loading, error } = useSelector((state) => state.products);
+  const { brands, categories, page, totalPages, products, loading, error, totalProducts } = useSelector((state) => state.products);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [editForm, setEditForm] = useState({
-    name: '',
-    description: '',
-    quantity: '',
-    price: '',
-    category: '',
-    brand: '',
-    tags: '',
-  }); 
+  name: '',
+  description: '',
+  quantity: '',
+  price: '',
+  category: '',
+  brand: '',
+  tags: '',
+  images: [], // Add images array
+  newImages: [], // For newly uploaded images
+});
 
-  //handling edit popup
+  // Calculate product statistics
+  const inStockCount = products?.filter(product => product.availability).length || 0;
+  const outOfStockCount = products?.filter(product => !product.availability).length || 0;
+
+  // Handle search
+  const handleSearch = (e) => {
+    e.preventDefault();
+    dispatch(fetchProducts({ page: 1, limit: 3, search: searchTerm }));
+  };
+
+  // Handling edit popup
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setEditForm({
@@ -47,7 +61,7 @@ const ProductAdmin = () => {
     setShowEditModal(true);
   };
 
-  //handling edit submit
+  // Handling edit submit
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const { name, description, quantity, price, category, brand, tags } = editForm;
@@ -77,44 +91,61 @@ const ProductAdmin = () => {
     formData.append('tags', tags);
 
     try {
-      //updating the product
       await dispatch(updateProduct({ id: selectedProduct._id, data: formData })).unwrap();
       toast.success('✅ Product updated successfully!');
       setShowEditModal(false);
       setSelectedProduct(null);
-      dispatch(fetchProducts()).unwrap();
-      navigate('/admin/products')
+      dispatch(fetchProducts({ page: 1, limit: 3, search: searchTerm })).unwrap();
+      navigate('/admin/products');
     } catch (error) {
       toast.error(error?.message || 'Failed to update product.');
     }
   };
 
-  //handling delete product using 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+const handleDelete = (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will permanently delete the product.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton:
+        'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+      cancelButton:
+        'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
       dispatch(deleteProduct(id)).then((res) => {
         if (res.type.endsWith('/fulfilled')) {
-          dispatch(fetchProducts());
+          toast.success('✅ Product deleted successfully!');
+          dispatch(fetchProducts({ page: 1, limit: 3, search: searchTerm }));
+        } else {
+          toast.error(res.payload?.message || 'Failed to delete product.');
         }
       });
     }
-  };
-  //handling cancle in edit modal
+  });
+};
+
+
   const closeEditModal = () => {
     setShowEditModal(false);
     setSelectedProduct(null);
   };
 
-  //getting brands and category from the backend and using its id and name
   const categoryOptions = categories.map((category) => ({
     label: category.categoryName,
     value: category._id
-  }))
+  }));
 
   const brandOptions = brands.map((brand) => ({
     label: brand.name,
     value: brand._id
-  }))
+  }));
 
   if (loading) return <p className="text-center py-4">Loading products...</p>;
   if (error) {
@@ -122,11 +153,61 @@ const ProductAdmin = () => {
     return <p className="text-red-500 text-center">{errorMessage}</p>;
   }
 
-
-
   return (
-    <div className="px-6 py-4">
-      <h2 className="text-2xl font-bold mb-4">Product List</h2>
+   <div className="px-6 py-4">
+  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <h2 className="text-2xl font-bold">Product Management</h2>
+    
+    <div className="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
+      {/* Product Stats - now in small cards top right */}
+      <div className="flex flex-wrap gap-2">
+        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg shadow-sm border border-blue-200 text-sm">
+          Total: <span className="font-bold">{totalProducts || 0}</span>
+        </div>
+        <div className="bg-green-100 text-green-800 px-3 py-1 rounded-lg shadow-sm border border-green-200 text-sm">
+          In Stock: <span className="font-bold">{inStockCount}</span>
+        </div>
+        <div className="bg-red-100 text-red-800 px-3 py-1 rounded-lg shadow-sm border border-red-200 text-sm">
+          Out: <span className="font-bold">{outOfStockCount}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+      
+      {/* Search Bar */}
+      <div className="mb-6">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <AuthInput
+            type="text"
+            name="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search products by name..."
+            width="w-full md:w-96"
+            Textcolor="text-gray-700"
+            borderColor="border-gray-300"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Search
+          </button>
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                dispatch(fetchProducts({ page: 1, limit: 3 }));
+              }}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              Clear
+            </button>
+          )}
+        </form>
+      </div>
+      
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border border-gray-200 text-left text-sm">
           <thead className="bg-gray-100">
@@ -156,7 +237,7 @@ const ProductAdmin = () => {
                     {product.availability ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </td>
-                <td className="px-4 py-2">{product.category.categoryName}</td>
+                <td className="px-4 py-2">{product.category?.categoryName || 'N/A'}</td>
                 <td className="px-4 py-2">${product.price?.toFixed(2)}</td>
                 <td className="px-4 py-2 whitespace-nowrap">
                   <button
@@ -181,7 +262,7 @@ const ProductAdmin = () => {
         <div className="flex justify-center items-center gap-4 mt-6">
           <button
             disabled={page <= 1}
-            onClick={() => dispatch(fetchProducts({ page: page - 1, limit: 3 }))}
+            onClick={() => dispatch(fetchProducts({ page: page - 1, limit: 3, search: searchTerm }))}
             className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
           >
             Previous
@@ -193,13 +274,12 @@ const ProductAdmin = () => {
 
           <button
             disabled={page >= totalPages}
-            onClick={() => dispatch(fetchProducts({ page: page + 1, limit: 3 }))}
+            onClick={() => dispatch(fetchProducts({ page: page + 1, limit: 3, search: searchTerm }))}
             className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
           >
             Next
           </button>
         </div>
-
       </div>
 
       {/* Edit Modal */}

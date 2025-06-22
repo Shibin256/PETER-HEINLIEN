@@ -3,19 +3,16 @@ import Title from '../common/Title';
 import heroimg from '../../assets/herosectionwatch.jpg';
 import ProductCard from '../common/ProductCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../features/products/productSlice';
+import { fetchCollection } from '../../features/products/productSlice';
 
 const LatestCollection = () => {
   const dispatch=useDispatch()
-  const {products}=useSelector(state=>state.products)
-  // console.log(products)
-
   useEffect(()=>{
-      dispatch(fetchProducts())
+      dispatch(fetchCollection())
   },[])
-
-  // const tenProducts = Array(10).fill(products); // Create array of 10 products
-
+  
+  const {latestCollection}=useSelector(state=>state.products)
+  console.log(latestCollection)
   return (
     <div className="latest-collection my-10 px-2 sm:px-4">
       {/* Heading Section */}
@@ -29,7 +26,7 @@ const LatestCollection = () => {
       {/* Products Grid */}
       <div className="flex justify-center">
         <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-          {products.map((product, index) => (
+          {latestCollection.map((product, index) => (
             <ProductCard key={index} product={product} />
           ))}
         </div>

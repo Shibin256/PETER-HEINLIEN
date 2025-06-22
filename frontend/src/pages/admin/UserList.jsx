@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import AuthInput from '../../components/common/AuthInput';
 import { deleteUser, fetchUsers, toggleUserBlock } from '../../features/users/userSlice';
 import { FaUser } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const UserList = () => {
   const dispatch = useDispatch();
@@ -33,8 +34,23 @@ const UserList = () => {
   };
 
   //handle delete
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+const handleDelete = (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will permanently delete the user.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete!',
+    cancelButtonText: 'Cancel',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton:
+        'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+      cancelButton:
+        'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
       dispatch(deleteUser(id)).then((res) => {
         if (res.type.endsWith('/fulfilled')) {
           toast.success('✅ User deleted successfully!');
@@ -44,7 +60,10 @@ const UserList = () => {
         }
       });
     }
-  };
+  });
+};
+
+
 //Search handling using filtering users by name and id
   const filteredUsers = users?.filter(
     (user) =>

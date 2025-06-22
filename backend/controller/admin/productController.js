@@ -37,18 +37,54 @@ export const createProduct = async (req, res) => {
     }
 }
 
+export const getCollection = async (req, res) => {
+    try {
+    console.log('hiiii')
+        const latestCollection = await Product.find().sort({ createdAt: -1 }).limit(10)
+            .populate('brand') // Populate the brand field with data from the Brands collection
+            .populate('category');
+        console.log(latestCollection.length)
+        res.json({latestCollection});
+    } catch (error) {
+        console.error('Error fetching products:', error.message);
+        res.status(500).json({ message: 'Server error fetching products' });
+    }
+}
+
+
 export const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    const categories = req.query.categories?.split(',') || [];
+    const brands = req.query.brands?.split(',') || [];
+    const sortField = req.query.sort || 'createdAt';
+    const sortOrder = req.query.order === 'asc' ? -1 : 1;
+    
+    console.log(sortField,'---------------------')
+
+
+    const filter = {};
+
+    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (categories.length) filter['category'] = { $in: categories };
+    if (brands.length) filter['brand'] = { $in: brands };
+    console.log(filter)
 
     try {
-        const total = await Product.countDocuments();
-        console.log(total)
-        const products = await Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit)
-            .populate('brand') // Populate the brand field with data from the Brands collection
+        // console.log(filter,'filllll')
+        const total = await Product.countDocuments(filter);
+
+
+        const products = await Product.find(filter)
+            .sort({ [sortField]: sortOrder })
+            .skip(skip)
+            .limit(limit)
+            .populate('brand')
             .populate('category');
-        console.log(products.length)
+
         res.json({
             products,
             total,
@@ -59,7 +95,9 @@ export const getAllProducts = async (req, res) => {
         console.error('Error fetching products:', error.message);
         res.status(500).json({ message: 'Server error fetching products' });
     }
-}
+};
+
+
 
 export const deleteProductById = async (req, res) => {
     try {
@@ -117,7 +155,7 @@ export const getBrandsAndCollection = async (req, res) => {
         const brands = await Brands.find().sort({ name: 1 })
         // console.log(category)
         const result = await Product.find()
-        res.status(200).json({ category, brands, result})
+        res.status(200).json({ category, brands, result })
     } catch (error) {
         console.error('Fetching brand and category  Error:', error);
         res.status(500).json({ message: 'Server error' });

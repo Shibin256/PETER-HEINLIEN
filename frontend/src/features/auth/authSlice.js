@@ -27,6 +27,8 @@ const authSlice=createSlice({
       state.token = token;
       state.isAuthenticated = true;
       state.isAdmin = user?.isAdmin || false;
+      console.log(state.isAuthenticated,'isauth')
+      console.log(state.isdmin,'isadmin')
     },
     logout: (state) => {
       state.user = null;

@@ -49,8 +49,8 @@ const Navbar = () => {
         >
           <a href="/" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">HOME</a>
           <a href="/collection" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">SHOP</a>
-        <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">ABOUT US</a>
-        <a href="#" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">CONTACT US</a>
+        <a href="/about" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">ABOUT US</a>
+        <a href="/contact" className="block md:inline-block px-3 py-2 hover:text-teal-200 transition-colors">CONTACT US</a>
       </nav>
 
       {/* Icons */}
@@ -61,7 +61,7 @@ const Navbar = () => {
         {/* <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaSearch /></a> */}
         <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaUser /></a>
         <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaShoppingCart /></a>
-        <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaHeart /></a>
+        <a href="/wishlist" className="hover:text-teal-200 transition-colors text-xl"><FaHeart /></a>
         <button onClick={handleLogout}><HiArrowLeftOnRectangle className="hover:text-teal-200 transition-colors text-xl" /></button>
       </div>
     </div>

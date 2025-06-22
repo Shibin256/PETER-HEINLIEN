@@ -14,6 +14,8 @@ import authRoutes from './routes/authRouter.js'
 
 import productRoutes from './routes/productRoutes.js'
 import adminRouter from './routes/adminRouter.js'
+import userRouter from './routes/userRouter.js'
+
 //cors for react can send req from diff port
 import cors from 'cors'
 
@@ -34,6 +36,8 @@ app.use(cors({
 app.use("/api/products", productRoutes);
 app.use('/api/admin',adminRouter)
 app.use('/api/auth',authRoutes)
+app.use('/api/user',userRouter)
+
 
 //port assigning
 app.listen(process.env.PORT, () => console.log(`The server started localhost:${process.env.PORT}`))

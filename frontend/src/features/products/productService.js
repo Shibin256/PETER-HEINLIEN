@@ -1,10 +1,20 @@
 import axiosInstance from "../../api/axiosInstance";
+
 //fetching producs
-const getProducts=async (page, limit)=>{
-    const response=await axiosInstance.get(`/api/products/get?page=${page}&limit=${limit}`)
+const getProducts=async (params)=>{
+    const response=await axiosInstance.get(`/api/products/get?${params.toString()}`)
     console.log(response.data)
     return response.data
 }
+
+//fetching producs  for collection
+const getLatestCollection=async ()=>{
+    const response=await axiosInstance.get(`/api/products/getCollection`)
+    console.log(response.data)
+    return response.data
+}
+
+
 //adding products
 const addProducts=async (formData)=>{
     const response= await axiosInstance.post('/api/products/add',formData)
@@ -43,7 +53,8 @@ const productService ={
     deleteProduct,
     updateProduct,
     getBrandAndCollection,
-    getProducById
+    getProducById,
+    getLatestCollection
 }
 
 export default productService

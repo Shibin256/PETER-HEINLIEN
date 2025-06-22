@@ -3,8 +3,9 @@ import jwt, { decode } from 'jsonwebtoken'
 
 export const verifyAccessToken=(req,res,next)=>{
     const authHeader=req.headers.authorization;
+    console.log(authHeader)
     //token is not valid res error
-    if(!authHeader?.startWith('Bearer ')){
+    if(!authHeader?.startsWith('Bearer ')){
          return res.sendStatus(401);
     }
 

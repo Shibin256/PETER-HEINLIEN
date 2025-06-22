@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, isRejectedWithValue } from "@reduxjs/too
 import inventoryService from "./inventoryService";
 
 export const addCategory = createAsyncThunk(
-    'addcategory',
+    'admin/addcategory',
     async (category, { rejectWithValue }) => {
         try {
             const res = await inventoryService.addCategory(category)
@@ -14,8 +14,21 @@ export const addCategory = createAsyncThunk(
     }
 )
 
+export const deleteCategory = createAsyncThunk(
+    'admin/deleteCategory',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await inventoryService.deleteCategory(id)
+            console.log(res)
+            return res
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Something went wrong');
+        }
+    })
+
+
 export const addBrand = createAsyncThunk(
-    'addBand',
+    'admin/addBand',
     async (formData, { rejectWithValue }) => {
         try {
             const res = await inventoryService.addBrand(formData)
@@ -27,7 +40,34 @@ export const addBrand = createAsyncThunk(
     }
 )
 
-const inventorySlice = createSlice({
+export const deleteBrand = createAsyncThunk(
+    'admin/deleteBrand',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await inventoryService.deleteBrnad(id)
+            return res
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Something went wrong');
+
+        }
+    }
+)
+
+export const editBrand = createAsyncThunk(
+    'admin/editBrand',
+    async ({ id, data }, { rejectWithValue }) => {
+        console.log(data)
+        try {
+            const res=await inventoryService.editBrand(id,data)
+            console.log(res)
+            return res
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+)
+
+const inventorySlice = createSlice({   
     name: 'inventory',
     initialState: {
     },
