@@ -13,7 +13,6 @@ const ProductCard = ({ product }) => {
 
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
-  console.log(user)
 
   useEffect(() => {
     if (user && product?._id) {

@@ -193,8 +193,9 @@ export const googleAuth = async (req, res) => {
 
     //generatind access and refresh token
     const accessToken = generateAccessToken(user)
+    console.log(accessToken)
     const refreshToken = generateRefreshToken(user)
-
+    console.log(refreshToken)
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -240,7 +241,11 @@ export const login = async (req, res) => {
 
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
+    console.log(accessToken, ':accesssToken')
     const refreshToken = generateRefreshToken(user)
+    console.log(refreshToken, ':reresh token')
+
+
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -298,7 +303,10 @@ export const adminLogin = async (req, res) => {
 
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
+    console.log(accessToken)
     const refreshToken = generateRefreshToken(user)
+    console.log(refreshToken)
+
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

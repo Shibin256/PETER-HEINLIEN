@@ -4,10 +4,13 @@ import Title from '../../components/common/Title';
 import ProductCard from '../../components/common/ProductCard';
 import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
-const Collection = () => {
+const CategoryBasedCollection = () => {
   const dispatch = useDispatch();
-
+   const location = useLocation();
+  const categoryId = location.state?.categoryId;
+  const categoryName=location.state?.categoryName
   const [showFilter, setShowFilter] = useState(false);
   const [category, setCategory] = useState([]);
   const [brand, setBrands] = useState([]);
@@ -17,35 +20,53 @@ const Collection = () => {
 
   const { products, page, totalPages, brands, categories } = useSelector(state => state.products);
 
+
+useEffect(() => {
+    dispatch(fetchProducts({
+      page: 1,
+      limit: 10,
+      search: '',
+      categories: [categoryId],
+      brands: brand,
+      sort: sortType === 'low-high' || sortType === 'high-low' ? 'price' : '',
+      order: sortType === 'low-high' ? 'asc' : sortType === 'high-low' ? 'desc' : alphabeticOrder === 'a-z' ? 'asc' : alphabeticOrder === 'z-a' ? 'desc' : ''
+    }));
+}, [categoryId]);
+
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
+
   // Fetch initial data
   useEffect(() => {
     dispatch(getBrandAndCollection());
   }, [dispatch]);
 
-  // Fetch filtered products
-  const fetchFilteredProducts = (pageNumber = 1) => {
-    setCurrentPage(pageNumber);
-    dispatch(fetchProducts({
-      page: pageNumber,
-      limit: 10,
-      search: '',
-      categories: category,
-      brands: brand,
-      sort: sortType === 'low-high' || sortType === 'high-low' ? 'price' : '',
-      order: sortType === 'low-high' ? 'asc' : sortType === 'high-low' ? 'desc' : alphabeticOrder === 'a-z' ? 'asc' : alphabeticOrder === 'z-a' ? 'desc' : ''
-    }));
-  };
+
+
+const fetchFilteredProducts = (pageNumber = 1) => {
+  setCurrentPage(pageNumber);
+  dispatch(fetchProducts({
+    page: pageNumber,
+    limit: 10,
+    search: '',
+    categories: category.length ? category : [categoryId], // Use selected filters or fallback
+    brands: brand,
+    sort: sortType === 'low-high' || sortType === 'high-low' ? 'price' : '',
+    order:
+      sortType === 'low-high' ? 'asc' :
+      sortType === 'high-low' ? 'desc' :
+      alphabeticOrder === 'a-z' ? 'asc' :
+      alphabeticOrder === 'z-a' ? 'desc' : ''
+  }));
+};
 
   // Filters + sorting effect
   useEffect(() => {
     fetchFilteredProducts(1); // Reset to page 1 on filter/sort change
   }, [category, brand, sortType, alphabeticOrder]);
 
-  // Brand and category toggle
-  const toggleCategory = (e) => {
-    const value = e.target.value;
-    setCategory(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);
-  };
 
   const toggleBrand = (e) => {
     const value = e.target.value;
@@ -85,43 +106,6 @@ const Collection = () => {
                 Clear all filters
               </button>
             )}
-
-            {/* Category Filter */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Categories</p>
-                {category.length > 0 && (
-                  <span className="text-xs text-blue-600">{category.length} selected</span>
-                )}
-              </div>
-              <div className="space-y-2">
-                {categories.map((cat) => (
-                  <label
-                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${category.includes(cat._id) ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
-                    key={cat._id}
-                  >
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        value={cat._id}
-                        onChange={toggleCategory}
-                        checked={category.includes(cat._id)}
-                        className="sr-only"
-                      />
-                      <div className={`w-5 h-5 rounded flex items-center justify-center ${category.includes(cat._id) ? 'bg-blue-500 border-blue-500' : 'border-2 border-gray-300'}`}>
-                        {category.includes(cat._id) && (
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-sm text-gray-700">{cat.categoryName}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
             {/* Brand Filter */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-3">
@@ -183,8 +167,8 @@ const Collection = () => {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
                   <option value="">None</option>
-                  <option value="low-high">Low to High</option>
-                  <option value="high-low">High to Low</option>
+                  <option value="low-high">High to Low</option>
+                  <option value="high-low">Low to High</option>
                 </select>
               </div>
             </div>
@@ -194,19 +178,8 @@ const Collection = () => {
         {/* Right Product Grid */}
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <Title text1={'ALL'} text2={'COLLECTIONS'} />
-            {/* <div className="w-full sm:w-auto">
-              <span className="block text-xs text-gray-500 mb-1 sm:hidden">Sort by</span>
-              <select
-                onChange={(e) => setSortType(e.target.value)}
-                value={sortType}
-                className="w-full sm:w-48 px-4 py-2 text-sm border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              >
-                <option value="">Sort by: Relevant</option>
-                <option value="low-high">Price: Low to High</option>
-                <option value="high-low">Price: High to Low</option>
-              </select>
-            </div> */}
+
+            <Title text1={`${categoryName}'s`} text2={'COLLECTIONS'} />
           </div>
 
           {/* Products */}
@@ -272,4 +245,4 @@ const Collection = () => {
   );
 };
 
-export default Collection;
+export default CategoryBasedCollection;

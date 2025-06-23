@@ -9,9 +9,10 @@ const router=express.Router()
 const storage=multer.diskStorage({})
 const upload=multer({storage})
 
+
 // user managing
-router.get('/users/get',getAllUsers)
-router.patch('/block-toggle/:id', toggleUserBlock);
+router.get('/users/get',verifyAccessToken,getAllUsers)
+router.patch('/block-toggle/:id',verifyAccessToken, toggleUserBlock);
 router.delete('/delete/:id',verifyAccessToken,deleteUser)
 
 //category managing

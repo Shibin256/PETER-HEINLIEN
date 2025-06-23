@@ -3,14 +3,12 @@ import axiosInstance from "../../api/axiosInstance";
 //fetching producs
 const getProducts=async (params)=>{
     const response=await axiosInstance.get(`/api/products/get?${params.toString()}`)
-    console.log(response.data)
     return response.data
 }
 
 //fetching producs  for collection
 const getLatestCollection=async ()=>{
     const response=await axiosInstance.get(`/api/products/getCollection`)
-    console.log(response.data)
     return response.data
 }
 

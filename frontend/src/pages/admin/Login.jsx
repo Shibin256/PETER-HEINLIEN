@@ -4,6 +4,9 @@ import { HiLockClosed, HiMail } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthInput from '../../components/common/AuthInput';
+import axiosInstance from '../../api/axiosInstance';
+import { setAdmin } from '../../features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -12,6 +15,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate()
+  const dispatch=useDispatch()
 
   //handling admin login
   const handleSubmit = async (e) => {
@@ -22,12 +26,16 @@ const AdminLogin = () => {
     }
     setError('');
     try {
-      const response = await axios.post(`${baseUrl}/api/auth/admin-login`, { email, password })
-      console.log(response)
+      const response = await axiosInstance.post(`${baseUrl}/api/auth/admin-login`, { email, password })
+      console.log(response.data, 'admin login res')
 
       // settong access token to the local storage
-      const yourJWT = response.data.accessToken
-      localStorage.setItem('accessToken', yourJWT)
+      const token = response.data.accessToken
+      const admin = JSON.stringify(response.data.user)
+      console.log(token, 'admin login token========')
+      dispatch(setAdmin({ token, admin }))
+      localStorage.setItem('accessToken', token)
+      localStorage.setItem('admin', admin)
 
       if (response) {
         toast.success(response.data.message)
@@ -84,7 +92,7 @@ const AdminLogin = () => {
               Textcolor='text-gray-300'
               bgcolor='bg-gray-700'
               borderColor='border-gray-600'
-              
+
             />
 
             <div>

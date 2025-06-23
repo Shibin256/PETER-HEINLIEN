@@ -1,28 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Title from '../common/Title';
 import heroImg2 from '../../assets/heroSectionWatch2.png';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBrandAndCollection } from '../../features/products/productSlice';
+import { useNavigate } from 'react-router-dom';
+
 
 const CategoryProducts = () => {
-  const categories = [
-    {
-      name: 'Men',
-      image: heroImg2,
-      link: '/category/men',
-      description: 'Explore our premium collection of watches for men.',
-    },
-    {
-      name: 'Women',
-      image: heroImg2,
-      link: '/category/women',
-      description: 'Discover elegant and stylish watches for women.',
-    },
-    {
-      name: 'Couples',
-      image: heroImg2,
-      link: '/category/couples',
-      description: 'Find the perfect matching watches for couples.',
-    },
-  ];
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getBrandAndCollection())
+  }, [])
+
+  const { categories } = useSelector(state => state.products);
+
+  //pass category id when click button
+  const handleclick = (categoryId,categoryName) => {
+    // console.log(categoryId,'888888888888888')
+    navigate('/category-collection', { state: { categoryId,categoryName } });
+  };
 
   return (
     <div className="our-model my-10 px-2 sm:px-4">
@@ -44,30 +43,30 @@ const CategoryProducts = () => {
             {/* Category Image */}
             <div className="relative h-64 w-full overflow-hidden">
               <img
-                src={category.image}
-                alt={category.name}
+                src={heroImg2}
+                alt={category.categoryName}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
               {/* Overlay on Hover */}
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center">
-                <a
-                  href={category.link}
+                <button
+                  onClick={() => handleclick(category._id,category.categoryName)}
                   className="text-white text-sm font-semibold px-4 py-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{ backgroundColor: '#003543' }}
                 >
                   Shop Now
-                </a>
+                </button>
               </div>
             </div>
 
             {/* Category Info */}
             <div className="p-4 text-center">
               <h3 className="text-lg font-semibold text-gray-800">
-                {category.name}
+                {category.categoryName}
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              {/* <p className="mt-1 text-sm text-gray-500">
                 {category.description}
-              </p>
+              </p> */}
             </div>
           </div>
         ))}

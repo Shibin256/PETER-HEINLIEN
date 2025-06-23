@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axiosInstance from '../../api/axiosInstance';
 
 const OTPForm = () => {
   const navigate = useNavigate()
@@ -59,7 +60,7 @@ const OTPForm = () => {
   const handleResend = async () => {
     setLoading(true)
     try {
-      const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
+      const response = await axiosInstance.post(`${baseUrl}/api/auth/register`, formData);
       if (response) {
         const expiry = Date.now() + 600000;
         localStorage.setItem('otpExpiry', expiry.toString());
@@ -111,7 +112,7 @@ const OTPForm = () => {
     try {
       const otp = userOTP.join('');
       console.log('Submitted OTP:', otp);
-      const response = await axios.post(`${baseUrl}/api/auth/verifyOTP`, { formData, otp })
+      const response = await axiosInstance.post(`${baseUrl}/api/auth/verifyOTP`, { formData, otp })
       const { user } = response.data
       console.log("User registered:", user);
       toast.success(response.data.message)

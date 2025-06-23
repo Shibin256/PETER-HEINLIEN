@@ -1,5 +1,7 @@
 import express from 'express'
 import { adminLogin, changePassword, fetchCurrentUser, forgotPass, googleAuth, login, refreshAccessToken, register, verifyOTP, verifyOTPForgotpass } from "../controller/authController.js";
+import { verifyAccessToken } from "../middleware/authMiddleware.js";
+
 
 const router=express.Router()
 //authentication managing
@@ -10,8 +12,8 @@ router.post('/login',login)
 router.post('/admin-login',adminLogin)
 
 //token and fetch current user manage
-router.post('/refresh-token',refreshAccessToken)
-router.get('/me/:id',fetchCurrentUser)
+router.get('/refresh-token',refreshAccessToken)
+router.get('/me/:id',verifyAccessToken,fetchCurrentUser)
 
 //forgot password managing
 router.post('/forgotpass',forgotPass)

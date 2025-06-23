@@ -114,7 +114,7 @@ const Signup = () => {
         return;
       }
 
-      const response = await axios.post(`${baseUrl}/api/auth/register`, formData);
+      const response = await axiosInstance.post(`${baseUrl}/api/auth/register`, formData);
       if (response) {
         //navigate to verify otp with formdata
         toast.success(response.data.message)

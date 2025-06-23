@@ -11,7 +11,7 @@ const TopRated = () => {
   // console.log(products)
 
   useEffect(()=>{
-      dispatch(fetchProducts())
+      // dispatch(fetchProducts())
   },[]) // Create array of 10 products
 
   return (

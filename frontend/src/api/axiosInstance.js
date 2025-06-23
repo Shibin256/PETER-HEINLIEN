@@ -9,7 +9,6 @@ const axiosInstance=axios.create({
 axiosInstance.interceptors.request.use(
     (config)=>{
         const token=localStorage.getItem('accessToken')
-        console.log(token)
        if(token){
         config.headers.Authorization = `Bearer ${token}`
     }
@@ -17,6 +16,7 @@ axiosInstance.interceptors.request.use(
     },
     (error)=>Promise.reject(error)
 )
+
 //  Response Interceptor Refresh Access Token 
 axiosInstance.interceptors.response.use(
     (res)=>res,
@@ -25,9 +25,11 @@ axiosInstance.interceptors.response.use(
          if (err.response?.status === 403 && !originalRequest._retry) {
              originalRequest._retry = true;
              try {
-                const response = await axios.get('/api/refresh-token', {
+                //refresh token
+                const response = await axiosInstance.get('/api/auth/refresh-token', {
           withCredentials: true,
         });
+        console.log(response,'res from refresh+++++++++++++++++++++++++++++++++++++++++++++++')
 
           const newAccessToken = response.data.accessToken;
         localStorage.setItem("accessToken", newAccessToken);

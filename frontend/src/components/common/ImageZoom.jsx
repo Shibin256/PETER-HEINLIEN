@@ -12,12 +12,12 @@ const ImageZoom = ({ imageUrl }) => {
         },
         largeImage: {
           src: imageUrl,
-          width: 900,
-          height: 900,
+          width: 1200,
+          height: 1800,
         },
         enlargedImageContainerDimensions: {
-          width: '150%',
-          height: '110%',
+          width: '185%',
+          height: '105%',
         },
         enlargedImagePosition: 'beside', // This is key
       }}

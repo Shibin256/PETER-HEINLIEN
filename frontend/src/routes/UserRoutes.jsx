@@ -17,28 +17,19 @@ import ChangePass from '../pages/user/ChangePass'
 import ProductDetails from '../pages/user/ProductDetails'
 import Contact from '../pages/user/Contact'
 import Wishlist from '../pages/user/Wishlist'
+import PublicOnlyRoute from './PublicOnlyRoute'
+import CategoryBasedCollection from '../pages/user/CategoryBasedCollection'
 
 
 
 
 const UserRoutes = () => {
-  
-  const navigate = useNavigate();
-
-//  useEffect(() => {
-//     const token = localStorage.getItem('accessToken');
-//     console.log(token)
-//     if (token) {
-//       navigate('/');
-//     }
-//   }, []);
-  
-  
+    
   return (
     <div>
       <Routes>
-        <Route path='login' element={<Login />}/>
-        <Route path='register' element={<Signup/>}/>
+        <Route path='login' element={<PublicOnlyRoute><Login /></PublicOnlyRoute>}/>
+        <Route path='register' element={<PublicOnlyRoute><Signup/></PublicOnlyRoute>}/>
          <Route path='/' element={<UserLayout />}>
         <Route index element={<Home />} />
         <Route path='collection' element={<Collection />} />
@@ -53,7 +44,7 @@ const UserRoutes = () => {
         <Route path='reset-password' element={<ForgotPass />} />
         <Route path='contact' element={<Contact />} />
         <Route path='wishlist' element={<Wishlist />} />
-        
+        <Route path='category-collection' element={<CategoryBasedCollection />} />
       </Route>
       </Routes>
       

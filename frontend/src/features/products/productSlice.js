@@ -32,7 +32,7 @@ export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async ({ page = 1, limit = 8, search = '', categories = [], brands = [], sort = '', order = '' }, thunkAPI) => {
     try {
-      console.log(categories,brands,sort,'------------',order)
+      // console.log(categories,brands,sort,'------------',order)
       const params = new URLSearchParams({ page, limit });
 
       if (search) params.append('search', search);

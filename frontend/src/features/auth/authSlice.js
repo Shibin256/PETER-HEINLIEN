@@ -28,7 +28,16 @@ const authSlice=createSlice({
       state.isAuthenticated = true;
       state.isAdmin = user?.isAdmin || false;
       console.log(state.isAuthenticated,'isauth')
-      console.log(state.isdmin,'isadmin')
+      console.log(state.isAdmin,'isadmin')
+    },
+    setAdmin:(state,action)=>{
+    const { admin, token } = action.payload;
+      state.admin = admin;
+      state.token = token;
+      state.isAuthenticated = true;
+      state.isAdmin = admin?.isAdmin || true;
+      console.log(state.isAuthenticated,'isauth')
+      console.log(state.isAdmin,'isadmin')
     },
     logout: (state) => {
       state.user = null;

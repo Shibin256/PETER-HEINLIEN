@@ -12,7 +12,6 @@ const LatestCollection = () => {
   },[])
   
   const {latestCollection}=useSelector(state=>state.products)
-  console.log(latestCollection)
   return (
     <div className="latest-collection my-10 px-2 sm:px-4">
       {/* Heading Section */}

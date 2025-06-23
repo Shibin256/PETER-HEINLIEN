@@ -13,7 +13,6 @@ const getWishlist = async (userId) => {
 
 const getWishedProduct = async ({userId,productId}) => {
   const response = await axiosInstance.get(`/api/user/wishlist/check/${userId}/${productId}`);
-  console.log(response.data)
   return response.data;
 };
 
