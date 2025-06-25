@@ -9,12 +9,12 @@ const storage=multer.diskStorage({})
 const upload=multer({storage})
 
 //products manage
-router.get('/getCollection',verifyAccessToken,getCollection)
+router.get('/getCollection',getCollection)
 router.post('/add',upload.array("images",4),verifyAccessToken,createProduct)
-router.get('/get',verifyAccessToken,getAllProducts)
+router.get('/get',getAllProducts)
 router.delete('/:id',verifyAccessToken,deleteProductById)
-router.put('/update/:id', upload.none(),verifyAccessToken, updateProduct)
+router.put('/update/:id', upload.array("newImages",4),verifyAccessToken, updateProduct)
 
-router.get('/getBrandsAndCollection',verifyAccessToken,getBrandsAndCollection)
-router.get('/:id',verifyAccessToken,getProductById)
+router.get('/getBrandsAndCollection',getBrandsAndCollection)
+router.get('/:id',getProductById)
 export default router

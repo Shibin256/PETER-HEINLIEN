@@ -19,6 +19,8 @@ import Contact from '../pages/user/Contact'
 import Wishlist from '../pages/user/Wishlist'
 import PublicOnlyRoute from './PublicOnlyRoute'
 import CategoryBasedCollection from '../pages/user/CategoryBasedCollection'
+import MyAccount from '../pages/user/accout/MyAccount'
+import Profile from '../pages/user/accout/Profile'
 
 
 
@@ -45,6 +47,8 @@ const UserRoutes = () => {
         <Route path='contact' element={<Contact />} />
         <Route path='wishlist' element={<Wishlist />} />
         <Route path='category-collection' element={<CategoryBasedCollection />} />
+        <Route path='My-account' element={<MyAccount />} />
+        <Route path='My-profile' element={<Profile />} />
       </Route>
       </Routes>
       

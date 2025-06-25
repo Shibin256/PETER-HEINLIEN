@@ -1,24 +1,74 @@
-import React, { useState } from 'react';
-import { FiPlus, FiTrash2, FiEye, FiCheckCircle } from 'react-icons/fi';
+import React, { useState, useRef } from 'react';
+import { FiPlus, FiTrash2, FiEye, FiCheckCircle, FiUpload, FiX } from 'react-icons/fi';
 
 const Banners = () => {
   // Form state
-  const [imageUrl, setImageUrl] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [buttonText, setButtonText] = useState('');
   const [buttonLink, setButtonLink] = useState('');
+  
+  // Image states
+  const [bgImage, setBgImage] = useState(null);
+  const [bgImagePreview, setBgImagePreview] = useState('');
+  const [mainImage, setMainImage] = useState(null);
+  const [mainImagePreview, setMainImagePreview] = useState('');
+  
+  // Refs for file inputs
+  const bgImageInputRef = useRef(null);
+  const mainImageInputRef = useRef(null);
 
   // Banners list
   const [banners, setBanners] = useState([]);
   const [activeBannerId, setActiveBannerId] = useState(null);
 
+  const handleBgImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBgImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBgImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMainImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMainImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMainImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeBgImage = () => {
+    setBgImage(null);
+    setBgImagePreview('');
+    if (bgImageInputRef.current) {
+      bgImageInputRef.current.value = '';
+    }
+  };
+
+  const removeMainImage = () => {
+    setMainImage(null);
+    setMainImagePreview('');
+    if (mainImageInputRef.current) {
+      mainImageInputRef.current.value = '';
+    }
+  };
+
   const handleCreate = () => {
-    if (!imageUrl || !title) return;
+    if (!bgImagePreview || !title) return;
     
     const newBanner = {
       id: Date.now(),
-      imageUrl,
+      bgImage: bgImagePreview,
+      mainImage: mainImagePreview,
       title,
       description,
       buttonText,
@@ -31,11 +81,14 @@ const Banners = () => {
   };
 
   const resetForm = () => {
-    setImageUrl('');
     setTitle('');
     setDescription('');
     setButtonText('');
     setButtonLink('');
+    setBgImage(null);
+    setBgImagePreview('');
+    setMainImage(null);
+    setMainImagePreview('');
   };
 
   const deleteBanner = (id) => {
@@ -61,15 +114,76 @@ const Banners = () => {
           <h3 className="text-lg font-semibold text-gray-800 mb-6">Create New Banner</h3>
           
           <div className="space-y-4">
+            {/* Background Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/banner.jpg"
-                className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-teal-100 focus:border-teal-500 text-gray-700 transition-all"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Background Image</label>
+              {bgImagePreview ? (
+                <div className="relative group">
+                  <img 
+                    src={bgImagePreview} 
+                    alt="Background preview" 
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                  />
+                  <button
+                    onClick={removeBgImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-teal-500 transition-colors"
+                  onClick={() => bgImageInputRef.current.click()}
+                >
+                  <FiUpload className="mx-auto text-gray-400 mb-2" size={24} />
+                  <p className="text-sm text-gray-500">Click to upload background image</p>
+                  <p className="text-xs text-gray-400 mt-1">Recommended size: 1200x400px</p>
+                  <input
+                    type="file"
+                    ref={bgImageInputRef}
+                    onChange={handleBgImageChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              )}
+            </div>
+            
+            {/* Main Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Main Image (Optional)</label>
+              {mainImagePreview ? (
+                <div className="relative group">
+                  <img 
+                    src={mainImagePreview} 
+                    alt="Main image preview" 
+                    className="w-full h-32 object-contain rounded-lg border border-gray-200"
+                  />
+                  <button
+                    onClick={removeMainImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-teal-500 transition-colors"
+                  onClick={() => mainImageInputRef.current.click()}
+                >
+                  <FiUpload className="mx-auto text-gray-400 mb-2" size={24} />
+                  <p className="text-sm text-gray-500">Click to upload main image</p>
+                  <p className="text-xs text-gray-400 mt-1">Product or featured image</p>
+                  <input
+                    type="file"
+                    ref={mainImageInputRef}
+                    onChange={handleMainImageChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              )}
             </div>
             
             <div>
@@ -120,8 +234,8 @@ const Banners = () => {
             
             <button
               onClick={handleCreate}
-              disabled={!imageUrl || !title}
-              className={`w-full mt-4 px-6 py-3 rounded-lg font-medium text-white transition-all ${(!imageUrl || !title) ? 'bg-gray-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700 shadow-md hover:shadow-lg'} flex items-center justify-center`}
+              disabled={!bgImagePreview || !title}
+              className={`w-full mt-4 px-6 py-3 rounded-lg font-medium text-white transition-all ${(!bgImagePreview || !title) ? 'bg-gray-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700 shadow-md hover:shadow-lg'} flex items-center justify-center`}
             >
               <FiPlus className="mr-2" />
               Create Banner
@@ -147,17 +261,22 @@ const Banners = () => {
                 {banners.map((banner) => (
                   <div key={banner.id} className={`relative border rounded-xl overflow-hidden transition-all ${activeBannerId === banner.id ? 'ring-2 ring-teal-500 border-teal-500' : 'border-gray-200'}`}>
                     {/* Banner Image */}
-                    <div className="h-40 bg-gray-100 overflow-hidden">
-                      {banner.imageUrl ? (
-                        <img 
-                          src={banner.imageUrl} 
-                          alt={banner.title} 
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null; 
-                            e.target.src = 'https://via.placeholder.com/600x200?text=Banner+Image';
-                          }}
-                        />
+                    <div className="h-40 bg-gray-100 overflow-hidden relative">
+                      {banner.bgImage ? (
+                        <>
+                          <img 
+                            src={banner.bgImage} 
+                            alt={banner.title} 
+                            className="w-full h-full object-cover"
+                          />
+                          {banner.mainImage && (
+                            <img 
+                              src={banner.mainImage} 
+                              alt={banner.title} 
+                              className="absolute bottom-4 right-4 h-3/5 object-contain"
+                            />
+                          )}
+                        </>
                       ) : (
                         <div className="w-full h-full bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center">
                           <span className="text-gray-500">Banner Preview</span>
@@ -212,12 +331,19 @@ const Banners = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Active Banner Preview</h3>
               <div className="border rounded-xl overflow-hidden">
-                <div className="h-48 bg-gray-100 overflow-hidden">
+                <div className="h-48 bg-gray-100 overflow-hidden relative">
                   <img 
-                    src={banners.find(b => b.id === activeBannerId).imageUrl || 'https://via.placeholder.com/1200x400?text=Banner+Image'} 
+                    src={banners.find(b => b.id === activeBannerId).bgImage || 'https://via.placeholder.com/1200x400?text=Banner+Image'} 
                     alt="Active banner" 
                     className="w-full h-full object-cover"
                   />
+                  {banners.find(b => b.id === activeBannerId).mainImage && (
+                    <img 
+                      src={banners.find(b => b.id === activeBannerId).mainImage} 
+                      alt="Main image"
+                      className="absolute bottom-6 right-6 h-1/2 object-contain"
+                    />
+                  )}
                 </div>
                 <div className="p-6 bg-gradient-to-r from-gray-50 to-white">
                   <h4 className="text-xl font-bold text-gray-800">
@@ -227,9 +353,12 @@ const Banners = () => {
                     {banners.find(b => b.id === activeBannerId).description}
                   </p>
                   {banners.find(b => b.id === activeBannerId).buttonText && (
-                    <button className="mt-4 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+                    <a 
+                      href={banners.find(b => b.id === activeBannerId).buttonLink || '#'}
+                      className="inline-block mt-4 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                    >
                       {banners.find(b => b.id === activeBannerId).buttonText}
-                    </button>
+                    </a>
                   )}
                 </div>
               </div>

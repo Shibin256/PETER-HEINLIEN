@@ -263,6 +263,8 @@ export const login = async (req, res) => {
         name: user.username,
         email: user.email,
         isAdmin: user.isAdmin,
+        phone:user.phone,
+        gender:user.gender
       },
     });
   } catch (error) {

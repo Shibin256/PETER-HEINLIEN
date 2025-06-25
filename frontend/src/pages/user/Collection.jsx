@@ -4,6 +4,7 @@ import Title from '../../components/common/Title';
 import ProductCard from '../../components/common/ProductCard';
 import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import AuthInput from '../../components/common/AuthInput';
 
 const Collection = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,8 @@ const Collection = () => {
   const [sortType, setSortType] = useState('');
   const [alphabeticOrder, setAlphabeticOrder] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   const { products, page, totalPages, brands, categories } = useSelector(state => state.products);
 
@@ -36,6 +39,12 @@ const Collection = () => {
     }));
   };
 
+  // Handle search
+  const handleSearch = (e) => {
+    e.preventDefault();
+    dispatch(fetchProducts({ page: 1, limit: 10, search: searchTerm }));
+  };
+
   // Filters + sorting effect
   useEffect(() => {
     fetchFilteredProducts(1); // Reset to page 1 on filter/sort change
@@ -56,8 +65,7 @@ const Collection = () => {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Filters - Enhanced Version */}
-
-        <div className="lg:w-72 xl:w-80">
+        <div className="lg:w-7 xl:w-80">
           <div
             className="my-2 text-xl flex items-center cursor-pointer gap-2 lg:cursor-auto"
             onClick={() => setShowFilter(!showFilter)}
@@ -183,8 +191,8 @@ const Collection = () => {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
                   <option value="">None</option>
-                  <option value="low-high">Low to High</option>
-                  <option value="high-low">High to Low</option>
+                  <option value="low-high">High to Low</option>
+                  <option value="high-low">Low to High</option>
                 </select>
               </div>
             </div>
@@ -195,18 +203,37 @@ const Collection = () => {
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <Title text1={'ALL'} text2={'COLLECTIONS'} />
-            {/* <div className="w-full sm:w-auto">
-              <span className="block text-xs text-gray-500 mb-1 sm:hidden">Sort by</span>
-              <select
-                onChange={(e) => setSortType(e.target.value)}
-                value={sortType}
-                className="w-full sm:w-48 px-4 py-2 text-sm border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              >
-                <option value="">Sort by: Relevant</option>
-                <option value="low-high">Price: Low to High</option>
-                <option value="high-low">Price: High to Low</option>
-              </select>
-            </div> */}
+            {/* Search Bar */}
+            <div className="mb-4">
+              <form onSubmit={handleSearch} className="flex gap-2 items-center">
+                <AuthInput
+                  type="text"
+                  name="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search products by name..."
+                  width="w-full md:w-64"
+                  Textcolor="text-gray-700"
+                  borderColor="border-gray-300"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                  Search
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm('');
+                    dispatch(fetchProducts({ page: 1, limit: 10 }));
+                  }}
+                  className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+                >
+                  Clear
+                </button>
+              </form>
+            </div>
           </div>
 
           {/* Products */}

@@ -48,7 +48,7 @@ export const getCollection = async (req, res) => {
             .populate('brand') // Populate the brand field with data from the Brands collection
             .populate('category');
 
-        res.json({latestCollection});
+        res.json({ latestCollection });
     } catch (error) {
         console.error('Error fetching products:', error.message);
         res.status(500).json({ message: 'Server error fetching products' });
@@ -66,7 +66,7 @@ export const getAllProducts = async (req, res) => {
     const categories = req.query.categories?.split(',') || [];
     const brands = req.query.brands?.split(',') || [];
     const sortField = req.query.sort || 'createdAt';
-    const sortOrder = req.query.order === 'asc' ? -1 : 1;
+    const sortOrder = req.query.order === 'asc' ? 1 : -1;
 
     const filter = {};
 
@@ -120,8 +120,33 @@ export const updateProduct = async (req, res) => {
     try {
         let available = true
         const { id } = req.params
-        
+
         if (req.body.quantity <= 0) available = false
+
+
+        // Step 1: Handle existing image URLs sent from frontend
+        let existingImages = [];
+        if (req.body.existingImages) {
+            if (Array.isArray(req.body.existingImages)) {
+                existingImages = req.body.existingImages;
+            } else {
+                existingImages = [req.body.existingImages]; // if only one string was sent
+            }
+        }
+
+
+        const uploadImage = []
+
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const result = await cloudinary.uploader.upload(file.path);
+                uploadImage.push(result.secure_url);
+            }
+        }
+
+
+        // Step 3: Combine existing + new images
+        const finalImages = [...existingImages, ...uploadImage];
 
         const updatedData = {
             name: req.body.name,
@@ -131,8 +156,12 @@ export const updateProduct = async (req, res) => {
             brand: req.body.brand,
             price: req.body.price,
             totalQuantity: req.body.quantity,
-            availability: available
+            availability: available,
+            images:finalImages
         };
+
+
+
 
 
         const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
@@ -180,3 +209,12 @@ export const getProductById = async (req, res) => {
         res.status(500).json({ message: 'Server error fetching product' });
     }
 }
+
+
+
+// export const shopPagesearch=async(req,res)=>{
+//     const SearchName=req.body
+
+//     const res=await Product.find({name:})
+
+// }

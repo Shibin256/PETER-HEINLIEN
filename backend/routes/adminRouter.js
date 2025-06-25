@@ -3,6 +3,7 @@ import multer from "multer";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { deleteUser, getAllUsers, toggleUserBlock } from "../controller/admin/usersController.js";
 import { createBrand, createCategory, deleteBrand, deleteCategory, editBrand } from "../controller/admin/inventoryController.js";
+import { createBanner } from "../controller/admin/bannerController.js";
 
 const router=express.Router()
 
@@ -24,4 +25,7 @@ router.post('/addBrand',verifyAccessToken, upload.single('logo'), createBrand)
 router.delete('/deleteBrand/:id',verifyAccessToken,deleteBrand)
 router.put('/editBrand/:id',verifyAccessToken,upload.single('logo'),editBrand)
 
+
+//bannerManage
+router.post('/banner/add',verifyAccessToken,createBanner)
 export default router

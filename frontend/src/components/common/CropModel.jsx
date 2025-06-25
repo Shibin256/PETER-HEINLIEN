@@ -18,7 +18,7 @@ const CropModal = ({ imageSrc, onComplete, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-60  z-[9999]  flex justify-center items-center">
       <div className="bg-white rounded-xl shadow-lg p-4 w-[90vw] max-w-md">
         <div className="relative w-full h-64 bg-gray-100 rounded overflow-hidden">
           <Cropper

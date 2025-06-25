@@ -95,8 +95,8 @@ function AddItem() {
   // handling submit of form
   const handleSubmit = async () => {
     // check all fields are in
-    if (!productName || !description || !category || !tags || !brand || !price || images.length === 0 || !quantity) {
-      toast.error('Please fill all fields and upload at least one image.');
+    if (!productName.trim() || !description.trim() || !category || !tags || !brand || !price || images.length === 0 || !quantity) {
+      toast.error('Please fill all fields without empty spaces and upload at least one image.');
       return;
     }
     //validation for price and quantity
