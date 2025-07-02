@@ -8,7 +8,6 @@ import About from '../pages/user/About'
 import OTPForm from '../pages/user/OtpVerification'
 import Cart from '../pages/user/Cart'
 import Collection from '../pages/user/Collection'
-import Placeorder from '../pages/user/PlaceOrder'
 import Orders from '../pages/user/Orders'
 import ProtectedRoute from './ProtectedRoute'
 import ForgotPass from '../pages/user/ForgotPass'
@@ -21,6 +20,12 @@ import PublicOnlyRoute from './PublicOnlyRoute'
 import CategoryBasedCollection from '../pages/user/CategoryBasedCollection'
 import MyAccount from '../pages/user/accout/MyAccount'
 import Profile from '../pages/user/accout/Profile'
+import EditName from '../pages/user/accout/EditName'
+import EditMobile from '../pages/user/accout/EditMobile'
+import EditPassword from '../pages/user/accout/EditPassword'
+import Address from '../pages/user/accout/Adress'
+import AddAddress from '../pages/user/accout/AddAddress'
+import Checkout from '../pages/user/Checkout'
 
 
 
@@ -36,19 +41,29 @@ const UserRoutes = () => {
         <Route index element={<Home />} />
         <Route path='collection' element={<Collection />} />
         <Route path='about' element={<About />} />
-        <Route path='cart' element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+        <Route path='cart' element={<Cart />} />
         <Route path='product/:id' element={<ProductDetails />} />
         <Route path='verify-otp' element={<OTPForm />} />
         <Route path='change-password' element={<ChangePass />} />
         <Route path='verify-otp-forgotpass' element={<OTPFormFrogotpass />} />
-        <Route path='checkout' element={<ProtectedRoute><Placeorder /></ProtectedRoute>} />
         <Route path='orders' element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path='reset-password' element={<ForgotPass />} />
         <Route path='contact' element={<Contact />} />
         <Route path='wishlist' element={<Wishlist />} />
         <Route path='category-collection' element={<CategoryBasedCollection />} />
+        <Route path='checkout' element={<Checkout />} />
+
+
+
+
         <Route path='My-account' element={<MyAccount />} />
         <Route path='My-profile' element={<Profile />} />
+        <Route path='edit-name' element={<EditName />} />
+        <Route path='edit-mobile' element={<EditMobile />} />
+        <Route path='edit-password' element={<EditPassword />} />
+        <Route path='my-address' element={<Address />} />
+        <Route path='add-address' element={<AddAddress />} />
+
       </Route>
       </Routes>
       

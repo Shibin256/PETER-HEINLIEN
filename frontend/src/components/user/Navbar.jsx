@@ -60,7 +60,7 @@ const Navbar = () => {
       >
         {/* <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaSearch /></a> */}
         <a href="/my-account" className="hover:text-teal-200 transition-colors text-xl"><FaUser /></a>
-        <a href="#" className="hover:text-teal-200 transition-colors text-xl"><FaShoppingCart /></a>
+        <a href="/cart" className="hover:text-teal-200 transition-colors text-xl"><FaShoppingCart /></a>
         <a href="/wishlist" className="hover:text-teal-200 transition-colors text-xl"><FaHeart /></a>
         <button onClick={handleLogout}><HiArrowLeftOnRectangle className="hover:text-teal-200 transition-colors text-xl" /></button>
       </div>

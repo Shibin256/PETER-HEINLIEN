@@ -50,6 +50,12 @@ export const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
+  addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }],
+//   defaultAddress: {
+//   type: mongoose.Schema.Types.ObjectId,
+//   ref: 'Address',
+//   default: null,
+// },
 }, {
     timestamps: true
 })

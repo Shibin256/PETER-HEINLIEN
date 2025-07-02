@@ -40,7 +40,7 @@ const MyAccount = () => {
             icon={<img src="path/to/address-icon.png" alt="Address" className="w-6 h-6" />}
             title="ADDRESS"
             description="Edit addresses for orders and gifts"
-            onclickFun={() => {}}
+            onclickFun={() => {navigate('/my-address')}}
           />
 
           <AccountCard

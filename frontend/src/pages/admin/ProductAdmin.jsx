@@ -62,7 +62,7 @@ const ProductAdmin = () => {
       brand: product.brand || '',
       tags: product.tags || '',
       images: product.images,
-      newImages:[]
+      newImages: []
     });
     setShowEditModal(true);
   };
@@ -88,7 +88,6 @@ const ProductAdmin = () => {
     }
 
 
-    console.log(newImages, 'new images----------')
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
@@ -334,7 +333,7 @@ const ProductAdmin = () => {
                 />
               </div>
 
-              
+
               {/* Image Upload Section */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>

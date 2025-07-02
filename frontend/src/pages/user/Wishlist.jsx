@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getWishlist, removeFromWishlist } from '../../features/wishlist/wishlistSlice';
 import { toast } from 'react-toastify';
+import Title from '../../components/common/Title';
 
 const Wishlist = () => {
     const dispatch = useDispatch();
@@ -66,7 +67,8 @@ const Wishlist = () => {
     return (
         <div className="max-w-6xl mx-auto p-6 md:p-8">
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Your Wishlist</h2>
+                {/* <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Your Wishlist</h2> */}
+                <Title text1={'Your'} text2={'wishlist'} />
                 <span className="text-gray-600">{wishlist?.length || 0} {wishlist?.length === 1 ? 'item' : 'items'}</span>
             </div>
 

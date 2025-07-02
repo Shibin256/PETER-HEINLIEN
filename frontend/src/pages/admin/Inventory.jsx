@@ -183,7 +183,6 @@ const Inventory = () => {
             formData.append('logo', brandLogo);
 
             const res = await dispatch(addBrand(formData)).unwrap();
-            console.log(res)
             if (res) {
                 toast.success('Brand added successfully');
                 dispatch(getBrandAndCollection())
@@ -215,19 +214,13 @@ const Inventory = () => {
     // brand update
     const handleUpdateBrand = async (e) => {
         e.preventDefault();
-        console.log('hiii')
         setIsLoading(true)
         try {
             if (!editingBrandName.trim()) {
                 toast.warning('Brand name is required');
                 return;
             }
-            // if (!editingBrandLogo) {
-            //     toast.warning('Brand need Logo image');
-            //     return;
-            // }
-            // console.log(editingBrandLogo, '---------')
-            const formData = new FormData();
+               const formData = new FormData();
             formData.append('name', editingBrandName);
             formData.append('description', editingBrandDescription);
             formData.append('logo', editingBrandLogo);

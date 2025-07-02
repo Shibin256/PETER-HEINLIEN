@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { addToWishlist, getWishedProduct, getWishlist, removeFromWishlist } from '../../features/wishlist/wishlistSlice';
+import { addToCart} from '../../features/cart/cartSlice';
 import { useEffect } from 'react';
 
 const ProductCard = ({ product }) => {
@@ -16,14 +17,14 @@ const ProductCard = ({ product }) => {
 
   useEffect(() => {
     if (user && product?._id) {
-        dispatch(getWishedProduct({ userId: user._id, productId: product._id }))
-              .then((res) => {
-                if (res.payload?.wished) {
-                  setIsFavorite(true);
-                } else {
-                  setIsFavorite(false);
-                }
-              });
+      dispatch(getWishedProduct({ userId: user._id, productId: product._id }))
+        .then((res) => {
+          if (res.payload?.wished) {
+            setIsFavorite(true);
+          } else {
+            setIsFavorite(false);
+          }
+        });
     }
   }, [])
 
@@ -52,6 +53,20 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  const handleAddCart = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.warning('Please login to use Cart');
+      return;
+    }
+    try {
+      dispatch(addToCart({userId: user._id, productId: product._id}))
+    } catch (err) {
+      console.error('cart error:', err);
+      toast.error('Something went wrong');
+    }
+  }
+
   return (
     <Link to={`/product/${product._id}`} className="block">
       <div className="relative w-64 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-md hover:shadow-xl transition duration-300 group">
@@ -71,7 +86,7 @@ const ProductCard = ({ product }) => {
               {isFavorite ? <FaHeart className="text-red-500" /> : <FaRegHeart className="text-gray-500" />}
             </button>
             <button
-              onClick={(e) => e.preventDefault()}
+              onClick={handleAddCart}
               className="p-1.5 bg-white rounded-full shadow hover:bg-gray-100 transition"
               aria-label="Add to Cart"
             >

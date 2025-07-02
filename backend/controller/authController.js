@@ -83,12 +83,12 @@ export const register = async (req, res) => {
     }
 
     // Check if user already exists
-    const userExist = await User.findOne({ email });
+    const userExist = await User.findOne({ email }).select('-password');
     if (userExist) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const phoneExist = await User.findOne({ phone });
+    const phoneExist = await User.findOne({ phone }).select('-password');
     if (phoneExist && phoneExist.phone != null) {
       return res.status(400).json({ message: "The mobile number is already exists" });
     }
@@ -260,11 +260,12 @@ export const login = async (req, res) => {
       accessToken,
       user: {
         _id: user._id,
-        name: user.username,
+        username: user.username,
         email: user.email,
         isAdmin: user.isAdmin,
         phone:user.phone,
-        gender:user.gender
+        gender:user.gender,
+        profileImage:user.profileImage
       },
     });
   } catch (error) {

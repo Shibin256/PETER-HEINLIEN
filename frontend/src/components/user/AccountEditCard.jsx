@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AccountEditCard = ({ title, description, placeholder, value,type, onBack, onVerify, }) => {
+const AccountEditCard = ({ title, description, placeholder, inputValue,type, onBack, onVerify,onVerifyButtonName,onBackButtonName }) => {
   const [value, setvalue] = useState('');
 
   const handleSubmit = (e) => {
@@ -24,17 +24,17 @@ const AccountEditCard = ({ title, description, placeholder, value,type, onBack, 
             <div className="relative">
               <input
                 type={type}
-                value={value}
+                value={inputValue}
                 onChange={(e) => setvalue(e.target.value)}
                 placeholder={placeholder}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003543]/50 focus:border-[#003543] transition-all duration-300"
                 autoFocus
               />
-              <div className="absolute right-3 top-3 text-gray-400">
+              {/* <div className="absolute right-3 top-3 text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-              </div>
+              </div> */}
             </div>
 
             <div className="flex justify-between space-x-4">
@@ -46,7 +46,7 @@ const AccountEditCard = ({ title, description, placeholder, value,type, onBack, 
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back
+                {onBackButtonName}
               </button>
               <button
                 type="submit"
@@ -55,7 +55,7 @@ const AccountEditCard = ({ title, description, placeholder, value,type, onBack, 
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Verify
+                {onVerifyButtonName}
               </button>
             </div>
           </form>

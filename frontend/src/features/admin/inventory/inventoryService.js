@@ -2,7 +2,6 @@ import axiosInstance from "../../../api/axiosInstance";
 
 const addCategory = async (category) => {
     const res = await axiosInstance.post('/api/admin/addCategory', { category })
-    console.log(res.data)
     return res.data
 }
 
@@ -22,7 +21,6 @@ const deleteBrnad = async (id) => {
 }
 
 const editBrand=async(id,data)=>{
-    console.log(data)
     const res=await axiosInstance.put(`api/admin/editBrand/${id}`,data,{
     headers: {
       'Content-Type': 'multipart/form-data',

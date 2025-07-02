@@ -23,10 +23,12 @@ const authSlice=createSlice({
     reducers:{
     setUser:(state,action)=>{
     const { user, token } = action.payload;
+    console.log(action.payload,'ap-------')
       state.user = user;
       state.token = token;
       state.isAuthenticated = true;
       state.isAdmin = user?.isAdmin || false;
+      console.log(state.user,'user=======')
       console.log(state.isAuthenticated,'isauth')
       console.log(state.isAdmin,'isadmin')
     },
