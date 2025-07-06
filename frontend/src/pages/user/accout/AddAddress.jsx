@@ -79,7 +79,12 @@ const AddAddress = () => {
     const missingFields = requiredFields.filter(field => !addressData[field].trim());
 
     if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    if(addressData.altPhone === addressData.phone){
+      toast.error('Alternative phone number cannot be the same as the primary phone number.');
       return;
     }
 

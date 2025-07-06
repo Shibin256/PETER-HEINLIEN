@@ -26,7 +26,7 @@ const MyAccount = () => {
             icon={<img src={image} alt="Orders" className="rounded-md" />}
             title="MY ORDERS"
             description="Track, return, or buy things again"
-            onclickFun={() => {}}
+            onclickFun={() => {navigate('/my-orders')}}
           />
 
           <AccountCard

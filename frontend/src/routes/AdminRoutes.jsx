@@ -5,13 +5,13 @@ import AdminLogin from '../pages/admin/Login'
 import Dashboard from '../pages/admin/Dashboard'
 import AddItem from '../pages/admin/AddItem'
 import Customer from '../pages/admin/Customer'
-import OrderAdmin from '../pages/admin/OrderAdmin'
 import ProductAdmin from '../pages/admin/ProductAdmin'
 import ProtectedAdminRoute from './ProtectedAdminRoute'
 import UserList from '../pages/admin/UserList'
 import Inventory from '../pages/admin/Inventory'
 import Settings from '../pages/admin/Settings'
 import Banners from '../pages/admin/Banners'
+import OrdersList from '../pages/admin/OrdersList'
 
 
 const AdminRoutes = () => {
@@ -45,7 +45,7 @@ const AdminRoutes = () => {
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='additems' element={<AddItem />} />
           <Route path='customers' element={<Customer />} />
-          <Route path='orders' element={<OrderAdmin />} />
+          <Route path='orders' element={<OrdersList />} />
           <Route path='products' element={<ProductAdmin />} />
           <Route path='user-list' element={<UserList />} />
           <Route path='inventory' element={<Inventory />} />

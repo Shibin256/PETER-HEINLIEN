@@ -3,11 +3,13 @@ import Title from '../../components/common/Title';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchCart, removeFromCart, updateCart } from '../../features/cart/cartSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
 
   const user = JSON.parse(localStorage.getItem('user'))
   const dispatch = useDispatch()
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?._id) {
@@ -17,7 +19,6 @@ const Cart = () => {
 
   const { cartItems = [] } = useSelector(state => state.cart)
   const [localCart, setLocalCart] = useState([]);
-  console.log(localCart, '---------+++++++')
 
   useEffect(() => {
     setLocalCart(cartItems);
@@ -25,7 +26,7 @@ const Cart = () => {
 
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 1000 ? 0 : 50;
+  const shipping = subtotal > 10000 ? 0 : 50;
   const total = subtotal + shipping;
   const { currency } = useSelector(state => state.global)
 
@@ -184,7 +185,18 @@ const Cart = () => {
               </div>
             </div>
 
-            <button className="w-full mt-6 bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-md font-medium transition-colors shadow-md hover:shadow-lg">
+            <button 
+            onClick={() => navigate('/checkout',
+              {
+                state: {
+                  cartItems: localCart,
+                  totalPrice: total,
+                  shippingCost: shipping,
+                  userId: user._id
+                }
+              }
+            )}
+            className="w-full mt-6 bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-md font-medium transition-colors shadow-md hover:shadow-lg">
               Proceed to Checkout
             </button>
           </div>

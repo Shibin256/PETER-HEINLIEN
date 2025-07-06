@@ -6,6 +6,7 @@ import { updateAddress } from '../../features/accountSettings/accountSlice';
 const EditAddressModal = ({ address, onClose, onSuccess }) => {
     const dispatch = useDispatch();
     const [form, setForm] = useState({ ...address });
+    console.log(form)
 
     const handleChange = (e) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -35,6 +36,8 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
                     <input name="state" value={form.state} onChange={handleChange} placeholder="State" className="w-full border p-2 rounded" />
                     <input name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" className="w-full border p-2 rounded" />
                     <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" className="w-full border p-2 rounded" />
+                    <input name="altphone" value={form.alternativePhone} onChange={handleChange} placeholder="alternative Phone" className="w-full border p-2 rounded" />
+                    
                     {/* {form.alternativePhone &&<input name="phone" value={form.alternativePhone} onChange={handleChange} placeholder="Phone" className="w-full border p-2 rounded" />} */}
                     <div className="flex justify-end space-x-3 mt-4">
                         <button type="button" onClick={onClose} className="px-4 py-2 border rounded">

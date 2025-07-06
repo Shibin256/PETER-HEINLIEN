@@ -14,6 +14,7 @@ const Address = () => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
   const { addresses } = useSelector(state => state.account);
+  console.log(addresses);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -66,7 +67,7 @@ const Address = () => {
               pin={addr.pincode}
               phone={addr.phone}
               altPhone={addr.alternativePhone}
-              defaultAddress={addr.setdefault}
+              defaultAddress={addr.defaultAddress}
               onEdit={() => handleEdit(addr)}
               onRemove={() => handleRemove(addr._id)}
               onSetDefault={() => handleSetDefault(addr._id)}

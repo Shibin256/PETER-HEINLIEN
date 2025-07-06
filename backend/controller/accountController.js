@@ -275,8 +275,10 @@ export const SetDefaultAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
     const { addressId } = req.params
-    const { name, house, locality, city, state, pincode, phone, alternativePhone, addressType, defaultAddress } = req.body
+    const { name, house, locality, city, state, pincode, phone, altphone, addressType, defaultAddress } = req.body
     console.log(req.body)
+    const alternativePhone=Number(altphone)
+    console.log(alternativePhone, 'altphone')
     const updatedData = {
         name,
         house,

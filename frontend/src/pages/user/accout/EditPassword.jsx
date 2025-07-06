@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import usePasswordVal from '../../../usePasswordVal';
 import MainThemeButton from '../../../components/common/MainThemeButton';
@@ -14,8 +14,8 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL;
 const EditPassword = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const location=useLocation()
-  const profileData=location.state?.profileData
+  const location = useLocation()
+  const profileData = location.state?.profileData
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -24,7 +24,7 @@ const EditPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(false);
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,48 +51,48 @@ const EditPassword = () => {
 
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
-      toast.error('All fields are required');
-      return;
+    try {
+      if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+        toast.error('All fields are required');
+        return;
+      }
+
+      const validationMsg = usePasswordVal(formData.newPassword);
+      if (validationMsg) {
+        setError(validationMsg);
+        setIsPasswordValid(false);
+        return;
+      }
+
+      if (formData.newPassword !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+
+      // ✅ Use await
+      const res = await dispatch(changePassword({ userId: profileData.id, data: formData }));
+
+      const message = res.payload?.message;
+      const updatedUser = res.payload?.data;
+      if (message) {
+        toast.success(message);
+      }
+
+      if (updatedUser) {
+        dispatch(setUser({ user: updatedUser }));
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        navigate('/my-profile');
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || 'Failed to update password';
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
-
-    const validationMsg = usePasswordVal(formData.newPassword);
-    if (validationMsg) {
-      setError(validationMsg);
-      setIsPasswordValid(false);
-      return;
-    }
-
-    if (formData.newPassword !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    // ✅ Use await
-    const res = await dispatch(changePassword({ userId: profileData.id, data: formData }));
-
-    const message = res.payload?.message;
-    const updatedUser = res.payload?.data;
-    if (message) {
-      toast.success(message);
-    }
-
-    if (updatedUser) {
-      dispatch(setUser({ user: updatedUser }));
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      navigate('/my-profile');
-    }
-  } catch (err) {
-    const message = err?.response?.data?.message || err?.message || 'Failed to update password';
-    toast.error(message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <main className="flex-grow flex items-center justify-center py-12 px-4">
@@ -147,6 +147,15 @@ const EditPassword = () => {
 
           <MainThemeButton loading={loading} page="Save Changes" width="w-full" type="submit" />
         </form>
+          <br />
+        <div className="flex items-center justify-end">
+          <Link
+            to="/reset-password"
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
       </div>
     </main>
   );

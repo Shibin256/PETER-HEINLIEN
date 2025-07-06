@@ -26,6 +26,8 @@ import EditPassword from '../pages/user/accout/EditPassword'
 import Address from '../pages/user/accout/Adress'
 import AddAddress from '../pages/user/accout/AddAddress'
 import Checkout from '../pages/user/Checkout'
+import PaymentPage from '../pages/user/PaymentPage'
+import MyOrders from '../pages/user/MyOrders'
 
 
 
@@ -52,6 +54,10 @@ const UserRoutes = () => {
         <Route path='wishlist' element={<Wishlist />} />
         <Route path='category-collection' element={<CategoryBasedCollection />} />
         <Route path='checkout' element={<Checkout />} />
+        <Route path='payment-page' element={<PaymentPage />} />
+        <Route path='my-orders' element={<MyOrders />} />
+
+
 
 
 

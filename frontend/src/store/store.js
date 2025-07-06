@@ -6,6 +6,8 @@ import globalReducer from '../features/globalSlice'
 import wishlistReducer from '../features/wishlist/wishlistSlice'
 import accountReducer from '../features/accountSettings/accountSlice'
 import cartReducer from '../features/cart/cartSlice'
+import ordersReducer from '../features/orders/ordersSlice'
+
 export const store=configureStore({
     reducer:{
         auth:authReducer,
@@ -14,6 +16,7 @@ export const store=configureStore({
         global:globalReducer,
         wishlist:wishlistReducer,
         account:accountReducer,
-        cart:cartReducer
+        cart:cartReducer,
+        orders:ordersReducer
     }
 })
