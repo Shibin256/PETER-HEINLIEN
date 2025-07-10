@@ -36,7 +36,7 @@ app.use("/api/products", productRoutes);
 app.use('/api/admin',adminRouter)
 app.use('/api/auth',authRoutes)
 app.use('/api/user',userRouter)
-
+//app.use('api/v1/users') need to change it in this way
 
 //port assigning
 app.listen(process.env.PORT, () => console.log(`The server started localhost:${process.env.PORT}`))

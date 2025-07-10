@@ -18,7 +18,6 @@ export const userSchema = new mongoose.Schema({
         required:false,
         unique:true,
         sparse:true,
-        default:null
     },
     googleId:{
         type:String,

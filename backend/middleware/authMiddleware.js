@@ -2,11 +2,9 @@ import jwt from 'jsonwebtoken';
 
 export const verifyAccessToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-//   console.log(authHeader,'authhesder===========================+++++++++++++++++++++++++++++++++++++++++++++++++');
 
   // Check if token starts with Bearer
   if (!authHeader?.startsWith('Bearer ')) {
-    console.log('unautherized_----------')
     return res.sendStatus(401); // Unauthorized
   }
 

@@ -32,9 +32,8 @@ const AdminLogin = () => {
       // settong access token to the local storage
       const token = response.data.accessToken
       const admin = JSON.stringify(response.data.user)
-      console.log(token, 'admin login token========')
       dispatch(setAdmin({ token, admin }))
-      localStorage.setItem('accessToken', token)
+      localStorage.setItem('adminAccessToken', token)
       localStorage.setItem('admin', admin)
 
       if (response) {

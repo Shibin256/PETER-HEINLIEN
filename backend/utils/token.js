@@ -2,13 +2,21 @@
 import jwt from 'jsonwebtoken'
 
 //access token creation
-export const generateAccessToken=(user)=>{
-    return jwt.sign({_id:user.id},process.env.JWT_ACCESS_SECRET,{expiresIn: '60m'})
+export const generateAccessToken = (user) => {
+  let userRole='user'
+  if(user.isAdmin){
+    userRole='admin'
+  }
+  const payload = {
+    id: user._id,
+    role: userRole,
+  }
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '60m' })
 }
 
 //refresh token creation
-export const generateRefreshToken= (user)=>{
-    return jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
+export const generateRefreshToken = (user) => {
+  return jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: '7d',
   });
 }

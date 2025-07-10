@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { cancelOrderItem, getOrders } from '../../features/orders/ordersSlice';
+import { cancelOrderItem, downloadInvoice, getOrders, returnOrderItem } from '../../features/orders/ordersSlice';
 import { Dialog } from '@headlessui/react';
 
-const Order = ({ order , onCancelSuccess}) => {
-  console.log(order)
+const Order = ({ order, onCancelSuccess }) => {
   const {
     Items = [],
     DeliveryCharge,
@@ -22,6 +21,12 @@ const Order = ({ order , onCancelSuccess}) => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedItemToCancel, setSelectedItemToCancel] = useState(null);
   const [cancellationReason, setCancellationReason] = useState('');
+
+  // Return modal states
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [selectedItemToReturn, setSelectedItemToReturn] = useState(null);
+  const [returnReason, setReturnReason] = useState('');
+  const [additionalDetails, setAdditionalDetails] = useState('');
 
   // Status styling
   const statusStyles = {
@@ -49,6 +54,20 @@ const Order = ({ order , onCancelSuccess}) => {
     'Shipping takes too long',
     'Ordered by mistake',
     'Product specifications changed',
+    'Other reason'
+  ];
+
+  // Return reasons specific to watches
+  const watchReturnReasons = [
+    'Product damaged or defective',
+    'Received wrong item',
+    'Item not as described',
+    'Size/fit issues',
+    'Quality not as expected',
+    'Battery issues',
+    'Strap/band problems',
+    'Watch not working properly',
+    'Changed my mind',
     'Other reason'
   ];
 
@@ -87,17 +106,12 @@ const Order = ({ order , onCancelSuccess}) => {
   };
 
   const submitReview = (itemId) => {
-    console.log(`Review submitted for item ${itemId}:`, { 
+    console.log(`Review submitted for item ${itemId}:`, {
       rating: ratings[itemId],
       review: reviews[itemId]
     });
     toggleReviewForm(itemId);
   };
-
-  // const openCancelModal = (itemOrderId) => {
-  //   setSelectedItemToCancel(itemOrderId);
-  //   setIsCancelModalOpen(true);
-  // };
 
   const closeCancelModal = () => {
     setIsCancelModalOpen(false);
@@ -111,11 +125,38 @@ const Order = ({ order , onCancelSuccess}) => {
         itemOrderId: selectedItemToCancel,
         reason: cancellationReason
       }));
-      onCancelSuccess()
+      onCancelSuccess();
       closeCancelModal();
     }
   };
 
+  // Return modal functions
+  const openReturnModal = (itemOrderId) => {
+    setSelectedItemToReturn(itemOrderId);
+    setIsReturnModalOpen(true);
+  };
+
+  const closeReturnModal = () => {
+    setIsReturnModalOpen(false);
+    setSelectedItemToReturn(null);
+    setReturnReason('');
+    setAdditionalDetails('');
+  };
+
+  const confirmReturn = async () => {
+    if (selectedItemToReturn && returnReason) {
+      console.log(selectedItemToCancel, returnReason, additionalDetails, 'in confirm return function');
+      await dispatch(returnOrderItem({ itemOrderId: selectedItemToReturn, reason: returnReason, deatials: additionalDetails }));
+      onCancelSuccess();
+      closeReturnModal();
+
+    }
+  };
+
+  const handleInvoice = async (orderId) => {
+    await dispatch(downloadInvoice({ itemOrderId: orderId }))
+    console.log('success')
+  }
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
       {/* Order Header */}
@@ -135,21 +176,25 @@ const Order = ({ order , onCancelSuccess}) => {
           <div className="bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-xs">
             <p className="text-lg font-bold text-gray-900">₹{TotalAmount}</p>
           </div>
-          {OrderStatus!=='Cancelled' && 
-            <div> <button 
-            onClick={() =>(
-              setSelectedItemToCancel(orderId),
-              setIsCancelModalOpen(true))}
-            className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
-          >
-            Cancel Order
-          </button>
-          <button className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors border border-blue-100">
-            Invoice
-          </button>
-          </div>
-          }
+          <div>
+            {OrderStatus !== 'Cancelled' && OrderStatus !== 'Delivered' &&
+              <button
+                onClick={() => (
+                  setSelectedItemToCancel(orderId),
+                  setIsCancelModalOpen(true)
+                )}
+                className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
+              >
+                Cancel Order
+              </button>
+            }
 
+           {OrderStatus !== 'Cancelled' && <button
+              onClick={() => handleInvoice(orderId)}
+              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors border border-blue-100">
+              Invoice
+            </button>}
+          </div>
         </div>
       </div>
 
@@ -159,17 +204,17 @@ const Order = ({ order , onCancelSuccess}) => {
           <div key={idx} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
             {/* Product Image */}
             <div className="w-full h-48 flex items-center justify-center mb-4">
-              <img 
-                src={item.productImage[0]} 
-                alt={item.productName} 
-                className="max-h-full max-w-full object-contain rounded-lg bg-gray-50 p-2" 
+              <img
+                src={item.productImage[0]}
+                alt={item.productName}
+                className="max-h-full max-w-full object-contain rounded-lg bg-gray-50 p-2"
               />
             </div>
-            
+
             {/* Product Details */}
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">{item.productName}</h3>
-              
+
               <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
                 <div>
                   <span className="font-medium">Price:</span> ₹{item.productPrice}
@@ -187,21 +232,18 @@ const Order = ({ order , onCancelSuccess}) => {
 
               {/* Action Buttons */}
               <div className="mt-4 flex flex-wrap gap-2">
-                {/* <button 
-                  onClick={() => openCancelModal(item.itemOrderId)}
-                  className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
-                >
-                  Cancel Item
-                </button> */}
-                
                 {OrderStatus === 'Delivered' && (
-                  <button className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-sm font-medium transition-colors border border-gray-200">
-                    Return/Replace
+                  <button
+                    disabled={item.returnReason}
+                    onClick={() => openReturnModal(item.itemOrderId)}
+                    className={`px-3 py-1.5  ${!item.returnReason ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 'bg-red-50 hover:bg-red-100 text-red-700'} rounded-lg text-sm font-medium transition-colors border border-gray-200`}
+                  >
+                    {!item.returnReason ? 'Return/Replace' : 'Product Returned'}
                   </button>
                 )}
-                
+
                 {OrderStatus === 'Delivered' && (
-                  <button 
+                  <button
                     onClick={() => toggleReviewForm(item.itemOrderId)}
                     className="px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-lg text-sm font-medium transition-colors border border-yellow-100"
                   >
@@ -214,7 +256,7 @@ const Order = ({ order , onCancelSuccess}) => {
               {OrderStatus === 'Delivered' && showReviewForm[item.itemOrderId] && (
                 <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <h4 className="text-md font-medium text-gray-800 mb-2">Rate this product</h4>
-                  
+
                   {/* Star Rating */}
                   <div className="flex items-center mb-3">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -236,7 +278,7 @@ const Order = ({ order , onCancelSuccess}) => {
                       {ratings[item.itemOrderId] > 0 ? `${ratings[item.itemOrderId]} star${ratings[item.itemOrderId] !== 1 ? 's' : ''}` : 'Not rated'}
                     </span>
                   </div>
-                  
+
                   {/* Review Textarea */}
                   <div className="mb-3">
                     <textarea
@@ -247,7 +289,7 @@ const Order = ({ order , onCancelSuccess}) => {
                       onChange={(e) => handleReviewChange(item.itemOrderId, e.target.value)}
                     />
                   </div>
-                  
+
                   {/* Submit Button */}
                   <div className="flex justify-end">
                     <button
@@ -280,9 +322,9 @@ const Order = ({ order , onCancelSuccess}) => {
             <div className="bg-white p-4 rounded-lg border border-gray-200">
               <p className="font-medium">{Order_Address.name}</p>
               <p className="text-sm text-gray-600">{Order_Address.phone}</p>
-              <p className="text-sm text-gray-600 mt-2">
-                {Order_Address.street},<br />
-                {Order_Address.city}, {Order_Address.state} - {Order_Address.zip}
+              <p className="text-sm text-gray-600 mt-2">                
+                {Order_Address.house},{Order_Address.locality}<br />
+                {Order_Address.city}, {Order_Address.state} - {Order_Address.pincode}
               </p>
             </div>
           </div>
@@ -327,7 +369,7 @@ const Order = ({ order , onCancelSuccess}) => {
             <Dialog.Title className="text-lg font-bold text-gray-900 mb-4">
               {selectedItemToCancel ? 'Cancel Item' : 'Cancel Order'}
             </Dialog.Title>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Reason for cancellation
@@ -370,6 +412,80 @@ const Order = ({ order , onCancelSuccess}) => {
                 className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
               >
                 Confirm Cancellation
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
+      {/* Return Modal */}
+      <Dialog open={isReturnModalOpen} onClose={closeReturnModal} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="w-full max-w-md rounded-xl bg-white p-6">
+            <Dialog.Title className="text-lg font-bold text-gray-900 mb-4">
+              Request Return
+            </Dialog.Title>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reason for return
+              </label>
+              <select
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select a reason</option>
+                {watchReturnReasons.map((reason, index) => (
+                  <option key={index} value={reason}>{reason}</option>
+                ))}
+              </select>
+            </div>
+
+            {(returnReason === 'Other reason' || returnReason === 'Item not as described') && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional details
+                </label>
+                <textarea
+                  rows="3"
+                  value={additionalDetails}
+                  onChange={(e) => setAdditionalDetails(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Please provide more information..."
+                />
+              </div>
+            )}
+
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    Please note: Return requests must be initiated within 7 days of delivery. The item should be in its original condition with all tags and packaging intact.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={closeReturnModal}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmReturn}
+                disabled={!returnReason}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!returnReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                Submit Return Request
               </button>
             </div>
           </Dialog.Panel>

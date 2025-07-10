@@ -20,6 +20,7 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
             toast.success('Address updated successfully');
             onSuccess();
         } catch (err) {
+            console.log(err)
             toast.error('Failed to update address');
         }
     };
@@ -36,7 +37,7 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
                     <input name="state" value={form.state} onChange={handleChange} placeholder="State" className="w-full border p-2 rounded" />
                     <input name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" className="w-full border p-2 rounded" />
                     <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" className="w-full border p-2 rounded" />
-                    <input name="altphone" value={form.alternativePhone} onChange={handleChange} placeholder="alternative Phone" className="w-full border p-2 rounded" />
+                    <input name="alternativePhone" value={form.alternativePhone} onChange={handleChange} placeholder="alternative Phone" className="w-full border p-2 rounded" />
                     
                     {/* {form.alternativePhone &&<input name="phone" value={form.alternativePhone} onChange={handleChange} placeholder="Phone" className="w-full border p-2 rounded" />} */}
                     <div className="flex justify-end space-x-3 mt-4">

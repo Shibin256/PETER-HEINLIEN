@@ -20,7 +20,7 @@ const AdminRoutes = () => {
   const location = useLocation()
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('adminAccessToken');
     const isLoginPage = location.pathname === '/admin/login';
 
     if (token && isLoginPage) {

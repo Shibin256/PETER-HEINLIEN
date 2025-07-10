@@ -47,16 +47,7 @@ const PaymentPage = () => {
                 setOrderStatus('success');
                 setShowModal(true);
             }
-
-
-            // // Randomly determine success/failure for demo purposes
-            // const isSuccess = Math.random() > 0.2; // 80% success rate for demo
-            // setOrderStatus(isSuccess ? 'success' : 'error');
-            // setShowModal(true);
-
-            // if (isSuccess) {
-            //     // Clear cart or perform other success actions
-            // }
+        
         } catch (error) {
             setOrderStatus('error');
             setShowModal(true);
@@ -68,7 +59,7 @@ const PaymentPage = () => {
     const handleModalClose = () => {
         setShowModal(false);
         if (orderStatus === 'success') {
-            navigate('/orders'); // Redirect to orders page on success
+            navigate('/my-orders'); // Redirect to orders page on success
         }
     };
 

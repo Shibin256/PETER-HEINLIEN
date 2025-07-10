@@ -26,6 +26,18 @@ export const deleteCategory = createAsyncThunk(
         }
     })
 
+    export const editCategory = createAsyncThunk(
+    'admin/editBrand',
+    async ({ id, name }, { rejectWithValue }) => {
+        try {
+            const res=await inventoryService.editCategory(id,name)
+            return res
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+)
+
 
 export const addBrand = createAsyncThunk(
     'admin/addBand',

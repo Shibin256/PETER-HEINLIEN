@@ -9,7 +9,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');  
+    localStorage.removeItem('adminAccessToken');  
     toast.success('Logged out successfully');
     navigate('/admin/login'); 
   };

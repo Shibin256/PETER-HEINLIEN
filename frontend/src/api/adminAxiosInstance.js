@@ -1,14 +1,14 @@
 import axios from 'axios'
 
-const axiosInstance=axios.create({
+const adminAxiosInstance=axios.create({
     baseURL:import.meta.env.VITE_API_BASE_URL,
     withCredentials:true
 })
 
 //Request Interceptor – Attach Access Token
-axiosInstance.interceptors.request.use(
+adminAxiosInstance.interceptors.request.use(
     (config)=>{
-        const token=localStorage.getItem('accessToken')
+        const token=localStorage.getItem('adminAccessToken')
        if(token){
         config.headers.Authorization = `Bearer ${token}`
     }
@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
 )
 
 //  Response Interceptor Refresh Access Token 
-axiosInstance.interceptors.response.use(
+adminAxiosInstance.interceptors.response.use(
     (res)=>res,
     async(err)=>{
         const originalRequest=err.config;
@@ -31,7 +31,7 @@ axiosInstance.interceptors.response.use(
         });
 
           const newAccessToken = response.data.accessToken;
-        localStorage.setItem("accessToken", newAccessToken);
+        localStorage.setItem("adminAccessToken", newAccessToken);
 
          // Retry the original request with new token
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(
 
              } catch (refreshError) {
                  console.error("Refresh token failed", refreshError);
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("adminAccessToken");
         window.location.href = "/login";
              }
          }
@@ -47,4 +47,4 @@ axiosInstance.interceptors.response.use(
     }
 )
 
-export default axiosInstance
+export default adminAxiosInstance

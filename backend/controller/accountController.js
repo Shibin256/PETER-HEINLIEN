@@ -241,44 +241,38 @@ export const removeAddress = async (req, res) => {
 
 // users block and upblock part
 export const SetDefaultAddress = async (req, res) => {
-    try {
-        const { userId, addressId } = req.params
+     try {
+    const { userId, addressId } = req.params;
 
-        const user = await User.findById(userId).populate('addresses').lean()
-        console.log(user)
+    // Step 1: Get user and validate
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        user.addresses.map(adr => adr.defaultAddress = false)
-
-        const addressExists = user.addresses.find(addr => addr._id.toString() === addressId);
-        if (!addressExists) {
-            return res.status(400).json({ message: 'Address does not belong to this user' });
-        }
-
-        await Address.updateMany(
-            { _id: { $in: user.addresses.map(addr => addr._id) } },
-            { $set: { setdefault: false } }
-        );
-
-        await Address.findByIdAndUpdate(addressId, { setdefault: true });
-
-
-
-    } catch (error) {
-        console.error('Error  user setDefault address status:', error.message);
-        res.status(500).json({ message: 'Server error toggling block status' });
+    // Step 2: Check if address belongs to the user
+    const belongsToUser = user.addresses.some(id => id.toString() === addressId);
+    if (!belongsToUser) {
+      return res.status(400).json({ message: 'Address does not belong to this user' });
     }
+
+    // Step 3: Unset default for all of this user's addresses
+    await Address.updateMany(
+      { _id: { $in: user.addresses } },
+      { $set: { defaultAddress: false } }
+    );
+
+    // Step 4: Set selected address as default
+    await Address.findByIdAndUpdate(addressId, { defaultAddress: true });
+
+    res.status(200).json({ message: 'Default address set successfully' });
+  } catch (error) {
+    console.error('Error setting default address:', error.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 }
 
 export const updateAddress = async (req, res) => {
     const { addressId } = req.params
-    const { name, house, locality, city, state, pincode, phone, altphone, addressType, defaultAddress } = req.body
-    console.log(req.body)
-    const alternativePhone=Number(altphone)
-    console.log(alternativePhone, 'altphone')
+    const { name, house, locality, city, state, pincode, phone, alternativePhone, addressType, defaultAddress } = req.body
     const updatedData = {
         name,
         house,

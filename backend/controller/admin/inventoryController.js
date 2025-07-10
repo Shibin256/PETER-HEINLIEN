@@ -13,7 +13,7 @@ export const createCategory = async (req, res) => {
         });
 
         if (categoryCheck) return res.status(400).json({ message: 'Category already exists' });
-        
+
         //creating new category with a objectId
         const newCategory = new Category({
             _id: new mongoose.Types.ObjectId(),
@@ -63,78 +63,109 @@ export const createBrand = async (req, res) => {
 //Category deleting section
 export const deleteCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id)
-        //finding products respected with the category to delete
-        const prdoucts = await Product.find({ category: req.params.id })
+        const category = await Category.findById(req.params.id);
 
-        if (!category) return res.status(404).json({ message: 'Category not found' });
-        //deleting products that with the category
-        const deletedProducts = await Product.deleteMany({ category: req.params.id });
-        //delete category
-        await category.deleteOne();
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        // Mark products with this category as isList: true
+        const updatedProducts = await Product.updateMany(
+            { category: req.params.id },
+            { $set: { isList: true } }
+        );
+
+        // Mark the category itself as isList: true
+        category.isList = true;
+        await category.save();
 
         res.status(200).json({
-            message: 'Category and related products deleted successfully',
-            deletedProductCount: deletedProducts.deletedCount,
+            message: 'Category and related products marked as isList:true',
+            updatedProductCount: updatedProducts.modifiedCount,
         });
     } catch (error) {
-        console.error('Error deleting category:', error);
+        console.error('Error updating category/products:', error);
         res.status(500).json({ message: 'Server error while deleting category' });
     }
-}
+};
+
 
 //Brand deleting section
-export const deleteBrand=async(req,res)=>{
+export const deleteBrand = async (req, res) => {
     try {
         const brand = await Brands.findById(req.params.id)
-        //finding products respected with the Brand to delete
-        const prdoucts = await Product.find({ brand: req.params.id })
-
         if (!brand) return res.status(404).json({ message: 'Brand not found' });
 
-        //deleting products that with the brand
-        const deletedProducts = await Product.deleteMany({ brand: req.params.id });
-        //delete brand
-        await brand.deleteOne();
+         // Mark products with this category as isList: true
+        const updatedProducts = await Product.updateMany(
+            { brand: req.params.id },
+            { $set: { isList: true } }
+        );
+
+        brand.isList = true;
+        await brand.save();
 
         res.status(200).json({
             message: 'Brand and related products deleted successfully',
-            deletedProductCount: deletedProducts.deletedCount,
+            deletedProductCount: updatedProducts.modifiedCount,
         });
     } catch (error) {
-          console.error('Error deleting brand:', error);
+        console.error('Error deleting brand:', error);
         res.status(500).json({ message: 'Server error while deleting brand' });
     }
 }
 
 export const editBrand = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const logo = req.file;
+    try {
+        const { id } = req.params;
+        const logo = req.file;
 
-    const updatedData = {
-      name: req.body.name,
-      description: req.body.description,
-    };
+        const updatedData = {
+            name: req.body.name,
+            description: req.body.description,
+        };
 
-    // If a new logo is uploaded, upload to Cloudinary
-    if (logo) {
-      const result = await cloudinary.uploader.upload(logo.path);
-      updatedData.image = result.secure_url;
+        // If a new logo is uploaded, upload to Cloudinary
+        if (logo) {
+            const result = await cloudinary.uploader.upload(logo.path);
+            updatedData.image = result.secure_url;
+        }
+
+        //updating brand
+        const updatedBrand = await Brands.findByIdAndUpdate(id, updatedData, {
+            new: true,
+        });
+
+        if (!updatedBrand) {
+            return res.status(404).json({ message: 'Brand not found' });
+        }
+
+        res.status(200).json(updatedBrand);
+    } catch (error) {
+        console.error('Edit brand Error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-
-    //updating brand
-    const updatedBrand = await Brands.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
-
-    if (!updatedBrand) {
-      return res.status(404).json({ message: 'Brand not found' });
-    }
-
-    res.status(200).json(updatedBrand);
-  } catch (error) {
-    console.error('Edit brand Error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
 };
+
+
+export const editCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+
+        // Check if the category exists
+        const category = await Category.findById(id);
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        // Update the category name
+        category.categoryName = name;
+        await category.save();
+
+        res.status(200).json({ message: 'Category updated successfully', category });
+    } catch (error) {
+        console.error('Edit category Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}

@@ -16,27 +16,30 @@ const EditName = () => {
         navigate(-1);
     };
 
-const handleSave = (newName) => {
-    const formData = new FormData();
-    formData.append("name", newName);
-
-    dispatch(changeName({ userId: profileData.id, data: formData }))
-        .then((res) => {
-            const updatedUser = res.payload?.data;
-            if (updatedUser) {
-                dispatch(setUser({ user: updatedUser }));
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                toast.success(res.payload?.message)
-                navigate('/my-profile');
-            }else{
-                toast.error('user Name changing failed')
-            }
-        })
-        .catch((err) => {
-            toast.error(err)
-            console.error('Name update failed:', err);
-        });
-};
+    const handleSave = (newName) => {
+        const formData = new FormData();
+        if (!newName.trim()) {
+            toast.error('proper name needed')
+        }else{
+        formData.append("name", newName);
+        dispatch(changeName({ userId: profileData.id, data: formData }))
+            .then((res) => {
+                const updatedUser = res.payload?.data;
+                if (updatedUser) {
+                    dispatch(setUser({ user: updatedUser }));
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    toast.success(res.payload?.message)
+                    navigate('/my-profile');
+                } else {
+                    toast.error('user Name changing failed')
+                }
+            })
+            .catch((err) => {
+                toast.error(err)
+                console.error('Name update failed:', err);
+            });
+        }
+    };
 
     return (
         <AccountEditCard

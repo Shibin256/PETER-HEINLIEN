@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import AuthInput from '../../components/common/AuthInput';
 import { deleteUser, fetchUsers, toggleUserBlock } from '../../features/users/userSlice';
 import { FaUser } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import AuthInput from '../../components/common/AuthInput';
 
 const UserList = () => {
   const dispatch = useDispatch();
   const { users, loading, error, currentPage, totalPages } = useSelector((state) => state.users);
-  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  // fetch all users
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    dispatch(fetchUsers({ page, limit, search: searchTerm }));
+  }
+
   useEffect(() => {
     dispatch(fetchUsers({ page, limit }));
   }, [dispatch, page]);
 
-  // user block and unblock manage
   const handleToggleBlock = (user) => {
     const action = user.isBlocked ? 'unblock' : 'block';
 
@@ -31,17 +35,14 @@ const UserList = () => {
       cancelButtonText: 'Cancel',
       buttonsStyling: false,
       customClass: {
-        confirmButton:
-          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-        cancelButton:
-          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+        confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+        cancelButton: 'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
       },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(toggleUserBlock(user._id)).then((res) => {
           if (res.type.endsWith('/fulfilled')) {
             toast.success(`✅ User ${action}ed successfully!`);
-            dispatch(fetchUsers({ page, limit }));
           } else {
             toast.error(res?.error?.message || `Failed to ${action} user.`);
           }
@@ -50,7 +51,6 @@ const UserList = () => {
     });
   };
 
-  // delete user
   const handleDelete = (id) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -61,17 +61,14 @@ const UserList = () => {
       cancelButtonText: 'Cancel',
       buttonsStyling: false,
       customClass: {
-        confirmButton:
-          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-        cancelButton:
-          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+        confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+        cancelButton: 'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
       },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(deleteUser(id)).then((res) => {
           if (res.type.endsWith('/fulfilled')) {
             toast.success('✅ User deleted successfully!');
-            dispatch(fetchUsers({ page, limit }));
           } else {
             toast.error(res?.error?.message || 'Failed to delete user.');
           }
@@ -79,12 +76,6 @@ const UserList = () => {
       }
     });
   };
-
-  const filteredUsers = users?.filter(
-    (user) =>
-      user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const totalUsers = users?.length || 0;
   const blockedUsers = users?.filter((user) => user.isBlocked)?.length || 0;
@@ -98,28 +89,46 @@ const UserList = () => {
   return (
     <div className="px-6 py-4">
       <h2 className="text-2xl font-bold mb-4">User List</h2>
-
-      <div className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="w-full md:w-1/3">
+      {/* Search Bar */}
+      <div className="mb-6">
+        <form onSubmit={handleSearch} className="flex gap-2">
           <AuthInput
-            label="Search Users"
             type="text"
             name="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name or email..."
-            width="w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search orders by name..."
+            width="w-full md:w-96"
             Textcolor="text-gray-700"
             borderColor="border-gray-300"
           />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Search
+          </button>
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                dispatch(fetchUsers({ page, limit })); // Reset search
+              }}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              Clear
+            </button>
+          )}
+        </form>
+      </div>
+
+      <div className="mb-4 flex flex-wrap justify-between items-center gap-4">
+        <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg shadow-sm border border-blue-200">
+          Total Users: <span className="font-bold">{totalUsers}</span>
         </div>
-        <div className="flex flex-wrap gap-4">
-          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg shadow-sm border border-blue-200">
-            Total Users: <span className="font-bold">{totalUsers}</span>
-          </div>
-          <div className="bg-red-100 text-red-800 px-4 py-2 rounded-lg shadow-sm border border-red-200">
-            Blocked Users: <span className="font-bold">{blockedUsers}</span>
-          </div>
+        <div className="bg-red-100 text-red-800 px-4 py-2 rounded-lg shadow-sm border border-red-200">
+          Blocked Users: <span className="font-bold">{blockedUsers}</span>
         </div>
       </div>
 
@@ -135,13 +144,13 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredUsers?.map((user) => (
+            {users?.map((user) => (
               <tr key={user._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 rounded-full border-2 border-gray-300 overflow-hidden flex items-center justify-center bg-gray-100">
-                      {user.profilePic ? (
-                        <img className="h-full w-full object-cover" src={user.profilePic} alt="Profile" />
+                      {user.profileImage ? (
+                        <img className="h-full w-full object-cover" src={user.profileImage} alt="Profile" />
                       ) : (
                         <FaUser className="h-5 w-5 text-gray-400" />
                       )}
@@ -161,20 +170,19 @@ const UserList = () => {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => handleToggleBlock(user)}
-                      className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        user.isBlocked
-                          ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500'
-                          : 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500'
-                      }`}
+                      className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${user.isBlocked
+                        ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500'
+                        : 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500'
+                        }`}
                     >
                       {user.isBlocked ? 'Unblock' : 'Block'}
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => handleDelete(user._id)}
                       className="inline-flex items-center px-3 py-1 border border-red-200 rounded-md shadow-sm text-sm font-medium text-red-800 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       Delete
-                    </button>
+                    </button> */}
                   </div>
                 </td>
               </tr>

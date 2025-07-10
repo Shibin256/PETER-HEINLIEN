@@ -6,7 +6,7 @@ import EditAddressModal from '../../components/common/EditAddress';
 import CheckoutCard from '../../components/user/checkoutCard';
 
 const Checkout = () => {
-    const [step, setStep] = useState(2); // Changed from 1 to 2 to start with address step
+    const [step, setStep] = useState(2);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const location = useLocation();
@@ -19,8 +19,7 @@ const Checkout = () => {
     const user = JSON.parse(localStorage.getItem('user')) || { name: 'Guest' };
     const { currency } = useSelector(state => state.global);
     const { addresses } = useSelector(state => state.account);
-
-
+    console.log(addresses, '--------------------------')
 
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -30,11 +29,23 @@ const Checkout = () => {
         year: 'numeric'
     });
 
-
-
     useEffect(() => {
         dispatch(getAllAddress(user._id));
-    }, []);
+    }, [dispatch, user._id]);
+
+    // Automatically select default address when addresses are loaded
+    useEffect(() => {
+        if (addresses && addresses.length > 0) {
+            // Find the default address
+            const defaultAddr = addresses.find(addr => addr.defaultAddress === true);
+            if (defaultAddr) {
+                setSelectedAddress(defaultAddr);
+            } else if (addresses.length > 0) {
+                // If no default address is set, select the first one
+                setSelectedAddress(addresses[0]);
+            }
+        }
+    }, [addresses]);
 
     const handleEdit = (addr) => {
         setSelectedAddress(addr);
@@ -53,7 +64,7 @@ const Checkout = () => {
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Left Column - Checkout Steps */}
                 <div className="lg:w-2/3">
-                    {/* Step 1: Login (hidden since we start at step 2) */}
+                    {/* Step 1: Login */}
                     <div className="mb-8 p-5 bg-white rounded-lg shadow-sm border border-gray-100 opacity-50">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
@@ -104,10 +115,18 @@ const Checkout = () => {
                                                         <div className="ml-2">
                                                             <div className="flex items-center space-x-3">
                                                                 <span className="font-medium text-gray-800">{addr.name}</span>
+                                                                {addr.defaultAddress && (
+                                                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+                                                                        DEFAULT
+                                                                    </span>
+                                                                )}
+                                                                <span className={` ${addr.addressType === 'home' ? 'bg-blue-100 text-blue-800' : ' bg-yellow-100 text-yellow-800'} text-xs px-2 py-0.5 rounded-full`}>
+                                                                    {addr.addressType}
+                                                                </span>
                                                                 <span className="text-gray-500 text-sm">{addr.phone}</span>
                                                             </div>
                                                             <p className="text-sm text-gray-700 mt-2">
-                                                                {addr.address}, {addr.city}, {addr.state} - {addr.pincode}
+                                                                {addr.house},{addr.locality}, {addr.city}, {addr.state} - {addr.pincode}
                                                             </p>
                                                         </div>
                                                     </label>
@@ -151,7 +170,7 @@ const Checkout = () => {
                                         <p className="font-medium text-gray-800">{selectedAddress.name}</p>
                                         <p className="text-sm text-gray-600">{selectedAddress.phone}</p>
                                         <p className="text-sm text-gray-600 mt-1">
-                                            {selectedAddress.address}, {selectedAddress.city}, {selectedAddress.state} - {selectedAddress.pincode}
+                                            {selectedAddress.house},   {selectedAddress.locality},{selectedAddress.city}, {selectedAddress.state} - {selectedAddress.pincode}
                                         </p>
                                     </div>
                                 </div>
@@ -201,10 +220,9 @@ const Checkout = () => {
                                                     totalPrice: total,
                                                     shippingCost: shippingCost,
                                                     userId: user._id,
-                                                    deliveryDate:formattedDeliveryDate
+                                                    deliveryDate: formattedDeliveryDate
                                                 }
                                             })
-
                                         }}
                                     >
                                         PLACE ORDER
@@ -218,7 +236,6 @@ const Checkout = () => {
                 {/* Right Column - Price Details */}
                 <div className="lg:w-1/3">
                     <div className="sticky top-4">
-                        {/* Price Summary - Always visible */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4">
                             <h4 className="text-lg font-semibold text-gray-800 mb-4">PRICE DETAILS</h4>
                             <div className="space-y-3">
@@ -238,7 +255,6 @@ const Checkout = () => {
                             </div>
                         </div>
 
-                        {/* Cancel Button */}
                         <button
                             className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md transition-all shadow-md"
                             onClick={() => { navigate(-1) }}

@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { FaStar, FaRegStar, FaHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import heroImg from '../../assets/herosectionwatch.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProducById } from '../../features/products/productSlice';
+import { getProducById, relatedProducts } from '../../features/products/productSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import ImageZoom from '../../components/common/ImageZoom';
 import { addToWishlist, getWishedProduct, getWishlist, removeFromWishlist } from '../../features/wishlist/wishlistSlice';
 import { toast } from 'react-toastify';
+import { addToCart } from '../../features/cart/cartSlice';
+import Title from '../../components/common/Title';
+import ProductCard from '../../components/common/ProductCard';
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -20,16 +23,18 @@ const ProductDetails = () => {
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  const { singleProduct } = useSelector(state => state.products)
-  console.log(singleProduct)
+  const { singleProduct, productsRelated } = useSelector(state => state.products)
+  console.log(productsRelated, 'realated products')
   // First: fetch the product
   useEffect(() => {
-    if (id) dispatch(getProducById(id));
+    if (id) {
+      dispatch(getProducById(id));
+      dispatch(relatedProducts(id))
+    }
   }, [id, dispatch]);
 
   // Then: check if it's wishlisted (once product and user are available)
   useEffect(() => {
-    console.log(singleProduct, 'chekcckdfoksdhfjsdhaf')
     if (user && singleProduct?._id) {
       dispatch(getWishedProduct({ userId: user._id, productId: singleProduct._id }))
         .then((res) => {
@@ -43,6 +48,14 @@ const ProductDetails = () => {
   }, [user, singleProduct, dispatch]);
 
   const product = singleProduct
+  let shippingCost = 0;
+  const totalQuantity = product.totalQuantity
+  if (product && product.price < 500) {
+    shippingCost = 50;
+  }
+
+
+
   if (!product || !product.images || product.images.length === 0) {
     return <div className="text-center p-10">Loading product details...</div>;
   }
@@ -78,6 +91,26 @@ const ProductDetails = () => {
       toast.error('Something went wrong');
     }
 
+  }
+
+  const handleAddCart = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.warning('Please login to use Cart');
+      return;
+    }
+    try {
+      const res = await dispatch(addToCart({ userId: user._id, productId: singleProduct._id }))
+      console.log(res.payload);
+      if (res.payload === 'max quantity added') {
+        toast.warning('max quantity added');
+      } else {
+        toast.success('Added to cart');
+      }
+    } catch (err) {
+      console.error('cart error:', err);
+      toast.error('Something went wrong');
+    }
   }
 
   return (
@@ -163,13 +196,19 @@ const ProductDetails = () => {
                 <button
                   onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
                   className="text-xl text-gray-600 hover:text-gray-900"
+                  disabled={quantity <= 1}
                 >
                   -
                 </button>
+
                 <span className="w-8 text-center">{quantity}</span>
+
                 <button
-                  onClick={() => setQuantity((prev) => prev + 1)}
+                  onClick={() =>
+                    setQuantity((prev) => Math.min(Math.min(4, totalQuantity), prev + 1))
+                  }
                   className="text-xl text-gray-600 hover:text-gray-900"
+                  disabled={quantity >= Math.min(4, totalQuantity)}
                 >
                   +
                 </button>
@@ -179,12 +218,14 @@ const ProductDetails = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <button className="flex-1 bg-teal-700 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
+            <button
+              onClick={handleAddCart}
+              className="flex-1 bg-teal-700 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
               ADD TO CART
             </button>
-            <button onClick={() => navigate('/login')} className="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
+            {/* <button  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
               BUY NOW
-            </button>
+            </button> */}
           </div>
 
           {/* Wishlist */}
@@ -251,6 +292,31 @@ const ProductDetails = () => {
           </div>
         </div>
       </div> */}
+      <div className="mt-16">
+        {/* Top Separator Line */}
+        <div className="border-t border-gray-200 mb-8"></div>
+
+        {/* Title - Left Aligned */}
+        <div className="mb-10">
+          <Title
+            text1={'Related'}
+            text2={'Products'}
+            className="text-2xl font-bold text-gray-800"
+          />
+        </div>
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {productsRelated.map((product) => (
+            <div
+              key={product._id}
+              className="w-full max-w-[280px] mx-auto"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

@@ -94,11 +94,22 @@ export const getProducById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const res = await productService.getProducById(id)
-      console.log(res)
       return res
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+)
 
+export const relatedProducts=createAsyncThunk(
+  'product/relatedProduct',
+  async(id,{rejectWithValue})=>{
+    try {
+      const res=await productService.getRelatedProducts(id)
+      return res
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+      
     }
   }
 )
@@ -107,6 +118,7 @@ const productSlice = createSlice({
   name: 'products',
   initialState: {
     products: [],
+    productsRelated:[],
     latestCollection:[],
     page: 1,
     totalPages: 1,
@@ -212,6 +224,20 @@ const productSlice = createSlice({
         state.singleProduct = action.payload;
       })
       .addCase(getProducById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // getRelatedProduct
+      .addCase(relatedProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(relatedProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productsRelated = action.payload;
+      })
+      .addCase(relatedProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

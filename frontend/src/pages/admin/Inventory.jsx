@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import InventoryCard from '../../components/admin/InventoryCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
-import { addBrand, addCategory, deleteBrand, deleteCategory, editBrand, } from '../../features/admin/inventory/inventorySlice';
+import { addBrand, addCategory, deleteBrand, deleteCategory, editBrand, editCategory, } from '../../features/admin/inventory/inventorySlice';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
@@ -28,6 +28,13 @@ const Inventory = () => {
     const [editingBrandLogo, setEditingBrandLogo] = useState(null);
     const [editingLogoPreview, setEditingLogoPreview] = useState(null);
 
+    // edit category
+    const [isEditingCategory, setIsEditingCategory] = useState(false);
+    const [editingCategoryId, setEditingCategoryId] = useState(null);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
+
+
+
     const dispatch = useDispatch();
     //get all collection and brands
     useEffect(() => {
@@ -47,6 +54,12 @@ const Inventory = () => {
             total: count,
         };
     });
+
+    const handleCategoryEdit = (category) => {
+        setEditingCategoryId(category._id);
+        setEditingCategoryName(category.categoryName);
+        setIsEditingCategory(true);
+    };
 
     //the total brand counts
     const brandCounts = brands.map((brand) => {
@@ -110,7 +123,12 @@ const Inventory = () => {
     const handleSubmitCategory = async (e) => {
         e.preventDefault();
         try {
-            if (newCategory.trim()) {
+            if (!newCategory.trim()) {
+                toast.warning('Category name is required');
+                setNewCategory("");
+                return;
+            }
+            else {
                 const res = await dispatch(addCategory(newCategory.trim()))
                 if (res.payload?.message === "Category created") {
                     toast.success("Category created successfully");
@@ -220,7 +238,7 @@ const Inventory = () => {
                 toast.warning('Brand name is required');
                 return;
             }
-               const formData = new FormData();
+            const formData = new FormData();
             formData.append('name', editingBrandName);
             formData.append('description', editingBrandDescription);
             formData.append('logo', editingBrandLogo);
@@ -276,6 +294,34 @@ const Inventory = () => {
                 });
             }
         });
+    };
+
+    // Update category function for edit
+    const handleUpdateCategory = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            if (!editingCategoryName.trim()) {
+                toast.warning('Category name is required');
+                return;
+            }
+
+            // You'll need to create an editCategory action in your inventorySlice
+            const res = await dispatch(editCategory({
+                id: editingCategoryId,
+                name: editingCategoryName
+            })).unwrap();
+
+            if (res) {
+                toast.success('Category updated successfully');
+                dispatch(getBrandAndCollection());
+                setIsEditingCategory(false);
+            }
+        } catch (error) {
+            toast.error(error?.message || 'Failed to update category');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
 
@@ -352,6 +398,55 @@ const Inventory = () => {
 
 
 
+            {isEditingCategory && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold text-gray-800">Edit Category</h2>
+                                <button
+                                    onClick={() => setIsEditingCategory(false)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleUpdateCategory}>
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                                        Category Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingCategoryName}
+                                        onChange={(e) => setEditingCategoryName(e.target.value)}
+                                        placeholder="Enter category name"
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditingCategory(false)}
+                                        className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+                                    >
+                                        {isLoading ? 'Loading' : 'Update Category'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
 
 
 
@@ -497,19 +592,6 @@ const Inventory = () => {
             )}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
             {isAddingBrand && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -646,6 +728,7 @@ const Inventory = () => {
                             title={`${category.categoryName} Collection`}
                             lastUpdated={new Date(category.updatedAt).toLocaleDateString()}
                             totalCollection={category.total}
+                            editClick={() => handleCategoryEdit(category)}
                             deleteClick={() => handleCategoryDelete(category._id)}
                         />
                     ))}

@@ -85,6 +85,9 @@ const Signup = () => {
         return;
       }
 
+      if(!formData.name.trim()){
+        toast.error('proper name needed')
+      }
       //phone number validation
       if (formData.phone) {
         if (!/^\d{10}$/.test(formData.phone)) {

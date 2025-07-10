@@ -4,9 +4,9 @@ import userService from "./userService";
 //fetch users
 export const fetchUsers = createAsyncThunk(
     'users/fetchUsers',
-    async ({ page = 1, limit = 10 }, thunkAPI) => {
+    async ({ page = 1, limit = 10, search = '' }, thunkAPI) => {
         try {
-            const res = await userService.getUsers(page, limit)
+            const res = await userService.getUsers(page, limit,search)
             return res;
         } catch (err) {
             return thunkAPI.rejectWithValue(err.response?.data?.message || 'Fetch failed');
@@ -73,8 +73,9 @@ const userSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
             .addCase(toggleUserBlock.fulfilled, (state, action) => {
-                const updatedUser = action.payload;
+                const updatedUser = action.payload.user;
                 const index = state.users.findIndex((u) => u._id === updatedUser._id);
                 if (index !== -1) {
                     state.users[index] = updatedUser;
@@ -82,7 +83,24 @@ const userSlice = createSlice({
             })
             .addCase(toggleUserBlock.rejected, (state, action) => {
                 state.error = action.payload;
-            });
+            })
+
+             .addCase(deleteUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                const { users, currentPage, totalPages, totalUsers } = action.payload;
+                state.loading = false;
+                state.users = users;
+                state.totalUsers = totalUsers;
+            })
+            .addCase(deleteUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+
     },
 })
 

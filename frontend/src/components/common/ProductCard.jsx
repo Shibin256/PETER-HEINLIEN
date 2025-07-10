@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { addToWishlist, getWishedProduct, getWishlist, removeFromWishlist } from '../../features/wishlist/wishlistSlice';
-import { addToCart} from '../../features/cart/cartSlice';
+import { addToCart } from '../../features/cart/cartSlice';
 import { useEffect } from 'react';
 
 const ProductCard = ({ product }) => {
@@ -60,7 +60,15 @@ const ProductCard = ({ product }) => {
       return;
     }
     try {
-      dispatch(addToCart({userId: user._id, productId: product._id}))
+      const res = await dispatch(addToCart({ userId: user._id, productId: product._id }))
+      console.log(res.payload);
+      if (res.payload == 'max quantity added') {
+        toast.warning('max quantity added')
+      }else if(res.payload=='Product is out of stock'){
+              toast.warning('The Product is out of stoke')
+      }else {
+        toast.success('Added to cart');
+      }
     } catch (err) {
       console.error('cart error:', err);
       toast.error('Something went wrong');
@@ -85,13 +93,13 @@ const ProductCard = ({ product }) => {
             >
               {isFavorite ? <FaHeart className="text-red-500" /> : <FaRegHeart className="text-gray-500" />}
             </button>
-            <button
+            {product.availability && <button
               onClick={handleAddCart}
               className="p-1.5 bg-white rounded-full shadow hover:bg-gray-100 transition"
               aria-label="Add to Cart"
             >
               <FaShoppingCart className="text-gray-600" />
-            </button>
+            </button>}
           </div>
         </div>
 

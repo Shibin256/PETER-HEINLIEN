@@ -1,3 +1,4 @@
+import adminAxiosInstance from "../../api/adminAxiosInstance";
 import axiosInstance from "../../api/axiosInstance";
 
 //fetching producs
@@ -15,19 +16,19 @@ const getLatestCollection=async ()=>{
 
 //adding products
 const addProducts=async (formData)=>{
-    const response= await axiosInstance.post('/api/products/add',formData)
+    const response= await adminAxiosInstance.post('/api/products/add',formData)
     return response.data
 }
 
 // deleteProduct using id
 const deleteProduct=async(id)=>{
-    const response=await axiosInstance.delete(`/api/products/${id}`)
+    const response=await adminAxiosInstance.delete(`/api/products/${id}`)
     return response.data
 }
 
 //editing product
 const updateProduct = async (id, data) => {
-  const res = await axiosInstance.put(`/api/products/update/${id}`, data, {
+  const res = await adminAxiosInstance.put(`/api/products/update/${id}`, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -48,6 +49,10 @@ const getProducById=async(id)=>{
   return res.data
 }
 
+const getRelatedProducts=async(id)=>{
+  const res=await axiosInstance.get(`/api/products/relatedProducts/${id}`)
+  return res.data
+}
 
 const productService ={
     getProducts,
@@ -56,7 +61,8 @@ const productService ={
     updateProduct,
     getBrandAndCollection,
     getProducById,
-    getLatestCollection
+    getLatestCollection,
+    getRelatedProducts
 }
 
 export default productService

@@ -74,11 +74,12 @@ const EditPassword = () => {
 
       // ✅ Use await
       const res = await dispatch(changePassword({ userId: profileData.id, data: formData }));
+      console.log(res, 'in change password res')
 
-      const message = res.payload?.message;
+      const message = res.payload;
       const updatedUser = res.payload?.data;
       if (message) {
-        toast.success(message);
+        toast.error(message);
       }
 
       if (updatedUser) {

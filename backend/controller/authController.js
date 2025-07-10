@@ -173,10 +173,6 @@ export const googleAuth = async (req, res) => {
 
     let user = await User.findOne({ googleId: sub });
 
-    if (user.isBlocked) {
-      return res.status(401).json({ message: 'The user is blocked form using the site, cant join' })
-    }
-
     if (!user) {
       user = await User.create({
         googleId: sub,
@@ -219,8 +215,12 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email })
 
+
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
+    }
+    if(user.googleId){
+      return res.status(401).json({message:'user not exist, try google login'})
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
@@ -305,6 +305,7 @@ export const adminLogin = async (req, res) => {
     await user.save();
 
     //creation of access and refresh Token when user log in
+    console.log(user,'user in access')
     const accessToken = generateAccessToken(user)
     console.log(accessToken)
     const refreshToken = generateRefreshToken(user)

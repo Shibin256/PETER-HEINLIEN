@@ -44,7 +44,7 @@ export const createProduct = async (req, res) => {
 //fetch latest collection for home page
 export const getCollection = async (req, res) => {
     try {
-        const latestCollection = await Product.find().sort({ createdAt: -1 }).limit(10)
+        const latestCollection = await Product.find({isList: { $ne: true }}).sort({ createdAt: -1 }).limit(10)
             .populate('brand') // Populate the brand field with data from the Brands collection
             .populate('category');
 
@@ -78,7 +78,10 @@ export const getAllProducts = async (req, res) => {
         // getting the number of total products
         const total = await Product.countDocuments(filter);
 
-        const products = await Product.find(filter)
+        const products = await Product.find({
+            ...filter,
+            isList: { $ne: true },
+        })
             .sort({ [sortField]: sortOrder })
             .skip(skip)
             .limit(limit)
@@ -105,7 +108,8 @@ export const deleteProductById = async (req, res) => {
 
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        await product.deleteOne();
+        product.isList = true;
+        await product.save();
         res.status(200).json({ message: 'Product deleted successfully' });
 
     } catch (error) {
@@ -145,7 +149,6 @@ export const updateProduct = async (req, res) => {
         }
 
 
-        // Step 3: Combine existing + new images
         const finalImages = [...existingImages, ...uploadImage];
 
         const updatedData = {
@@ -157,12 +160,8 @@ export const updateProduct = async (req, res) => {
             price: req.body.price,
             totalQuantity: req.body.quantity,
             availability: available,
-            images:finalImages
+            images: finalImages
         };
-
-
-
-
 
         const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
             new: true,
@@ -184,10 +183,10 @@ export const updateProduct = async (req, res) => {
 //get all brands and collection form db
 export const getBrandsAndCollection = async (req, res) => {
     try {
-        const category = await Category.find()
-        const brands = await Brands.find().sort({ name: 1 })
+        const category = await Category.find({isList: { $ne: true }})
+        const brands = await Brands.find({isList: { $ne: true }}).sort({ name: 1 })
 
-        const result = await Product.find()
+        const result = await Product.find({isList: { $ne: true }})
         res.status(200).json({ category, brands, result })
     } catch (error) {
         console.error('Fetching brand and category  Error:', error);
@@ -211,10 +210,21 @@ export const getProductById = async (req, res) => {
 }
 
 
+export const getRelatedProducts = async (req, res) => {
+    try {
+        const { productId } = req.params
+        console.log(productId)
+        const currentProduct = await Product.findById(productId)
+        if (!currentProduct) return res.status(404).json({ message: 'product not found' });
 
-// export const shopPagesearch=async(req,res)=>{
-//     const SearchName=req.body
+        const similarProducts = await Product.find({
+            _id: { $ne: productId },
+            isList: { $ne: true} ,
+            category: currentProduct.category
+        }).limit(6)
 
-//     const res=await Product.find({name:})
-
-// }
+        res.status(200).json(similarProducts);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error });
+    }
+}

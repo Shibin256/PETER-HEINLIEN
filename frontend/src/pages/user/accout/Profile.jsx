@@ -11,7 +11,6 @@ const Profile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch()
     const { user } = useSelector(state => state.auth)
-    console.log('========user:',user)
     const [showModal, setShowModal] = useState(false);
     const [nameImg,setNameImg]=useState([])
     const [profileData, setProfileData] = useState({

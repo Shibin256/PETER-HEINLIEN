@@ -4,7 +4,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Title from '../../../components/common/Title';
 import AccountCard from '../../../components/user/AccountCard';
-import image from '../../../assets/Footer.png'
+import myOrders from '../../../assets/myOrders.png'
+import password from '../../../assets/passwordAndSecurity.png'
+import address from '../../../assets/address.png'
+import coupon from '../../../assets/coupon.png'
+import wallet from '../../../assets/wallet.png'
+import contact from '../../../assets/contact.png'
+
 
 const MyAccount = () => {
 
@@ -23,52 +29,46 @@ const MyAccount = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <AccountCard
-            icon={<img src={image} alt="Orders" className="rounded-md" />}
+            icon={<img src={myOrders} alt="Orders" className="rounded-md" />}
             title="MY ORDERS"
             description="Track, return, or buy things again"
             onclickFun={() => {navigate('/my-orders')}}
           />
 
           <AccountCard
-            icon={<img src="path/to/lock-icon.png" alt="Security" className="w-6 h-6" />}
+            icon={<img src={password} alt="Security" className="rounded-md" />}
             title="PASSWORD & SECURITY"
             description="Edit login, name, and mobile number"
             onclickFun={() => {navigate('/my-profile')}}
           />
 
           <AccountCard
-            icon={<img src="path/to/address-icon.png" alt="Address" className="w-6 h-6" />}
+            icon={<img src={address} alt="Address" className="rounded-md" />}
             title="ADDRESS"
             description="Edit addresses for orders and gifts"
             onclickFun={() => {navigate('/my-address')}}
           />
 
           <AccountCard
-            icon={<img src="path/to/coupons-icon.png" alt="Coupons" className="w-6 h-6" />}
+            icon={<img src={coupon} alt="Coupons" className="rounded-md" />}
             title="COUPONS"
             description="Get exciting offers and discounts"
             onclickFun={() => {}}
           />
 
           <AccountCard
-            icon={<img src="path/to/contact-icon.png" alt="Contact" className="w-6 h-6" />}
+            icon={<img src={contact} alt="Contact" className="rounded-md" />}
             title="CONTACT US"
             description="Reach our customer service team"
-            onclickFun={() => {}}
+            onclickFun={() => {navigate('/contact')}}
           />
 
           <AccountCard
-            icon={<img src="path/to/wallet-icon.png" alt="Wallet" className="w-6 h-6" />}
+            icon={<img src={wallet} alt="Wallet" className="rounded-md" />}
             title="WALLET"
             description="View balance and add money"
             onclickFun={() => {}}
           />
-        </div>
-
-        <div className="mt-12 text-center">
-          <button className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors duration-300 shadow-sm hover:shadow-md">
-            View Account Settings
-          </button>
         </div>
       </div>
     </div>

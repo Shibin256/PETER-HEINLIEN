@@ -5,18 +5,29 @@ import ProductCard from '../../components/common/ProductCard';
 import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthInput from '../../components/common/AuthInput';
+import { useSearchParams } from 'react-router-dom';
 
 const Collection = () => {
   const dispatch = useDispatch();
 
-  const [showFilter, setShowFilter] = useState(false);
-  const [category, setCategory] = useState([]);
-  const [brand, setBrands] = useState([]);
-  const [sortType, setSortType] = useState('');
-  const [alphabeticOrder, setAlphabeticOrder] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const initialCategory = searchParams.getAll('category');
+  const initialBrand = searchParams.getAll('brand');
+  const initialSort = searchParams.get('sort') || '';
+  const initialAlpha = searchParams.get('alpha') || '';
+  const initialSearch = searchParams.get('search') || '';
+  const initialPage = parseInt(searchParams.get('page')) || 1;
+
+  const [category, setCategory] = useState(initialCategory);
+  const [brand, setBrands] = useState(initialBrand);
+  const [sortType, setSortType] = useState(initialSort);
+  const [alphabeticOrder, setAlphabeticOrder] = useState(initialAlpha);
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+
+  const [showFilter, setShowFilter] = useState(false);
 
   const { products, page, totalPages, brands, categories } = useSelector(state => state.products);
 
@@ -25,24 +36,46 @@ const Collection = () => {
     dispatch(getBrandAndCollection());
   }, [dispatch]);
 
+  useEffect(() => {
+    const params = new URLSearchParams();
+    category.forEach(cat => params.append('category', cat));
+    brand.forEach(br => params.append('brand', br));
+    if (sortType) params.set('sort', sortType);
+    if (alphabeticOrder) params.set('alpha', alphabeticOrder);
+    if (searchTerm) params.set('search', searchTerm);
+    params.set('page', currentPage);
+
+    setSearchParams(params);
+  }, [category, brand, sortType, alphabeticOrder, searchTerm, currentPage]);
+
+
   // Fetch filtered products
   const fetchFilteredProducts = (pageNumber = 1) => {
     setCurrentPage(pageNumber);
     dispatch(fetchProducts({
       page: pageNumber,
-      limit: 10,
-      search: '',
+      limit: 4,
+      search: searchTerm,
       categories: category,
       brands: brand,
       sort: sortType === 'low-high' || sortType === 'high-low' ? 'price' : '',
-      order: sortType === 'low-high' ? 'asc' : sortType === 'high-low' ? 'desc' : alphabeticOrder === 'a-z' ? 'asc' : alphabeticOrder === 'z-a' ? 'desc' : ''
+      order: sortType === 'low-high'
+        ? 'asc'
+        : sortType === 'high-low'
+          ? 'desc'
+          : alphabeticOrder === 'a-z'
+            ? 'asc'
+            : alphabeticOrder === 'z-a'
+              ? 'desc'
+              : ''
     }));
   };
+
 
   // Handle search
   const handleSearch = (e) => {
     e.preventDefault();
-    dispatch(fetchProducts({ page: 1, limit: 10, search: searchTerm }));
+    dispatch(fetchProducts({ page: 1, limit: 4, search: searchTerm }));
   };
 
   // Filters + sorting effect
@@ -191,8 +224,8 @@ const Collection = () => {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
                   <option value="">None</option>
-                  <option value="low-high">High to Low</option>
-                  <option value="high-low">Low to High</option>
+                  <option value="low-high">Low to High</option>
+                  <option value="high-low">High to Low</option>
                 </select>
               </div>
             </div>
