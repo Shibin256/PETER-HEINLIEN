@@ -19,6 +19,14 @@ export const fetchCart = createAsyncThunk(
         return await cartService.fetchCart(userId);
     });
 
+export const toggleIsLocked = createAsyncThunk(
+    'user/cart/toggleIsLocked',
+    async (userId,lock) => {
+        console.log(lock)
+        return await cartService.toggleIsLocked(userId,lock);
+    });
+
+
 
 export const removeFromCart = createAsyncThunk(
     'user/cart/removeFromCart',
@@ -38,11 +46,11 @@ export const updateCart = createAsyncThunk(
     }
 );
 
-export const wishlistToCart=createAsyncThunk(
+export const wishlistToCart = createAsyncThunk(
     'user/cart/wishlistToCart',
-    async({userId,productIds,quantity=1},thunkAPI)=>{
+    async ({ userId, productIds, quantity = 1 }, thunkAPI) => {
         try {
-            
+
             return await cartService.wishlistToCart({ userId, productIds, quantity });
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -56,6 +64,7 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState: {
         cartItems: [],
+        isLocked:false,
         subTotal: 0,
         totalPrice: 0,
         loading: false,
@@ -84,6 +93,7 @@ const cartSlice = createSlice({
             })
 
             .addCase(fetchCart.fulfilled, (state, action) => {
+                state.isLocked=action.payload.isLocked;
                 state.cartItems = action.payload.products;
                 state.subTotal = action.payload.subTotal;
                 state.totalPrice = action.payload.totalPrice;
@@ -118,7 +128,7 @@ const cartSlice = createSlice({
                 state.error = action.payload;
             })
 
-              .addCase(wishlistToCart.pending, (state) => {
+            .addCase(wishlistToCart.pending, (state) => {
                 state.loading = true;
             })
 

@@ -14,7 +14,7 @@ export const createCoupons = async (req, res) => {
         console.log(expirationDate);
 
         // Await is missing here
-        const existingCoupon = await Coupons.findOne({ code: couponCode });
+        const existingCoupon = await Coupons.findOne({ code: couponCode }).select('-password -createdAt -updatedAt');
         if (existingCoupon) {
             return res.status(400).json({ message: 'A coupon with this code already exists' });
         }
@@ -53,7 +53,7 @@ export const fetchCoupons = async (req, res) => {
     if (search) filter.code = { $regex: search, $options: 'i' };
 
 
-    let coupons = await Coupons.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit)
+    let coupons = await Coupons.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).select('-createdAt -updatedAt');
     let total = await Coupons.countDocuments(filter)
 
 
@@ -69,7 +69,7 @@ export const deleteCoupon = async (req, res) => {
     const { couponId } = req.params;
 
     try {
-        const deletedCoupon = await Coupons.findByIdAndDelete(couponId);
+        const deletedCoupon = await Coupons.findByIdAndDelete(couponId).select('-createdAt -updatedAt');
         if (!deletedCoupon) {
             return res.status(404).json({ message: 'Coupon not found' });
         }
@@ -115,8 +115,7 @@ export const updateCoupon = async (req, res) => {
 export const applyCoupon = async (req, res) => {
     const { userId, couponCode } = req.body;
     try {
-        const coupon = await Coupons.findOne
-            ({ code: couponCode });
+        const coupon = await Coupons.findOne({ code: couponCode }).select('-createdAt -updatedAt');
 
         console.log(coupon, 'coupon');
         if (!coupon) {
@@ -151,7 +150,7 @@ export const removeCoupon = async (req, res) => {
     const { userId } = req.body; // Make sure userId is sent in the request body
 
     try {
-        const coupon = await Coupons.findOne({ code: couponId });
+        const coupon = await Coupons.findOne({ code: couponId }).select('-createdAt -updatedAt');
         if (!coupon) {
             return res.status(404).json({ message: 'Coupon not found' });
         }

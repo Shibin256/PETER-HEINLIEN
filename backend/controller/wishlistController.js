@@ -5,7 +5,7 @@ import Wishlist from '../model/wishlistModel.js';
 export const addToWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
-    let wishlist = await Wishlist.findOne({ userId });
+    let wishlist = await Wishlist.findOne({ userId }).select('-createdAt -updatedAt');
 
     if (!wishlist) {
       wishlist = new Wishlist({ userId, productIds: [productId] });
@@ -26,7 +26,7 @@ export const addToWishlist = async (req, res) => {
 export const removeFromWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
-    const wishlist = await Wishlist.findOne({ userId });
+    const wishlist = await Wishlist.findOne({ userId }).select('-createdAt -updatedAt');
     if (wishlist) {
       wishlist.productIds = wishlist.productIds.filter(id => id.toString() !== productId);
       await wishlist.save();
@@ -57,7 +57,7 @@ export const getWishedProduct = async (req, res) => {
     const { userId, productId } = req.params;
 
     // Find the wishlist for the user
-    const wishlist = await Wishlist.findOne({ userId });
+    const wishlist = await Wishlist.findOne({ userId }).select('-createdAt -updatedAt');
 
     // Check if the product exists in the wishlist
     const isWished = wishlist?.productIds?.some(

@@ -10,7 +10,7 @@ export const changeName = async (req, res) => {
     try {
         const { id } = req.params
         const newName = req.body.name
-        const user = await User.findById(id).select('-password')
+        const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId')
         if (!user) return res.status(404).json({ message: 'User not found' })
 
         user.username = newName
@@ -25,36 +25,7 @@ export const changeName = async (req, res) => {
     }
 }
 
-// export const EditOTPGeneration = async (req, res) => {
-//   try {
-//     const { email } = req.body;
-//     console.log('email ======', email);
 
-//     const userExist = await User.findOne({ email });
-//     if (!userExist) {
-//       return res.status(400).json({ message: "User does not exist" });
-//     }
-
-//     const otp = genarateOtp();
-//     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-//     console.log('otp is: ----', otp);
-
-//     // Remove any previous OTP
-//     await otpModel.findOneAndDelete({ email });
-//     await otpModel.create({ email, otp, expiresAt });
-
-//     const emailSend = await sendVerificationEmail(email, otp);
-//     if (!emailSend) {
-//       return res.status(400).json({ message: "OTP not sent. Email error." });
-//     }
-
-//     return res.status(200).json({ message: 'The OTP has been sent to the email', email });
-
-//   } catch (error) {
-//     console.error("Reset password error:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
 
 export const changeOrAddMobile = async (req, res) => {
     try {
@@ -65,13 +36,13 @@ export const changeOrAddMobile = async (req, res) => {
             return res.status(400).json({ message: 'Mobile number is required' });
         }
 
-        const user = await User.findById(id).select('-password'); // Exclude password
+        const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId'); // Exclude password
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const phoneExist = await User.findOne({ phone: newNumber });
+        const phoneExist = await User.findOne({ phone: newNumber }).select('-password -createdAt -updatedAt -googleId');
         if (phoneExist && phoneExist.phone != null) {
             return res.status(400).json({ message: "The mobile number is already exists" });
         }
@@ -106,7 +77,7 @@ export const editPassword = async (req, res) => {
             return res.status(400).json({ message: 'New password and confirm password must match' });
         }
 
-        const user = await User.findById(id);
+        const user = await User.findById(id).select('-createdAt -updatedAt -googleId');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -124,7 +95,6 @@ export const editPassword = async (req, res) => {
         user.password = hashedNewPassword;
         await user.save();
 
-        // ✅ Remove password from user object before sending
         const { password, ...userWithoutPassword } = user.toObject();
 
         return res.status(200).json({
@@ -143,7 +113,7 @@ export const editImage = async (req, res) => {
         const { id } = req.params
         const img = req.file
         console.log(req.file)
-        const user = await User.findById(id).select('-password')
+        const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId')
 
         const result = await cloudinary.uploader.upload(img.path)
         const uploadedImage = result.secure_url
@@ -178,7 +148,7 @@ export const addAddress = async (req, res) => {
             defaultAddress
         })
 
-        const user = await User.findById(id).select('-password')
+        const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId')
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -200,7 +170,7 @@ export const addAddress = async (req, res) => {
 export const getAllAddress = async (req, res) => {
     try {
         const { id } = req.params
-        const user = await User.findById(id).select('-password').populate('addresses').lean()
+        const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId').populate('addresses').lean()
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -214,7 +184,7 @@ export const getAllAddress = async (req, res) => {
 export const removeAddress = async (req, res) => {
     try {
         const { userId, addressId } = req.params
-        const user = await User.findById(userId).select('-password')
+        const user = await User.findById(userId).select('-password -createdAt -updatedAt -googleId')
         console.log(user, 'user----')
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -225,7 +195,7 @@ export const removeAddress = async (req, res) => {
             return res.status(400).json({ message: "Address does not belong to this user" });
         }
 
-        await Address.findByIdAndDelete(addressId)
+        await Address.findByIdAndDelete(addressId).select('-createdAt -updatedAt')
 
         user.addresses = user.addresses.filter(id => id.toString() !== addressId)
 
@@ -244,24 +214,21 @@ export const SetDefaultAddress = async (req, res) => {
      try {
     const { userId, addressId } = req.params;
 
-    // Step 1: Get user and validate
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('-password -createdAt -updatedAt -googleId');
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Step 2: Check if address belongs to the user
+
     const belongsToUser = user.addresses.some(id => id.toString() === addressId);
     if (!belongsToUser) {
       return res.status(400).json({ message: 'Address does not belong to this user' });
     }
 
-    // Step 3: Unset default for all of this user's addresses
     await Address.updateMany(
       { _id: { $in: user.addresses } },
       { $set: { defaultAddress: false } }
     );
 
-    // Step 4: Set selected address as default
-    await Address.findByIdAndUpdate(addressId, { defaultAddress: true });
+    await Address.findByIdAndUpdate(addressId, { defaultAddress: true }).select('-createdAt -updatedAt');
 
     res.status(200).json({ message: 'Default address set successfully' });
   } catch (error) {
@@ -288,7 +255,7 @@ export const updateAddress = async (req, res) => {
 
     const updatedAdress = await Address.findByIdAndUpdate(addressId, updatedData, {
         new: true
-    })
+    }).select('-createdAt -updatedAt')
 
 
     if (!updatedAdress) {
@@ -296,5 +263,4 @@ export const updateAddress = async (req, res) => {
     }
 
     res.status(200).json(updateAddress);
-
 }

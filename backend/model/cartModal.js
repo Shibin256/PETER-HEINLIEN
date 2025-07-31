@@ -41,7 +41,8 @@ const cartSchema = new mongoose.Schema({
   couponID: {
     type: String,
     default: null
-  }
+  },
+  isLocked: { type: Boolean, default: false },
 }, { timestamps: true });
 
 const Cart=mongoose.model('Cart', cartSchema);

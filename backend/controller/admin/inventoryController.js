@@ -10,18 +10,22 @@ export const createCategory = async (req, res) => {
         const { category } = req.body
         const categoryCheck = await Category.findOne({
             categoryName: { $regex: new RegExp(`^${category}$`, 'i') }
-        });
+        }).select('-createdAt -updatedAt');
 
         if (categoryCheck) return res.status(400).json({ message: 'Category already exists' });
 
-        //creating new category with a objectId
         const newCategory = new Category({
             _id: new mongoose.Types.ObjectId(),
             categoryName: category
         });
-        //saving category
+
         await newCategory.save()
-        res.status(201).json({ message: "Category created", category: newCategory })
+
+        const categoryResponse = newCategory.toObject();
+        delete categoryResponse.createdAt;
+        delete categoryResponse.updatedAt;
+
+        res.status(201).json({ message: "Category created", category: categoryResponse })
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: error.message })
@@ -39,7 +43,7 @@ export const createBrand = async (req, res) => {
 
         const brandExists = await Brands.findOne({
             name: { $regex: new RegExp(`^${name}$`, 'i') }
-        })
+        }).select('-createdAt -updatedAt -image')
 
         if (brandExists) return res.status(400).json({ message: 'Brand already exists' });
 
@@ -52,6 +56,11 @@ export const createBrand = async (req, res) => {
         })
 
         await newBrand.save()
+
+        const brandResponse = newBrand.toObject();
+        delete brandResponse.createdAt;
+        delete brandResponse.updatedAt;
+
         res.status(201).json({ message: "brand created", brand: newBrand })
 
     } catch (error) {
@@ -63,7 +72,7 @@ export const createBrand = async (req, res) => {
 //Category deleting section
 export const deleteCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id);
+        const category = await Category.findById(req.params.id).select('_id categoryName isList');
 
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
@@ -93,7 +102,7 @@ export const deleteCategory = async (req, res) => {
 //Brand deleting section
 export const deleteBrand = async (req, res) => {
     try {
-        const brand = await Brands.findById(req.params.id)
+        const brand = await Brands.findById(req.params.id).select('_id categoryName isList')
         if (!brand) return res.status(404).json({ message: 'Brand not found' });
 
         // Mark products with this category as isList: true
@@ -134,7 +143,7 @@ export const editBrand = async (req, res) => {
         //updating brand
         const updatedBrand = await Brands.findByIdAndUpdate(id, updatedData, {
             new: true,
-        });
+        }).select('-createdAt -updatedAt');
 
         if (!updatedBrand) {
             return res.status(404).json({ message: 'Brand not found' });
@@ -154,7 +163,7 @@ export const editCategory = async (req, res) => {
         const { name } = req.body;
 
         // Check if the category exists
-        const category = await Category.findById(id);
+        const category = await Category.findById(id).select('-createdAt -updatedAt')
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
@@ -180,7 +189,7 @@ export const addCategoryOffer = async (req, res) => {
             return res.status(400).json({ message: 'category ID and percentage are required' });
         }
 
-        const category = await Category.findById(categoryId);
+        const category = await Category.findById(categoryId).select('-createdAt -updatedAt');
         if (!category) {
             return res.status(404).json({ message: 'category not found' });
         }
@@ -189,16 +198,16 @@ export const addCategoryOffer = async (req, res) => {
 
         category.save()
 
-        const products = await Product.find({ category: categoryId });
+        const products = await Product.find({ category: categoryId }).select('-createdAt -updatedAt');
 
         for (let product of products) {
             const discountAmount = (product.price * percentage) / 100;
-            console.log(product.offerPrice,product.price,discountAmount)
+            console.log(product.offerPrice, product.price, discountAmount)
             if (product.offerPrice && product.offerPrice > product.price - discountAmount) {
                 product.offerPrice = product.price - discountAmount;
                 await product.save();
-            }else{
-                 product.offerPrice = product.price - discountAmount;
+            } else {
+                product.offerPrice = product.price - discountAmount;
                 await product.save();
             }
         }
@@ -219,12 +228,12 @@ export const removeCategoryOffer = async (req, res) => {
             return res.status(400).json({ message: 'Product ID is required' });
         }
 
-        const category = await Category.findById(categoryId);
+        const category = await Category.findById(categoryId).select('-createdAt -updatedAt');
         if (!category) {
             return res.status(404).json({ message: 'category not found' });
         }
 
-        const products = await Product.find({ category: categoryId });
+        const products = await Product.find({ category: categoryId }).select('-createdAt -updatedAt');
 
         for (let product of products) {
             product.offerPrice = 0;

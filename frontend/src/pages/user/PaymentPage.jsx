@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createPaymentOrder, placeOrder, verifyPayment } from '../../features/orders/ordersSlice';
 import { toast } from 'react-toastify';
-import { resetCart } from '../../features/cart/cartSlice';
+import { resetCart, toggleIsLocked } from '../../features/cart/cartSlice';
 import { getWallet } from '../../features/wallet/walletSlice';
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
 
@@ -25,6 +25,9 @@ const PaymentPage = () => {
     }
 
     const { currency } = useSelector(state => state.global);
+    const { isLocked } = useSelector(state => state.cart);
+    console.log(isLocked)
+
 
     const handlePaymentChange = (method) => {
         setSelectedPayment(method);
@@ -139,6 +142,12 @@ const PaymentPage = () => {
                 }, 0);
 
             } else if (selectedPayment === 'razorpay') {
+                if(isLocked===true){
+                    toast.error('the cart already locked and need to payment complete')
+                    navigate('/')
+                }else{
+                await dispatch(toggleIsLocked({ userID: userId, lock: true }))
+
                 let totalAmount = totalPrice + (shippingCost || 0);
                 const paymentSuccess = await handlePayment({ totalPrice: totalAmount })
                 console.log(paymentSuccess)
@@ -161,9 +170,8 @@ const PaymentPage = () => {
                         navigate('/order-success', { state: { order: res.order } });
                     }, 0);
                 }
-                // else {
-                //     navigate('/order-failed')
-                // }
+                // await dispatch(toggleIsLocked({ userID: userId, lock: false }))
+            }
             } else if (selectedPayment === 'walletPay') {
                 let totalAmount = totalPrice + (shippingCost || 0);
                 if (totalAmount > walletAmount) {
@@ -189,17 +197,18 @@ const PaymentPage = () => {
             }
         } catch (error) {
             setOrderStatus('error');
-            console.log(cartItems,totalPrice,'in the payment')
-            navigate('/order-failed',{
-                state:{
+            console.log(cartItems, totalPrice, 'in the payment')
+            navigate('/order-failed', {
+                state: {
                     cartItems,
                     totalPrice,
                     shippingCost,
                     userId
-                }    
+                }
             })
 
         } finally {
+            await dispatch(toggleIsLocked({ userID: userId, lock: false }))
             setIsProcessing(false);
         }
     };

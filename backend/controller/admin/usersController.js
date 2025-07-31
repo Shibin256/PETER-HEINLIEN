@@ -11,7 +11,7 @@ export const getAllUsers = async (req, res) => {
         const query = { isAdmin: { $ne: true } };
 
         let [users, total] = await Promise.all([
-            User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).select('-password -createdAt -updatedAt -googleId'),
             User.countDocuments(query)
         ]);
 
@@ -38,7 +38,7 @@ export const getAllUsers = async (req, res) => {
 // users block and upblock part
 export const toggleUserBlock = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id)
+        const user = await User.findById(req.params.id).select('-password -createdAt -updatedAt -googleId')
 
         if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -56,7 +56,7 @@ export const toggleUserBlock = async (req, res) => {
 //user delete section
 export const deleteUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id)
+        const user = await User.findById(req.params.id).select('-password -createdAt -updatedAt -googleId')
 
         if (!user) return res.status(404).json({ message: 'User not found' });
 

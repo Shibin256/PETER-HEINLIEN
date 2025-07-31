@@ -32,8 +32,12 @@ export const createProduct = async (req, res) => {
 
 
         await newProduct.save()
-        res.status(201).json({ message: "Product created", product: newProduct })
 
+        const productResponse = newProduct.toObject();
+        delete productResponse.createdAt;
+        delete productResponse.updatedAt;
+
+        res.status(201).json({ message: "Product created", product: productResponse })
 
     } catch (error) {
         console.log(error)
@@ -46,7 +50,8 @@ export const getCollection = async (req, res) => {
     try {
         const latestCollection = await Product.find({isList: { $ne: true }}).sort({ createdAt: -1 }).limit(10)
             .populate('brand') // Populate the brand field with data from the Brands collection
-            .populate('category');
+            .populate('category')
+            .select('-createdAt -updatedAt');
 
         res.json({ latestCollection });
     } catch (error) {
@@ -86,7 +91,8 @@ export const getAllProducts = async (req, res) => {
             .skip(skip)
             .limit(limit)
             .populate('brand')
-            .populate('category');
+            .populate('category')
+            .select('-createdAt -updatedAt');
 
         res.json({
             products,
@@ -104,7 +110,7 @@ export const getAllProducts = async (req, res) => {
 //product deleting section
 export const deleteProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id)
+        const product = await Product.findById(req.params.id).select('_id isList')
 
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
@@ -126,7 +132,6 @@ export const updateProduct = async (req, res) => {
         const { id } = req.params
 
         if (req.body.quantity <= 0) available = false
-
 
         // Step 1: Handle existing image URLs sent from frontend
         let existingImages = [];
@@ -165,7 +170,7 @@ export const updateProduct = async (req, res) => {
 
         const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
             new: true,
-        });
+        }).select('-createdAt -updatedAt');
 
         if (!updatedProduct) {
             return res.status(404).json({ message: 'Product not found' });
@@ -183,10 +188,10 @@ export const updateProduct = async (req, res) => {
 //get all brands and collection form db
 export const getBrandsAndCollection = async (req, res) => {
     try {
-        const category = await Category.find({isList: { $ne: true }})
-        const brands = await Brands.find({isList: { $ne: true }}).sort({ name: 1 })
+        const category = await Category.find({isList: { $ne: true }}).select('-createdAt -updatedAt')
+        const brands = await Brands.find({isList: { $ne: true }}).sort({ name: 1 }).select('-createdAt -updatedAt')
 
-        const result = await Product.find({isList: { $ne: true }})
+        const result = await Product.find({isList: { $ne: true }}).select('-createdAt -updatedAt')
         res.status(200).json({ category, brands, result })
     } catch (error) {
         console.error('Fetching brand and category  Error:', error);
@@ -199,7 +204,8 @@ export const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
             .populate('brand') // Populate the brand field with data from the Brands collection
-            .populate('category');
+            .populate('category')
+            .select('-createdAt -updatedAt');
 
         if (!product) return res.status(404).json({ message: 'Product not found' });
         res.status(200).json(product);
@@ -221,7 +227,7 @@ export const getRelatedProducts = async (req, res) => {
             _id: { $ne: productId },
             isList: { $ne: true} ,
             category: currentProduct.category
-        }).limit(6)
+        }).limit(6).select('-createdAt -updatedAt')
 
         res.status(200).json(similarProducts);
     } catch (error) {
@@ -237,7 +243,7 @@ export const addProductOffer = async (req, res) => {
             return res.status(400).json({ message: 'Product ID and percentage are required' });
         }
 
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productId).select('-createdAt -updatedAt');
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -265,7 +271,8 @@ export const removeProductOffer = async (req, res) => {
         }
         const product = await Product
             .findById(productId)
-            .select('offerPrice'); // Select only the offerPrice field
+            .select('offerPrice')
+            .select('-createdAt -updatedAt'); // Select only the offerPrice field
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }

@@ -9,7 +9,7 @@ import {
 import { verifyAccessToken } from '../middleware/authMiddleware.js';
 import { addAddress, changeName, changeOrAddMobile, editImage, editPassword, getAllAddress, removeAddress, SetDefaultAddress, updateAddress } from '../controller/accountController.js';
 import multer from 'multer';
-import { addFromWishlistToCart, addItemToCart, getCart, removeCartItem, updateCartItem } from '../controller/cartController.js';
+import { addFromWishlistToCart, addItemToCart, getCart, removeCartItem, toggleIsLocked, updateCartItem } from '../controller/cartController.js';
 import { cancelOrderItem, cancelOrderSingleItem, changeOrderStatus, downloadInvoice, getOrders, placeOrder, returnOrderItem, verifyCancel } from '../controller/orderController.js';
 import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymentController.js';
 import { applyCoupon, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
@@ -44,6 +44,7 @@ router.get('/cart/:userId',verifyAccessToken,getCart)
 router.delete('/cart/:userId/:productId',verifyAccessToken,removeCartItem)
 router.put('/cart/update',verifyAccessToken,updateCartItem)
 router.post('/cart/wishlistToCart',verifyAccessToken,addFromWishlistToCart)
+router.post('/cart/toggleIsLocked/:userId/:lock',verifyAccessToken,toggleIsLocked)
 
 
 

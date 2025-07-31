@@ -23,6 +23,13 @@ const updateCart = async (data) => {
   return response.data;
 };
 
+
+const toggleIsLocked = async ({userID,lock}) => {
+  console.log('userID:',userID,'lock',lock,'====')
+  const response = await axiosInstance.post(`/api/user/cart/toggleIsLocked/${userID}/${lock}`,);
+  return response.data;
+};
+
 const wishlistToCart=async(data)=>{
   console.log(data,'in slice')
   const response=await axiosInstance.post('/api/user/cart/wishlistToCart',data)
@@ -36,7 +43,8 @@ const cartService = {
   fetchCart,
   removeFromCart,
   updateCart,
-  wishlistToCart
+  wishlistToCart,
+  toggleIsLocked
 };
 
 export default cartService;

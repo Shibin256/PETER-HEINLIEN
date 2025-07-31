@@ -87,20 +87,20 @@ export const register = async (req, res) => {
     }
 
     // Check if user already exists
-    const userExist = await User.findOne({ email }).select('-password');
+    const userExist = await User.findOne({ email }).select('-password -createdAt -updatedAt -googleId');
     if (userExist) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const phoneExist = await User.findOne({ phone }).select('-password');
+    const phoneExist = await User.findOne({ phone }).select('-password -createdAt -updatedAt -googleId');
     if (phoneExist && phoneExist.phone != null) {
       return res.status(400).json({ message: "The mobile number is already exists" });
     }
 
-    const ReferralUser = await User.findOne({ referralCode:ReferralCode }).select('-password')
+    const ReferralUser = await User.findOne({ referralCode:ReferralCode }).select('-password -createdAt -updatedAt -googleId')
 
     if (ReferralUser) {
-      let wallet = await Wallet.findOne({ userId: ReferralUser._id })
+      let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
       const transactions = {
         userId: ReferralUser._id,
         amount: 50,
@@ -170,8 +170,6 @@ export const verifyOTP = async (req, res) => {
           name: user.username,
           email: user.email,
           isAdmin: user.isAdmin,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
         },
       });
 
@@ -239,7 +237,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).select('-createdAt -updatedAt')
 
 
     if (!user) {
@@ -307,7 +305,7 @@ export const adminLogin = async (req, res) => {
     const { email, password } = req.body
     console.log("Admin login attempt for email:", email);
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).select('-createdAt -updatedAt')
 
     if (!user) {
       console.log('Admin login failed: User not found');
@@ -381,7 +379,6 @@ export const refreshAccessToken = (req, res) => {
 export const forgotPass = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log('email ======', email);
 
     const userExist = await User.findOne({ email });
     if (!userExist) {
@@ -434,7 +431,7 @@ export const verifyOTPForgotpass = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const { newPassword, email } = req.body
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).select('-createdAt -updatedAt')
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -457,7 +454,7 @@ export const changePassword = async (req, res) => {
 // fetch current user who logged in
 export const fetchCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id).select('-password -createdAt -updatedAt -googleId');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json(user);
   } catch (error) {
