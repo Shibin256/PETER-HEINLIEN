@@ -7,7 +7,7 @@ export const addItemToCart = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).select('-createdAt -updatedAt');
 
     if (!product) return res.status(404).json({ message: 'Product not found' });
     if (product.totalQuantity <= 0) return res.status(400).json({ message: 'Product is out of stock' });
@@ -29,8 +29,8 @@ export const addItemToCart = async (req, res) => {
       if (existingItem.quantity >= 4) return res.status(400).json({ message: 'max quantity added' });
       console.log(quantity)
       if (existingItem.quantity >= product.totalQuantity) {
-      return res.status(400).json({ message: `Product is out of stock` });
-    }
+        return res.status(400).json({ message: `Product is out of stock` });
+      }
 
       existingItem.quantity += quantity;
       existingItem.productSubTotal = existingItem.quantity * existingItem.price;
@@ -72,23 +72,52 @@ export const addItemToCart = async (req, res) => {
 export const getCart = async (req, res) => {
   try {
     const { userId } = req.params;
-    const cart = await Cart.findOne({ userId }).populate('products.productId');
+    const cart = await Cart.findOne({ userId }).populate('products.productId').select('-createdAt -updatedAt');
     if (!cart) return res.status(404).json({ message: 'Cart not found' });
+    console.log(cart)
     res.status(200).json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+export const toggleIsLocked = async (req, res) => {
+  try {
+    const { userId, lock } = req.params;
+    console.log(userId, lock,'in controller')
+
+    const cart = await Cart.findOne({ userId: userId });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    if (lock == 'true') {
+      cart.isLocked = true;
+    } else {
+      cart.isLocked = false;
+    }
+
+    await cart.save();
+    res.status(200).json({
+      message: lock ? "Cart locked for payment" : "Cart unlocked",
+      cart
+    });
+
+  } catch (error) {
+    console.error("Error in toggleIsLocked:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 
 export const updateCartItem = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
 
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId }).select('-createdAt -updatedAt');
     if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).select('-createdAt -updatedAt');
     if (!product) return res.status(404).json({ message: 'Product not found' });
     console.log('product0==', product)
     if (quantity > product.totalQuantity) {
@@ -142,10 +171,10 @@ export const removeCartItem = async (req, res) => {
   try {
     const { userId, productId } = req.params;
     const { quantity } = req.body;
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).select('-createdAt -updatedAt');
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId }).select('-createdAt -updatedAt');
     if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
     cart.products = cart.products.filter(p => p.productId.toString() !== productId);
@@ -169,7 +198,7 @@ export const addFromWishlistToCart = async (req, res) => {
   }
 
   try {
-    let cart = await Cart.findOne({ userId: userId });
+    let cart = await Cart.findOne({ userId: userId }).select('-createdAt -updatedAt');
 
     if (!cart) {
       cart = new Cart({
@@ -217,9 +246,6 @@ export const addFromWishlistToCart = async (req, res) => {
           productSubTotal: product.price * quantity,
         });
       }
-
-      // Reduce stock
-      // product.totalQuantity -= quantity;
       await product.save();
     }
     // Remove products from wishlist

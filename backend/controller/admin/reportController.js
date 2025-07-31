@@ -47,7 +47,7 @@ export const getSalesReport = async (req, res) => {
         }
 
 
-        const orders = await Order.find(matchQuery);
+        const orders = await Order.find(matchQuery).select('-createdAt -updatedAt');
 
         const totalSales = orders.reduce((sum, order) => sum + order.TotalAmount, 0);
 
@@ -113,7 +113,7 @@ const getSalesReportCall = async (type, startDate, endDate) => {
             }
         }
 
-        return await Order.find(matchQuery);
+        return await Order.find(matchQuery).select('-createdAt -updatedAt');
 
     } catch (error) {
         console.error("Error fetching sales report:", error);

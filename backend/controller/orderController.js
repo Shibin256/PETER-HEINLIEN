@@ -66,6 +66,13 @@ export const placeOrder = async (req, res) => {
         orderId: mainOrderId
     }
     try {
+        for (const item of orderData.Items) {
+            console.log(item,'--------')
+            const product = await Product.findOne({ _id: item.productId })
+            if (item.quantity > product.totalQuantity) {
+                return res.status(404).json({ message: 'The product is on out of stock know' });
+            }
+        }
         const newOrder = await Order.create(orderData);
 
         for (const item of newOrder.Items) {
@@ -161,7 +168,7 @@ export const cancelOrderItem = async (req, res) => {
     const { itemOrderId, reason } = req.body;
 
     try {
-        const order = await Order.findOne({ "orderId": itemOrderId });
+        const order = await Order.findOne({ "orderId": itemOrderId }).select('-createdAt -updatedAt');
         if (!order) {
             return res.status(404).json({ message: 'Order item not found' });
         }
@@ -170,7 +177,7 @@ export const cancelOrderItem = async (req, res) => {
                 item.productId,
                 { $inc: { totalQuantity: +item.quantity } },
                 { new: true }
-            );
+            ).select('-createdAt -updatedAt');
 
             if (updatedProduct.totalQuantity == 1) {
                 updatedProduct.stockStatus = 'In Stock';
@@ -193,13 +200,13 @@ export const cancelOrderSingleItem = async (req, res) => {
     const { itemOrderId, reason } = req.body;
 
     try {
-        const orderItem = await Order.findOne({ "Items.itemOrderId": itemOrderId });
+        const orderItem = await Order.findOne({ "Items.itemOrderId": itemOrderId }).select('-createdAt -updatedAt');
         if (!orderItem) {
             return res.status(404).json({ message: 'Order item not found' });
         }
 
         const UserID = orderItem.UserID;
-        console.log(orderItem.Items.length,'---')
+        console.log(orderItem.Items.length, '---')
 
         // Find the specific item in the order
         const item = orderItem.Items.find(item => item.itemOrderId === itemOrderId);
@@ -211,7 +218,7 @@ export const cancelOrderSingleItem = async (req, res) => {
             item.productId,
             { $inc: { totalQuantity: +item.quantity } },
             { new: true }
-        );
+        ).select('-createdAt -updatedAt');
 
         if (updatedProduct.totalQuantity == 1) {
             updatedProduct.stockStatus = 'In Stock';
@@ -220,13 +227,13 @@ export const cancelOrderSingleItem = async (req, res) => {
 
         item.cancelReason = reason || 'No reason provided';
 
-        if(orderItem.Items.length==1){
-            orderItem.OrderStatus='Cancelled'
+        if (orderItem.Items.length == 1) {
+            orderItem.OrderStatus = 'Cancelled'
         }
 
         await orderItem.save();
-        
-        const order = await Order.find({ "UserID": UserID });
+
+        const order = await Order.find({ "UserID": UserID }).select('-createdAt -updatedAt');
         return res.status(200).json({ message: 'Item cancelled successfully', order });
     } catch (error) {
         console.error(err);
@@ -237,7 +244,7 @@ export const cancelOrderSingleItem = async (req, res) => {
 export const singleCancelVerify = async (req, res) => {
     const { itemOrderId } = req.params;
     try {
-        let total=0
+        let total = 0
         const orderitem = await Order.findOne({ "Items.itemOrderId": itemOrderId });
         if (!orderitem) {
             return res.status(404).json({ message: 'Order item not found' });
@@ -245,13 +252,13 @@ export const singleCancelVerify = async (req, res) => {
         orderitem.Items.forEach(item => {
             if (item.itemOrderId === itemOrderId) {
                 item.cancelVerified = true;
-                total=item.productPrice
+                total = item.productPrice
             }
         })
 
         await orderitem.save();
 
-         if (orderitem.PaymentMethod != 'cod') {
+        if (orderitem.PaymentMethod != 'cod') {
             let wallet = await Wallet.findOne({ userId: orderitem.UserID });
             console.log(total)
             const transactions = {
@@ -267,12 +274,12 @@ export const singleCancelVerify = async (req, res) => {
                 wallet.balance += total
                 wallet.transactions.push(transactions)
             } else {
-                wallet = new Wallet({ userId:orderitem.UserID, balance: total, transactions: [transactions] });
+                wallet = new Wallet({ userId: orderitem.UserID, balance: total, transactions: [transactions] });
             }
             await wallet.save();
         }
 
-        const order = await Order.find().sort({ createdAt: -1 })
+        const order = await Order.find().sort({ createdAt: -1 }).select('-createdAt -updatedAt')
         return res.status(200).json({ message: 'Return request verified successfully', order });
     } catch (error) {
         console.error(error);
@@ -311,7 +318,7 @@ export const verifyCancel = async (req, res) => {
                 wallet.balance += total
                 wallet.transactions.push(transactions)
             } else {
-                wallet = new Wallet({ userId:order.UserID, balance: total, transactions: [transactions] });
+                wallet = new Wallet({ userId: order.UserID, balance: total, transactions: [transactions] });
             }
             await wallet.save();
         }
@@ -328,7 +335,7 @@ export const changeOrderStatus = async (req, res) => {
     const orderId = req.params.orderId;
     const { status } = req.body;
     try {
-        const order = await Order.findOne({ "orderId": orderId });
+        const order = await Order.findOne({ "orderId": orderId }).select('-createdAt -updatedAt');
         if (!order) {
             return res.status(404).json({ message: 'Order item not found' });
         }
@@ -363,7 +370,7 @@ export const getAllOrders = async (req, res) => {
     try {
         const total = await Order.countDocuments(filter);
         const totalPage = Math.ceil(total / limit);
-        let orders = await Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('Items');
+        let orders = await Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('Items').select('-createdAt -updatedAt');
 
         res.status(200).json({
             orders,
@@ -382,7 +389,7 @@ export const returnOrderItem = async (req, res) => {
     const { itemOrderId } = req.params;
     const { reason, deatials } = req.body;
     try {
-        const orderItem = await Order.findOne({ "Items.itemOrderId": itemOrderId });
+        const orderItem = await Order.findOne({ "Items.itemOrderId": itemOrderId }).select('-createdAt -updatedAt');
         if (!orderItem) {
             return res.status(404).json({ message: 'Order item not found' });
         }
@@ -412,21 +419,21 @@ export const returnOrderItem = async (req, res) => {
 export const retrunVerify = async (req, res) => {
     const { itemOrderId } = req.params;
     try {
-        let total=0
-        const orderitem = await Order.findOne({ "Items.itemOrderId": itemOrderId });
+        let total = 0
+        const orderitem = await Order.findOne({ "Items.itemOrderId": itemOrderId }).select('-createdAt -updatedAt');
         if (!orderitem) {
             return res.status(404).json({ message: 'Order item not found' });
         }
         orderitem.Items.forEach(item => {
             if (item.itemOrderId === itemOrderId) {
                 item.returnVerified = true;
-                total=item.productPrice
+                total = item.productPrice
             }
         })
         await orderitem.save();
 
-        
-         if (orderitem.PaymentMethod != 'cod') {
+
+        if (orderitem.PaymentMethod != 'cod') {
             let wallet = await Wallet.findOne({ userId: orderitem.UserID });
 
             const transactions = {
@@ -447,7 +454,7 @@ export const retrunVerify = async (req, res) => {
             await wallet.save();
         }
 
-        const order = await Order.find().sort({ createdAt: -1 })
+        const order = await Order.find().sort({ createdAt: -1 }).select('-createdAt -updatedAt')
         return res.status(200).json({ message: 'Return request verified successfully', order });
     } catch (error) {
         console.error(error);
@@ -459,7 +466,7 @@ export const retrunVerify = async (req, res) => {
 export const downloadInvoice = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const order = await Order.findOne({ orderId }).populate('UserID');
+        const order = await Order.findOne({ orderId }).populate('UserID').select('-createdAt -updatedAt');
 
         if (!order) return res.status(404).json({ message: 'Order not found' });
 

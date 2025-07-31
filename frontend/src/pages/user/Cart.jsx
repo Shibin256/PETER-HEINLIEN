@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Title from '../../components/common/Title';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchCart, removeFromCart, updateCart } from '../../features/cart/cartSlice';
+import { fetchCart, removeFromCart, toggleIsLocked, updateCart } from '../../features/cart/cartSlice';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { applyCoupon } from '../../features/coupons/couponsSlice';
@@ -21,7 +21,6 @@ const Cart = () => {
   const { cartItems = [] } = useSelector(state => state.cart)
   const [localCart, setLocalCart] = useState([]);
   const [couponCode, setCouponCode] = useState('');
-  console.log(localCart, 'local cart')
 
   useEffect(() => {
     setLocalCart(cartItems);
@@ -73,24 +72,18 @@ const Cart = () => {
     dispatch(fetchCart(user._id));
   };
 
+  const handleProceedToCheckout=async()=>{
+    navigate('/checkout',
+                {
+                  state: {
+                    cartItems: localCart,
+                    totalPrice: total,
+                    shippingCost: shipping,
+                    userId: user._id
+                  }
+                })
+  }
 
-  // const handleApplyCoupon = async () => {
-  //   if (couponCode.trim() === '') {
-  //     alert('Please enter a coupon code');
-  //     return;
-  //   }
-  //   const res = await dispatch(applyCoupon({ userId: user._id, couponCode }));
-  //   console.log('Coupon applied:', res);
-  //   if (res.type == 'user/cart/applyCoupon/fulfilled') {
-  //     if (res.payload.coupon.discountType === 'percentage') {
-  //       const discount = (subtotal * res.payload.coupon.discountValue) / 100;
-  //       setTotal(subtotal - discount + shipping);
-  //     } else if (res.payload.coupon.discountType === 'fixed') {
-  //       const discount = res.payload.coupon.discountValue;
-  //       setTotal(subtotal - discount + shipping);
-  //     }
-  //   }
-  // }
 
   if (cartItems.length === 0) {
     return (
@@ -205,24 +198,7 @@ const Cart = () => {
               </table>
             </div>
           </div>
-
-          {/* <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <div className="flex-grow flex">
-              <input
-                type="text"
-                placeholder="Coupon code"
-                onChange={(e) => setCouponCode(e.target.value)}
-                className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-              />
-              <button onClick={handleApplyCoupon}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-r-md transition-colors">
-                Apply Coupon
-              </button>
-            </div>
-            <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">
-              Update Cart
-            </button>
-          </div> */}
+       
         </div>
 
         {/* Cart Summary */}
@@ -250,16 +226,7 @@ const Cart = () => {
             </div>
 
             <button
-              onClick={() => navigate('/checkout',
-                {
-                  state: {
-                    cartItems: localCart,
-                    totalPrice: total,
-                    shippingCost: shipping,
-                    userId: user._id
-                  }
-                }
-              )}
+              onClick={handleProceedToCheckout}
               className="w-full mt-6 bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-md font-medium transition-colors shadow-md hover:shadow-lg">
               Proceed to Checkout
             </button>
