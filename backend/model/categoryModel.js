@@ -7,6 +7,8 @@ const categorySchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    offerAdded:{type:Boolean,default:false},
+    offerPersentage:{type:Number,default:0},
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 }, { collection: 'category' })

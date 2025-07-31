@@ -114,6 +114,32 @@ export const relatedProducts=createAsyncThunk(
   }
 )
 
+export const addProductOffer = createAsyncThunk(
+  'product/addProductOffer',
+  async ({ productId, percentage }, { rejectWithValue }) => {
+    try {
+      console.log('Adding product offer:', { productId, percentage });
+      const res = await productService.addProductOffer({productId, percentage});
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+)
+
+export const removeProductOffer=createAsyncThunk(
+  'product/removeProductOffer',
+  async(productId,{ rejectWithValue })=>{
+    try {
+      const res = await productService.removeProductOffer(productId);
+      return res
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+      
+    }
+  }
+)
+
 const productSlice = createSlice({
   name: 'products',
   initialState: {

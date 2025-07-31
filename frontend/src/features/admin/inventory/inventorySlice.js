@@ -79,6 +79,31 @@ export const editBrand = createAsyncThunk(
     }
 )
 
+export const addCategoryOffer = createAsyncThunk(
+  'product/addCategoryOffer',
+  async ({ categoryId, percentage }, { rejectWithValue }) => {
+    try {
+      const res = await inventoryService.addCategoryOffer({categoryId, percentage});
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+)
+
+export const removeCategoryOffer=createAsyncThunk(
+  'product/removeCategoryOffer',
+  async(categoryId,{ rejectWithValue })=>{
+    try {
+      const res = await inventoryService.removeCategoryOffer(categoryId);
+      return res
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+      
+    }
+  }
+)
+
 const inventorySlice = createSlice({   
     name: 'inventory',
     initialState: {

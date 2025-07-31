@@ -16,9 +16,9 @@ export const placeOrder = createAsyncThunk(
 
 export const getOrders = createAsyncThunk(
     'user/getOrders',
-    async ({userId,search='',page=1,limit=4}, { rejectWithValue }) => {
+    async ({ userId, search = '', page = 1, limit = 4 }, { rejectWithValue }) => {
         try {
-            const res = await orderService.getOrders(userId,search,page,limit);
+            const res = await orderService.getOrders(userId, search, page, limit);
             return res;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -37,11 +37,11 @@ export const cancelOrderItem = createAsyncThunk(
     }
 )
 
-export const verifyCancel=createAsyncThunk(
-    'user/verifyCancel',
-    async(itemOrderId, { rejectWithValue }) => {
+export const cancelSingleOrderItem = createAsyncThunk(
+    'user/cancelSingleOrderItem',
+    async ({ itemOrderId, reason }, { rejectWithValue }) => {
         try {
-            const res = await orderService.cancelVerify(itemOrderId );
+            const res = await orderService.cancelSingleOrderItem({ itemOrderId: itemOrderId, reason: reason });
             return res;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -49,11 +49,23 @@ export const verifyCancel=createAsyncThunk(
     }
 )
 
-export const changeOrderStatus=createAsyncThunk(
-    'user/changestatus',
-    async({itemOrderId,data},{ rejectWithValue }) => {
+export const verifyCancel = createAsyncThunk(
+    'user/verifyCancel',
+    async (itemOrderId, { rejectWithValue }) => {
         try {
-            const res = await orderService.changeOrderStatus({itemOrderId,data});
+            const res = await orderService.cancelVerify(itemOrderId);
+            return res;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Something went wrong');
+        }
+    }
+)
+
+export const changeOrderStatus = createAsyncThunk(
+    'user/changestatus',
+    async ({ itemOrderId, data }, { rejectWithValue }) => {
+        try {
+            const res = await orderService.changeOrderStatus({ itemOrderId, data });
             return res;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -63,9 +75,9 @@ export const changeOrderStatus=createAsyncThunk(
 
 export const fetchAllOrders = createAsyncThunk(
     'user/fetchAllOrders',
-    async ({search='',page=1,limit=8,sort=''}, { rejectWithValue }) => {
+    async ({ search = '', page = 1, limit = 8, sort = '' }, { rejectWithValue }) => {
         try {
-            const response = await orderService.getALlOrders(search,page,limit,sort);
+            const response = await orderService.getALlOrders(search, page, limit, sort);
             return response;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -75,7 +87,7 @@ export const fetchAllOrders = createAsyncThunk(
 
 export const returnOrderItem = createAsyncThunk(
     'user/returnOrderItem',
-    async ({ itemOrderId, reason='',deatials='' }, { rejectWithValue }) => {
+    async ({ itemOrderId, reason = '', deatials = '' }, { rejectWithValue }) => {
         try {
             const res = await orderService.returnOrderItem({ itemOrderId: itemOrderId, reason: reason, deatials: deatials });
             return res;
@@ -83,39 +95,77 @@ export const returnOrderItem = createAsyncThunk(
             return rejectWithValue(error.response?.data || 'Something went wrong');
         }
     })
-    
-    export const retrunVerify=createAsyncThunk(
-        'user/retrunVerify',
-        async({itemOrderId}, { rejectWithValue }) => {
-            try {
-                const res = await orderService.retrunVerify(itemOrderId);
-                return res;
-            } catch (error) {
-                return rejectWithValue(error.response?.data || 'Something went wrong');
-            }
-        }
-    )
 
-    export const downloadInvoice=createAsyncThunk(
-        'user/downloadInvoice',
-        async({itemOrderId},{rejectWithValue})=>{
-        try{
+export const retrunVerify = createAsyncThunk(
+    'user/retrunVerify',
+    async ({ itemOrderId }, { rejectWithValue }) => {
+        try {
+            const res = await orderService.retrunVerify(itemOrderId);
+            return res;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Something went wrong');
+        }
+    }
+)
+
+export const singleCancelVerify = createAsyncThunk(
+    'user/singleCancelVerify',
+    async ({ itemOrderId }, { rejectWithValue }) => {
+        try {
+            const res = await orderService.singleCancelVerify(itemOrderId);
+            return res;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Something went wrong');
+        }
+    }
+)
+
+export const downloadInvoice = createAsyncThunk(
+    'user/downloadInvoice',
+    async ({ itemOrderId }, { rejectWithValue }) => {
+        try {
             await orderService.downloadInvoice(itemOrderId)
         } catch (error) {
-                return rejectWithValue(error.response?.data || 'Something went wrong');   
+            return rejectWithValue(error.response?.data || 'Something went wrong');
         }
+    }
+)
+
+export const createPaymentOrder = createAsyncThunk(
+    'order/createPaymentOrder',
+    async ({totalPrice}, thunkAPI) => {
+        console.log(totalPrice,'in slice')
+        try {
+            return await orderService.createRazorpayOrder(totalPrice);
+        } catch (err) {
+            return thunkAPI.rejectWithValue(err.response.data);
         }
-    )
+    }
+);
+
+export const verifyPayment = createAsyncThunk(
+    'order/verifyPayment',
+    async (paymentDetails, thunkAPI) => {
+        try {
+            return await orderService.verifyRazorpayPayment(paymentDetails);
+        } catch (err) {
+            return thunkAPI.rejectWithValue(err.response.data);
+        }
+    }
+);
+
 
 const orderSlice = createSlice({
     name: 'orders',
     initialState: {
         orders: [],
+        currentPlaceOrder:[],
         page: 1,
         totalPage: 1,
         loading: false,
         success: false,
         error: null,
+        paymentVerified: false
     },
     reducers: {
         resetProductState: (state) => {
@@ -132,7 +182,7 @@ const orderSlice = createSlice({
             .addCase(placeOrder.fulfilled, (state, action) => {
                 state.loading = false;
                 state.success = true;
-                state.orders.push(action.payload.order);
+                state.currentPlaceOrder=action.payload.order;
             })
             .addCase(placeOrder.rejected, (state, action) => {
                 state.loading = false;
@@ -153,7 +203,7 @@ const orderSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            
+
             .addCase(fetchAllOrders.pending, (state) => {
                 state.loading = true;
             })
@@ -168,12 +218,12 @@ const orderSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            
+
             .addCase(returnOrderItem.pending, (state) => {
                 state.loading = true;
             })
             .addCase(returnOrderItem.fulfilled, (state, action) => {
-                console.log(action.payload.order,'in slice')
+                console.log(action.payload.order, 'in slice')
                 state.loading = false;
                 state.success = true;
                 state.orders = action.payload.order;
@@ -183,7 +233,7 @@ const orderSlice = createSlice({
                 state.error = action.payload;
             })
 
-              .addCase(retrunVerify.pending, (state) => {
+            .addCase(retrunVerify.pending, (state) => {
                 state.loading = true;
             })
             .addCase(retrunVerify.fulfilled, (state, action) => {
@@ -195,6 +245,34 @@ const orderSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            .addCase(singleCancelVerify.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(singleCancelVerify.fulfilled, (state, action) => {
+                state.loading = false;
+                state.success = true;
+                state.orders = action.payload.order;
+            })
+            .addCase(singleCancelVerify.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(createPaymentOrder.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(createPaymentOrder.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(createPaymentOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(verifyPayment.fulfilled, (state, action) => {
+                state.paymentVerified = action.payload.success;
+            });
+
     }
 })
 

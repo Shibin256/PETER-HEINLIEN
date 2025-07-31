@@ -15,14 +15,16 @@ const addressSchema = new mongoose.Schema({
 
 const itemSchema = new mongoose.Schema([{
     itemOrderId: { type: String, required: true },
-    productId:{type:String,required:true},
+    productId: { type: String, required: true },
     productImage: [{ type: String, required: true }],
     productName: { type: String, required: true },
     productPrice: { type: Number, required: true },
     subTotal: { type: Number, required: true },
     quantity: { type: Number, required: true, default: 1 },
     returnReason: { type: String, default: '' },
-    returnVerified: { type: Boolean, default: false }
+    returnVerified: { type: Boolean, default: false },
+    cancelReason: { type: String, default: '' },
+    cancelVerified: { type: Boolean, default: false },
 }, { _id: false }]);
 
 const orderSchema = new mongoose.Schema({

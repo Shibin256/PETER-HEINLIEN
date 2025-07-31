@@ -51,7 +51,6 @@ export const getUserWishlist = async (req, res) => {
   }
 };
 
-
 // getting single products to check whishlisted or not 
 export const getWishedProduct = async (req, res) => {
   try {
@@ -74,3 +73,7 @@ export const getWishedProduct = async (req, res) => {
     res.status(500).json({ message: 'Failed to check wishlist product' });
   }
 };
+
+
+
+

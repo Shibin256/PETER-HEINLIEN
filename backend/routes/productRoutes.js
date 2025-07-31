@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { createProduct, deleteProductById, getAllProducts, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, updateProduct } from "../controller/admin/productController.js";
+import { addProductOffer, createProduct, deleteProductById, getAllProducts, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, removeProductOffer, updateProduct } from "../controller/admin/productController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
 
@@ -20,4 +20,6 @@ router.put('/update/:id',authorizeRole(roles), upload.array("newImages",4),verif
 router.get('/getBrandsAndCollection',getBrandsAndCollection)
 router.get('/:id',getProductById)
 router.get('/relatedProducts/:productId',getRelatedProducts)
+router.post('/addOffer',authorizeRole(roles),verifyAccessToken,addProductOffer);
+router.delete('/removeOffer/:productId', authorizeRole(roles), verifyAccessToken,removeProductOffer);
 export default router

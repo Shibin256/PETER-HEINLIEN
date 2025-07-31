@@ -15,7 +15,7 @@ const menuItems = [
   { name: "Inventory", icon: HiArchiveBox, path: "/admin/inventory" },
   { name: "Coupons", icon: HiTicket, path: "/admin/coupons" },
   { name: "Settings", icon: HiCog6Tooth, path: "/admin/settings" },
-  { name: "Offers", icon: HiGift, path: "/admin/offers" },
+  // { name: "Offers", icon: HiGift, path: "/admin/offers" },
   { name: "Banners", icon: HiRectangleGroup, path: "/admin/banners" },
   { name: "Reviews", icon: HiStar, path: "/admin/reviews" },
 ];

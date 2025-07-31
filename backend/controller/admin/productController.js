@@ -68,7 +68,7 @@ export const getAllProducts = async (req, res) => {
     const sortField = req.query.sort || 'createdAt';
     const sortOrder = req.query.order === 'asc' ? 1 : -1;
 
-    const filter = {};
+    const filter = {isList: false };
 
     if (search) filter.name = { $regex: search, $options: 'i' };
     if (categories.length) filter['category'] = { $in: categories };
@@ -226,5 +226,55 @@ export const getRelatedProducts = async (req, res) => {
         res.status(200).json(similarProducts);
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error });
+    }
+}
+
+export const addProductOffer = async (req, res) => {
+    try {
+        const { productId, percentage } = req.body;
+
+        if (!productId || !percentage) {
+            return res.status(400).json({ message: 'Product ID and percentage are required' });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Calculate the offer price based on the percentage
+        const discountAmount = (product.price * percentage) / 100;
+        product.offerPrice = product.price - discountAmount;
+
+        await product.save();
+
+        res.status(200).json({ message: 'Offer added successfully', product });
+    } catch (error) {
+        console.error('Error adding offer:', error);
+        res.status(500).json({ message: 'Server error while adding offer' });
+    }
+}   
+
+
+
+export const removeProductOffer = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        if (!productId) {
+            return res.status(400).json({ message: 'Product ID is required' });
+        }
+        const product = await Product
+            .findById(productId)
+            .select('offerPrice'); // Select only the offerPrice field
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        // Remove the offer price
+        product.offerPrice = 0;
+        await product.save();
+        res.status(200).json({ message: 'Offer removed successfully', product });
+    } catch (error) {
+        console.error('Error removing offer:', error);
+        res.status(500).json({ message: 'Server error while removing offer' });
     }
 }

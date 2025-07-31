@@ -2,7 +2,18 @@ import React, { useEffect, useState, useRef } from 'react';
 import InventoryCard from '../../components/admin/InventoryCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
-import { addBrand, addCategory, deleteBrand, deleteCategory, editBrand, editCategory, } from '../../features/admin/inventory/inventorySlice';
+import { 
+  addBrand, 
+  addCategory, 
+  addCategoryOffer, 
+  deleteBrand, 
+  deleteCategory, 
+  editBrand, 
+  editCategory,
+  removeCategoryOffer,
+//   addCategoryOffer,
+//   removeCategoryOffer
+} from '../../features/admin/inventory/inventorySlice';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
@@ -20,7 +31,7 @@ const Inventory = () => {
     const [logoPreview, setLogoPreview] = useState(null);
     const fileInputRef = useRef(null);
 
-    //brand editing states
+    // Brand editing states
     const [isEditingBrand, setIsEditingBrand] = useState(false);
     const [editingBrandId, setEditingBrandId] = useState(null);
     const [editingBrandName, setEditingBrandName] = useState("");
@@ -28,22 +39,26 @@ const Inventory = () => {
     const [editingBrandLogo, setEditingBrandLogo] = useState(null);
     const [editingLogoPreview, setEditingLogoPreview] = useState(null);
 
-    // edit category
+    // Category editing states
     const [isEditingCategory, setIsEditingCategory] = useState(false);
     const [editingCategoryId, setEditingCategoryId] = useState(null);
     const [editingCategoryName, setEditingCategoryName] = useState("");
 
-
+    // Offer states
+    const [selectedCategoryForOffer, setSelectedCategoryForOffer] = useState(null);
+    const [offerPercentage, setOfferPercentage] = useState('');
+    const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
     const dispatch = useDispatch();
-    //get all collection and brands
+    
+    // Get all collections and brands
     useEffect(() => {
         dispatch(getBrandAndCollection())
     }, [dispatch])
 
     const { brands, categories, categoryBrandTotal } = useSelector(state => state.products)
 
-    //the total category counts
+    // The total category counts
     const categoryCounts = categories.map((cat) => {
         const count = categoryBrandTotal.filter(
             (product) => product.category === cat._id
@@ -55,13 +70,7 @@ const Inventory = () => {
         };
     });
 
-    const handleCategoryEdit = (category) => {
-        setEditingCategoryId(category._id);
-        setEditingCategoryName(category.categoryName);
-        setIsEditingCategory(true);
-    };
-
-    //the total brand counts
+    // The total brand counts
     const brandCounts = brands.map((brand) => {
         const count = categoryBrandTotal.filter(
             (product) => product.brand === brand._id
@@ -73,7 +82,13 @@ const Inventory = () => {
         };
     });
 
-    //delete categrory
+    const handleCategoryEdit = (category) => {
+        setEditingCategoryId(category._id);
+        setEditingCategoryName(category.categoryName);
+        setIsEditingCategory(true);
+    };
+
+    // Delete category
     const handleCategoryDelete = (id) => {
         Swal.fire({
             title: 'Are you sure?',
@@ -114,7 +129,7 @@ const Inventory = () => {
         { value: "brand", label: "Brand" },
     ];
 
-    //adding category modal popup
+    // Adding category modal popup
     const handleAddCategory = () => {
         setIsAddingBrand(false);
         setIsAddingCategory(true);
@@ -146,13 +161,13 @@ const Inventory = () => {
         }
     };
 
-    //add brand modal shows
+    // Add brand modal shows
     const handleAddBrand = () => {
         setIsAddingCategory(false);
         setIsAddingBrand(true);
     }
 
-    // file change of images
+    // File change of images
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -219,7 +234,7 @@ const Inventory = () => {
         }
     }
 
-    // brand edit
+    // Brand edit
     const handleBrandEdit = (brand) => {
         setEditingBrandId(brand._id);
         setEditingBrandName(brand.name);
@@ -229,7 +244,7 @@ const Inventory = () => {
         setIsEditingBrand(true);
     };
 
-    // brand update
+    // Brand update
     const handleUpdateBrand = async (e) => {
         e.preventDefault();
         setIsLoading(true)
@@ -243,7 +258,6 @@ const Inventory = () => {
             formData.append('description', editingBrandDescription);
             formData.append('logo', editingBrandLogo);
 
-            // You'll need to create an updateBrand action in your inventorySlice
             const res = await dispatch(editBrand({ id: editingBrandId, data: formData })).unwrap();
 
             if (res) {
@@ -258,7 +272,7 @@ const Inventory = () => {
         }
     };
 
-    //brand deletion
+    // Brand deletion
     const handleBrandDelete = (id) => {
         Swal.fire({
             title: 'Are you sure?',
@@ -269,10 +283,8 @@ const Inventory = () => {
             cancelButtonText: 'Cancel',
             buttonsStyling: false,
             customClass: {
-                confirmButton:
-                    'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
-                cancelButton:
-                    'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
+                confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
+                cancelButton: 'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
             },
         }).then((result) => {
             if (result.isConfirmed) {
@@ -306,7 +318,6 @@ const Inventory = () => {
                 return;
             }
 
-            // You'll need to create an editCategory action in your inventorySlice
             const res = await dispatch(editCategory({
                 id: editingCategoryId,
                 name: editingCategoryName
@@ -324,6 +335,66 @@ const Inventory = () => {
         }
     };
 
+    // Offer functions
+    const handleAddOfferClick = (category) => {
+        setSelectedCategoryForOffer(category);
+        setOfferPercentage(category.offerPercentage || '');
+    };
+
+    const handleAddOffer = async () => {
+        try {
+            if (!offerPercentage || isNaN(offerPercentage)) {
+                toast.warning('Please enter a valid percentage');
+                return;
+            }
+
+            const percentage = parseInt(offerPercentage);
+            if (percentage < 1 || percentage > 100) {
+                toast.warning('Percentage must be between 1 and 100');
+                return;
+            }
+
+            setIsLoading(true);
+            const res = await dispatch(addCategoryOffer({
+                categoryId: selectedCategoryForOffer._id,
+                percentage
+            })).unwrap();
+
+            if (res) {
+                toast.success('Offer added successfully');
+                dispatch(getBrandAndCollection());
+                setSelectedCategoryForOffer(null);
+                setOfferPercentage('');
+            }
+        } catch (error) {
+            toast.error(error?.message || 'Failed to add offer');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleRemoveOfferClick = (category) => {
+        setSelectedCategoryForOffer(category);
+        setShowRemoveConfirm(true);
+    };
+
+    const confirmRemoveOffer = async () => {
+        try {
+            setIsLoading(true);
+            const res = await dispatch(removeCategoryOffer(selectedCategoryForOffer._id)).unwrap();
+
+            if (res) {
+                toast.success('Offer removed successfully');
+                dispatch(getBrandAndCollection());
+                setShowRemoveConfirm(false);
+                setSelectedCategoryForOffer(null);
+            }
+        } catch (error) {
+            toast.error(error?.message || 'Failed to remove offer');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
@@ -396,8 +467,6 @@ const Inventory = () => {
                 </form>
             )}
 
-
-
             {isEditingCategory && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -448,8 +517,6 @@ const Inventory = () => {
                 </div>
             )}
 
-
-
             {isEditingBrand && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -465,7 +532,6 @@ const Inventory = () => {
                             </div>
 
                             <form onSubmit={handleUpdateBrand}>
-                                {/* Image Upload with Preview */}
                                 <div className="mb-4">
                                     <label className="block text-gray-700 text-sm font-medium mb-2">
                                         Brand Logo
@@ -510,9 +576,7 @@ const Inventory = () => {
                                             className="hidden"
                                             accept="image/png, image/jpeg, image/jpg"
                                             onChange={(e) => {
-
                                                 const file = e.target.files[0];
-                                                console.log(file)
                                                 if (file) {
                                                     if (!file.type.match('image.*')) {
                                                         toast.warning('Please select an image file (JPEG, PNG)');
@@ -540,7 +604,6 @@ const Inventory = () => {
                                     )}
                                 </div>
 
-                                {/* Brand Name */}
                                 <div className="mb-4">
                                     <label className="block text-gray-700 text-sm font-medium mb-2">
                                         Brand Name *
@@ -555,7 +618,6 @@ const Inventory = () => {
                                     />
                                 </div>
 
-                                {/* Description */}
                                 <div className="mb-6">
                                     <label className="block text-gray-700 text-sm font-medium mb-2">
                                         Description
@@ -569,7 +631,6 @@ const Inventory = () => {
                                     />
                                 </div>
 
-                                {/* Buttons */}
                                 <div className="flex justify-end gap-3">
                                     <button
                                         type="button"
@@ -591,7 +652,6 @@ const Inventory = () => {
                 </div>
             )}
 
-
             {isAddingBrand && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -610,7 +670,6 @@ const Inventory = () => {
                             </div>
 
                             <form onSubmit={handleSubmitBrand}>
-                                {/* Image Upload with Preview */}
                                 <div className="mb-4">
                                     <label className="block text-gray-700 text-sm font-medium mb-2">
                                         Brand Logo *
@@ -618,7 +677,6 @@ const Inventory = () => {
                                     <div
                                         className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 overflow-hidden relative"
                                         onClick={triggerFileInput}
-
                                     >
                                         {logoPreview ? (
                                             <img
@@ -666,7 +724,6 @@ const Inventory = () => {
                                     )}
                                 </div>
 
-                                {/* Brand Name */}
                                 <div className="mb-4">
                                     <label className="block text-gray-700 text-sm font-medium mb-2">
                                         Brand Name *
@@ -681,7 +738,6 @@ const Inventory = () => {
                                     />
                                 </div>
 
-                                {/* Description */}
                                 <div className="mb-6">
                                     <label className="block text-gray-700 text-sm font-medium mb-2">
                                         Description
@@ -695,7 +751,6 @@ const Inventory = () => {
                                     />
                                 </div>
 
-                                {/* Buttons */}
                                 <div className="flex justify-end gap-3">
                                     <button
                                         type="button"
@@ -719,29 +774,106 @@ const Inventory = () => {
                     </div>
                 </div>
             )}
-            {/* shows the categories */}
+
+            {/* Add Offer Modal */}
+            {selectedCategoryForOffer && !showRemoveConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h3 className="text-lg font-bold mb-4">
+                            {selectedCategoryForOffer.offerPercentage 
+                                ? 'Update Offer' 
+                                : 'Add Offer'} for {selectedCategoryForOffer.categoryName}
+                        </h3>
+                        <input
+                            type="number"
+                            value={offerPercentage}
+                            onChange={(e) => setOfferPercentage(e.target.value)}
+                            placeholder="Enter percentage (e.g., 20)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded mb-4"
+                            min="1"
+                            max="100"
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => {
+                                    setSelectedCategoryForOffer(null);
+                                    setOfferPercentage('');
+                                }}
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleAddOffer}
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                                disabled={!offerPercentage}
+                            >
+                                {selectedCategoryForOffer.offerPercentage ? 'Update Offer' : 'Apply Offer'}
+                            </button>
+                            {selectedCategoryForOffer.offerPercentage && (
+                                <button
+                                    onClick={() => setShowRemoveConfirm(true)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                >
+                                    Remove Offer
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Remove Offer Confirmation Modal */}
+            {showRemoveConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h3 className="text-lg font-bold mb-4">Confirm Remove Offer</h3>
+                        <p className="mb-4">Are you sure you want to remove this offer?</p>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setShowRemoveConfirm(false)}
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmRemoveOffer}
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                            >
+                                Remove Offer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Shows the categories */}
             {selectedOption === 'category' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {categoryCounts.map((category) => (
                         <InventoryCard
                             key={category._id}
-                            title={`${category.categoryName} Collection`}
+                            title={`${category.categoryName}`}
                             lastUpdated={new Date(category.updatedAt).toLocaleDateString()}
                             totalCollection={category.total}
                             editClick={() => handleCategoryEdit(category)}
                             deleteClick={() => handleCategoryDelete(category._id)}
+                            offerClick={() => handleAddOfferClick(category)}
+                            removeOfferClick={()=>handleRemoveOfferClick(category)}
+                            hasOffer={!!category.offerAdded}
+                            offerPercentage={category.offerPersentage}
                         />
                     ))}
                 </div>
             )}
 
-            {/* shows the brands */}
+            {/* Shows the brands */}
             {selectedOption === 'brand' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {brandCounts.map((brand) => (
                         <InventoryCard
                             key={brand._id}
-                            title={`${brand.name} Collection`}
+                            title={`${brand.name}`}
                             lastUpdated={new Date(brand.updatedAt).toLocaleDateString()}
                             totalCollection={brand.total}
                             editClick={() => handleBrandEdit(brand)}

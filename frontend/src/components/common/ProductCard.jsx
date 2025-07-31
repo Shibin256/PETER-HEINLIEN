@@ -65,7 +65,7 @@ const ProductCard = ({ product }) => {
       if (res.payload == 'max quantity added') {
         toast.warning('max quantity added')
       }else if(res.payload=='Product is out of stock'){
-              toast.warning('The Product is out of stoke')
+              toast.warning('Only this much products are left')
       }else {
         toast.success('Added to cart');
       }

@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getAllAddress } from '../../features/accountSettings/accountSlice';
 import EditAddressModal from '../../components/common/EditAddress';
 import CheckoutCard from '../../components/user/checkoutCard';
+import { applyCoupon, removeCoupon } from '../../features/coupons/couponsSlice';
 
 const Checkout = () => {
     const [step, setStep] = useState(2);
@@ -14,12 +15,26 @@ const Checkout = () => {
     const cartItems = location.state?.cartItems || [];
     const shippingCost = location.state?.shippingCost || 0;
 
+
+    const [couponCode, setCouponCode] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [couponApplied, setCouponApplied] = useState(false);
+    const [couponError, setCouponError] = useState('');
+
+
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = JSON.parse(localStorage.getItem('user')) || { name: 'Guest' };
     const { currency } = useSelector(state => state.global);
     const { addresses } = useSelector(state => state.account);
-    console.log(addresses, '--------------------------')
+    useEffect(() => {
+        // Block direct access without required state
+        if (!location.state || !cartItems || cartItems.length === 0) {
+            navigate('/', { replace: true }); // Redirect to home
+        }
+    }, []);
+
 
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -57,6 +72,52 @@ const Checkout = () => {
             setStep(3);
         }
     };
+
+
+    const handleApplyCoupon = async () => {
+        setCouponError('');
+        if (!couponCode) {
+            return setCouponError('Please enter a coupon code');
+        }
+
+        try {
+            const data = await dispatch(applyCoupon({ userId: user._id, couponCode })).unwrap();
+            console.log('Coupon applied:', data);
+            if (data.error) {
+                return setCouponError(data.error);
+            }
+
+            let discountAmount = 0;
+
+            if (data.coupon.discountType === 'percentage') {
+                discountAmount = (total * data.coupon.discountValue) / 100;
+            } else if (data.coupon.discountType === 'fixed') {
+                discountAmount = data.coupon.discountValue;
+            }
+            if (discountAmount > total) {
+                discountAmount = total; // Ensure discount does not exceed total
+            }
+            console.log('Discount amount:', discountAmount);
+            setDiscount(discountAmount);
+            setCouponApplied(true);
+            setCouponError('');
+        } catch (err) {
+            setCouponError(err.message || 'Failed to apply coupon');
+        }
+    };
+
+
+    const handleRemoveCoupon = async () => {
+        const res = await dispatch(removeCoupon({ userId: user._id, couponCode }));
+        console.log('Coupon removed', res);
+        if (res.type == 'user/cart/removeCoupon/fulfilled') {
+            setCouponCode('');
+            setDiscount(0);
+            setCouponApplied(false);
+            setCouponError('');
+        }
+    };
+
 
     return (
         <div className="max-w-6xl mx-auto my-10 p-6">
@@ -218,6 +279,7 @@ const Checkout = () => {
                                                     address: selectedAddress,
                                                     cartItems: cartItems,
                                                     totalPrice: total,
+                                                    discount: discount,
                                                     shippingCost: shippingCost,
                                                     userId: user._id,
                                                     deliveryDate: formattedDeliveryDate
@@ -238,10 +300,38 @@ const Checkout = () => {
                     <div className="sticky top-4">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4">
                             <h4 className="text-lg font-semibold text-gray-800 mb-4">PRICE DETAILS</h4>
+                            {/* Coupon Apply Section */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Apply Coupon</label>
+                                {couponApplied ? (
+                                    <div className="flex items-center justify-between bg-green-100 border border-green-300 text-green-800 text-sm p-2 rounded">
+                                        <span>Coupon <strong>{couponCode}</strong> applied</span>
+                                        <button onClick={handleRemoveCoupon} className="text-red-600 font-medium hover:underline text-sm ml-2">Remove</button>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value)}
+                                            className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                                            placeholder="Enter coupon code"
+                                        />
+                                        <button
+                                            onClick={handleApplyCoupon}
+                                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium shadow"
+                                        >
+                                            Apply
+                                        </button>
+                                    </div>
+                                )}
+                                {couponError && <p className="text-red-600 text-xs mt-1">{couponError}</p>}
+                            </div>
+
                             <div className="space-y-3">
                                 <div className="flex justify-between text-sm text-gray-700">
                                     <span>SubTotal</span>
-                                    <span>{currency}{total}</span>
+                                    <span>{currency}{total-shippingCost}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-700">
                                     <span>Delivery Charges</span>
@@ -249,10 +339,16 @@ const Checkout = () => {
                                 </div>
                             </div>
                             <hr className="my-4 border-gray-200" />
-                            <div className="flex justify-between text-lg font-bold text-gray-800">
-                                <span>Total Payable</span>
-                                <span>{currency}{total + shippingCost}</span>
+                            <div className="flex justify-between text-sm text-gray-700">
+                                <span>Discount</span>
+                                <span className="text-green-700">- {currency}{discount}</span>
                             </div>
+
+                            <div className="flex justify-between text-lg font-bold text-gray-800 mt-1">
+                                <span>Total Payable</span>
+                                <span>{currency}{Math.max(0, total - discount)}</span>
+                            </div>
+
                         </div>
 
                         <button

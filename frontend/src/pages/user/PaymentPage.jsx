@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { placeOrder } from '../../features/orders/ordersSlice';
+import { createPaymentOrder, placeOrder, verifyPayment } from '../../features/orders/ordersSlice';
+import { toast } from 'react-toastify';
+import { resetCart } from '../../features/cart/cartSlice';
+import { getWallet } from '../../features/wallet/walletSlice';
+const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
 
 const PaymentPage = () => {
     const [selectedPayment, setSelectedPayment] = useState('');
@@ -15,7 +19,11 @@ const PaymentPage = () => {
     const location = useLocation();
     const dispatch = useDispatch()
 
-    const { address, cartItems, totalPrice, shippingCost, userId, deliveryDate } = location.state || {};
+    let { address, cartItems, totalPrice, discount, shippingCost, userId, deliveryDate } = location.state || {};
+    if (discount > 0) {
+        totalPrice -= discount;
+    }
+
     const { currency } = useSelector(state => state.global);
 
     const handlePaymentChange = (method) => {
@@ -27,10 +35,91 @@ const PaymentPage = () => {
         }
     };
 
+    useEffect(() => {
+        dispatch(getWallet(userId))
+    }, [])
+
+    const { walletAmount } = useSelector(state => state.wallet)
+
+
+    useEffect(() => {
+        const script = document.createElement('script')
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+        script.async = true;
+        document.body.appendChild(script);
+    }, [])
+
+    useEffect(() => {
+        // If user landed here directly without state, redirect them to cart
+        if (!location.state || !address || !cartItems) {
+            navigate('/cart', { replace: true });
+        }
+    }, []);
+
+    const handlePayment = async (amount) => {
+        try {
+            const result = await dispatch(createPaymentOrder(amount)).unwrap();
+            const { order } = result;
+
+            return new Promise((resolve, reject) => {
+                const options = {
+                    key: razorpayKey,
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: "Peter Heinlien Watches",
+                    description: "Watch Order",
+                    order_id: order.id,
+                    handler: async (response) => {
+                        try {
+                            const verifyRes = await dispatch(verifyPayment(response)).unwrap();
+                            if (verifyRes.success) {
+                                resolve(true); // Payment success
+                            } else {
+                                reject("Payment verification failed");
+                            }
+                        } catch (err) {
+                            reject("Payment verification error");
+                        }
+                    },
+                    prefill: {
+                        name: "Customer Name",
+                        email: "customer@example.com",
+                        contact: "9999999999"
+                    },
+                    theme: {
+                        color: "#3399cc"
+                    },
+                    modal: {
+                        ondismiss: () => {
+                            reject("Payment was cancelled by user");
+                        }
+                    },
+                    retry: {
+                        enabled: false // disables auto retry popup
+                    }
+                };
+
+                const rzp = new window.Razorpay(options);
+
+                rzp.on("payment.failed", function (response) {
+                    const errorMessage = response.error?.description || "Payment failed due to an error.";
+                    reject(errorMessage);
+                });
+
+                rzp.open();
+            });
+
+        } catch (err) {
+            console.error("Razorpay init failed:", err);
+            return false;
+        }
+    };
+
+
+
     const handlePlaceOrder = async () => {
         setIsProcessing(true);
         try {
-
             if (selectedPayment == 'cod') {
                 const res = await dispatch(placeOrder({ orderdata: { address, cartItems, totalPrice, shippingCost, userId, deliveryDate }, paymentMethod: selectedPayment })).unwrap();
                 setOrderId(res.order.orderId)
@@ -41,16 +130,75 @@ const PaymentPage = () => {
                     month: "long",
                     year: "numeric"
                 });
-                console.log(formattedDeliveryDate, 'order placed successfully');
+                // First replace with home
+                navigate('/', { replace: true });
 
-                setDate(formattedDeliveryDate);
-                setOrderStatus('success');
-                setShowModal(true);
+                // Now push order success page as a fresh new entry
+                setTimeout(() => {
+                    navigate('/order-success', { state: { order: res.order } });
+                }, 0);
+
+            } else if (selectedPayment === 'razorpay') {
+                let totalAmount = totalPrice + (shippingCost || 0);
+                const paymentSuccess = await handlePayment({ totalPrice: totalAmount })
+                console.log(paymentSuccess)
+                if (paymentSuccess) {
+                    const res = await dispatch(placeOrder({ orderdata: { address, cartItems, totalPrice, shippingCost, userId, deliveryDate }, paymentMethod: selectedPayment })).unwrap();
+                    setOrderId(res.order.orderId)
+                    const date = new Date(res.order.DeliveryDate);
+                    const formattedDeliveryDate = date.toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    });
+                    navigate("/order-success", { state: { order: res.order }, replace: true });
+                    dispatch(resetCart());
+                    // First replace with home
+                    navigate('/', { replace: true });
+
+                    // Now push order success page as a fresh new entry
+                    setTimeout(() => {
+                        navigate('/order-success', { state: { order: res.order } });
+                    }, 0);
+                }
+                // else {
+                //     navigate('/order-failed')
+                // }
+            } else if (selectedPayment === 'walletPay') {
+                let totalAmount = totalPrice + (shippingCost || 0);
+                if (totalAmount > walletAmount) {
+                    setShowModal(true)
+                } else {
+                    const res = await dispatch(placeOrder({ orderdata: { address, cartItems, totalPrice, shippingCost, userId, deliveryDate }, paymentMethod: selectedPayment })).unwrap();
+                    setOrderId(res.order.orderId)
+                    console.log(res, 'order placed successfully');
+                    const date = new Date(res.order.DeliveryDate);
+                    const formattedDeliveryDate = date.toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    });
+                    navigate('/', { replace: true });
+
+                    setTimeout(() => {
+                        navigate('/order-success', { state: { order: res.order } });
+                    }, 0);
+                }
+            } else {
+                navigate('/cart')
             }
-        
         } catch (error) {
             setOrderStatus('error');
-            setShowModal(true);
+            console.log(cartItems,totalPrice,'in the payment')
+            navigate('/order-failed',{
+                state:{
+                    cartItems,
+                    totalPrice,
+                    shippingCost,
+                    userId
+                }    
+            })
+
         } finally {
             setIsProcessing(false);
         }
@@ -59,9 +207,12 @@ const PaymentPage = () => {
     const handleModalClose = () => {
         setShowModal(false);
         if (orderStatus === 'success') {
-            navigate('/my-orders'); // Redirect to orders page on success
+            navigate('/my-orders');
         }
     };
+
+
+
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-gray-50 rounded-lg shadow-sm">
@@ -77,12 +228,12 @@ const PaymentPage = () => {
                                 type="radio"
                                 name="payment"
                                 className="h-5 w-5 text-green-600 focus:ring-green-500"
-                                checked={selectedPayment === 'upi'}
-                                onChange={() => handlePaymentChange('upi')}
+                                checked={selectedPayment === 'razorpay'}
+                                onChange={() => handlePaymentChange('razorpay')}
                             />
                             <div className="ml-3">
-                                <span className="block font-medium text-gray-800">UPI Payment</span>
-                                <span className="block text-sm text-gray-500">Pay instantly using any UPI app</span>
+                                <span className="block font-medium text-gray-800">Razorpay</span>
+                                <span className="block text-sm text-gray-500">Pay instantly using any razorpay app</span>
                             </div>
                             <div className="ml-auto flex space-x-2">
                                 {/* UPI app icons would go here */}
@@ -91,18 +242,18 @@ const PaymentPage = () => {
                     </div>
 
                     {/* Net Banking Option */}
-                    <div className={`p-4 transition-all ${selectedPayment === 'netbanking' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}>
+                    <div className={`p-4 transition-all ${selectedPayment === 'walletPay' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}>
                         <label className="flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 name="payment"
                                 className="h-5 w-5 text-green-600 focus:ring-green-500"
-                                checked={selectedPayment === 'netbanking'}
-                                onChange={() => handlePaymentChange('netbanking')}
+                                checked={selectedPayment === 'walletPay'}
+                                onChange={() => handlePaymentChange('walletPay')}
                             />
                             <div className="ml-3">
-                                <span className="block font-medium text-gray-800">Net Banking</span>
-                                <span className="block text-sm text-gray-500">Direct bank transfer</span>
+                                <span className="block font-medium text-gray-800">Wallet</span>
+                                <span className="block text-sm text-gray-500">Your balance (Rs.{walletAmount})</span>
                             </div>
                         </label>
                     </div>
@@ -126,23 +277,6 @@ const PaymentPage = () => {
                 </div>
             </div>
 
-            {/* COD Handling Fee Message */}
-            {showCODMessage && (
-                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start">
-                    <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                    </div>
-                    <div className="ml-3">
-                        <h3 className="text-sm font-medium text-yellow-800">Cash on Delivery Notice</h3>
-                        <div className="mt-2 text-sm text-yellow-700">
-                            <p>Due to additional handling costs, a nominal charge of ₹5 will be added to your order total.</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Order Summary */}
             <div className="mb-6 bg-white rounded-lg shadow overflow-hidden">
                 <div className="p-4 border-b border-gray-200">
@@ -160,7 +294,7 @@ const PaymentPage = () => {
                     <div className="border-t border-gray-200 my-2"></div>
                     <div className="flex justify-between py-2 font-bold text-lg">
                         <span>Total Payable</span>
-                        <span>{showCODMessage && ` ${currency}${totalPrice} `}</span>
+                        <span>{`${currency}${totalPrice + shippingCost} `}</span>
                     </div>
                 </div>
             </div>
@@ -215,7 +349,8 @@ const PaymentPage = () => {
                                     </div>
                                     <h3 className="mt-3 text-lg font-medium text-gray-900">Order Failed</h3>
                                     <div className="mt-2 text-sm text-gray-500">
-                                        <p>There was an issue processing your order. Please try again or use a different payment method.</p>
+                                        <p>Your wallet balance is insufficient</p>
+                                        <p>Please try again or use a different payment method.</p>
                                     </div>
                                 </>
                             )}

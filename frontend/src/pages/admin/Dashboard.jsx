@@ -1,38 +1,315 @@
-import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { downloadSalesReportExcel, downloadSalesReportPdf, fetchSalesReport } from '../../features/admin/dashboard/dashboardSlice';
 
 const Dashboard = () => {
-  const [salesData, setSalesData] = useState({
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Sales ($)',
-        data: [3000, 3200, 2800, 3500, 4000, 5000],
-        borderColor: '#FF6384',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: true,
-      },
-    ],
-  });
+  const [reportPeriod, setReportPeriod] = useState('Custom Date Range');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [totalSales, setTotalSales] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalDiscounts, setTotalDiscounts] = useState(0);
+  const [avgOrderValue, setAvgOrderValue] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState('');
 
-  const topProducts = [
-    { name: 'Men Watches', sales: 120 },
-    { name: 'Women Watches', sales: 80 },
-    { name: 'Couples', sales: 75 },
-  ];
+  const dispatch = useDispatch()
+  const { salesReport } = useSelector(state => state.dashboard)
 
-  const recentOrders = [
-    { id: 'ORD001', customer: 'John Doe', amount: 150, status: 'Delivered' },
-    { id: 'ORD002', customer: 'Jane Smith', amount: 200, status: 'Pending' },
-    { id: 'ORD003', customer: 'Mike Johnson', amount: 175, status: 'Shipped' },
-  ];
+  const handleReportPeriodChange = (e) => {
+    setReportPeriod(e.target.value);
+    setStartDate('');
+    setEndDate('');
+  };
+
+  const applyFilters = async () => {
+    console.log(startDate)
+    const today = new Date().toISOString().split("T")[0];
+
+    if ((startDate && startDate > today) || (endDate && endDate > today)) {
+      toast.warning("You cannot select upcoming dates.");
+      return;
+    }
+
+    if (reportPeriod != "Custom Date Range" && startDate == '') {
+      toast.warning('please select a date')
+      return;
+    }
+
+    if (reportPeriod == "Custom Date Range" && (startDate == '' || endDate == '')) {
+      toast.warning('Please select a date');
+      return;
+    }
+
+
+    if (reportPeriod === "Custom Date Range" && startDate && endDate && endDate < startDate) {
+      toast.warning("End date cannot be earlier than start date.");
+      return;
+    }
+
+    const res = await dispatch(fetchSalesReport({ type: reportPeriod, startDate, endDate }))
+    setTotalSales(res.payload.totalSales);
+    setTotalOrders(res.payload.totalOrders);
+    setTotalDiscounts(res.payload.totalDiscount);
+    setAvgOrderValue(res.payload.avgOrderValue);
+  };
+
+
+  const resetFilters = () => {
+    setReportPeriod('Custom Date Range');
+    setStartDate('');
+    setEndDate('');
+    setTotalSales(0);
+    setTotalOrders(0);
+    setTotalDiscounts(0);
+    setAvgOrderValue(0);
+  };
+
+  const handleGenerateReport = () => {
+    setShowModal(true);
+  };
+
+  const handleDownload = async() => {
+     if (reportPeriod != "Custom Date Range" && startDate == '') {
+      toast.warning('please select a date')
+      return;
+    }
+
+    if (reportPeriod == "Custom Date Range" && (startDate == '' || endDate == '')) {
+      toast.warning('Please select a date');
+      return;
+    }
+
+    if(selectedFormat=='Excel'){
+        const res=await dispatch(downloadSalesReportExcel({ type: reportPeriod, startDate, endDate }))
+    }else{
+        const res=await dispatch(downloadSalesReportPdf({ type: reportPeriod, startDate, endDate }))
+        console.log(res)
+    }
+    setShowModal(false);
+    setSelectedFormat('');
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+    setSelectedFormat('');
+  };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-     {/*  */}
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Generate Report</h3>
+            <p className="text-gray-600 mb-4">Select the format for your report:</p>
+
+            <div className="space-y-3 mb-6">
+              <div
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === 'PDF' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:bg-gray-50'}`}
+                onClick={() => setSelectedFormat('PDF')}
+              >
+                <div className="flex items-center">
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === 'PDF' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-400'}`}>
+                    {selectedFormat === 'PDF' && (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium">PDF Document</p>
+                    <p className="text-sm text-gray-500">High quality printable format</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === 'Excel' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:bg-gray-50'}`}
+                onClick={() => setSelectedFormat('Excel')}
+              >
+                <div className="flex items-center">
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === 'Excel' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-400'}`}>
+                    {selectedFormat === 'Excel' && (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium">Excel Spreadsheet</p>
+                    <p className="text-sm text-gray-500">Editable data format</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDownload}
+                disabled={!selectedFormat}
+                className={`px-4 py-2 rounded-lg text-white transition-colors ${selectedFormat ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'}`}
+              >
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+            <p className="text-gray-600">Track and analyze your sales performance</p>
+          </div>
+          <button
+            onClick={handleGenerateReport}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm transition-colors duration-200 mt-4 sm:mt-0"
+          >
+            Generate Report
+          </button>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Sales Reports</h2>
+
+          <div className="flex flex-col md:flex-row md:items-end gap-4 mb-6">
+            <div className="flex-1">
+              <label htmlFor="report-period" className="block text-sm font-medium text-gray-700 mb-1">Report Period</label>
+              <select
+                id="report-period"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={reportPeriod}
+                onChange={handleReportPeriodChange}
+              >
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+                <option value="Custom Date Range">Custom Date Range</option>
+              </select>
+            </div>
+
+            {(reportPeriod !== 'Custom Date Range') && (
+              <div className="flex-1">
+                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input
+                  id="date"
+                  type="date"
+                  max={new Date().toISOString().split("T")[0]}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+            )}
+
+            {reportPeriod === 'Custom Date Range' && (
+              <>
+                <div className="flex-1">
+                  <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <input
+                    id="start-date"
+                    type="date"
+                    max={new Date().toISOString().split("T")[0]}  // Prevent future dates
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <input
+                    id="end-date"
+                    type="date"
+                    max={new Date().toISOString().split("T")[0]}  // Prevent future dates
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm transition-colors duration-200"
+              onClick={applyFilters}
+            >
+              Apply Filters
+            </button>
+            <button
+              className="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 transition-colors duration-200"
+              onClick={resetFilters}
+            >
+              Reset
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-5 rounded-xl shadow-sm border border-indigo-50">
+              <p className="text-sm font-medium text-indigo-600">Total Sales</p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">₹{totalSales.toLocaleString()}</p>
+              {/* <div className="mt-2 text-xs text-indigo-500">
+                <span className="inline-flex items-center">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                  </svg>
+                  +12% from last period
+                </span>
+              </div> */}
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl shadow-sm border border-green-50">
+              <p className="text-sm font-medium text-green-600">Total Orders</p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">{totalOrders}</p>
+              {/* <div className="mt-2 text-xs text-green-500">
+                <span className="inline-flex items-center">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                  </svg>
+                  +8% from last period
+                </span>
+              </div> */}
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-5 rounded-xl shadow-sm border border-yellow-50">
+              <p className="text-sm font-medium text-yellow-600">Total Discounts</p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">₹{totalDiscounts.toLocaleString()}</p>
+              {/* <div className="mt-2 text-xs text-yellow-500">
+                <span className="inline-flex items-center">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1v-5a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clipRule="evenodd" />
+                  </svg>
+                  -3% from last period
+                </span>
+              </div> */}
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-sm border border-gray-50">
+              <p className="text-sm font-medium text-gray-600">Avg. Order Value</p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">₹{avgOrderValue.toLocaleString()}</p>
+              {/* <div className="mt-2 text-xs text-gray-500">
+                <span className="inline-flex items-center">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                  </svg>
+                  +5% from last period
+                </span>
+              </div> */}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -96,7 +96,7 @@ export const deleteBrand = async (req, res) => {
         const brand = await Brands.findById(req.params.id)
         if (!brand) return res.status(404).json({ message: 'Brand not found' });
 
-         // Mark products with this category as isList: true
+        // Mark products with this category as isList: true
         const updatedProducts = await Product.updateMany(
             { brand: req.params.id },
             { $set: { isList: true } }
@@ -167,5 +167,78 @@ export const editCategory = async (req, res) => {
     } catch (error) {
         console.error('Edit category Error:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+}
+
+
+
+export const addCategoryOffer = async (req, res) => {
+    try {
+        const { categoryId, percentage } = req.body;
+
+        if (!categoryId || !percentage) {
+            return res.status(400).json({ message: 'category ID and percentage are required' });
+        }
+
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ message: 'category not found' });
+        }
+        category.offerPersentage = percentage
+        category.offerAdded = true
+
+        category.save()
+
+        const products = await Product.find({ category: categoryId });
+
+        for (let product of products) {
+            const discountAmount = (product.price * percentage) / 100;
+            console.log(product.offerPrice,product.price,discountAmount)
+            if (product.offerPrice && product.offerPrice > product.price - discountAmount) {
+                product.offerPrice = product.price - discountAmount;
+                await product.save();
+            }else{
+                 product.offerPrice = product.price - discountAmount;
+                await product.save();
+            }
+        }
+
+        res.status(200).json({ message: 'Offer added successfully' });
+    } catch (error) {
+        console.error('Error adding offer:', error);
+        res.status(500).json({ message: 'Server error while adding offer' });
+    }
+}
+
+
+
+export const removeCategoryOffer = async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+        if (!categoryId) {
+            return res.status(400).json({ message: 'Product ID is required' });
+        }
+
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ message: 'category not found' });
+        }
+
+        const products = await Product.find({ category: categoryId });
+
+        for (let product of products) {
+            product.offerPrice = 0;
+            await product.save();
+        }
+
+        category.offerPersentage = 0
+        category.offerAdded = false
+        category.save()
+
+        // Remove the offer price
+        res.status(200).json({ message: 'Offer removed successfully', products });
+    } catch (error) {
+        console.error('Error removing offer:', error);
+        res.status(500).json({ message: 'Server error while removing offer' });
     }
 }

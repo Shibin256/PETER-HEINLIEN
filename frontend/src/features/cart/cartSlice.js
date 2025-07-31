@@ -4,7 +4,6 @@ import cartService from './cartService';
 export const addToCart = createAsyncThunk(
     'user/cart/add',
     async ({ userId, productId, quantity = 1 }, thunkAPI) => {
-        console.log(userId, '----', productId)
         try {
             return await cartService.addToCart({ userId, productId, quantity });
         } catch (error) {
@@ -43,12 +42,15 @@ export const wishlistToCart=createAsyncThunk(
     'user/cart/wishlistToCart',
     async({userId,productIds,quantity=1},thunkAPI)=>{
         try {
+            
             return await cartService.wishlistToCart({ userId, productIds, quantity });
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 )
+
+
 
 const cartSlice = createSlice({
     name: 'cart',
@@ -72,7 +74,6 @@ const cartSlice = createSlice({
 
             .addCase(addToCart.fulfilled, (state, action) => {
                 state.loading = false;
-                console.log(action.payload, 'in slice - updated cart');
                 state.cartItems = action.payload.products;
             })
 
@@ -83,7 +84,6 @@ const cartSlice = createSlice({
             })
 
             .addCase(fetchCart.fulfilled, (state, action) => {
-                console.log('slice', action.payload)
                 state.cartItems = action.payload.products;
                 state.subTotal = action.payload.subTotal;
                 state.totalPrice = action.payload.totalPrice;
@@ -124,7 +124,6 @@ const cartSlice = createSlice({
 
             .addCase(wishlistToCart.fulfilled, (state, action) => {
                 state.loading = false;
-                console.log(action.payload,'payload in wishlist')
                 state.cartItems = action.payload.cart.products;
             })
 

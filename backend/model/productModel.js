@@ -69,6 +69,10 @@ const productSchema = new mongoose.Schema(
     color: {
       type: String,
     },
+    offerPrice: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

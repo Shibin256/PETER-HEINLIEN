@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { cancelOrderItem, downloadInvoice, getOrders, returnOrderItem } from '../../features/orders/ordersSlice';
+import { cancelOrderItem, cancelSingleOrderItem, downloadInvoice, getOrders, returnOrderItem } from '../../features/orders/ordersSlice';
 import { Dialog } from '@headlessui/react';
 
 const Order = ({ order, onCancelSuccess }) => {
@@ -19,6 +19,7 @@ const Order = ({ order, onCancelSuccess }) => {
 
   const dispatch = useDispatch();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isSingleCancelModalOpen, setIsSingleCancelModalOpen] = useState(false);
   const [selectedItemToCancel, setSelectedItemToCancel] = useState(null);
   const [cancellationReason, setCancellationReason] = useState('');
 
@@ -119,6 +120,13 @@ const Order = ({ order, onCancelSuccess }) => {
     setCancellationReason('');
   };
 
+  const closeSingleCancelModal = () => {
+    setIsSingleCancelModalOpen(false);
+    setSelectedItemToCancel(null);
+    setCancellationReason('');
+  };
+
+
   const confirmCancel = async () => {
     if (selectedItemToCancel && cancellationReason) {
       await dispatch(cancelOrderItem({
@@ -129,6 +137,18 @@ const Order = ({ order, onCancelSuccess }) => {
       closeCancelModal();
     }
   };
+
+  const confirmSingleCancel = async () => {
+    if (selectedItemToCancel && cancellationReason) {
+      await dispatch(cancelSingleOrderItem({
+        itemOrderId: selectedItemToCancel,
+        reason: cancellationReason
+      }));
+      onCancelSuccess();
+      closeSingleCancelModal();
+    }
+  };
+
 
   // Return modal functions
   const openReturnModal = (itemOrderId) => {
@@ -157,6 +177,7 @@ const Order = ({ order, onCancelSuccess }) => {
     await dispatch(downloadInvoice({ itemOrderId: orderId }))
     console.log('success')
   }
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
       {/* Order Header */}
@@ -189,7 +210,7 @@ const Order = ({ order, onCancelSuccess }) => {
               </button>
             }
 
-           {OrderStatus !== 'Cancelled' && <button
+            {OrderStatus !== 'Cancelled' && <button
               onClick={() => handleInvoice(orderId)}
               className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors border border-blue-100">
               Invoice
@@ -230,9 +251,29 @@ const Order = ({ order, onCancelSuccess }) => {
                 </div>
               </div>
 
+
+
               {/* Action Buttons */}
               <div className="mt-4 flex flex-wrap gap-2">
-                {OrderStatus === 'Delivered' && (
+
+                {!item.returnReason && (
+                  <button
+                    disabled={item.cancelReason}
+                    onClick={() => (
+                      setSelectedItemToCancel(item.itemOrderId),
+                      setIsSingleCancelModalOpen(true)
+                    )}
+                    className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
+                  >
+                    {!item.cancelReason ? 'Cancel Order' : 'Product canceled'}
+                  </button>
+                )}
+
+
+
+
+
+                {OrderStatus === 'Delivered' && !item.cancelReason && (
                   <button
                     disabled={item.returnReason}
                     onClick={() => openReturnModal(item.itemOrderId)}
@@ -322,7 +363,7 @@ const Order = ({ order, onCancelSuccess }) => {
             <div className="bg-white p-4 rounded-lg border border-gray-200">
               <p className="font-medium">{Order_Address.name}</p>
               <p className="text-sm text-gray-600">{Order_Address.phone}</p>
-              <p className="text-sm text-gray-600 mt-2">                
+              <p className="text-sm text-gray-600 mt-2">
                 {Order_Address.house},{Order_Address.locality}<br />
                 {Order_Address.city}, {Order_Address.state} - {Order_Address.pincode}
               </p>
@@ -408,6 +449,73 @@ const Order = ({ order, onCancelSuccess }) => {
               </button>
               <button
                 onClick={confirmCancel}
+                disabled={!cancellationReason}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
+              >
+                Confirm Cancellation
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
+
+
+
+
+
+
+
+
+
+
+      {/*single Cancellation Modal */}
+      <Dialog open={isSingleCancelModalOpen} onClose={closeSingleCancelModal} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="w-full max-w-md rounded-xl bg-white p-6">
+            <Dialog.Title className="text-lg font-bold text-gray-900 mb-4">
+              {selectedItemToCancel ? 'Cancel Item' : 'Cancel Order'}
+            </Dialog.Title>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reason for cancellation
+              </label>
+              <select
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select a reason</option>
+                {cancellationReasons.map((reason, index) => (
+                  <option key={index} value={reason}>{reason}</option>
+                ))}
+              </select>
+            </div>
+
+            {cancellationReason === 'Other reason' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Please specify
+                </label>
+                <textarea
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter your reason here..."
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={closeSingleCancelModal}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              >
+                Go Back
+              </button>
+              <button
+                onClick={confirmSingleCancel}
                 disabled={!cancellationReason}
                 className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
               >

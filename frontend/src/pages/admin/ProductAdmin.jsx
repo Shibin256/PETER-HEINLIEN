@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteProduct, fetchProducts, getBrandAndCollection, updateProduct } from '../../features/products/productSlice';
+import { addProductOffer, deleteProduct, fetchProducts, getBrandAndCollection, removeProductOffer, updateProduct } from '../../features/products/productSlice';
 import { toast } from 'react-toastify';
 import AuthInput from '../../components/common/AuthInput';
 import SelectInput from '../../components/common/SelectInput';
@@ -10,8 +10,13 @@ import Swal from 'sweetalert2';
 const ProductAdmin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currency } = useSelector(state => state.global)
+  const { currency } = useSelector(state => state.global);
 
+  // State for offer management
+  const [selectedProductForOffer, setSelectedProductForOffer] = useState(null);
+  const [offerPercentage, setOfferPercentage] = useState('');
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [productToRemoveOffer, setProductToRemoveOffer] = useState(null);
 
   // Fetching category and brand from server
   useEffect(() => {
@@ -35,8 +40,8 @@ const ProductAdmin = () => {
     category: '',
     brand: '',
     tags: '',
-    images: [], // Add images array
-    newImages: [], // For newly uploaded images
+    images: [],
+    newImages: [],
   });
 
   // Calculate product statistics
@@ -49,10 +54,51 @@ const ProductAdmin = () => {
     dispatch(fetchProducts({ page: 1, limit: 10, search: searchTerm }));
   };
 
+  // Offer management handlers
+  const handleAddOffer = async () => {
+
+    if (!selectedProductForOffer || !offerPercentage) return;
+    if(offerPercentage <= 0 || offerPercentage > 100) {
+      toast.error('Offer percentage must be between 1 and 100.');
+      return;
+    }
+    
+    try {
+     dispatch(addProductOffer({ productId: selectedProductForOffer._id, percentage: offerPercentage })).unwrap();
+      toast.success(`Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`);      
+      setSelectedProductForOffer(null);
+      setOfferPercentage('');
+      dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
+    } catch (error) {
+      toast.error(error?.message || 'Failed to add offer.');
+    }
+  };
+
+  const handleRemoveOffer = (productId) => {
+    setProductToRemoveOffer(productId);
+    setShowRemoveConfirm(true);
+  };
+
+  const confirmRemoveOffer = async () => {
+    try {
+      const res= await dispatch(removeProductOffer(productToRemoveOffer));
+      console.log('Offer removed:', res); 
+      if (res.type.endsWith('/rejected')) {
+        toast.error(res.payload?.message || 'Failed to remove offer.');
+        return;
+      }
+      toast.success('✅ Offer removed successfully!');
+      setShowRemoveConfirm(false);
+      setProductToRemoveOffer(null);
+      dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
+    } catch (error) {
+      toast.error(error?.message || 'Failed to remove offer.');
+    }
+  };
+
   // Handling edit popup
   const handleEdit = (product) => {
     setSelectedProduct(product);
-    console.log(product, 'product')
     setEditForm({
       name: product.name || '',
       description: product.description || '',
@@ -87,7 +133,6 @@ const ProductAdmin = () => {
       return;
     }
 
-
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
@@ -97,19 +142,15 @@ const ProductAdmin = () => {
     formData.append('brand', brand._id);
     formData.append('tags', tags);
 
-    // Append new image files
     editForm.newImages.forEach((file, index) => {
-      formData.append('newImages', file); // Backend should handle array of files under `newImages`
+      formData.append('newImages', file);
     });
 
-    // Append existing image URLs (optional depending on backend)
     editForm.images.forEach((url, index) => {
       if (typeof url === 'string') {
-        formData.append('existingImages', url); // Optional: your backend should keep old images
+        formData.append('existingImages', url);
       }
     });
-
-
 
     try {
       await dispatch(updateProduct({ id: selectedProduct._id, data: formData })).unwrap();
@@ -123,7 +164,7 @@ const ProductAdmin = () => {
     }
   };
 
-  //handle product delete
+  // Handle product delete
   const handleDelete = (id) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -153,7 +194,7 @@ const ProductAdmin = () => {
     });
   };
 
-  //edit modal cancel button handle
+  // Edit modal cancel button handle
   const closeEditModal = () => {
     setShowEditModal(false);
     setSelectedProduct(null);
@@ -181,7 +222,6 @@ const ProductAdmin = () => {
         <h2 className="text-2xl font-bold">Product Management</h2>
 
         <div className="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
-          {/* Product Stats - now in small cards top right */}
           <div className="flex flex-wrap gap-2">
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg shadow-sm border border-blue-200 text-sm">
               Total: <span className="font-bold">{totalProducts || 0}</span>
@@ -240,27 +280,68 @@ const ProductAdmin = () => {
               <th className="px-4 py-2 border-b">Availability</th>
               <th className="px-4 py-2 border-b">Category</th>
               <th className="px-4 py-2 border-b">Price</th>
+              <th className="px-4 py-2 border-b">Offer</th>
               <th className="px-4 py-2 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products?.map((product) => (
               <tr key={product._id} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-2 ">
+                <td className="px-4 py-2">
                   <img src={product.images[0]} alt="Product" className="w-12 h-12 object-cover rounded" />
                 </td>
-                <td className="px-4 py-2">{product.name}</td>
+                <td className="px-4 py-2">
+                  {product.name}
+                  {product.offerPercentage && (
+                    <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      {product.offerPercentage}% OFF
+                    </span>
+                  )}
+                </td>
                 <td className="px-4 py-2">{product.totalQuantity}</td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${product.availability ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      product.availability ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}
                   >
                     {product.availability ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </td>
                 <td className="px-4 py-2">{product.category?.categoryName || 'N/A'}</td>
-                <td className="px-4 py-2">${product.price?.toFixed(2)}</td>
+                <td className="px-4 py-2">
+                  {product.offerPrice ? (
+                    <>
+                      <span className="line-through text-gray-400 mr-1">
+                        ₹{product.price?.toFixed(2)}
+                      </span>
+                      <span className="text-red-600">
+                        ₹{product.offerPrice.toFixed(2)}
+                      </span>
+                    </>
+                  ) : (
+                    `₹${product.price?.toFixed(2)}`
+                  )}
+                </td>
+                
+
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {product.offerPrice ? (
+                    <button
+                      onClick={() => handleRemoveOffer(product._id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Remove Offer
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedProductForOffer(product)}
+                      className="text-green-600 hover:text-green-800"
+                    >
+                      Add Offer
+                    </button>
+                  )}
+                </td>
                 <td className="px-4 py-2 whitespace-nowrap">
                   <button
                     onClick={() => handleEdit(product)}
@@ -333,12 +414,10 @@ const ProductAdmin = () => {
                 />
               </div>
 
-
               {/* Image Upload Section */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {/* Preview existing images */}
                   {editForm.images?.map((image, index) => (
                     <div key={`existing-${index}`} className="relative">
                       <img
@@ -360,7 +439,6 @@ const ProductAdmin = () => {
                     </div>
                   ))}
 
-                  {/* Preview newly added images */}
                   {editForm.newImages?.map((image, index) => (
                     <div key={`new-${index}`} className="relative">
                       <img
@@ -382,7 +460,6 @@ const ProductAdmin = () => {
                     </div>
                   ))}
 
-                  {/* Image upload button (limit to 4 total images) */}
                   {editForm.images.length + editForm.newImages.length < 4 && (
                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -411,7 +488,6 @@ const ProductAdmin = () => {
                   )}
                 </div>
               </div>
-
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <SelectInput
@@ -483,6 +559,66 @@ const ProductAdmin = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Offer Modal */}
+      {selectedProductForOffer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-lg font-bold mb-4">Add Offer to {selectedProductForOffer.name}</h3>
+            <input
+              type="number"
+              value={offerPercentage}
+              onChange={(e) => setOfferPercentage(e.target.value)}
+              placeholder="Enter percentage (e.g., 20)"
+              className="w-full px-3 py-2 border border-gray-300 rounded mb-4"
+              min="1"
+              max="100"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setSelectedProductForOffer(null);
+                  setOfferPercentage('');
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddOffer}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                disabled={!offerPercentage}
+              >
+                Apply Offer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Offer Confirmation Modal */}
+      {showRemoveConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-lg font-bold mb-4">Confirm Remove Offer</h3>
+            <p className="mb-4">Are you sure you want to remove this offer?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowRemoveConfirm(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRemoveOffer}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Remove Offer
+              </button>
+            </div>
           </div>
         </div>
       )}

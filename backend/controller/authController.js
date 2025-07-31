@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 //module for otp verification
 import nodemailer from 'nodemailer'
+import { v4 as uuidv4 } from 'uuid';
 import Otp from '../model/otpModel.js'
 const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 
@@ -10,6 +11,7 @@ const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 import { OAuth2Client } from 'google-auth-library';
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import Product from "../model/productModel.js";
+import Wallet from "../model/walletModal.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //generate otp with random 6 digit number
@@ -70,7 +72,9 @@ export const register = async (req, res) => {
       password,
       confirmPassword,
       phone,
+      ReferralCode
     } = req.body;
+
 
     // Check if all required fields are present
     if (!name || !email || !password || !confirmPassword) {
@@ -92,6 +96,28 @@ export const register = async (req, res) => {
     if (phoneExist && phoneExist.phone != null) {
       return res.status(400).json({ message: "The mobile number is already exists" });
     }
+
+    const ReferralUser = await User.findOne({ referralCode:ReferralCode }).select('-password')
+
+    if (ReferralUser) {
+      let wallet = await Wallet.findOne({ userId: ReferralUser._id })
+      const transactions = {
+        userId: ReferralUser._id,
+        amount: 50,
+        paymentId: `REF-${Date.now()}-${uuidv4().slice(0, 8)}`,
+        status: 'success',
+        type: 'credit',
+        description: ' Referral Amount'
+      }
+      if (wallet) {
+        wallet.balance +=50;
+        wallet.transactions.push(transactions)
+      } else {
+        wallet = new Wallet({ userId:ReferralUser._id, balance: 50, transactions: [transactions] });
+      }
+      await wallet.save();
+    }
+
     //generate and sending otp
     const otp = genarateOtp()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -219,8 +245,8 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    if(user.googleId){
-      return res.status(401).json({message:'user not exist, try google login'})
+    if (user.googleId) {
+      return res.status(401).json({ message: 'user not exist, try google login' })
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
@@ -263,9 +289,10 @@ export const login = async (req, res) => {
         username: user.username,
         email: user.email,
         isAdmin: user.isAdmin,
-        phone:user.phone,
-        gender:user.gender,
-        profileImage:user.profileImage
+        phone: user.phone,
+        gender: user.gender,
+        profileImage: user.profileImage,
+        referralCode:user.referralCode
       },
     });
   } catch (error) {
@@ -305,7 +332,7 @@ export const adminLogin = async (req, res) => {
     await user.save();
 
     //creation of access and refresh Token when user log in
-    console.log(user,'user in access')
+    console.log(user, 'user in access')
     const accessToken = generateAccessToken(user)
     console.log(accessToken)
     const refreshToken = generateRefreshToken(user)

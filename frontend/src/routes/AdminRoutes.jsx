@@ -12,6 +12,8 @@ import Inventory from '../pages/admin/Inventory'
 import Settings from '../pages/admin/Settings'
 import Banners from '../pages/admin/Banners'
 import OrdersList from '../pages/admin/OrdersList'
+import Coupons from '../pages/admin/coupons'
+import Offers from '../pages/admin/Offer'
 
 
 const AdminRoutes = () => {
@@ -51,6 +53,8 @@ const AdminRoutes = () => {
           <Route path='inventory' element={<Inventory />} />
           <Route path='settings' element={<Settings />} />
           <Route path='banners' element={<Banners />} />
+          <Route path='coupons' element={<Coupons />} />
+          <Route path='offers' element={<Offers />} />
 
         </Route>
       </Routes>

@@ -26,13 +26,19 @@ const SelectInput = ({
           required={required}
           className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white transition-all duration-200"
         >
-          <option value="">Select {label}</option>
+          {/* Only show placeholder if no value selected */}
+          {(!value || value === "") && (
+            <option value="" disabled>
+              Select {label}
+            </option>
+          )}
           {options.map((option, index) => (
             <option key={index} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
+
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
           <svg
             className="w-5 h-5 text-gray-400"

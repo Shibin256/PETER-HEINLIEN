@@ -54,6 +54,7 @@ const ProductDetails = () => {
     shippingCost = 50;
   }
 
+  
 
 
   if (!product || !product.images || product.images.length === 0) {
@@ -104,8 +105,12 @@ const ProductDetails = () => {
       console.log(res.payload);
       if (res.payload === 'max quantity added') {
         toast.warning('max quantity added');
-      } else {
+      } else if (res.payload === 'Product is out of stock') {
+        toast.warning('Product is out of stock')
+      }
+      else {
         toast.success('Added to cart');
+        navigate('/cart')
       }
     } catch (err) {
       console.error('cart error:', err);
@@ -170,8 +175,22 @@ const ProductDetails = () => {
                   )}
               </div>
               <span className="text-sm text-gray-500">(2 reviews)</span>
+            </div><div className="mb-4">
+              {product.offerPrice ? (
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-2xl font-semibold text-red-600">₹{product.offerPrice}</p>
+                    <p className="text-lg text-gray-500 line-through">₹{product.price}</p>
+                    <span className="text-sm text-green-600 font-medium">
+                      ({Math.round(((product.price - product.offerPrice) / product.price) * 100)}% OFF)
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-2xl font-semibold text-gray-800">₹{product.price}</p>
+              )}
             </div>
-            <p className="text-2xl font-semibold text-gray-800 mb-4">{product.price} .Rs</p>
+
             <p className="text-gray-700 mb-6">{product.description}</p>
           </div>
 

@@ -27,6 +27,9 @@ import AddAddress from '../pages/user/accout/AddAddress'
 import Checkout from '../pages/user/Checkout'
 import PaymentPage from '../pages/user/PaymentPage'
 import MyOrders from '../pages/user/MyOrders'
+import OrderSuccessPage from '../pages/user/orderSuccess'
+import Wallet from '../pages/user/Wallet'
+import OrderFailed from '../pages/user/orderFailed'
 
 
 
@@ -56,6 +59,11 @@ const UserRoutes = () => {
           <Route path='checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path='payment-page' element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
           <Route path='my-orders' element={<ProtectedRoute><MyOrders/></ProtectedRoute>} />
+          <Route path='order-success' element={<ProtectedRoute><OrderSuccessPage/></ProtectedRoute>} />
+          <Route path='wallet' element={<ProtectedRoute><Wallet/></ProtectedRoute>} />
+          <Route path='order-failed' element={<ProtectedRoute><OrderFailed/></ProtectedRoute>} />
+
+
 
 
 
@@ -66,6 +74,7 @@ const UserRoutes = () => {
           <Route path='edit-password' element={<ProtectedRoute><EditPassword /></ProtectedRoute>} />
           <Route path='my-address' element={<ProtectedRoute><Address /></ProtectedRoute>} />
           <Route path='add-address' element={<ProtectedRoute><AddAddress /></ProtectedRoute>} />
+
 
         </Route>
       </Routes>

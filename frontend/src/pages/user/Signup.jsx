@@ -29,6 +29,7 @@ const Signup = () => {
     phone: '',
     gender: 'male',
     file: null,
+    ReferralCode:''
   });
   const navigate = useNavigate();
   const dispatch = useDispatch()
@@ -218,39 +219,6 @@ const Signup = () => {
               borderColor='border-gray-300'
             />
 
-            {/* profile pic not going to add */}
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
-              <div className="flex items-center">
-                <label className="flex-1 cursor-pointer">
-                  <div className="flex items-center justify-between p-3 border border-gray-300 rounded-md hover:bg-gray-50">
-                    <span className="text-gray-500">
-                      {formData.file ? formData.file.name : 'Choose file'}
-                    </span>
-                    <FaPaperclip className="text-gray-400" />
-                  </div>
-                  <input
-                    type="file"
-                    name="file"
-                    onChange={handleChange}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div> */}
-            {/* 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="+91 Enter your phone number"
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent"
-              />
-            </div> */}
-
             <AuthInput
               label="Phone Number"
               type="tel"
@@ -258,6 +226,19 @@ const Signup = () => {
               value={formData.phone}
               onChange={handleChange}
               placeholder="Enter 10-digit phone number"
+              width="w-full"
+              Textcolor="text-gray-700"
+              borderColor="border-gray-300"
+              required={false}
+            />
+
+              <AuthInput
+              label="Referral  code"
+              type="text"
+              name="ReferralCode"
+              value={formData.ReferralCode}
+              onChange={handleChange}
+              placeholder="Enter the referral code"
               width="w-full"
               Textcolor="text-gray-700"
               borderColor="border-gray-300"

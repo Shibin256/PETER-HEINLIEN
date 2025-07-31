@@ -259,7 +259,7 @@ const Collection = () => {
                   type="button"
                   onClick={() => {
                     setSearchTerm('');
-                    dispatch(fetchProducts({ page: 1, limit: 10 }));
+                    dispatch(fetchProducts({ page: 1, limit: 4 }));
                   }}
                   className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
                 >

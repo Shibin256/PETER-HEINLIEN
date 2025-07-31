@@ -54,6 +54,19 @@ const getRelatedProducts=async(id)=>{
   return res.data
 }
 
+const addProductOffer = async ({ productId, percentage }) => {
+  const res = await adminAxiosInstance.post('/api/products/addOffer', {
+    productId,
+    percentage,
+  });
+  return res.data;
+};
+
+ const removeProductOffer = async (productId) => {
+  const res = await adminAxiosInstance.delete(`/api/products/removeOffer/${productId}`);
+  return res.data;
+};
+
 const productService ={
     getProducts,
     addProducts,
@@ -62,7 +75,9 @@ const productService ={
     getBrandAndCollection,
     getProducById,
     getLatestCollection,
-    getRelatedProducts
+    getRelatedProducts,
+    addProductOffer,
+    removeProductOffer
 }
 
 export default productService

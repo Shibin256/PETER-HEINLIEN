@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import GenericTable from '../../components/admin/GenericTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { changeOrderStatus, fetchAllOrders, retrunVerify, verifyCancel } from '../../features/orders/ordersSlice';
+import { changeOrderStatus, fetchAllOrders, retrunVerify, singleCancelVerify, verifyCancel } from '../../features/orders/ordersSlice';
 import AuthInput from '../../components/common/AuthInput';
 
 const OrdersList = () => {
@@ -14,7 +14,10 @@ const OrdersList = () => {
   const [showReturnVerifyModal, setShowReturnVerifyModal] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [selectedReturnItem, setSelectedReturnItem] = useState(null);
+  const [selectedCancelItem, setSelectedCancelItem] = useState(null);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [showCancelVerifyModal, setShowCancelVerifyModal] = useState(false);
+
 
 
   useEffect(() => {
@@ -47,6 +50,16 @@ const OrdersList = () => {
     }
   };
 
+  const handleVerifySingleCancel = async (orderId, itemId) => {
+    try {
+      await dispatch(singleCancelVerify({ itemOrderId: itemId }));
+      setShowCancelVerifyModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   const handleSearch = async (e) => {
     e.preventDefault();
     dispatch(fetchAllOrders({ search: searchTerm, page: 1, limit: 10 }));
@@ -56,7 +69,7 @@ const OrdersList = () => {
     try {
       console.log(itemOrderId)
       const res = await dispatch(verifyCancel(itemOrderId)).then((res) => {
-        console.log(res,'resssss')
+        console.log(res, 'resssss')
         if (res.type === 'user/verifyCancel/fulfilled') {
           console.log('orders')
           dispatch(fetchAllOrders({ page: 1, limit: 10 }))
@@ -151,6 +164,7 @@ const OrdersList = () => {
           Mark Delivered
         </button>
       )}
+
       {item.OrderStatus === 'Delivered' && item.Items.some(i => i.returnReason && !i.returnVerified) && (
         <button
           onClick={() => {
@@ -163,6 +177,22 @@ const OrdersList = () => {
           Verify Return
         </button>
       )}
+
+
+      {item.OrderStatus !== 'Cancelled' && item.Items.some(i => i.cancelReason && !i.cancelVerified) && (
+        <button
+          onClick={() => {
+            setCurrentOrder(item);
+            setSelectedCancelItem(item.Items.find(i => i.cancelReason && !i.cancelVerified));
+            setShowCancelVerifyModal(true);
+          }}
+          className="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded transition-colors"
+        >
+          Verify cancel
+        </button>
+      )}
+
+
       {item.OrderStatus === 'Cancelled' && (
         <button
           onClick={() => {
@@ -403,10 +433,22 @@ const OrdersList = () => {
                               <div>Qty: {item.quantity}</div>
                               <div>Subtotal: ₹{item.subTotal?.toFixed(2)}</div>
                               <div>
-                                Status: {item.returnReason ? (
+                                Return Status: {item.returnReason ? (
                                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.returnVerified ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'
                                     }`}>
                                     {item.returnVerified ? 'Return Verified' : 'Return Requested'}
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    No Return
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                  Cancel Status: {item.cancelReason ? (
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.cancelVerified ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'
+                                    }`}>
+                                    {item.cancelVerified ? 'Cancel Verified' : 'Cancel Requested'}
                                   </span>
                                 ) : (
                                   <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -512,6 +554,76 @@ const OrdersList = () => {
         )}
 
         {/* Return Verification Modal */}
+        {showCancelVerifyModal && currentOrder && selectedCancelItem && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Verify Return</h2>
+
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-700 mb-2">Product:</h3>
+                  <div className="flex items-center">
+                    {selectedCancelItem.productImage?.length > 0 && (
+                      <img
+                        src={selectedCancelItem.productImage[0]}
+                        alt={selectedCancelItem.productName}
+                        className="w-16 h-16 object-cover rounded mr-3"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">{selectedCancelItem.productName}</p>
+                      <p className="text-sm text-gray-600">₹{selectedCancelItem.productPrice?.toFixed(2)} × {selectedCancelItem.quantity}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-700 mb-2">Return Reason:</h3>
+                  <p className="bg-gray-50 p-3 rounded-md">{selectedCancelItem.returnReason}</p>
+                </div>
+
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-700 mb-2">Refund Amount:</h3>
+                  <p className="text-lg font-bold">₹{selectedCancelItem.subTotal?.toFixed(2)}</p>
+                </div>
+
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-700">
+                        Please confirm that you have received the returned item in good condition before verifying this return.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowCancelVerifyModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleVerifySingleCancel(currentOrder._id, selectedCancelItem.itemOrderId)}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-sm font-medium text-white"
+                >
+                  Confirm Return
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+
+        {/* Single Cancel Verification Modal */}
         {showReturnVerifyModal && currentOrder && selectedReturnItem && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full">

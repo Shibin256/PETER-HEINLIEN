@@ -28,6 +28,9 @@ const wishlistToCart=async(data)=>{
   const response=await axiosInstance.post('/api/user/cart/wishlistToCart',data)
   return response.data
 }
+
+
+
 const cartService = {
   addToCart,
   fetchCart,

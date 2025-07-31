@@ -6,8 +6,8 @@ const placeOrder = async (orderData) => {
   return response.data;
 }
 
-const getOrders = async (userId, search,page,limit) => {
-  const params = new URLSearchParams({page,limit});
+const getOrders = async (userId, search, page, limit) => {
+  const params = new URLSearchParams({ page, limit });
   if (search) {
     params.append('search', search);
   }
@@ -22,6 +22,11 @@ const getOrders = async (userId, search,page,limit) => {
 
 const cancelOrderItem = async (data) => {
   const response = await axiosInstance.post(`/api/user/orders/cancelItem`, data);
+  return response.data;
+}
+
+const cancelSingleOrderItem = async (data) => {
+  const response = await axiosInstance.post(`/api/user/orders/cancelSingleItem`, data);
   return response.data;
 }
 
@@ -65,9 +70,14 @@ const retrunVerify = async (itemId) => {
   return response.data;
 }
 
+const singleCancelVerify = async (itemId) => {
+  const response = await adminAxiosInstance.post(`/api/admin/orders/singleCancelVerify/${itemId}`);
+  return response.data;
+}
+
 const downloadInvoice = async (itemOrderId) => {
   const response = await axiosInstance.get(`/api/user/invoice/${itemOrderId}`, {
-    responseType: 'blob', // 👈 Important for downloading files
+    responseType: 'blob',
   })
   const blob = new Blob([response.data], { type: 'application/pdf' });
   const url = window.URL.createObjectURL(blob);
@@ -80,6 +90,20 @@ const downloadInvoice = async (itemOrderId) => {
   window.URL.revokeObjectURL(url);
 }
 
+
+
+const createRazorpayOrder = async (amount) => {
+  console.log(amount,'in serviese')
+  const res = await axiosInstance.post('/api/user/create-order', { amount });
+  return res.data; 
+}
+
+ const verifyRazorpayPayment = async (paymentDetails) => {
+  const res = await axiosInstance.post('/api/user/verify-payment', paymentDetails);
+  return res.data; // returns { success: true/false }
+};
+
+
 const orderService = {
   placeOrder,
   getOrders,
@@ -89,7 +113,11 @@ const orderService = {
   getALlOrders,
   returnOrderItem,
   retrunVerify,
-  downloadInvoice
+  downloadInvoice,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  cancelSingleOrderItem,
+  singleCancelVerify
 }
 
 export default orderService;

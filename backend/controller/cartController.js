@@ -12,8 +12,6 @@ export const addItemToCart = async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Product not found' });
     if (product.totalQuantity <= 0) return res.status(400).json({ message: 'Product is out of stock' });
 
-
-
     let cart = await Cart.findOne({ userId });
     if (!cart) {
       cart = new Cart({
@@ -29,7 +27,10 @@ export const addItemToCart = async (req, res) => {
 
     if (existingItem) {
       if (existingItem.quantity >= 4) return res.status(400).json({ message: 'max quantity added' });
-      if (product.totalQuantity <= 0) return res.status(400).json({ message: 'Product is out of stock' });
+      console.log(quantity)
+      if (existingItem.quantity >= product.totalQuantity) {
+      return res.status(400).json({ message: `Product is out of stock` });
+    }
 
       existingItem.quantity += quantity;
       existingItem.productSubTotal = existingItem.quantity * existingItem.price;
@@ -58,7 +59,7 @@ export const addItemToCart = async (req, res) => {
     cart.totalPrice = cart.subTotal;
 
     await cart.save();
-    product.totalQuantity -= quantity;
+    // product.totalQuantity -= quantity;
     await product.save();
 
     res.status(200).json(cart);
@@ -89,9 +90,12 @@ export const updateCartItem = async (req, res) => {
 
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: 'Product not found' });
+    console.log('product0==', product)
+    if (quantity > product.totalQuantity) {
+      return res.status(400).json({ message: `Cannot add more. Only ${product.totalQuantity} item(s) in stock.` });
+    }
 
     const item = cart.products.find(p => p.productId.toString() === productId);
-    console.log(item, 'item')
     if (!item) return res.status(404).json({ message: 'Product not in cart' });
 
     const oldQuantity = item.quantity;
@@ -108,7 +112,7 @@ export const updateCartItem = async (req, res) => {
     }
 
     // Update product stock
-    product.totalQuantity -= quantityDifference;
+    // product.totalQuantity -= quantityDifference;
     if (product.totalQuantity < 0) {
       return res.status(400).json({ message: 'Insufficient stock' });
     }
@@ -149,7 +153,7 @@ export const removeCartItem = async (req, res) => {
     cart.subTotal = cart.products.reduce((acc, item) => acc + item.productSubTotal, 0);
     cart.totalPrice = cart.subTotal;
 
-    product.totalQuantity += quantity;
+    // product.totalQuantity += quantity;
     await product.save();
     await cart.save();
     res.status(200).json(cart);
@@ -215,7 +219,7 @@ export const addFromWishlistToCart = async (req, res) => {
       }
 
       // Reduce stock
-      product.totalQuantity -= quantity;
+      // product.totalQuantity -= quantity;
       await product.save();
     }
     // Remove products from wishlist
@@ -242,3 +246,4 @@ export const addFromWishlistToCart = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+

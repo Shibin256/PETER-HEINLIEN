@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { fetchCart, removeFromCart, updateCart } from '../../features/cart/cartSlice';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { applyCoupon } from '../../features/coupons/couponsSlice';
 
 const Cart = () => {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -19,20 +20,30 @@ const Cart = () => {
 
   const { cartItems = [] } = useSelector(state => state.cart)
   const [localCart, setLocalCart] = useState([]);
-  console.log(localCart,'local cart')
+  const [couponCode, setCouponCode] = useState('');
+  console.log(localCart, 'local cart')
 
   useEffect(() => {
     setLocalCart(cartItems);
   }, [cartItems]);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 10000 ? 0 : 50;
-  const total = subtotal + shipping;
+  const shipping = subtotal > 1000 ? 0 : 50;
+  const [total, setTotal] = useState(subtotal + shipping);
+  useEffect(() => {
+    setTotal(subtotal + shipping);
+  }, [subtotal, shipping]);
   const { currency } = useSelector(state => state.global)
 
   const handleQuantityChange = (productId, delta) => {
     const item = localCart.find(item => item.productId._id === productId);
     const newQuantity = Math.max(1, item.quantity + delta);
+
+    if (delta > 0 && newQuantity > item.productId.totalQuantity) {
+      console.warn(`Only ${item.productId.totalQuantity} items available in stock.`);
+      return;
+    }
+
 
     if (item.quantity === 4 && delta > 0) {
       console.warn("Max quantity reached");
@@ -61,6 +72,25 @@ const Cart = () => {
     await dispatch(removeFromCart({ userId: user._id, productId: id, itemQuantity: { quantity: quantity } }))
     dispatch(fetchCart(user._id));
   };
+
+
+  // const handleApplyCoupon = async () => {
+  //   if (couponCode.trim() === '') {
+  //     alert('Please enter a coupon code');
+  //     return;
+  //   }
+  //   const res = await dispatch(applyCoupon({ userId: user._id, couponCode }));
+  //   console.log('Coupon applied:', res);
+  //   if (res.type == 'user/cart/applyCoupon/fulfilled') {
+  //     if (res.payload.coupon.discountType === 'percentage') {
+  //       const discount = (subtotal * res.payload.coupon.discountValue) / 100;
+  //       setTotal(subtotal - discount + shipping);
+  //     } else if (res.payload.coupon.discountType === 'fixed') {
+  //       const discount = res.payload.coupon.discountValue;
+  //       setTotal(subtotal - discount + shipping);
+  //     }
+  //   }
+  // }
 
   if (cartItems.length === 0) {
     return (
@@ -153,9 +183,13 @@ const Cart = () => {
                           <span className="mx-3 text-base w-8 text-center">{item.quantity}</span>
                           <button
                             onClick={() => handleQuantityChange(item.productId._id, 1)}
-                            className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${item.quantity >= 4 || item.productId.totalQuantity<=0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={item.quantity >= 4 || item.productId.totalQuantity<=0}
+                            className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${item.quantity >= 4 || item.quantity >= item.productId.totalQuantity
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                              }`}
+                            disabled={item.quantity >= 4 || item.quantity >= item.productId.totalQuantity}
                           >
+
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
@@ -172,21 +206,23 @@ const Cart = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          {/* <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <div className="flex-grow flex">
               <input
                 type="text"
                 placeholder="Coupon code"
+                onChange={(e) => setCouponCode(e.target.value)}
                 className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               />
-              <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-r-md transition-colors">
+              <button onClick={handleApplyCoupon}
+                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-r-md transition-colors">
                 Apply Coupon
               </button>
             </div>
             <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">
               Update Cart
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Cart Summary */}

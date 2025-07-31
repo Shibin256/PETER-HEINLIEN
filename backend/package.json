@@ -8,6 +8,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "fd": "^0.0.3",
     "fs": "^0.0.1-security",
@@ -21,6 +22,8 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.17.1",
+    "razorpay": "^2.9.6",
+    "uuid": "^11.1.0",
     "winston": "^3.17.0"
   },
   "scripts": {

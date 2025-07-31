@@ -7,6 +7,12 @@ import wishlistReducer from '../features/wishlist/wishlistSlice'
 import accountReducer from '../features/accountSettings/accountSlice'
 import cartReducer from '../features/cart/cartSlice'
 import ordersReducer from '../features/orders/ordersSlice'
+import couponsReducer from '../features/coupons/couponsSlice'
+import walletReducer from '../features/wallet/walletSlice'
+import dashboardReducer from '../features/admin/dashboard/dashboardSlice'
+
+
+
 
 export const store=configureStore({
     reducer:{
@@ -17,6 +23,9 @@ export const store=configureStore({
         wishlist:wishlistReducer,
         account:accountReducer,
         cart:cartReducer,
-        orders:ordersReducer
+        orders:ordersReducer,
+        coupons:couponsReducer,
+        wallet:walletReducer,
+        dashboard:dashboardReducer
     }
 })

@@ -2,10 +2,12 @@ import express from "express";
 import multer from "multer";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { deleteUser, getAllUsers, toggleUserBlock } from "../controller/admin/usersController.js";
-import { createBrand, createCategory, deleteBrand, deleteCategory, editBrand, editCategory } from "../controller/admin/inventoryController.js";
+import { addCategoryOffer, createBrand, createCategory, deleteBrand, deleteCategory, editBrand, editCategory, removeCategoryOffer } from "../controller/admin/inventoryController.js";
 import { createBanner } from "../controller/admin/bannerController.js";
-import { changeOrderStatus, getAllOrders, retrunVerify, verifyCancel } from "../controller/orderController.js";
+import { changeOrderStatus, getAllOrders, retrunVerify, singleCancelVerify, verifyCancel } from "../controller/orderController.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
+import { createCoupons, deleteCoupon, fetchCoupons, updateCoupon } from "../controller/admin/couponsController.js";
+import { downloadSalesReportPDF, exelReport, getSalesReport } from "../controller/admin/reportController.js";
 
 const router=express.Router()
 
@@ -36,4 +38,24 @@ router.get('/orders/getAllOrders',authorizeRole(roles),verifyAccessToken,getAllO
 router.post('/orders/verifyReturn/:itemOrderId',authorizeRole(roles),verifyAccessToken,retrunVerify)
 router.post('/orders/verifyCancel/:orderId',authorizeRole(roles),verifyAccessToken,verifyCancel)
 router.post('/orders/changeStatus/:orderId',authorizeRole(roles),changeOrderStatus)
+router.post('/orders/singleCancelVerify/:itemOrderId',authorizeRole(roles),verifyAccessToken,singleCancelVerify)
+
+
+
+//couponManage
+router.post('/coupons/createCoupons',authorizeRole(roles),verifyAccessToken,createCoupons)
+router.get('/coupons',authorizeRole(roles),verifyAccessToken,fetchCoupons)
+router.delete('/coupons/:couponId',authorizeRole(roles),verifyAccessToken,deleteCoupon);
+router.put('/coupons/:couponId',authorizeRole(roles),verifyAccessToken,updateCoupon);
+
+//offermanage
+
+router.post('/addOffer',authorizeRole(roles),verifyAccessToken,addCategoryOffer);
+router.delete('/removeOffer/:categoryId', authorizeRole(roles), verifyAccessToken,removeCategoryOffer);
+
+//sales report
+router.get('/dashboard/sales-report',authorizeRole(roles),verifyAccessToken,getSalesReport)
+router.get("/dashboard/sales-report/excel", authorizeRole(roles),verifyAccessToken,exelReport);
+router.get("/dashboard/sales-report/pdf",authorizeRole(roles),verifyAccessToken,downloadSalesReportPDF);
+
 export default router

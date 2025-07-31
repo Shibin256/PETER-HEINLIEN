@@ -38,13 +38,30 @@ const editBrand = async (id, data) => {
 }
 
 
+
+const addCategoryOffer = async ({ categoryId, percentage }) => {
+    console.log(categoryId,percentage)
+  const res = await adminAxiosInstance.post('/api/admin/addOffer', {
+    categoryId,
+    percentage,
+  });
+  return res.data;
+};
+
+ const removeCategoryOffer = async (categoryId) => {
+  const res = await adminAxiosInstance.delete(`/api/admin/removeOffer/${categoryId}`);
+  return res.data;
+};
+
 const inventoryService = {
     addCategory,
     addBrand,
     deleteCategory,
     deleteBrnad,
     editBrand,
-    editCategory
+    editCategory,
+    removeCategoryOffer,
+    addCategoryOffer
 }
 
 export default inventoryService

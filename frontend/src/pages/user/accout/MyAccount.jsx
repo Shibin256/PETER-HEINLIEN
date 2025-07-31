@@ -67,7 +67,7 @@ const MyAccount = () => {
             icon={<img src={wallet} alt="Wallet" className="rounded-md" />}
             title="WALLET"
             description="View balance and add money"
-            onclickFun={() => {}}
+            onclickFun={() => {navigate('/wallet')}}
           />
         </div>
       </div>
