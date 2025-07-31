@@ -195,8 +195,6 @@ export const addAddress = async (req, res) => {
     }
 }
 
-
-
 export const getAllAddress = async (req, res) => {
     try {
         const { id } = req.params
@@ -225,12 +223,9 @@ export const removeAddress = async (req, res) => {
             return res.status(400).json({ message: "Address does not belong to this user" });
         }
 
-        await Address.findByIdAndDelete(addressId)
-
+        await Address.findByIdAndDelete(addressId)git git
         user.addresses = user.addresses.filter(id => id.toString() !== addressId)
-
         await user.save();
-
         res.status(200).json({ message: "Address removed successfully", user: user });
 
     } catch (error) {
@@ -244,23 +239,19 @@ export const SetDefaultAddress = async (req, res) => {
      try {
     const { userId, addressId } = req.params;
 
-    // Step 1: Get user and validate
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Step 2: Check if address belongs to the user
     const belongsToUser = user.addresses.some(id => id.toString() === addressId);
     if (!belongsToUser) {
       return res.status(400).json({ message: 'Address does not belong to this user' });
     }
 
-    // Step 3: Unset default for all of this user's addresses
     await Address.updateMany(
       { _id: { $in: user.addresses } },
       { $set: { defaultAddress: false } }
     );
 
-    // Step 4: Set selected address as default
     await Address.findByIdAndUpdate(addressId, { defaultAddress: true });
 
     res.status(200).json({ message: 'Default address set successfully' });
