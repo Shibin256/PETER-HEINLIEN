@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import InventoryCard from '../../components/admin/InventoryCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, getBrandAndCollection } from '../../features/products/productSlice';
-import { 
-  addBrand, 
-  addCategory, 
-  addCategoryOffer, 
-  deleteBrand, 
-  deleteCategory, 
-  editBrand, 
-  editCategory,
-  removeCategoryOffer,
-//   addCategoryOffer,
-//   removeCategoryOffer
+import { fetchProducts, getBrandAndCategory, getBrandAndCollection } from '../../features/products/productSlice';
+import {
+    addBrand,
+    addCategory,
+    addCategoryOffer,
+    deleteBrand,
+    deleteCategory,
+    editBrand,
+    editCategory,
+    removeCategoryOffer,
+    //   addCategoryOffer,
+    //   removeCategoryOffer
 } from '../../features/admin/inventory/inventorySlice';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
@@ -50,14 +50,14 @@ const Inventory = () => {
     const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
     const dispatch = useDispatch();
-    
+
     // Get all collections and brands
     useEffect(() => {
-        dispatch(getBrandAndCollection())
+        dispatch(getBrandAndCategory({ page: page, limit: 4}))
     }, [dispatch])
 
-    const { brands, categories, categoryBrandTotal } = useSelector(state => state.products)
-
+    const { brands, categories, categoryBrandTotal,page,totalPages } = useSelector(state => state.products)
+    
     // The total category counts
     const categoryCounts = categories.map((cat) => {
         const count = categoryBrandTotal.filter(
@@ -111,7 +111,7 @@ const Inventory = () => {
                             `Category and ${res.payload.deletedProductCount} related product(s) deleted successfully.`,
                             'success'
                         );
-                        dispatch(getBrandAndCollection());
+                        dispatch(getBrandAndCategory({ page: page, limit: 4}));
                     } else {
                         Swal.fire(
                             'Error!',
@@ -147,7 +147,7 @@ const Inventory = () => {
                 const res = await dispatch(addCategory(newCategory.trim()))
                 if (res.payload?.message === "Category created") {
                     toast.success("Category created successfully");
-                    dispatch(getBrandAndCollection())
+                    dispatch(getBrandAndCategory({ page: page, limit: 4}))
                 } else if (res.payload?.message === "Category already exists") {
                     toast.warning("Category already exists");
                 } else {
@@ -218,7 +218,7 @@ const Inventory = () => {
             const res = await dispatch(addBrand(formData)).unwrap();
             if (res) {
                 toast.success('Brand added successfully');
-                dispatch(getBrandAndCollection())
+                dispatch(getBrandAndCategory({ page: page, limit: 4}))
                 setNewBrand("");
                 setBrandDescription("");
                 setBrandLogo(null);
@@ -262,7 +262,7 @@ const Inventory = () => {
 
             if (res) {
                 toast.success('Brand updated successfully');
-                dispatch(getBrandAndCollection());
+                dispatch(getBrandAndCategory({ page: page, limit: 4}));
                 setIsEditingBrand(false);
             }
         } catch (error) {
@@ -295,7 +295,7 @@ const Inventory = () => {
                             `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
                             'success'
                         );
-                        dispatch(getBrandAndCollection());
+                        dispatch(getBrandAndCategory({ page: page, limit: 4}));
                     } else {
                         Swal.fire(
                             'Error!',
@@ -325,7 +325,7 @@ const Inventory = () => {
 
             if (res) {
                 toast.success('Category updated successfully');
-                dispatch(getBrandAndCollection());
+                dispatch(getBrandAndCategory({ page: page, limit: 4}));
                 setIsEditingCategory(false);
             }
         } catch (error) {
@@ -362,7 +362,7 @@ const Inventory = () => {
 
             if (res) {
                 toast.success('Offer added successfully');
-                dispatch(getBrandAndCollection());
+                dispatch(getBrandAndCategory({ page: page, limit: 4}));
                 setSelectedCategoryForOffer(null);
                 setOfferPercentage('');
             }
@@ -385,7 +385,7 @@ const Inventory = () => {
 
             if (res) {
                 toast.success('Offer removed successfully');
-                dispatch(getBrandAndCollection());
+                dispatch(getBrandAndCategory({ page: page, limit: 4}));
                 setShowRemoveConfirm(false);
                 setSelectedCategoryForOffer(null);
             }
@@ -435,6 +435,30 @@ const Inventory = () => {
                 >
                     {selectedOption === 'category' ? 'Add Category' : 'Add Brand'}
                 </button>
+
+                {/* Pagination Buttons */}
+                {selectedOption !== 'category' &&
+                <div className="flex justify-center items-center gap-4 mt-1">
+                    <button
+                        disabled={page <= 1}
+                        onClick={() => dispatch(getBrandAndCategory({ page: page - 1, limit: 4}))}
+                        className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+                    >
+                        &lt;
+                    </button>
+
+                    <span className="text-sm text-gray-700">
+                        Page {page} of {totalPages}
+                    </span>
+
+                    <button
+                        disabled={page >= totalPages}
+                        onClick={() => dispatch(getBrandAndCategory({ page: page + 1, limit: 4}))}
+                        className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+                    >
+                        &gt;
+                    </button>
+                </div>}
             </div>
 
             {isAddingCategory && (
@@ -780,8 +804,8 @@ const Inventory = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                         <h3 className="text-lg font-bold mb-4">
-                            {selectedCategoryForOffer.offerPercentage 
-                                ? 'Update Offer' 
+                            {selectedCategoryForOffer.offerPercentage
+                                ? 'Update Offer'
                                 : 'Add Offer'} for {selectedCategoryForOffer.categoryName}
                         </h3>
                         <input
@@ -859,7 +883,7 @@ const Inventory = () => {
                             editClick={() => handleCategoryEdit(category)}
                             deleteClick={() => handleCategoryDelete(category._id)}
                             offerClick={() => handleAddOfferClick(category)}
-                            removeOfferClick={()=>handleRemoveOfferClick(category)}
+                            removeOfferClick={() => handleRemoveOfferClick(category)}
                             hasOffer={!!category.offerAdded}
                             offerPercentage={category.offerPersentage}
                         />
@@ -882,6 +906,7 @@ const Inventory = () => {
                     ))}
                 </div>
             )}
+
         </div>
     );
 };

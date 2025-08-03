@@ -88,6 +88,19 @@ export const getBrandAndCollection = createAsyncThunk(
   }
 )
 
+//fetching brand and collection
+export const getBrandAndCategory = createAsyncThunk(
+  'product/getBrandAndCategory',
+  async ({page=1,limit=10}, { rejectWithValue }) => {
+    try {
+      const res = await productService.getBrandAndCategory(page,limit)
+      return res
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+)
+
 //fetching single product
 export const getProducById = createAsyncThunk(
   'product/getProductById',
@@ -236,6 +249,23 @@ const productSlice = createSlice({
         state.categoryBrandTotal=result;
       })
       .addCase(getBrandAndCollection.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(getBrandAndCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getBrandAndCategory.fulfilled, (state, action) => {
+        const { brands, category,page,totalPages} = action.payload
+        state.brands = brands
+        state.categories = category
+        state.loading = false
+        state.page=page
+        state.totalPages=totalPages
+      })
+      .addCase(getBrandAndCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

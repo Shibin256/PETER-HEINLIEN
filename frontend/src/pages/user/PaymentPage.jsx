@@ -142,36 +142,36 @@ const PaymentPage = () => {
                 }, 0);
 
             } else if (selectedPayment === 'razorpay') {
-                if(isLocked===true){
+                if (isLocked === true) {
                     toast.error('the cart already locked and need to payment complete')
                     navigate('/')
-                }else{
-                await dispatch(toggleIsLocked({ userID: userId, lock: true }))
+                } else {
+                    await dispatch(toggleIsLocked({ userID: userId, lock: true }))
 
-                let totalAmount = totalPrice + (shippingCost || 0);
-                const paymentSuccess = await handlePayment({ totalPrice: totalAmount })
-                console.log(paymentSuccess)
-                if (paymentSuccess) {
-                    const res = await dispatch(placeOrder({ orderdata: { address, cartItems, totalPrice, shippingCost, userId, deliveryDate }, paymentMethod: selectedPayment })).unwrap();
-                    setOrderId(res.order.orderId)
-                    const date = new Date(res.order.DeliveryDate);
-                    const formattedDeliveryDate = date.toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric"
-                    });
-                    navigate("/order-success", { state: { order: res.order }, replace: true });
-                    dispatch(resetCart());
-                    // First replace with home
-                    navigate('/', { replace: true });
+                    let totalAmount = totalPrice + (shippingCost || 0);
+                    const paymentSuccess = await handlePayment({ totalPrice: totalAmount })
+                    console.log(paymentSuccess)
+                    if (paymentSuccess) {
+                        const res = await dispatch(placeOrder({ orderdata: { address, cartItems, totalPrice, shippingCost, userId, deliveryDate }, paymentMethod: selectedPayment })).unwrap();
+                        setOrderId(res.order.orderId)
+                        const date = new Date(res.order.DeliveryDate);
+                        const formattedDeliveryDate = date.toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric"
+                        });
+                        navigate("/order-success", { state: { order: res.order }, replace: true });
+                        dispatch(resetCart());
+                        // First replace with home
+                        navigate('/', { replace: true });
 
-                    // Now push order success page as a fresh new entry
-                    setTimeout(() => {
-                        navigate('/order-success', { state: { order: res.order } });
-                    }, 0);
+                        // Now push order success page as a fresh new entry
+                        setTimeout(() => {
+                            navigate('/order-success', { state: { order: res.order } });
+                        }, 0);
+                    }
+                    // await dispatch(toggleIsLocked({ userID: userId, lock: false }))
                 }
-                // await dispatch(toggleIsLocked({ userID: userId, lock: false }))
-            }
             } else if (selectedPayment === 'walletPay') {
                 let totalAmount = totalPrice + (shippingCost || 0);
                 if (totalAmount > walletAmount) {
@@ -271,6 +271,7 @@ const PaymentPage = () => {
                     <div className={`p-4 transition-all ${selectedPayment === 'cod' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}>
                         <label className="flex items-center cursor-pointer">
                             <input
+                                disabled={totalPrice > 1000 ? true : false}
                                 type="radio"
                                 name="payment"
                                 className="h-5 w-5 text-green-600 focus:ring-green-500"
@@ -279,7 +280,10 @@ const PaymentPage = () => {
                             />
                             <div className="ml-3">
                                 <span className="block font-medium text-gray-800">Cash on Delivery</span>
+                                {totalPrice < 1000 ?
                                 <span className="block text-sm text-gray-500">Pay when you receive your order</span>
+                                :<span className="block text-sm text-red-500">No delivery for orders over ₹1000</span>
+                                }
                             </div>
                         </label>
                     </div>

@@ -48,7 +48,7 @@ export const createProduct = async (req, res) => {
 //fetch latest collection for home page
 export const getCollection = async (req, res) => {
     try {
-        const latestCollection = await Product.find({isList: { $ne: true }}).sort({ createdAt: -1 }).limit(10)
+        const latestCollection = await Product.find({ isList: { $ne: true } }).sort({ createdAt: -1 }).limit(10)
             .populate('brand') // Populate the brand field with data from the Brands collection
             .populate('category')
             .select('-createdAt -updatedAt');
@@ -73,7 +73,7 @@ export const getAllProducts = async (req, res) => {
     const sortField = req.query.sort || 'createdAt';
     const sortOrder = req.query.order === 'asc' ? 1 : -1;
 
-    const filter = {isList: false };
+    const filter = { isList: false };
 
     if (search) filter.name = { $regex: search, $options: 'i' };
     if (categories.length) filter['category'] = { $in: categories };
@@ -188,10 +188,10 @@ export const updateProduct = async (req, res) => {
 //get all brands and collection form db
 export const getBrandsAndCollection = async (req, res) => {
     try {
-        const category = await Category.find({isList: { $ne: true }}).select('-createdAt -updatedAt')
-        const brands = await Brands.find({isList: { $ne: true }}).sort({ name: 1 }).select('-createdAt -updatedAt')
+        const category = await Category.find({ isList: { $ne: true } }).select('-createdAt -updatedAt')
+        const brands = await Brands.find({ isList: { $ne: true } }).sort({ name: 1 }).select('-createdAt -updatedAt')
 
-        const result = await Product.find({isList: { $ne: true }}).select('-createdAt -updatedAt')
+        const result = await Product.find({ isList: { $ne: true } }).select('-createdAt -updatedAt')
         res.status(200).json({ category, brands, result })
     } catch (error) {
         console.error('Fetching brand and category  Error:', error);
@@ -199,6 +199,27 @@ export const getBrandsAndCollection = async (req, res) => {
     }
 }
 
+export const getBrandAndCategory = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 4;
+        const skip = (page - 1) * limit;
+
+        const category = await Category.find({ isList: { $ne: true } }).select('-createdAt -updatedAt')
+        const total = await Brands.countDocuments({ isList: { $ne: true } })
+        const brands = await Brands.find({ isList: { $ne: true } }).sort({ name: 1 }).select('-createdAt -updatedAt').skip(skip).limit(limit)
+
+        res.status(200).json({
+            category, 
+            brands,
+            page,
+            totalPages: Math.ceil(total / limit),
+        })
+    } catch (error) {
+        console.error('Fetching brand and category  Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
 //get products by its Id with brands and category
 export const getProductById = async (req, res) => {
     try {
@@ -225,7 +246,7 @@ export const getRelatedProducts = async (req, res) => {
 
         const similarProducts = await Product.find({
             _id: { $ne: productId },
-            isList: { $ne: true} ,
+            isList: { $ne: true },
             category: currentProduct.category
         }).limit(6).select('-createdAt -updatedAt')
 
@@ -259,7 +280,7 @@ export const addProductOffer = async (req, res) => {
         console.error('Error adding offer:', error);
         res.status(500).json({ message: 'Server error while adding offer' });
     }
-}   
+}
 
 
 
