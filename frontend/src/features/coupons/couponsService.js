@@ -19,7 +19,12 @@ const fetchAllCoupons = async (search, page, limit) => {
   const response = await adminAxiosInstance.get("/api/admin/coupons", {
     params: params,
   });
-  console.log(response.data, "servbiece");
+  return response.data;
+};
+
+
+const fetchAdsCoupons= async () => {
+  const response = await adminAxiosInstance.get("/api/user/fetchAdsCoupons");
   return response.data;
 };
 
@@ -69,6 +74,7 @@ const couponsService = {
   applyCoupon,
   updateCoupon,
   removeCoupon,
+  fetchAdsCoupons
 };
 
 export default couponsService;

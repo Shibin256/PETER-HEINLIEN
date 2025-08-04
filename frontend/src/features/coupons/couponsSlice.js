@@ -25,6 +25,18 @@ export const fetchCoupons = createAsyncThunk(
   },
 );
 
+export const fetchAdsCoupons = createAsyncThunk(
+  "admin/fetchAdsCoupons",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await couponsService.fetchAdsCoupons();
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
 export const deleteCoupon = createAsyncThunk(
   "admin/deleteCoupon",
   async (couponId, { rejectWithValue }) => {
@@ -82,6 +94,7 @@ const couponsSlice = createSlice({
   name: "coupons",
   initialState: {
     coupons: [],
+    adsCoupon:null,
     coupon: null,
     page: 1,
     totalPages: 1,
@@ -125,6 +138,21 @@ const couponsSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+       .addCase(fetchAdsCoupons.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAdsCoupons.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.adsCoupon = action.payload.coupon;
+      })
+      .addCase(fetchAdsCoupons.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+
       .addCase(deleteCoupon.pending, (state) => {
         state.loading = true;
       })

@@ -12,7 +12,7 @@ import multer from 'multer';
 import { addFromWishlistToCart, addItemToCart, getCart, removeCartItem, toggleIsLocked, updateCartItem } from '../controller/cartController.js';
 import { cancelOrderItem, cancelOrderSingleItem, downloadInvoice, getOrders, placeOrder, returnOrderItem} from '../controller/orderController.js';
 import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymentController.js';
-import { applyCoupon, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
+import { applyCoupon, fetchAdsCoupons, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
 
 const router = express.Router();
@@ -62,6 +62,7 @@ router.post('/verify-payment',verifyAccessToken,verifyRazorpayPayment,fetchCoupo
 
 router.post('/coupons/applyCoupon', verifyAccessToken,applyCoupon);
 router.delete('/coupons/:couponId', verifyAccessToken, removeCoupon);
+router.get('/fetchAdsCoupons',verifyAccessToken,fetchAdsCoupons)
 
 
 router.post('/wallet/:userId/:amount/:paymentId',verifyAccessToken,addToWallet)

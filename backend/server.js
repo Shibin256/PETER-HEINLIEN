@@ -35,7 +35,7 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(morgan("combined", { stream: { write: (message) => logger.info(message.trim()) } }));
+// app.use(morgan("combined", { stream: { write: (message) => logger.info(message.trim()) } }));
 
 app.use("/api/products", productRoutes);
 app.use('/api/admin',adminRouter)

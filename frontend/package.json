@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
+    "framer-motion": "^12.23.12",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.522.0",
