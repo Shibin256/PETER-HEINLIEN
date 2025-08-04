@@ -1,17 +1,16 @@
-import React, { useEffect } from 'react';
-import Title from '../common/Title';
-import heroimg from '../../assets/herosectionwatch.jpg';
-import ProductCard from '../common/ProductCard';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCollection } from '../../features/products/productSlice';
+import React, { useEffect } from "react";
+import Title from "../common/Title";
+import ProductCard from "../common/ProductCard";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCollection } from "../../features/products/productSlice";
 
 const LatestCollection = () => {
-  const dispatch=useDispatch()
-  useEffect(()=>{
-      dispatch(fetchCollection())
-  },[])
-  
-  const {latestCollection}=useSelector(state=>state.products)
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchCollection());
+  }, []);
+
+  const { latestCollection } = useSelector((state) => state.products);
   return (
     <div className="latest-collection my-10 px-2 sm:px-4">
       {/* Heading Section */}

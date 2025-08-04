@@ -1,30 +1,34 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { downloadSalesReportExcel, downloadSalesReportPdf, fetchSalesReport } from '../../features/admin/dashboard/dashboardSlice';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import {
+  downloadSalesReportExcel,
+  downloadSalesReportPdf,
+  fetchSalesReport,
+} from "../../features/admin/dashboard/dashboardSlice";
 
 const Dashboard = () => {
-  const [reportPeriod, setReportPeriod] = useState('Custom Date Range');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [reportPeriod, setReportPeriod] = useState("Custom Date Range");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [totalSales, setTotalSales] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalDiscounts, setTotalDiscounts] = useState(0);
   const [avgOrderValue, setAvgOrderValue] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState('');
+  const [selectedFormat, setSelectedFormat] = useState("");
 
-  const dispatch = useDispatch()
-  const { salesReport } = useSelector(state => state.dashboard)
+  const dispatch = useDispatch();
+  // const { salesReport } = useSelector((state) => state.dashboard);
 
   const handleReportPeriodChange = (e) => {
     setReportPeriod(e.target.value);
-    setStartDate('');
-    setEndDate('');
+    setStartDate("");
+    setEndDate("");
   };
 
   const applyFilters = async () => {
-    console.log(startDate)
+    console.log(startDate);
     const today = new Date().toISOString().split("T")[0];
 
     if ((startDate && startDate > today) || (endDate && endDate > today)) {
@@ -32,34 +36,42 @@ const Dashboard = () => {
       return;
     }
 
-    if (reportPeriod != "Custom Date Range" && startDate == '') {
-      toast.warning('please select a date')
+    if (reportPeriod != "Custom Date Range" && startDate == "") {
+      toast.warning("please select a date");
       return;
     }
 
-    if (reportPeriod == "Custom Date Range" && (startDate == '' || endDate == '')) {
-      toast.warning('Please select a date');
+    if (
+      reportPeriod == "Custom Date Range" &&
+      (startDate == "" || endDate == "")
+    ) {
+      toast.warning("Please select a date");
       return;
     }
 
-
-    if (reportPeriod === "Custom Date Range" && startDate && endDate && endDate < startDate) {
+    if (
+      reportPeriod === "Custom Date Range" &&
+      startDate &&
+      endDate &&
+      endDate < startDate
+    ) {
       toast.warning("End date cannot be earlier than start date.");
       return;
     }
 
-    const res = await dispatch(fetchSalesReport({ type: reportPeriod, startDate, endDate }))
+    const res = await dispatch(
+      fetchSalesReport({ type: reportPeriod, startDate, endDate }),
+    );
     setTotalSales(res.payload.totalSales);
     setTotalOrders(res.payload.totalOrders);
     setTotalDiscounts(res.payload.totalDiscount);
     setAvgOrderValue(res.payload.avgOrderValue);
   };
 
-
   const resetFilters = () => {
-    setReportPeriod('Custom Date Range');
-    setStartDate('');
-    setEndDate('');
+    setReportPeriod("Custom Date Range");
+    setStartDate("");
+    setEndDate("");
     setTotalSales(0);
     setTotalOrders(0);
     setTotalDiscounts(0);
@@ -70,30 +82,36 @@ const Dashboard = () => {
     setShowModal(true);
   };
 
-  const handleDownload = async() => {
-     if (reportPeriod != "Custom Date Range" && startDate == '') {
-      toast.warning('please select a date')
+  const handleDownload = async () => {
+    if (reportPeriod != "Custom Date Range" && startDate == "") {
+      toast.warning("please select a date");
       return;
     }
 
-    if (reportPeriod == "Custom Date Range" && (startDate == '' || endDate == '')) {
-      toast.warning('Please select a date');
+    if (
+      reportPeriod == "Custom Date Range" &&
+      (startDate == "" || endDate == "")
+    ) {
+      toast.warning("Please select a date");
       return;
     }
 
-    if(selectedFormat=='Excel'){
-        const res=await dispatch(downloadSalesReportExcel({ type: reportPeriod, startDate, endDate }))
-    }else{
-        const res=await dispatch(downloadSalesReportPdf({ type: reportPeriod, startDate, endDate }))
-        console.log(res)
+    if (selectedFormat == "Excel") {
+      await dispatch(
+        downloadSalesReportExcel({ type: reportPeriod, startDate, endDate }),
+      );
+    } else {
+      await dispatch(
+        downloadSalesReportPdf({ type: reportPeriod, startDate, endDate }),
+      );
     }
     setShowModal(false);
-    setSelectedFormat('');
+    setSelectedFormat("");
   };
 
   const handleCancel = () => {
     setShowModal(false);
-    setSelectedFormat('');
+    setSelectedFormat("");
   };
 
   return (
@@ -102,44 +120,76 @@ const Dashboard = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Generate Report</h3>
-            <p className="text-gray-600 mb-4">Select the format for your report:</p>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Generate Report
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Select the format for your report:
+            </p>
 
             <div className="space-y-3 mb-6">
               <div
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === 'PDF' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:bg-gray-50'}`}
-                onClick={() => setSelectedFormat('PDF')}
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === "PDF" ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:bg-gray-50"}`}
+                onClick={() => setSelectedFormat("PDF")}
               >
                 <div className="flex items-center">
-                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === 'PDF' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-400'}`}>
-                    {selectedFormat === 'PDF' && (
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <div
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === "PDF" ? "border-indigo-500 bg-indigo-500" : "border-gray-400"}`}
+                  >
+                    {selectedFormat === "PDF" && (
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     )}
                   </div>
                   <div>
                     <p className="font-medium">PDF Document</p>
-                    <p className="text-sm text-gray-500">High quality printable format</p>
+                    <p className="text-sm text-gray-500">
+                      High quality printable format
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === 'Excel' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:bg-gray-50'}`}
-                onClick={() => setSelectedFormat('Excel')}
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === "Excel" ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:bg-gray-50"}`}
+                onClick={() => setSelectedFormat("Excel")}
               >
                 <div className="flex items-center">
-                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === 'Excel' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-400'}`}>
-                    {selectedFormat === 'Excel' && (
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <div
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === "Excel" ? "border-indigo-500 bg-indigo-500" : "border-gray-400"}`}
+                  >
+                    {selectedFormat === "Excel" && (
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     )}
                   </div>
                   <div>
                     <p className="font-medium">Excel Spreadsheet</p>
-                    <p className="text-sm text-gray-500">Editable data format</p>
+                    <p className="text-sm text-gray-500">
+                      Editable data format
+                    </p>
                   </div>
                 </div>
               </div>
@@ -155,7 +205,7 @@ const Dashboard = () => {
               <button
                 onClick={handleDownload}
                 disabled={!selectedFormat}
-                className={`px-4 py-2 rounded-lg text-white transition-colors ${selectedFormat ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'}`}
+                className={`px-4 py-2 rounded-lg text-white transition-colors ${selectedFormat ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-300 cursor-not-allowed"}`}
               >
                 Download
               </button>
@@ -168,7 +218,9 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-            <p className="text-gray-600">Track and analyze your sales performance</p>
+            <p className="text-gray-600">
+              Track and analyze your sales performance
+            </p>
           </div>
           <button
             onClick={handleGenerateReport}
@@ -179,11 +231,18 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Sales Reports</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Sales Reports
+          </h2>
 
           <div className="flex flex-col md:flex-row md:items-end gap-4 mb-6">
             <div className="flex-1">
-              <label htmlFor="report-period" className="block text-sm font-medium text-gray-700 mb-1">Report Period</label>
+              <label
+                htmlFor="report-period"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Report Period
+              </label>
               <select
                 id="report-period"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -198,9 +257,14 @@ const Dashboard = () => {
               </select>
             </div>
 
-            {(reportPeriod !== 'Custom Date Range') && (
+            {reportPeriod !== "Custom Date Range" && (
               <div className="flex-1">
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label
+                  htmlFor="date"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Date
+                </label>
                 <input
                   id="date"
                   type="date"
@@ -212,25 +276,35 @@ const Dashboard = () => {
               </div>
             )}
 
-            {reportPeriod === 'Custom Date Range' && (
+            {reportPeriod === "Custom Date Range" && (
               <>
                 <div className="flex-1">
-                  <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <label
+                    htmlFor="start-date"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Start Date
+                  </label>
                   <input
                     id="start-date"
                     type="date"
-                    max={new Date().toISOString().split("T")[0]}  // Prevent future dates
+                    max={new Date().toISOString().split("T")[0]} // Prevent future dates
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                   />
                 </div>
                 <div className="flex-1">
-                  <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <label
+                    htmlFor="end-date"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    End Date
+                  </label>
                   <input
                     id="end-date"
                     type="date"
-                    max={new Date().toISOString().split("T")[0]}  // Prevent future dates
+                    max={new Date().toISOString().split("T")[0]} // Prevent future dates
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
@@ -258,7 +332,9 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
             <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-5 rounded-xl shadow-sm border border-indigo-50">
               <p className="text-sm font-medium text-indigo-600">Total Sales</p>
-              <p className="text-3xl font-bold text-gray-800 mt-2">₹{totalSales.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">
+                ₹{totalSales.toLocaleString()}
+              </p>
               {/* <div className="mt-2 text-xs text-indigo-500">
                 <span className="inline-flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -271,7 +347,9 @@ const Dashboard = () => {
 
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl shadow-sm border border-green-50">
               <p className="text-sm font-medium text-green-600">Total Orders</p>
-              <p className="text-3xl font-bold text-gray-800 mt-2">{totalOrders}</p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">
+                {totalOrders}
+              </p>
               {/* <div className="mt-2 text-xs text-green-500">
                 <span className="inline-flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -283,8 +361,12 @@ const Dashboard = () => {
             </div>
 
             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-5 rounded-xl shadow-sm border border-yellow-50">
-              <p className="text-sm font-medium text-yellow-600">Total Discounts</p>
-              <p className="text-3xl font-bold text-gray-800 mt-2">₹{totalDiscounts.toLocaleString()}</p>
+              <p className="text-sm font-medium text-yellow-600">
+                Total Discounts
+              </p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">
+                ₹{totalDiscounts.toLocaleString()}
+              </p>
               {/* <div className="mt-2 text-xs text-yellow-500">
                 <span className="inline-flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -296,8 +378,12 @@ const Dashboard = () => {
             </div>
 
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-sm border border-gray-50">
-              <p className="text-sm font-medium text-gray-600">Avg. Order Value</p>
-              <p className="text-3xl font-bold text-gray-800 mt-2">₹{avgOrderValue.toLocaleString()}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Avg. Order Value
+              </p>
+              <p className="text-3xl font-bold text-gray-800 mt-2">
+                ₹{avgOrderValue.toLocaleString()}
+              </p>
               {/* <div className="mt-2 text-xs text-gray-500">
                 <span className="inline-flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

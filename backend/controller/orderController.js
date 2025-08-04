@@ -3,7 +3,6 @@ import Counter from "../model/counterModel.js";
 import Order from "../model/orderModel.js";
 import Product from "../model/productModel.js";
 import PDFDocument from 'pdfkit';
-import logger from "../utils/logger.js";
 import Wallet from "../model/walletModal.js";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -190,7 +189,7 @@ export const cancelOrderItem = async (req, res) => {
         await order.save();
         return res.status(200).json({ message: 'Item cancelled successfully', order });
     } catch (error) {
-        console.error(err);
+        console.error(error);
         return res.status(500).json({ message: 'Server error' });
     }
 }
@@ -236,7 +235,7 @@ export const cancelOrderSingleItem = async (req, res) => {
         const order = await Order.find({ "UserID": UserID }).select('-createdAt -updatedAt');
         return res.status(200).json({ message: 'Item cancelled successfully', order });
     } catch (error) {
-        console.error(err);
+        console.error(error);
         return res.status(500).json({ message: 'Server error' });
     }
 }
@@ -387,7 +386,7 @@ export const getAllOrders = async (req, res) => {
 
 export const returnOrderItem = async (req, res) => {
     const { itemOrderId } = req.params;
-    const { reason, deatials } = req.body;
+    const { reason } = req.body;
     try {
         const orderItem = await Order.findOne({ "Items.itemOrderId": itemOrderId }).select('-createdAt -updatedAt');
         if (!orderItem) {

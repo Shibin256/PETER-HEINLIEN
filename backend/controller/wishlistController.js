@@ -18,6 +18,7 @@ export const addToWishlist = async (req, res) => {
     await wishlist.save();
     res.status(200).json(wishlist);
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: 'Failed to add to wishlist' });
   }
 };
@@ -33,6 +34,7 @@ export const removeFromWishlist = async (req, res) => {
     }
     res.status(200).json({ message: 'Removed from wishlist' });
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: 'Failed to remove from wishlist' });
   }
 };
@@ -47,6 +49,8 @@ export const getUserWishlist = async (req, res) => {
 
     res.status(200).json(wishlist?.productIds || []);
   } catch (err) {
+    console.log(err)
+
     res.status(500).json({ message: 'Failed to fetch wishlist' });
   }
 };
@@ -70,6 +74,7 @@ export const getWishedProduct = async (req, res) => {
       res.status(200).json({ wished: false });
     }
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: 'Failed to check wishlist product' });
   }
 };

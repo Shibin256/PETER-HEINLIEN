@@ -1,4 +1,3 @@
-import otpModel from "../model/otpModel.js"
 import User from "../model/userModel.js"
 import bcrypt from 'bcrypt'
 import cloudinary from "../utils/cloudinary.js";

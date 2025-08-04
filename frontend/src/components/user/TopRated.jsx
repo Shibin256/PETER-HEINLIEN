@@ -1,18 +1,16 @@
-import React, { useEffect } from 'react';
-import Title from '../common/Title';
-import heroimg from '../../assets/herosectionwatch.jpg';
-import ProductCard from '../common/ProductCard';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../features/products/productSlice';
+import { useEffect } from "react";
+import Title from "../common/Title";
+import ProductCard from "../common/ProductCard";
+import { useDispatch, useSelector } from "react-redux";
 
 const TopRated = () => {
-  const dispatch=useDispatch()
-  const {products}=useSelector(state=>state.products)
+  const dispatch = useDispatch();
+  const { products } = useSelector((state) => state.products);
   // console.log(products)
 
-  useEffect(()=>{
-      // dispatch(fetchProducts())
-  },[]) // Create array of 10 products
+  useEffect(() => {
+    // dispatch(fetchProducts())
+  }, []); // Create array of 10 products
 
   return (
     <div className="latest-collection my-10 px-2 sm:px-4">

@@ -1,73 +1,73 @@
-import React, { useState } from 'react';
-import Title from '../../../components/common/Title';
-import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { addAddress } from '../../../features/accountSettings/accountSlice';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import Title from "../../../components/common/Title";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { addAddress } from "../../../features/accountSettings/accountSlice";
+import { useNavigate } from "react-router-dom";
 
 const AddAddress = () => {
   const [addressData, setAddressData] = useState({
-    name: '',
-    houseNo: '',
-    locality: '',
-    city: '',
-    state: '',
-    pin: '',
-    phone: '',
-    altPhone: '',
-    addressType: 'home', // home or work
-    defaultAddress: false
+    name: "",
+    houseNo: "",
+    locality: "",
+    city: "",
+    state: "",
+    pin: "",
+    phone: "",
+    altPhone: "",
+    addressType: "home", // home or work
+    defaultAddress: false,
   });
 
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { user } = useSelector(state => state.auth)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
   // console.log(user,'user is here')
 
   const indianStates = [
-    'Andhra Pradesh',
-    'Arunachal Pradesh',
-    'Assam',
-    'Bihar',
-    'Chhattisgarh',
-    'Goa',
-    'Gujarat',
-    'Haryana',
-    'Himachal Pradesh',
-    'Jharkhand',
-    'Karnataka',
-    'Kerala',
-    'Lakshadweep',
-    'Madhya Pradesh',
-    'Maharashtra',
-    'Manipur',
-    'Meghalaya',
-    'Mizoram',
-    'Nagaland',
-    'Odisha',
-    'Punjab',
-    'Rajasthan',
-    'Sikkim',
-    'Tamil Nadu',
-    'Telangana',
-    'Tripura',
-    'Uttar Pradesh',
-    'Uttarakhand',
-    'West Bengal',
-    'Andaman and Nicobar Islands',
-    'Chandigarh',
-    'Dadra and Nagar Haveli and Daman and Diu',
-    'Delhi',
-    'Jammu and Kashmir',
-    'Ladakh',
-    'Puducherry'
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Lakshadweep",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Andaman and Nicobar Islands",
+    "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Jammu and Kashmir",
+    "Ladakh",
+    "Puducherry",
   ];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setAddressData(prev => ({
+    setAddressData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -75,16 +75,30 @@ const AddAddress = () => {
     e.preventDefault();
 
     // Validate required fields
-    const requiredFields = ['name', 'houseNo', 'locality', 'city', 'state', 'pin', 'phone'];
-    const missingFields = requiredFields.filter(field => !addressData[field].trim());
+    const requiredFields = [
+      "name",
+      "houseNo",
+      "locality",
+      "city",
+      "state",
+      "pin",
+      "phone",
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !addressData[field].trim(),
+    );
 
     if (missingFields.length > 0) {
-      toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      toast.error(
+        `Please fill in all required fields: ${missingFields.join(", ")}`,
+      );
       return;
     }
 
-    if(addressData.altPhone === addressData.phone){
-      toast.error('Alternative phone number cannot be the same as the primary phone number.');
+    if (addressData.altPhone === addressData.phone) {
+      toast.error(
+        "Alternative phone number cannot be the same as the primary phone number.",
+      );
       return;
     }
 
@@ -99,24 +113,25 @@ const AddAddress = () => {
       phone: addressData.phone,
       altPhone: addressData.altPhone,
       addressType: addressData.addressType,
-      defaultAddress: addressData.defaultAddress
+      defaultAddress: addressData.defaultAddress,
     };
 
-    console.log('New Address Data:', formattedAddress);
+    console.log("New Address Data:", formattedAddress);
 
     try {
-      await dispatch(addAddress({ userId: user._id, data: formattedAddress })).then((res) => {
-        if (res.type.endsWith('/fulfilled')) {
-          toast.success('✅ address added successfully!');
-          navigate('/my-address')
+      await dispatch(
+        addAddress({ userId: user._id, data: formattedAddress }),
+      ).then((res) => {
+        if (res.type.endsWith("/fulfilled")) {
+          toast.success("✅ address added successfully!");
+          navigate("/my-address");
         } else {
-          toast.error(res?.error?.message || 'Failed to delete user.');
+          toast.error(res?.error?.message || "Failed to delete user.");
         }
       });
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || 'error hapened')
-
+      toast.error(error.response?.data?.message || "error hapened");
     }
 
     // Here you would typically save to your state management or API
@@ -125,16 +140,16 @@ const AddAddress = () => {
 
     // Reset form
     setAddressData({
-      name: '',
-      houseNo: '',
-      locality: '',
-      city: '',
-      state: '',
-      pin: '',
-      phone: '',
-      altPhone: '',
-      addressType: 'home',
-      defaultAddress: false
+      name: "",
+      houseNo: "",
+      locality: "",
+      city: "",
+      state: "",
+      pin: "",
+      phone: "",
+      altPhone: "",
+      addressType: "home",
+      defaultAddress: false,
     });
   };
 
@@ -145,13 +160,15 @@ const AddAddress = () => {
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
-      <Title text1={'Add New'} text2={'Address'} />
+      <Title text1={"Add New"} text2={"Address"} />
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Address Type Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Address Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Address Type
+            </label>
             <div className="flex space-x-6">
               <div className="flex items-center">
                 <input
@@ -159,11 +176,14 @@ const AddAddress = () => {
                   id="home"
                   name="addressType"
                   value="home"
-                  checked={addressData.addressType === 'home'}
+                  checked={addressData.addressType === "home"}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
-                <label htmlFor="home" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="home"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Home
                 </label>
               </div>
@@ -173,11 +193,14 @@ const AddAddress = () => {
                   id="work"
                   name="addressType"
                   value="work"
-                  checked={addressData.addressType === 'work'}
+                  checked={addressData.addressType === "work"}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
-                <label htmlFor="work" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="work"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Work
                 </label>
               </div>
@@ -333,7 +356,10 @@ const AddAddress = () => {
               onChange={handleInputChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="defaultAddress" className="ml-2 block text-sm text-gray-700">
+            <label
+              htmlFor="defaultAddress"
+              className="ml-2 block text-sm text-gray-700"
+            >
               Set as default address
             </label>
           </div>

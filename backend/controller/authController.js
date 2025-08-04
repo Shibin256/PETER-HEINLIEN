@@ -10,7 +10,6 @@ const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 //google authontication
 import { OAuth2Client } from 'google-auth-library';
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
-import Product from "../model/productModel.js";
 import Wallet from "../model/walletModal.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 

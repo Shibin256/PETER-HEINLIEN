@@ -1,135 +1,148 @@
-import React, { useEffect, useState } from 'react';
-import { FaStar, FaRegStar, FaHeart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import heroImg from '../../assets/herosectionwatch.jpg';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProducById, relatedProducts } from '../../features/products/productSlice';
-import { useNavigate, useParams } from 'react-router-dom';
-import ImageZoom from '../../components/common/ImageZoom';
-import { addToWishlist, getWishedProduct, getWishlist, removeFromWishlist } from '../../features/wishlist/wishlistSlice';
-import { toast } from 'react-toastify';
-import { addToCart } from '../../features/cart/cartSlice';
-import Title from '../../components/common/Title';
-import ProductCard from '../../components/common/ProductCard';
+import React, { useEffect, useState } from "react";
+import {
+  FaStar,
+  FaRegStar,
+  FaHeart,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getProducById,
+  relatedProducts,
+} from "../../features/products/productSlice";
+import { useNavigate, useParams } from "react-router-dom";
+import ImageZoom from "../../components/common/ImageZoom";
+import {
+  addToWishlist,
+  getWishedProduct,
+  removeFromWishlist,
+} from "../../features/wishlist/wishlistSlice";
+import { toast } from "react-toastify";
+import { addToCart } from "../../features/cart/cartSlice";
+import Title from "../../components/common/Title";
+import ProductCard from "../../components/common/ProductCard";
 
 const ProductDetails = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-  const { id } = useParams()
+  const { id } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-
-  const storedUser = localStorage.getItem('user');
+  const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  const { singleProduct, productsRelated } = useSelector(state => state.products)
-  console.log(productsRelated, 'realated products')
+  const { singleProduct, productsRelated } = useSelector(
+    (state) => state.products,
+  );
+  console.log(productsRelated, "realated products");
   // First: fetch the product
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id));
-      dispatch(relatedProducts(id))
+      dispatch(relatedProducts(id));
     }
   }, [id, dispatch]);
 
   // Then: check if it's wishlisted (once product and user are available)
   useEffect(() => {
     if (user && singleProduct?._id) {
-      dispatch(getWishedProduct({ userId: user._id, productId: singleProduct._id }))
-        .then((res) => {
-          if (res.payload?.wished) {
-            setIsWishlisted(true);
-          } else {
-            setIsWishlisted(false);
-          }
-        });
+      dispatch(
+        getWishedProduct({ userId: user._id, productId: singleProduct._id }),
+      ).then((res) => {
+        if (res.payload?.wished) {
+          setIsWishlisted(true);
+        } else {
+          setIsWishlisted(false);
+        }
+      });
     }
   }, [user, singleProduct, dispatch]);
 
-  const product = singleProduct
-  let shippingCost = 0;
-  const totalQuantity = product.totalQuantity
+  const product = singleProduct;
+  let shippingCost =0;
+  const totalQuantity = product.totalQuantity;
   if (product && product.price < 500) {
     shippingCost = 50;
   }
 
-  
-
-
   if (!product || !product.images || product.images.length === 0) {
     return <div className="text-center p-10">Loading product details...</div>;
   }
-
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + product.images.length) % product.images.length,
+    );
   };
 
   const handlewishClick = async (e) => {
     e.preventDefault(); // Prevent link navigation when clicking the heart icon
     if (!user) {
-      toast.warning('Please login to use wishlist');
+      toast.warning("Please login to use wishlist");
       return;
     }
 
     try {
       if (!isWishlisted) {
-        dispatch(addToWishlist({ userId: user._id, productId: product._id }))
-        toast.success('Added to wishlist');
+        dispatch(addToWishlist({ userId: user._id, productId: product._id }));
+        toast.success("Added to wishlist");
       } else {
         // Remove from wishlist
-        dispatch(removeFromWishlist({ userId: user._id, productId: product._id }))
-        toast.info('Removed from wishlist');
+        dispatch(
+          removeFromWishlist({ userId: user._id, productId: product._id }),
+        );
+        toast.info("Removed from wishlist");
       }
-      setIsWishlisted(!isWishlisted)
+      setIsWishlisted(!isWishlisted);
     } catch (error) {
-      console.error('Wishlist error:', err);
-      toast.error('Something went wrong');
+      console.error("Wishlist error:", error);
+      toast.error("Something went wrong");
     }
-
-  }
+  };
 
   const handleAddCart = async (e) => {
     e.preventDefault();
     if (!user) {
-      toast.warning('Please login to use Cart');
+      toast.warning("Please login to use Cart");
       return;
     }
     try {
-      const res = await dispatch(addToCart({ userId: user._id, productId: singleProduct._id }))
+      const res = await dispatch(
+        addToCart({ userId: user._id, productId: singleProduct._id }),
+      );
       console.log(res.payload);
-      if (res.payload === 'max quantity added') {
-        toast.warning('max quantity added');
-      } else if (res.payload === 'Product is out of stock') {
-        toast.warning('Product is out of stock')
-      }
-      else {
-        toast.success('Added to cart');
-        navigate('/cart')
+      if (res.payload === "max quantity added") {
+        toast.warning("max quantity added");
+      } else if (res.payload === "Product is out of stock") {
+        toast.warning("Product is out of stock");
+      } else {
+        toast.success("Added to cart");
+        navigate("/cart");
       }
     } catch (err) {
-      console.error('cart error:', err);
-      toast.error('Something went wrong');
+      console.error("cart error:", err);
+      toast.error("Something went wrong");
     }
-  }
+  };
 
   return (
     <div className="px-6 md:px-16 lg:px-24 py-12">
       <div className="flex flex-col lg:flex-row gap-12">
         <div className="flex flex-col-reverse md:flex-row gap-6 w-full lg:w-1/2">
-
           {/* Thumbnails */}
           <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
             {product.images.map((img, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${currentImageIndex === index ? 'border-blue-500' : 'border-gray-200'}`}
+                className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${currentImageIndex === index ? "border-blue-500" : "border-gray-200"}`}
               >
                 <img
                   src={img}
@@ -164,30 +177,50 @@ const ProductDetails = () => {
         {/* Right - Product Info */}
         <div className="w-full lg:w-1/2">
           <div className="mb-6">
-            <span className="text-sm font-medium text-blue-600">{product.category?.categoryName}</span>
-            <h1 className="text-3xl md:text-4xl font-bold mt-1 mb-2">{product.name}</h1>
+            <span className="text-sm font-medium text-blue-600">
+              {product.category?.categoryName}
+            </span>
+            <h1 className="text-3xl md:text-4xl font-bold mt-1 mb-2">
+              {product.name}
+            </h1>
             <div className="flex items-center gap-3 mb-4">
               <div className="flex text-yellow-500">
                 {Array(5)
                   .fill()
                   .map((_, i) =>
-                    i < product.rating ? <FaStar key={i} /> : <FaRegStar key={i} />
+                    i < product.rating ? (
+                      <FaStar key={i} />
+                    ) : (
+                      <FaRegStar key={i} />
+                    ),
                   )}
               </div>
               <span className="text-sm text-gray-500">(2 reviews)</span>
-            </div><div className="mb-4">
+            </div>
+            <div className="mb-4">
               {product.offerPrice ? (
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-2xl font-semibold text-red-600">₹{product.offerPrice}</p>
-                    <p className="text-lg text-gray-500 line-through">₹{product.price}</p>
+                    <p className="text-2xl font-semibold text-red-600">
+                      ₹{product.offerPrice}
+                    </p>
+                    <p className="text-lg text-gray-500 line-through">
+                      ₹{product.price}
+                    </p>
                     <span className="text-sm text-green-600 font-medium">
-                      ({Math.round(((product.price - product.offerPrice) / product.price) * 100)}% OFF)
+                      (
+                      {Math.round(
+                        ((product.price - product.offerPrice) / product.price) *
+                          100,
+                      )}
+                      % OFF)
                     </span>
                   </div>
                 </div>
               ) : (
-                <p className="text-2xl font-semibold text-gray-800">₹{product.price}</p>
+                <p className="text-2xl font-semibold text-gray-800">
+                  ₹{product.price}
+                </p>
               )}
             </div>
 
@@ -224,7 +257,9 @@ const ProductDetails = () => {
 
                 <button
                   onClick={() =>
-                    setQuantity((prev) => Math.min(Math.min(4, totalQuantity), prev + 1))
+                    setQuantity((prev) =>
+                      Math.min(Math.min(4, totalQuantity), prev + 1),
+                    )
                   }
                   className="text-xl text-gray-600 hover:text-gray-900"
                   disabled={quantity >= Math.min(4, totalQuantity)}
@@ -239,7 +274,8 @@ const ProductDetails = () => {
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <button
               onClick={handleAddCart}
-              className="flex-1 bg-teal-700 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
+              className="flex-1 bg-teal-700 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md"
+            >
               ADD TO CART
             </button>
             {/* <button  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
@@ -250,19 +286,22 @@ const ProductDetails = () => {
           {/* Wishlist */}
           <button
             onClick={handlewishClick}
-            className={`flex items-center gap-2 mb-8 ${isWishlisted ? 'text-red-500' : 'text-gray-600'} transition-colors`}
+            className={`flex items-center gap-2 mb-8 ${isWishlisted ? "text-red-500" : "text-gray-600"} transition-colors`}
           >
-            <FaHeart className={isWishlisted ? 'fill-current' : ''} />
-            <span>{isWishlisted ? 'REMOVE FROM WISHLIST' : 'ADD TO WISHLIST'}</span>
+            <FaHeart className={isWishlisted ? "fill-current" : ""} />
+            <span>
+              {isWishlisted ? "REMOVE FROM WISHLIST" : "ADD TO WISHLIST"}
+            </span>
           </button>
 
           {/* Product Meta */}
           <div className="text-sm text-gray-700 border-t pt-6">
             <p className="mb-2">
-              <span className="font-medium">Category:</span> {product.category?.categoryName}
+              <span className="font-medium">Category:</span>{" "}
+              {product.category?.categoryName}
             </p>
             <p>
-              <span className="font-medium">Tags:</span>{' '}
+              <span className="font-medium">Tags:</span>{" "}
               <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium">
                 {product.tags}
               </span>
@@ -318,8 +357,8 @@ const ProductDetails = () => {
         {/* Title - Left Aligned */}
         <div className="mb-10">
           <Title
-            text1={'Related'}
-            text2={'Products'}
+            text1={"Related"}
+            text2={"Products"}
             className="text-2xl font-bold text-gray-800"
           />
         </div>
@@ -327,10 +366,7 @@ const ProductDetails = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {productsRelated.map((product) => (
-            <div
-              key={product._id}
-              className="w-full max-w-[280px] mx-auto"
-            >
+            <div key={product._id} className="w-full max-w-[280px] mx-auto">
               <ProductCard product={product} />
             </div>
           ))}

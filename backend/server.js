@@ -20,6 +20,9 @@ import cors from 'cors'
 
 //connecting the DB file
 import ConnectDB from "./config/connectDB.js";
+//logger
+import morgan from "morgan";
+import logger from './utils/logger.js';
 
 
 ConnectDB()
@@ -32,6 +35,8 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use(morgan("combined", { stream: { write: (message) => logger.info(message.trim()) } }));
+
 app.use("/api/products", productRoutes);
 app.use('/api/admin',adminRouter)
 app.use('/api/auth',authRoutes)
@@ -39,4 +44,4 @@ app.use('/api/user',userRouter)
 //app.use('api/v1/users') need to change it in this way
 
 //port assigning
-app.listen(process.env.PORT, () => console.log(`The server started localhost:${process.env.PORT}`))
+app.listen(process.env.PORT, () => logger.info(`The server started localhost:${process.env.PORT}`))

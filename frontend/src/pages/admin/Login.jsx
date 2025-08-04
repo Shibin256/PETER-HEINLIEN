@@ -1,48 +1,48 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import { HiLockClosed, HiMail } from 'react-icons/hi';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import AuthInput from '../../components/common/AuthInput';
-import axiosInstance from '../../api/axiosInstance';
-import { setAdmin } from '../../features/auth/authSlice';
-import { useDispatch } from 'react-redux';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import AuthInput from "../../components/common/AuthInput";
+import axiosInstance from "../../api/axiosInstance";
+import { setAdmin } from "../../features/auth/authSlice";
+import { useDispatch } from "react-redux";
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate()
-  const dispatch=useDispatch()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   //handling admin login
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       return;
     }
-    setError('');
+    setError("");
     try {
-      const response = await axiosInstance.post(`${baseUrl}/api/auth/admin-login`, { email, password })
-      console.log(response.data, 'admin login res')
+      const response = await axiosInstance.post(
+        `${baseUrl}/api/auth/admin-login`,
+        { email, password },
+      );
+      console.log(response.data, "admin login res");
 
       // settong access token to the local storage
-      const token = response.data.accessToken
-      const admin = JSON.stringify(response.data.user)
-      dispatch(setAdmin({ token, admin }))
-      localStorage.setItem('adminAccessToken', token)
-      localStorage.setItem('admin', admin)
+      const token = response.data.accessToken;
+      const admin = JSON.stringify(response.data.user);
+      dispatch(setAdmin({ token, admin }));
+      localStorage.setItem("adminAccessToken", token);
+      localStorage.setItem("admin", admin);
 
       if (response) {
-        toast.success(response.data.message)
-        navigate('/admin/dashboard')
+        toast.success(response.data.message);
+        navigate("/admin/dashboard");
       }
     } catch (error) {
-      console.log(error)
-      toast.error(error.response?.data?.message || 'error hapened')
+      console.log(error);
+      toast.error(error.response?.data?.message || "error hapened");
     }
   };
 
@@ -66,32 +66,30 @@ const AdminLogin = () => {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-
             <AuthInput
               label="Email"
-              type='email'
-              name='email'
+              type="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder='your@email.com'
-              width='w-full'
-              Textcolor='text-gray-300'
-              bgcolor='bg-gray-700'
-              borderColor='border-gray-600'
+              placeholder="your@email.com"
+              width="w-full"
+              Textcolor="text-gray-300"
+              bgcolor="bg-gray-700"
+              borderColor="border-gray-600"
             />
 
             <AuthInput
               label="Password"
-              type='password'
-              name='password'
+              type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder='••••••••'
-              width='w-full'
-              Textcolor='text-gray-300'
-              bgcolor='bg-gray-700'
-              borderColor='border-gray-600'
-
+              placeholder="••••••••"
+              width="w-full"
+              Textcolor="text-gray-300"
+              bgcolor="bg-gray-700"
+              borderColor="border-gray-600"
             />
 
             <div>

@@ -1,19 +1,20 @@
-import axiosInstance from "../../api/axiosInstance"
+import axiosInstance from "../../api/axiosInstance";
 
-const addToWallet= async (userId,amount,paymentId) => {
-    const response = await axiosInstance.post(`/api/user/wallet/${userId}/${amount}/${paymentId}`)
-    return response.data
-}
+const addToWallet = async (userId, amount, paymentId) => {
+  const response = await axiosInstance.post(
+    `/api/user/wallet/${userId}/${amount}/${paymentId}`,
+  );
+  return response.data;
+};
 
-const getWallet= async (userId) => {
-    const response = await axiosInstance.get(`/api/user/wallet/${userId}`)
-    return response.data
-}
-
+const getWallet = async (userId) => {
+  const response = await axiosInstance.get(`/api/user/wallet/${userId}`);
+  return response.data;
+};
 
 const walletService = {
-    addToWallet,
-    getWallet
-}
+  addToWallet,
+  getWallet,
+};
 
-export default walletService
+export default walletService;

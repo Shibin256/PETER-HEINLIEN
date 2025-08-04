@@ -1,5 +1,5 @@
 // components/Navbar.jsx
-import React from 'react';
+import React from "react";
 import { HiArrowLeftOnRectangle } from "react-icons/hi2";
 
 const AdminNav = ({ onLogout }) => {
@@ -11,7 +11,7 @@ const AdminNav = ({ onLogout }) => {
         </div>
         <span className="text-xl font-bold text-white">Peter Heinlein</span>
       </div>
-      <button 
+      <button
         onClick={onLogout}
         className="flex items-center bg-gray-700 hover:bg-gray-600 text-gray-200 px-4 py-2 rounded-lg transition-colors duration-200"
       >

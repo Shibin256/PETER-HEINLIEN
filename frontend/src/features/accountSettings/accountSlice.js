@@ -2,133 +2,149 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import accountService from "./accountService";
 
 export const changeName = createAsyncThunk(
-  'user/account/changeName',
+  "user/account/changeName",
   async ({ userId, data }, thunkAPI) => {
     try {
-      return await accountService.changeName(userId, data)
+      return await accountService.changeName(userId, data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
-
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
-
+  },
+);
 
 export const changeMobile = createAsyncThunk(
-  'user/account/changeMobile',
+  "user/account/changeMobile",
   async ({ userId, data }, thunkAPI) => {
     try {
-      return await accountService.changeMobile(userId, data)
+      return await accountService.changeMobile(userId, data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
+  },
+);
 
-export const changePassword=createAsyncThunk(
-  'user/account/editPassword',
-  async({userId,data},thunkAPI)=>{
+export const changePassword = createAsyncThunk(
+  "user/account/editPassword",
+  async ({ userId, data }, thunkAPI) => {
     try {
-      return await accountService.changePassword(userId,data,)
+      return await accountService.changePassword(userId, data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
+  },
+);
 
-export const imageUpload=createAsyncThunk(
-  'user/account/editProfile',
-  async({userId,data},thunkAPI)=>{
+export const imageUpload = createAsyncThunk(
+  "user/account/editProfile",
+  async ({ userId, data }, thunkAPI) => {
     try {
-      const res= await accountService.uploadImage(userId,data,)
-      return res.data
+      const res = await accountService.uploadImage(userId, data);
+      return res.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
+  },
+);
 
-export const addAddress=createAsyncThunk(
-  'user/account/addAdress',
-  async({userId,data},thunkAPI)=>{
+export const addAddress = createAsyncThunk(
+  "user/account/addAdress",
+  async ({ userId, data }, thunkAPI) => {
     try {
-      const res= await accountService.addAddress(userId,data,)
-      return res
+      const res = await accountService.addAddress(userId, data);
+      return res;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
+  },
+);
 
-export const getAllAddress=createAsyncThunk(
-  'user/account/getAllAddress',
-  async(userId,thunkAPI)=>{
+export const getAllAddress = createAsyncThunk(
+  "user/account/getAllAddress",
+  async (userId, thunkAPI) => {
     try {
-      const res= await accountService.getAllAddress(userId)
-      return res
+      const res = await accountService.getAllAddress(userId);
+      return res;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
+  },
+);
 
-export const removeAddress=createAsyncThunk(
-    'user/account/removeAddress',
-  async({userId,addressId},thunkAPI)=>{
+export const removeAddress = createAsyncThunk(
+  "user/account/removeAddress",
+  async ({ userId, addressId }, thunkAPI) => {
     try {
-      const res= await accountService.removeAddress(userId,addressId)
-      return res
+      const res = await accountService.removeAddress(userId, addressId);
+      return res;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-)
+  },
+);
 
-export const setDefault=createAsyncThunk(
-    'user/account/setDefault',
-  async({userId,addressId},thunkAPI)=>{
-     try {
-      const res= await accountService.setDefault(userId,addressId)
-      return res
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
-    }
-  }
-)
-
-export const updateAddress=createAsyncThunk(
-   'user/account/updateAdress',
-  async({addressId,data},thunkAPI)=>{
-    console.log(addressId)
+export const setDefault = createAsyncThunk(
+  "user/account/setDefault",
+  async ({ userId, addressId }, thunkAPI) => {
     try {
-      const res= await accountService.updateAdress(addressId,data)
-      console.log(res,'sliceee')
-      return res
+      const res = await accountService.setDefault(userId, addressId);
+      return res;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
     }
-  }
-) 
+  },
+);
+
+export const updateAddress = createAsyncThunk(
+  "user/account/updateAdress",
+  async ({ addressId, data }, thunkAPI) => {
+    console.log(addressId);
+    try {
+      const res = await accountService.updateAdress(addressId, data);
+      console.log(res, "sliceee");
+      return res;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
+    }
+  },
+);
 
 const accountSlice = createSlice({
-  name: 'account',
+  name: "account",
   initialState: {
     user: [],
-    addresses:[],
+    addresses: [],
     loading: false,
-    error: null
+    error: null,
   },
   reducers: {
     resetUser: (state) => {
       state.user = [];
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(changeName.pending, (state) => {
         state.loading = true;
       })
-      .addCase(changeName.fulfilled, (state, action) => {
+      .addCase(changeName.fulfilled, (state) => {
         state.loading = false;
         // state.user.push(action.payload);
       })
@@ -140,7 +156,7 @@ const accountSlice = createSlice({
       .addCase(changeMobile.pending, (state) => {
         state.loading = true;
       })
-      .addCase(changeMobile.fulfilled, (state, action) => {
+      .addCase(changeMobile.fulfilled, (state) => {
         state.loading = false;
         // state.user.push(action.payload);
       })
@@ -152,7 +168,7 @@ const accountSlice = createSlice({
       .addCase(changePassword.pending, (state) => {
         state.loading = true;
       })
-      .addCase(changePassword.fulfilled, (state, action) => {
+      .addCase(changePassword.fulfilled, (state) => {
         state.loading = false;
         // state.user.push(action.payload);
       })
@@ -173,7 +189,7 @@ const accountSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-       .addCase(addAddress.pending, (state) => {
+      .addCase(addAddress.pending, (state) => {
         state.loading = true;
       })
       .addCase(addAddress.fulfilled, (state, action) => {
@@ -187,34 +203,34 @@ const accountSlice = createSlice({
         state.error = action.payload;
       })
 
-         .addCase(getAllAddress.pending, (state) => {
+      .addCase(getAllAddress.pending, (state) => {
         state.loading = true;
       })
       .addCase(getAllAddress.fulfilled, (state, action) => {
         state.loading = false;
         state.user.push(action.payload);
-        state.addresses=action.payload.user.addresses
-         })
+        state.addresses = action.payload.user.addresses;
+      })
       .addCase(getAllAddress.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-       .addCase(removeAddress.pending, (state) => {
+      .addCase(removeAddress.pending, (state) => {
         state.loading = true;
       })
       .addCase(removeAddress.fulfilled, (state, action) => {
         state.loading = false;
         state.user.push(action.payload);
-        state.addresses=action.payload.user.addresses
-        console.log(state.addresses,'adresss')
-         })
+        state.addresses = action.payload.user.addresses;
+        console.log(state.addresses, "adresss");
+      })
       .addCase(removeAddress.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-  }
-})
+      });
+  },
+});
 
 export const { resetUser } = accountSlice.actions;
 

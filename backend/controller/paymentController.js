@@ -45,7 +45,8 @@ export const verifyRazorpayPayment = async (req, res) => {
 
     if (expectedSignature === razorpay_signature) {
         // Payment is verified 
-        return res.status(200).json({ success: true, message: 'Payment verified' });
+        //return payment id and catch it in front end
+        return res.status(200).json({ success: true, message: 'Payment verified',paymentId:razorpay_payment_id });
     } else {
         // Verification failed 
         return res.status(400).json({ success: false, message: 'Invalid signature, verification failed' });

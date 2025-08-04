@@ -170,7 +170,6 @@ export const updateCartItem = async (req, res) => {
 export const removeCartItem = async (req, res) => {
   try {
     const { userId, productId } = req.params;
-    const { quantity } = req.body;
     const product = await Product.findById(productId).select('-createdAt -updatedAt');
     if (!product) return res.status(404).json({ message: 'Product not found' });
 

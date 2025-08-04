@@ -1,17 +1,17 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import AdminNav from '../components/admin/Navbar';
-import AdminSidebar from '../components/admin/Sidebar';
-import { Outlet } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import AdminNav from "../components/admin/Navbar";
+import AdminSidebar from "../components/admin/Sidebar";
+import { Outlet } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('adminAccessToken');  
-    toast.success('Logged out successfully');
-    navigate('/admin/login'); 
+    localStorage.removeItem("adminAccessToken");
+    toast.success("Logged out successfully");
+    navigate("/admin/login");
   };
 
   return (

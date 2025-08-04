@@ -116,8 +116,7 @@ const getSalesReportCall = async (type, startDate, endDate) => {
         return await Order.find(matchQuery).select('-createdAt -updatedAt');
 
     } catch (error) {
-        console.error("Error fetching sales report:", error);
-        res.status(500).json({ message: "Error fetching sales report" });
+        console.log(error)
     }
 };
 

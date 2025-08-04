@@ -1,6 +1,12 @@
-import React from 'react';
+import React from "react";
 
-const CheckoutCard = ({ productName, deliveryDate, price, imageUrl, quantity }) => {
+const CheckoutCard = ({
+  productName,
+  deliveryDate,
+  price,
+  imageUrl,
+  quantity,
+}) => {
   return (
     <div className="border border-gray-200 rounded-lg shadow-md p-4 mb-4 bg-white hover:shadow-lg transition-shadow duration-200">
       <div className="flex flex-col sm:flex-row items-start sm:items-center">
@@ -15,7 +21,8 @@ const CheckoutCard = ({ productName, deliveryDate, price, imageUrl, quantity }) 
         <div className="flex-1 w-full">
           <h3 className="text-lg font-semibold text-gray-800">{productName}</h3>
           <p className="text-sm text-green-600 mt-1">
-            Delivery by <span className="font-medium">{deliveryDate}</span> | <span className="font-semibold">FREE</span>
+            Delivery by <span className="font-medium">{deliveryDate}</span> |{" "}
+            <span className="font-semibold">FREE</span>
           </p>
 
           {/* Price */}

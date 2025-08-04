@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import Cropper from 'react-easy-crop';
-import { Slider } from '@mui/material';
-import { getCroppedImg } from '../../utils/cropUtils';
+import React, { useState, useCallback } from "react";
+import Cropper from "react-easy-crop";
+import { Slider } from "@mui/material";
+import { getCroppedImg } from "../../utils/cropUtils";
 
 const CropModal = ({ imageSrc, onComplete, onCancel }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -33,12 +33,25 @@ const CropModal = ({ imageSrc, onComplete, onCancel }) => {
         </div>
 
         <div className="mt-4">
-          <Slider value={zoom} min={1} max={3} step={0.1} onChange={(e, z) => setZoom(z)} />
+          <Slider
+            value={zoom}
+            min={1}
+            max={3}
+            step={0.1}
+            onChange={(e, z) => setZoom(z)}
+          />
         </div>
 
         <div className="flex justify-end space-x-3 mt-4">
-          <button onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-          <button onClick={handleDone} className="px-4 py-2 bg-blue-600 text-white rounded">Crop</button>
+          <button onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded">
+            Cancel
+          </button>
+          <button
+            onClick={handleDone}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Crop
+          </button>
         </div>
       </div>
     </div>

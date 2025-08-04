@@ -1,7 +1,9 @@
 const RadioGroup = ({ label, name, options, value, onChange }) => {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {label}
+      </label>
       <div className="flex items-center space-x-6">
         {options.map((option) => (
           <label key={option.value} className="flex items-center space-x-2">

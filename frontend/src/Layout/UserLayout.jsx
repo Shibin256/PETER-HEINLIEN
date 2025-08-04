@@ -1,16 +1,16 @@
 // layouts/UserLayout.jsx
-import React, { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import Navbar from '../components/user/Navbar';
-import Footer from '../components/user/Footer';
-import { toast } from 'react-toastify';
-import axiosInstance from '../api/axiosInstance';
+import React, { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import Navbar from "../components/user/Navbar";
+import Footer from "../components/user/Footer";
+import { toast } from "react-toastify";
+import axiosInstance from "../api/axiosInstance";
 
 const UserLayout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userString = localStorage.getItem('user');
+    const userString = localStorage.getItem("user");
     if (!userString) return;
     const user = JSON.parse(userString);
 
@@ -18,17 +18,17 @@ const UserLayout = () => {
       try {
         const res = await axiosInstance.get(`/api/auth/me/${user._id}`);
         if (res.data.isBlocked) {
-          localStorage.removeItem('user');
-          localStorage.removeItem('accessToken');
-          toast.error('You have been blocked. Logging out...');
-          navigate('/login');
+          localStorage.removeItem("user");
+          localStorage.removeItem("accessToken");
+          toast.error("You have been blocked. Logging out...");
+          navigate("/login");
         }
       } catch (err) {
-        console.error('Error checking user status:', err);
-        localStorage.removeItem('user');
-        localStorage.removeItem('accessToken');
-        toast.error('Session expired. Logging out...');
-        navigate('/login');
+        console.error("Error checking user status:", err);
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+        toast.error("Session expired. Logging out...");
+        navigate("/login");
       }
     };
 

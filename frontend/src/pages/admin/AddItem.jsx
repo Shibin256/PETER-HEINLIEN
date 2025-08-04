@@ -1,29 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import AuthInput from '../../components/common/AuthInput';
-import SelectInput from '../../components/common/SelectInput';
-import { toast } from 'react-toastify';
-import { addProduct, getBrandAndCollection, resetProductState } from '../../features/products/productSlice';
-import CropModal from '../../components/common/CropModel';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import AuthInput from "../../components/common/AuthInput";
+import SelectInput from "../../components/common/SelectInput";
+import { toast } from "react-toastify";
+import {
+  addProduct,
+  getBrandAndCollection,
+  resetProductState,
+} from "../../features/products/productSlice";
+import CropModal from "../../components/common/CropModel";
 
 function AddItem() {
   const dispatch = useDispatch();
   const [images, setImages] = useState([]);
-  const [productName, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [tags, setTags] = useState('');
-  const [brand, setBrand] = useState('');
-  const [price, setPrice] = useState('');
-  const [quantity, setQuantity] = useState(null)
+  const [productName, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
+  const [brand, setBrand] = useState("");
+  const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     dispatch(getBrandAndCollection());
-  }, [])
+  }, []);
 
-  const { brands, categories, loading, error } = useSelector(state => state.products);
-  const { currency } = useSelector(state => state.global)
+  const { brands, categories } = useSelector(
+    (state) => state.products,
+  );
+  const { currency } = useSelector((state) => state.global);
   // files waiting to crop
   const [pendingFiles, setPendingFiles] = useState([]);
   const [currentFileURL, setCurrentFileURL] = useState(null);
@@ -31,22 +37,26 @@ function AddItem() {
 
   //handiling the images upload
   const handleImageUpload = (e) => {
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/jpg",
+    ];
     const files = Array.from(e.target.files);
     const total = images.length + files.length;
-    console.log(files)
+    console.log(files);
     for (let file of files) {
-      console.log(file)
-        if(!validImageTypes.includes(file.type)){
-          toast.error('The file need to be a image format')
-          return
-        }
+      console.log(file);
+      if (!validImageTypes.includes(file.type)) {
+        toast.error("The file need to be a image format");
+        return;
+      }
     }
     if (total > 4) {
       toast.error("You can only upload 4 images max.");
       return;
     }
-
 
     setPendingFiles(files);
     if (files.length > 0) {
@@ -65,12 +75,12 @@ function AddItem() {
 
   //handling the crop before uploading image
   const handleCropDone = (cropped) => {
-    setImages(prev => [...prev, cropped]);
+    setImages((prev) => [...prev, cropped]);
     const [, ...rest] = pendingFiles;
-    setPendingFiles(rest)
+    setPendingFiles(rest);
     if (rest.length > 0) {
       const next = URL.createObjectURL(rest[0]);
-      setCurrentFileURL(next)
+      setCurrentFileURL(next);
     } else {
       setShowCropper(false);
       setCurrentFileURL(null);
@@ -90,50 +100,59 @@ function AddItem() {
     }
   };
 
-
-
   // handling submit of form
   const handleSubmit = async () => {
     // check all fields are in
-    if (!productName.trim() || !description.trim() || !category || !tags || !brand || !price || images.length === 0 || !quantity) {
-      toast.error('Please fill all fields without empty spaces and upload at least one image.');
+    if (
+      !productName.trim() ||
+      !description.trim() ||
+      !category ||
+      !tags ||
+      !brand ||
+      !price ||
+      images.length === 0 ||
+      !quantity
+    ) {
+      toast.error(
+        "Please fill all fields without empty spaces and upload at least one image.",
+      );
       return;
     }
     //validation for price and quantity
     if (isNaN(price) || price <= 0) {
-      toast.error('Price must be a valid number and greater than Zero.');
+      toast.error("Price must be a valid number and greater than Zero.");
       return;
     }
 
     if (isNaN(quantity) || quantity < 0) {
-      toast.error('Quantity must be a valid number.');
+      toast.error("Quantity must be a valid number.");
       return;
     }
 
     const formData = new FormData();
-    formData.append('name', productName);
-    formData.append('description', description);
-    formData.append('category', category);
-    formData.append('tags', tags);
-    formData.append('brand', brand);
-    formData.append('price', price);
-    formData.append('quantity', quantity)
-    images.forEach(img => formData.append('images', img.file));
+    formData.append("name", productName);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("tags", tags);
+    formData.append("brand", brand);
+    formData.append("price", price);
+    formData.append("quantity", quantity);
+    images.forEach((img) => formData.append("images", img.file));
     setIsSubmitting(true);
     try {
       await dispatch(addProduct(formData)).unwrap();
-      toast.success('✅ Product added successfully!');
-      setProductName('');
-      setDescription('');
-      setCategory('');
-      setTags('');
-      setBrand('');
-      setPrice('');
-      setQuantity(0)
+      toast.success("✅ Product added successfully!");
+      setProductName("");
+      setDescription("");
+      setCategory("");
+      setTags("");
+      setBrand("");
+      setPrice("");
+      setQuantity(0);
       setImages([]);
       dispatch(resetProductState());
     } catch (error) {
-      toast.error(error?.message || 'Failed to add product.');
+      toast.error(error?.message || "Failed to add product.");
     } finally {
       setIsSubmitting(false);
     }
@@ -142,13 +161,13 @@ function AddItem() {
   //getting category and brands from database
   const categoryOptions = categories.map((category) => ({
     label: category.categoryName, // or brand.brandName depending on your backend
-    value: category._id
-  }))
+    value: category._id,
+  }));
 
   const brandOptions = brands.map((brand) => ({
     label: brand.name, // or brand.brandName depending on your backend
-    value: brand._id
-  }))
+    value: brand._id,
+  }));
 
   return (
     <div className="max-w-2xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 shadow-xl rounded-2xl border border-gray-200">
@@ -158,7 +177,9 @@ function AddItem() {
 
       {/* Image Upload */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Upload Images (Max 4)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Upload Images (Max 4)
+        </label>
         <input
           type="file"
           accept="image/*"
@@ -199,7 +220,9 @@ function AddItem() {
 
       {/* Description */}
       <div className="mb-5">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Description
+        </label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -262,7 +285,6 @@ function AddItem() {
           Textcolor="text-gray-700"
           borderColor="border-gray-300"
         />
-
       </div>
 
       {/* Submit Button */}
@@ -270,18 +292,34 @@ function AddItem() {
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className={`py-3 px-8 rounded-full text-white font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`py-3 px-8 rounded-full text-white font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Processing...
             </>
           ) : (
-            'Add Product'
+            "Add Product"
           )}
         </button>
       </div>
@@ -292,7 +330,6 @@ function AddItem() {
           onCancel={handleCropCancel}
         />
       )}
-
     </div>
   );
 }

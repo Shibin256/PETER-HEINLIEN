@@ -9,9 +9,11 @@ export const fetchDashboardStats = createAsyncThunk(
       const res = await dashboardService.getStats();
       return res; // Should return { totalSales, totalOrders, totalUsers, revenue }
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch dashboard stats");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch dashboard stats",
+      );
     }
-  }
+  },
 );
 
 // Fetch sales report (daily, weekly, monthly, yearly, custom)
@@ -19,13 +21,19 @@ export const fetchSalesReport = createAsyncThunk(
   "dashboard/fetchSalesReport",
   async ({ type, startDate, endDate }, { rejectWithValue }) => {
     try {
-      const res = await dashboardService.getSalesReport({ type, startDate, endDate });
-      console.log(res)
+      const res = await dashboardService.getSalesReport({
+        type,
+        startDate,
+        endDate,
+      });
+      console.log(res);
       return res; // Should return detailed sales data
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch sales report");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch sales report",
+      );
     }
-  }
+  },
 );
 
 //Fetch top-selling products
@@ -36,37 +44,49 @@ export const fetchTopProducts = createAsyncThunk(
       const res = await dashboardService.getTopProducts();
       return res; // Should return top-selling products
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch top products");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch top products",
+      );
     }
-  }
+  },
 );
-
 
 export const downloadSalesReportExcel = createAsyncThunk(
   "dashboard/downloadSalesReportExcel",
   async ({ type, startDate, endDate }, { rejectWithValue }) => {
     try {
-      const res = await dashboardService.downloadSalesReportExcel({ type, startDate, endDate });
-      console.log(res)
+      const res = await dashboardService.downloadSalesReportExcel({
+        type,
+        startDate,
+        endDate,
+      });
+      console.log(res);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch sales report");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch sales report",
+      );
     }
-  }
+  },
 );
-
 
 export const downloadSalesReportPdf = createAsyncThunk(
   "dashboard/downloadSalesReportPdf",
   async ({ type, startDate, endDate }, { rejectWithValue }) => {
     try {
-      const res = await dashboardService.downloadSalesReportPdf({ type, startDate, endDate });
-      console.log(res)
+      const res = await dashboardService.downloadSalesReportPdf({
+        type,
+        startDate,
+        endDate,
+      });
+      console.log(res);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch sales report");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch sales report",
+      );
     }
-  }
+  },
 );
 
 // Slice
@@ -75,17 +95,17 @@ const dashboardSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    stats: null,            // { totalSales, totalOrders, totalUsers, revenue }
-    salesReport: null,      // Array of sales data (for chart/table)
-    topProducts: [],        // Array of best-selling products
-    success: false
+    stats: null, // { totalSales, totalOrders, totalUsers, revenue }
+    salesReport: null, // Array of sales data (for chart/table)
+    topProducts: [], // Array of best-selling products
+    success: false,
   },
   reducers: {
     resetDashboardState: (state) => {
       state.loading = false;
       state.success = false;
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -133,7 +153,7 @@ const dashboardSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
 export const { resetDashboardState } = dashboardSlice.actions;

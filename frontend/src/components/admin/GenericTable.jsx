@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import PropTypes from 'prop-types'
 
 const GenericTable = ({ title, columns, data, renderActions }) => {
   return (
@@ -23,8 +24,18 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
                       {column.label}
                       {column.sortable && (
                         <button className="ml-1 focus:outline-none">
-                          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                          <svg
+                            className="h-4 w-4 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                            />
                           </svg>
                         </button>
                       )}
@@ -43,7 +54,7 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
                 data.map((item, index) => (
                   <tr
                     key={item._id || item.id}
-                    className={`transition-all duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}
+                    className={`transition-all duration-150 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50`}
                   >
                     {columns.map((column) => (
                       <td
@@ -72,10 +83,22 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
                     className="px-6 py-8 text-center text-sm text-gray-500"
                   >
                     <div className="flex flex-col items-center justify-center">
-                      <svg className="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="h-12 w-12 text-gray-400 mb-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
-                      <span className="text-lg font-medium text-gray-600">No data found</span>
+                      <span className="text-lg font-medium text-gray-600">
+                        No data found
+                      </span>
                     </div>
                   </td>
                 </tr>
@@ -87,5 +110,20 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
     </div>
   );
 };
+
+
+GenericTable.PropTypes = {
+  title: PropTypes.string.isRequired,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      sortable: PropTypes.bool,
+      render: PropTypes.func,
+    })
+  ).isRequired,
+  data:PropTypes.arrayOf(PropTypes.object).isRequired,
+  renderActions: PropTypes.func,
+}
 
 export default GenericTable;

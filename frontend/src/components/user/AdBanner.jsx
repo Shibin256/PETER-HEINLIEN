@@ -1,12 +1,13 @@
-import React from 'react';
-import adBackgroundImg from '../../assets/adBannerImg.jpg'
+import React from "react";
+import adBackgroundImg from "../../assets/adBannerImg.jpg";
 
 const AdBanner = () => {
   const adContent = {
-    title: 'Exclusive Watch Sale!',
-    description: 'Get up to 30% off on our premium collection of watches for Men, Women, and Couples. Shop now and elevate your style!',
-    buttonText: 'Shop Now',
-    buttonLink: '/collection', // Replace with your actual shop page URL
+    title: "Exclusive Watch Sale!",
+    description:
+      "Get up to 30% off on our premium collection of watches for Men, Women, and Couples. Shop now and elevate your style!",
+    buttonText: "Shop Now",
+    buttonLink: "/collection", // Replace with your actual shop page URL
     backgroundImage: adBackgroundImg,
   };
 
@@ -30,7 +31,7 @@ const AdBanner = () => {
           <a
             href={adContent.buttonLink}
             className="inline-block px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md  transition-colors duration-300"
-             style={{ backgroundColor: '#003543' }}
+            style={{ backgroundColor: "#003543" }}
           >
             {adContent.buttonText}
           </a>

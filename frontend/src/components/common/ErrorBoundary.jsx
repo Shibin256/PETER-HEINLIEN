@@ -1,5 +1,5 @@
 // ErrorBoundary.js
-import React from 'react';
+import React from "react";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -7,12 +7,12 @@ class ErrorBoundary extends React.Component {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
-  componentDidCatch(error, info) {
-    console.error('Error caught:', error);
+  componentDidCatch(error,) {
+    console.error("Error caught:", error);
   }
 
   render() {

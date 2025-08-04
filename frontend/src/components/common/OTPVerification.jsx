@@ -1,5 +1,5 @@
 // components/common/OTPVerification.jsx
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
 const OTPVerification = ({
   duration = 180,
@@ -11,12 +11,12 @@ const OTPVerification = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isExpired, setIsExpired] = useState(false);
-  const [userOTP, setUserOTP] = useState(Array(otpLength).fill(''));
+  const [userOTP, setUserOTP] = useState(Array(otpLength).fill(""));
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);
 
   useEffect(() => {
-    const expiryTime = localStorage.getItem('otpExpiry');
+    const expiryTime = localStorage.getItem("otpExpiry");
     const now = Date.now();
 
     if (expiryTime) {
@@ -25,11 +25,11 @@ const OTPVerification = ({
         setTimeLeft(remaining);
       } else {
         setIsExpired(true);
-        localStorage.removeItem('otpExpiry');
+        localStorage.removeItem("otpExpiry");
       }
     } else {
       const newExpiry = now + duration * 1000;
-      localStorage.setItem('otpExpiry', newExpiry.toString());
+      localStorage.setItem("otpExpiry", newExpiry.toString());
     }
   }, [duration]);
 
@@ -43,12 +43,12 @@ const OTPVerification = ({
   }, [timeLeft]);
 
   const formatTime = (seconds) =>
-    `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(
-      seconds % 60
-    ).padStart(2, '0')}`;
+    `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(
+      seconds % 60,
+    ).padStart(2, "0")}`;
 
   const handleChange = (e, index) => {
-    const val = e.target.value.replace(/\D/, '');
+    const val = e.target.value.replace(/\D/, "");
     const otpCopy = [...userOTP];
     otpCopy[index] = val;
     setUserOTP(otpCopy);
@@ -58,13 +58,13 @@ const OTPVerification = ({
   };
 
   const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !userOTP[index] && index > 0) {
+    if (e.key === "Backspace" && !userOTP[index] && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
 
   const handleSubmit = async () => {
-    const otp = userOTP.join('');
+    const otp = userOTP.join("");
     if (otp.length === otpLength && onVerify) {
       setLoading(true);
       await onVerify(otp);
@@ -75,11 +75,15 @@ const OTPVerification = ({
   return (
     <div className="flex justify-center items-center min-h-[70vh]">
       <div className="bg-white p-8 border border-gray-300 w-full max-w-md font-roboto">
-        <h2 className="text-2xl font-semibold text-center mb-6 font-georgia">OTP Verification</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6 font-georgia">
+          OTP Verification
+        </h2>
         <p className="text-center text-gray-600 mb-4">
           Enter the {otpLength}-digit OTP sent to <strong>{email}</strong>
         </p>
-        <p className="text-center text-gray-400 mb-6">Time remaining: {formatTime(timeLeft)}</p>
+        <p className="text-center text-gray-400 mb-6">
+          Time remaining: {formatTime(timeLeft)}
+        </p>
         <div className="space-y-4">
           <div className="flex justify-center gap-2">
             {userOTP.map((digit, index) => (
@@ -101,7 +105,7 @@ const OTPVerification = ({
             onClick={handleSubmit}
             className="w-full bg-teal-900 text-white py-2 rounded hover:bg-teal-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Verifying...' : 'Verify'}
+            {loading ? "Verifying..." : "Verify"}
           </button>
           <div className="text-center text-sm ">
             {resendDisabled ? (

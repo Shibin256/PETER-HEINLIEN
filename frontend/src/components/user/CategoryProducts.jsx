@@ -1,26 +1,24 @@
-import React, { useEffect } from 'react';
-import Title from '../common/Title';
-import heroImg2 from '../../assets/heroSectionWatch2.png';
-import { useDispatch, useSelector } from 'react-redux';
-import { getBrandAndCollection } from '../../features/products/productSlice';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useEffect } from "react";
+import Title from "../common/Title";
+import heroImg2 from "../../assets/heroSectionWatch2.png";
+import { useDispatch, useSelector } from "react-redux";
+import { getBrandAndCollection } from "../../features/products/productSlice";
+import { useNavigate } from "react-router-dom";
 
 const CategoryProducts = () => {
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getBrandAndCollection())
-  }, [])
+    dispatch(getBrandAndCollection());
+  }, []);
 
-  const { categories } = useSelector(state => state.products);
+  const { categories } = useSelector((state) => state.products);
 
   //pass category id when click button
-  const handleclick = (categoryId,categoryName) => {
+  const handleclick = (categoryId, categoryName) => {
     // console.log(categoryId,'888888888888888')
-    navigate('/category-collection', { state: { categoryId,categoryName } });
+    navigate("/category-collection", { state: { categoryId, categoryName } });
   };
 
   return (
@@ -50,9 +48,11 @@ const CategoryProducts = () => {
               {/* Overlay on Hover */}
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center">
                 <button
-                  onClick={() => handleclick(category._id,category.categoryName)}
+                  onClick={() =>
+                    handleclick(category._id, category.categoryName)
+                  }
                   className="text-white text-sm font-semibold px-4 py-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ backgroundColor: '#003543' }}
+                  style={{ backgroundColor: "#003543" }}
                 >
                   Shop Now
                 </button>

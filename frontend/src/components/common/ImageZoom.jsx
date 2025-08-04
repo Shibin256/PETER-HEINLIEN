@@ -1,12 +1,12 @@
-import React from 'react';
-import ReactImageMagnify from 'react-image-magnify';
+import React from "react";
+import ReactImageMagnify from "react-image-magnify";
 
 const ImageZoom = ({ imageUrl }) => {
   return (
     <ReactImageMagnify
       {...{
         smallImage: {
-          alt: 'Product',
+          alt: "Product",
           isFluidWidth: true,
           src: imageUrl,
         },
@@ -16,10 +16,10 @@ const ImageZoom = ({ imageUrl }) => {
           height: 1800,
         },
         enlargedImageContainerDimensions: {
-          width: '185%',
-          height: '105%',
+          width: "185%",
+          height: "105%",
         },
-        enlargedImagePosition: 'beside', // This is key
+        enlargedImagePosition: "beside", // This is key
       }}
     />
   );

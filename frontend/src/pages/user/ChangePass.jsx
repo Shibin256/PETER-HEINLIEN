@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import { toast } from 'react-toastify';
-import { useNavigate, useLocation } from 'react-router-dom';
-import axiosInstance from '../../api/axiosInstance';
-import usePasswordVal from '../../usePasswordVal';
-import AuthInput from '../../components/common/AuthInput';
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { useNavigate, useLocation } from "react-router-dom";
+import axiosInstance from "../../api/axiosInstance";
+import usePasswordVal from "../../usePasswordVal";
+import AuthInput from "../../components/common/AuthInput";
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-import MainThemeButton from '../../components/common/MainThemeButton';
+import MainThemeButton from "../../components/common/MainThemeButton";
 
 const ChangePass = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const location = useLocation();
   const email = location.state?.email;
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: '',
+    password: "",
+    confirmPassword: "",
   });
   const navigate = useNavigate();
 
@@ -27,20 +27,20 @@ const ChangePass = () => {
       [name]: value,
     }));
     // password validation
-    if (name === 'password') {
+    if (name === "password") {
       const validationMsg = usePasswordVal(value);
       setError(validationMsg);
       setIsPasswordValid(!validationMsg);
     }
-    if (name === 'confirmPassword') {
+    if (name === "confirmPassword") {
       if (!isPasswordValid) {
-        setError('Enter a valid password first.');
+        setError("Enter a valid password first.");
         return;
       }
       if (formData.password !== value) {
-        setError('Passwords do not match');
+        setError("Passwords do not match");
       } else {
-        setError('');
+        setError("");
       }
     }
   };
@@ -52,7 +52,7 @@ const ChangePass = () => {
 
     try {
       if (!formData.password || !formData.confirmPassword) {
-        toast.error('Both password fields are required');
+        toast.error("Both password fields are required");
         setLoading(false);
         return;
       }
@@ -66,19 +66,26 @@ const ChangePass = () => {
       }
 
       if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
+        setError("Passwords do not match");
         setLoading(false);
         return;
       }
 
-      const response = await axiosInstance.patch(`${baseUrl}/api/auth/changePassword`, {
-        newPassword: formData.password, email
-      });
+      const response = await axiosInstance.patch(
+        `${baseUrl}/api/auth/changePassword`,
+        {
+          newPassword: formData.password,
+          email,
+        },
+      );
 
-      toast.success(response.data.message || 'Password reset successfully');
-      navigate('/login');
+      toast.success(response.data.message || "Password reset successfully");
+      navigate("/login");
     } catch (error) {
-      toast.error(error.response?.data?.message || 'An error occurred during password reset');
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred during password reset",
+      );
     } finally {
       setLoading(false);
     }
@@ -87,9 +94,12 @@ const ChangePass = () => {
   return (
     <main className="flex-grow flex items-center justify-center py-12 px-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md border border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">Set a new password</h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
+          Set a new password
+        </h2>
         <p className="text-sm text-gray-600 text-center mb-6">
-          Create a new password. Ensure it differs from previous ones for security
+          Create a new password. Ensure it differs from previous ones for
+          security
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5 relative">
@@ -133,7 +143,7 @@ const ChangePass = () => {
           />
 
           <p className="text-center text-sm text-gray-600">
-            Back to{' '}
+            Back to{" "}
             <a href="/login" className="text-blue-500">
               Login
             </a>

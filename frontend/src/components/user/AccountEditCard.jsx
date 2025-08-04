@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-const AccountEditCard = ({ title, description, placeholder, inputValue,type, onBack, onVerify,onVerifyButtonName,onBackButtonName }) => {
-  const [value, setvalue] = useState('');
+const AccountEditCard = ({
+  title,
+  description,
+  placeholder,
+  inputValue,
+  type,
+  onBack,
+  onVerify,
+  onVerifyButtonName,
+  onBackButtonName,
+}) => {
+  const [value, setvalue] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,7 +29,7 @@ const AccountEditCard = ({ title, description, placeholder, inputValue,type, onB
         {/* Content Section */}
         <div className="p-6">
           <p className="text-gray-600 mb-6 text-center">{description}</p>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input
@@ -43,8 +53,19 @@ const AccountEditCard = ({ title, description, placeholder, inputValue,type, onB
                 onClick={onBack}
                 className="flex-1 px-4 py-3 bg-white text-[#003543] border border-[#003543] rounded-lg hover:bg-[#003543]/5 transition-colors duration-300 font-medium flex items-center justify-center"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
                 </svg>
                 {onBackButtonName}
               </button>
@@ -52,8 +73,19 @@ const AccountEditCard = ({ title, description, placeholder, inputValue,type, onB
                 type="submit"
                 className="flex-1 px-4 py-3 bg-[#003543] text-white rounded-lg hover:bg-[#004d5f] transition-colors duration-300 font-medium flex items-center justify-center"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 {onVerifyButtonName}
               </button>
