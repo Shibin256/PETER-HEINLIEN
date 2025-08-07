@@ -3,11 +3,11 @@ import multer from "multer";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { deleteUser, getAllUsers, toggleUserBlock } from "../controller/admin/usersController.js";
 import { addCategoryOffer, createBrand, createCategory, deleteBrand, deleteCategory, editBrand, editCategory, removeCategoryOffer } from "../controller/admin/inventoryController.js";
-import { createBanner } from "../controller/admin/bannerController.js";
+import { createBanner, deleteBanner, fetchBanners, setActiveBanner } from "../controller/admin/bannerController.js";
 import { changeOrderStatus, getAllOrders, retrunVerify, singleCancelVerify, verifyCancel } from "../controller/orderController.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
 import { createCoupons, deleteCoupon, fetchCoupons, updateCoupon } from "../controller/admin/couponsController.js";
-import { downloadSalesReportPDF, exelReport, getSalesReport } from "../controller/admin/reportController.js";
+import { downloadSalesReportPDF, exelReport, getBestSellers, getSalesReport } from "../controller/admin/reportController.js";
 
 const router=express.Router()
 
@@ -31,7 +31,10 @@ router.delete('/deleteBrand/:id',authorizeRole(roles),verifyAccessToken,deleteBr
 router.put('/editBrand/:id',authorizeRole(roles),verifyAccessToken,upload.single('logo'),editBrand)
 
 //bannerManage
-router.post('/banner/add',authorizeRole(roles),verifyAccessToken,createBanner)
+router.post('/banner/add',authorizeRole(roles),upload.array("images",2),verifyAccessToken,createBanner)
+router.get('/banner/fetchBanners',authorizeRole(roles),verifyAccessToken,fetchBanners)
+router.delete('/banner/deleteBanner/:bannerId',authorizeRole(roles),verifyAccessToken,deleteBanner)
+router.put('/banner/setActiveBanner/:bannerId',authorizeRole(roles),verifyAccessToken,setActiveBanner)
 
 //orderManage
 router.get('/orders/getAllOrders',authorizeRole(roles),verifyAccessToken,getAllOrders)
@@ -57,5 +60,8 @@ router.delete('/removeOffer/:categoryId', authorizeRole(roles), verifyAccessToke
 router.get('/dashboard/sales-report',authorizeRole(roles),verifyAccessToken,getSalesReport)
 router.get("/dashboard/sales-report/excel", authorizeRole(roles),verifyAccessToken,exelReport);
 router.get("/dashboard/sales-report/pdf",authorizeRole(roles),verifyAccessToken,downloadSalesReportPDF);
+router.get('/dashboard/best-sellers',authorizeRole(roles),verifyAccessToken,getBestSellers)
+
+
 
 export default router

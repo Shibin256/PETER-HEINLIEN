@@ -1,6 +1,7 @@
 import Order from "../../model/orderModel.js";
 import ExcelJS from "exceljs";
 import PDFDocument from 'pdfkit';
+import Product from "../../model/productModel.js";
 
 
 export const getSalesReport = async (req, res) => {
@@ -164,7 +165,7 @@ export const downloadSalesReportPDF = async (req, res) => {
         const { type, startDate, endDate } = req.query;
         console.log(type)
         const orders = await getSalesReportCall(type, startDate, endDate);
-        console.log(orders,'------')
+        console.log(orders, '------')
         const doc = new PDFDocument({ margin: 50 });
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"');
@@ -208,4 +209,164 @@ export const downloadSalesReportPDF = async (req, res) => {
         console.error("Error generating PDF:", error);
         res.status(500).json({ message: "Error generating PDF report" });
     }
+};
+
+
+
+// export const getBestSellers = async (req, res) => {
+//     const orders = await Order.find()
+//     const productMap = {}
+//     const categoryMap = {};
+//     const brandMap = {};
+//     const limit=10;
+//     console.log(orders, '---best sellers')
+
+//     orders.forEach(order => {
+//         order.Items.forEach(item => {
+//             const key = item.productId;
+//             if (!productMap[key]) {
+//                 productMap[key] = {
+//                     name: item.productName,
+//                     quantity: 0,
+//                     revenue: 0
+//                 };
+//             }
+
+//             productMap[key].quantity += item.quantity;
+//             productMap[key].revenue += item.subTotal;
+
+
+//             // --- Categories ---
+//             if (item.categoryName) {  // Ensure category is present
+//                 if (!categoryMap[item.categoryId]) {
+//                     categoryMap[item.categoryId] = {
+//                         name: item.categoryName,
+//                         quantity: 0,
+//                         revenue: 0
+//                     };
+//                 }
+//                 categoryMap[item.categoryId].quantity += item.quantity;
+//                 categoryMap[item.categoryId].revenue += item.subTotal;
+//             }
+
+//             // --- Brands ---
+//             if (item.brandName) {  // Ensure brand is present
+//                 if (!brandMap[item.brandId]) {
+//                     brandMap[item.brandId] = {
+//                         name: item.brandName,
+//                         quantity: 0,
+//                         revenue: 0
+//                     };
+//                 }
+//                 brandMap[item.brandId].quantity += item.quantity;
+//                 brandMap[item.brandId].revenue += item.subTotal;
+//             }
+
+//         });
+
+
+//     });
+
+//     const topProducts = Object.values(productMap)
+//         .sort((a, b) => b.quantity - a.quantity)
+//         .slice(0, limit);
+
+//     const topCategories = Object.values(categoryMap)
+//         .sort((a, b) => b.quantity - a.quantity)
+//         .slice(0, limit);
+
+//     const topBrands = Object.values(brandMap)
+//         .sort((a, b) => b.quantity - a.quantity)
+//         .slice(0, limit);
+
+
+
+//     console.log(topProducts, '-------')
+//     console.log(topCategories, 'branddsss-------')
+//     console.log(topBrands, 'categoriii-------')
+
+// }
+
+
+
+export const getBestSellers = async (req, res) => {
+  try {
+    const orders = await Order.find();
+
+    const productMap = {};
+    const categoryMap = {};
+    const brandMap = {};
+    const limit = 10;
+
+    for (const order of orders) {
+      for (const item of order.Items) {
+        // Fetch product details for this item
+        const product = await Product.findById(item.productId).populate("category brand");
+        if (!product) continue;
+
+        // --- Products ---
+        const prodKey = product._id.toString();
+        if (!productMap[prodKey]) {
+          productMap[prodKey] = {
+            name: product.name,
+            quantity: 0,
+            revenue: 0
+          };
+        }
+        productMap[prodKey].quantity += item.quantity;
+        productMap[prodKey].revenue += item.subTotal;
+
+        // --- Categories ---
+        if (product.category) {
+          const catKey = product.category._id.toString();
+          if (!categoryMap[catKey]) {
+            categoryMap[catKey] = {
+              name: product.category.categoryName,
+              quantity: 0,
+              revenue: 0
+            };
+          }
+          categoryMap[catKey].quantity += item.quantity;
+          categoryMap[catKey].revenue += item.subTotal;
+        }
+
+        // --- Brands ---
+        if (product.brand) {
+          const brandKey = product.brand._id.toString();
+          if (!brandMap[brandKey]) {
+            brandMap[brandKey] = {
+              name: product.brand.name,
+              quantity: 0,
+              revenue: 0
+            };
+          }
+          brandMap[brandKey].quantity += item.quantity;
+          brandMap[brandKey].revenue += item.subTotal;
+        }
+      }
+    }
+
+    const topProducts = Object.values(productMap)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, limit);
+
+    const topCategories = Object.values(categoryMap)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, limit);
+
+    const topBrands = Object.values(brandMap)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, limit);
+
+
+      console.log(topProducts,'-----')
+      console.log(topCategories,'brans-----')
+      console.log(topBrands,'category-----')
+
+
+    res.json({ topProducts, topCategories, topBrands });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching best sellers" });
+  }
 };

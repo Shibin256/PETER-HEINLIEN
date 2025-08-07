@@ -7,13 +7,17 @@ import {
   FiUpload,
   FiX,
 } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { createBanner, deleteBanner, fetchBanners, setActiveBanner } from "../../features/admin/banner/bannerSlice";
+import { useEffect } from "react";
 
 const Banners = () => {
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [buttonText, setButtonText] = useState("");
-  const [buttonLink, setButtonLink] = useState("");
+  const dispatch = useDispatch()
 
   // Image states
   const [bgImage, setBgImage] = useState(null);
@@ -21,17 +25,30 @@ const Banners = () => {
   const [mainImage, setMainImage] = useState(null);
   const [mainImagePreview, setMainImagePreview] = useState("");
 
-  // Refs for file inputs
+  const [loading, setLoading] = useState(false)
   const bgImageInputRef = useRef(null);
   const mainImageInputRef = useRef(null);
 
-  // Banners list
-  const [banners, setBanners] = useState([]);
-  const [activeBannerId, setActiveBannerId] = useState(null);
+  const { banners } = useSelector(state => state.banner)
+
+  const activeBanner = banners.find(banner => banner.isActive);
+
+  useEffect(() => {
+    dispatch(fetchBanners())
+  }, [])
 
   const handleBgImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.match("image.*")) {
+        toast.warning("Please select an image file (JPEG, PNG)");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        toast.warning("File size should be less than 2MB");
+        return;
+      }
       setBgImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -44,6 +61,16 @@ const Banners = () => {
   const handleMainImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.match("image.*")) {
+        toast.warning("Please select an image file (JPEG, PNG)");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        toast.warning("File size should be less than 2MB");
+        return;
+      }
+
       setMainImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -69,44 +96,54 @@ const Banners = () => {
     }
   };
 
-  const handleCreate = () => {
-    if (!bgImagePreview || !title) return;
+  const handleCreate = async () => {
+    try {
+      setLoading(true)
+      if (!bgImagePreview || !title || !buttonText || !description) {
+        toast.warning("All fields required");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("buttonText", buttonText);
+      if (bgImage) formData.append("images", bgImage);
+      if (mainImage) formData.append("images", mainImage);
 
-    const newBanner = {
-      id: Date.now(),
-      bgImage: bgImagePreview,
-      mainImage: mainImagePreview,
-      title,
-      description,
-      buttonText,
-      buttonLink,
-      createdAt: new Date().toISOString(),
-    };
-
-    setBanners([...banners, newBanner]);
-    resetForm();
+      await dispatch(createBanner(formData))
+      resetForm();
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
   };
 
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setButtonText("");
-    setButtonLink("");
     setBgImage(null);
     setBgImagePreview("");
     setMainImage(null);
     setMainImagePreview("");
   };
 
-  const deleteBanner = (id) => {
-    setBanners(banners.filter((banner) => banner.id !== id));
-    if (activeBannerId === id) {
-      setActiveBannerId(null);
+  const handledeleteBanner = async (id) => {
+    try {
+      await dispatch(deleteBanner({ bannerId: id }))
+    } catch (error) {
+      console.log(error)
     }
   };
 
-  const activateBanner = (id) => {
-    setActiveBannerId(id);
+  const activateBanner = async (id) => {
+    try {
+      await dispatch(setActiveBanner({ bannerId: id }));
+      dispatch(fetchBanners()); // Refresh the banners list to get updated active status
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
@@ -248,19 +285,6 @@ const Banners = () => {
                   className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-teal-100 focus:border-teal-500 text-gray-700 transition-all"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Link
-                </label>
-                <input
-                  type="text"
-                  value={buttonLink}
-                  onChange={(e) => setButtonLink(e.target.value)}
-                  placeholder="/summer-sale"
-                  className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-teal-100 focus:border-teal-500 text-gray-700 transition-all"
-                />
-              </div>
             </div>
 
             <button
@@ -268,8 +292,8 @@ const Banners = () => {
               disabled={!bgImagePreview || !title}
               className={`w-full mt-4 px-6 py-3 rounded-lg font-medium text-white transition-all ${!bgImagePreview || !title ? "bg-gray-400 cursor-not-allowed" : "bg-teal-600 hover:bg-teal-700 shadow-md hover:shadow-lg"} flex items-center justify-center`}
             >
-              <FiPlus className="mr-2" />
-              Create Banner
+              {!loading && <FiPlus className="mr-2" />}
+              {loading ? 'loading' : 'Create Banner'}
             </button>
           </div>
         </div>
@@ -297,21 +321,21 @@ const Banners = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {banners.map((banner) => (
                   <div
-                    key={banner.id}
-                    className={`relative border rounded-xl overflow-hidden transition-all ${activeBannerId === banner.id ? "ring-2 ring-teal-500 border-teal-500" : "border-gray-200"}`}
+                    key={banner._id}
+                    className={`relative border rounded-xl overflow-hidden transition-all ${banner.isActive ? "ring-2 ring-teal-500 border-teal-500" : "border-gray-200"}`}
                   >
                     {/* Banner Image */}
                     <div className="h-40 bg-gray-100 overflow-hidden relative">
-                      {banner.bgImage ? (
+                      {banner.bannerImage ? (
                         <>
                           <img
-                            src={banner.bgImage}
+                            src={banner.bannerImage}
                             alt={banner.title}
                             className="w-full h-full object-cover"
                           />
-                          {banner.mainImage && (
+                          {banner.bagroundImage && (
                             <img
-                              src={banner.mainImage}
+                              src={banner.bagroundImage}
                               alt={banner.title}
                               className="absolute bottom-4 right-4 h-3/5 object-contain"
                             />
@@ -330,7 +354,11 @@ const Banners = () => {
                         {banner.title}
                       </h4>
                       <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                        {banner.description}
+                        description : {banner.description}
+                      </p>
+
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        button text :{banner.buttonText}
                       </p>
 
                       <div className="flex justify-between items-center mt-4">
@@ -340,7 +368,7 @@ const Banners = () => {
 
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => deleteBanner(banner.id)}
+                            onClick={() => handledeleteBanner(banner._id)}
                             className="p-2 text-red-500 hover:text-red-700 transition-colors"
                             title="Delete banner"
                           >
@@ -348,10 +376,10 @@ const Banners = () => {
                           </button>
 
                           <button
-                            onClick={() => activateBanner(banner.id)}
-                            className={`p-2 transition-colors ${activeBannerId === banner.id ? "text-teal-500" : "text-gray-400 hover:text-gray-600"}`}
+                            onClick={() => activateBanner(banner._id)}
+                            className={`p-2 transition-colors ${banner.isActive ? "text-teal-500" : "text-gray-400 hover:text-gray-600"}`}
                             title={
-                              activeBannerId === banner.id
+                              banner.isActive
                                 ? "Active banner"
                                 : "Set as active"
                             }
@@ -363,7 +391,7 @@ const Banners = () => {
                     </div>
 
                     {/* Active Badge */}
-                    {activeBannerId === banner.id && (
+                    {banner.isActive && (
                       <div className="absolute top-2 right-2 bg-teal-500 text-white text-xs px-2 py-1 rounded-full">
                         Active
                       </div>
@@ -374,52 +402,74 @@ const Banners = () => {
             )}
           </div>
 
-          {/* Active Banner Preview */}
-          {activeBannerId && banners.find((b) => b.id === activeBannerId) && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          {/* Active Banner Preview - Compact Version */}
+          {activeBanner && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+              <h3 className="text-md font-semibold text-gray-800 mb-3">
                 Active Banner Preview
               </h3>
-              <div className="border rounded-xl overflow-hidden">
-                <div className="h-48 bg-gray-100 overflow-hidden relative">
+              <section className="relative w-full bg-gray-50 overflow-hidden rounded-lg">
+                {/* Background image with overlay */}
+                <div className="absolute inset-0 z-0">
                   <img
-                    src={
-                      banners.find((b) => b.id === activeBannerId).bgImage ||
-                      "https://via.placeholder.com/1200x400?text=Banner+Image"
-                    }
-                    alt="Active banner"
-                    className="w-full h-full object-cover"
+                    src={activeBanner.bannerImage || "https://via.placeholder.com/1200x400?text=Banner+Image"}
+                    alt="Banner background"
+                    className="w-full h-full object-cover opacity-20"
                   />
-                  {banners.find((b) => b.id === activeBannerId).mainImage && (
-                    <img
-                      src={
-                        banners.find((b) => b.id === activeBannerId).mainImage
-                      }
-                      alt="Main image"
-                      className="absolute bottom-6 right-6 h-1/2 object-contain"
-                    />
-                  )}
                 </div>
-                <div className="p-6 bg-gradient-to-r from-gray-50 to-white">
-                  <h4 className="text-xl font-bold text-gray-800">
-                    {banners.find((b) => b.id === activeBannerId).title}
-                  </h4>
-                  <p className="text-gray-600 mt-2">
-                    {banners.find((b) => b.id === activeBannerId).description}
-                  </p>
-                  {banners.find((b) => b.id === activeBannerId).buttonText && (
-                    <a
-                      href={
-                        banners.find((b) => b.id === activeBannerId)
-                          .buttonLink || "#"
-                      }
-                      className="inline-block mt-4 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-                    >
-                      {banners.find((b) => b.id === activeBannerId).buttonText}
-                    </a>
-                  )}
+
+                <div className="relative z-10 px-4 py-12 sm:py-16">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
+                    {/* Text content */}
+                    <div className="text-center lg:text-left">
+                      <h1 className="prata-regular text-2xl md:text-3xl font-bold mb-2 text-gray-900">
+                        {activeBanner.title || "DISCOVER"}
+                      </h1>
+                      {activeBanner.description && (
+                        <h2 className="text-xl md:text-2xl mb-4 text-gray-800">
+                          {activeBanner.description}
+                        </h2>
+                      )}
+
+                      <div className="border-t border-gray-300 my-4 w-3/4 lg:w-1/2 mx-auto lg:mx-0"></div>
+
+                      <div className="mb-4">
+                        {activeBanner.buttonText && (
+                          <>
+                            <p className="text-md md:text-lg mb-3 max-w-xl mx-auto lg:mx-0 text-gray-600">
+                              {activeBanner.additionalText || "Explore our premium collection"}
+                            </p>
+                            <button
+                              className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300 text-md font-medium"
+                            >
+                              {activeBanner.buttonText}
+                            </button>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="border-t border-gray-300 my-4 w-3/4 lg:w-1/2 mx-auto lg:mx-0"></div>
+                    </div>
+
+                    {/* Image showcase */}
+                    {activeBanner.bagroundImage && (
+                      <div className="relative w-full lg:w-[350px] h-[250px]">
+                        <div className="bg-white p-4 rounded-lg shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                          <img
+                            src={activeBanner.bagroundImage}
+                            alt="Featured product"
+                            className="w-full h-auto object-contain"
+                            width="90px"
+                          />
+                          <div className="absolute -bottom-4 -right-4 bg-yellow-100 px-3 py-1 rounded-lg shadow-md">
+                            <span className="font-bold text-gray-800 text-xs">NEW</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </section>
             </div>
           )}
         </div>

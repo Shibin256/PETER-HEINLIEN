@@ -70,7 +70,7 @@ export const fetchAdsCoupons = async (req, res) => {
     let coupon = await Coupons.findOne()
         .sort({ createdAt: -1 })
         .select('-createdAt -updatedAt');
-F    res.json({ coupon });
+    res.json({ coupon });
 }
 
 export const deleteCoupon = async (req, res) => {

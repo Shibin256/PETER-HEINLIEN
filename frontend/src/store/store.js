@@ -10,6 +10,7 @@ import ordersReducer from "../features/orders/ordersSlice";
 import couponsReducer from "../features/coupons/couponsSlice";
 import walletReducer from "../features/wallet/walletSlice";
 import dashboardReducer from "../features/admin/dashboard/dashboardSlice";
+import bannerReducer from "../features/admin/banner/bannerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export const store = configureStore({
     coupons: couponsReducer,
     wallet: walletReducer,
     dashboard: dashboardReducer,
+    banner:bannerReducer
   },
 });

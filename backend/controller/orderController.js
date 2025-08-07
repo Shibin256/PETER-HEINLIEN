@@ -54,6 +54,7 @@ export const placeOrder = async (req, res) => {
     }))
 
 
+
     const orderData = {
         UserID: userId,
         Order_Address: refinedAddress,
@@ -545,3 +546,27 @@ export const downloadInvoice = async (req, res) => {
         res.status(500).json({ message: 'Server error generating invoice' });
     }
 };
+
+
+
+
+export const addReview = async (req, res) => {
+    const { rating, comment } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+      const alreadyReviewed = product.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+     const review = {
+      user: req.user._id,
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+    };
+
+
+
+}

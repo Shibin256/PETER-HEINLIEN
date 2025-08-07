@@ -80,6 +80,13 @@ const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
   window.URL.revokeObjectURL(url);
 };
 
+
+
+const getBestSellers = async () => {
+  const res = await adminAxiosInstance.get("/api/admin/dashboard/best-sellers");
+  return res.data;
+};
+
 const dashboardService = {
   getStats,
   getSalesReport,
@@ -87,6 +94,7 @@ const dashboardService = {
   getRecentOrders,
   downloadSalesReportPdf,
   downloadSalesReportExcel,
+  getBestSellers
 };
 
 export default dashboardService;

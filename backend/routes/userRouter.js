@@ -14,6 +14,7 @@ import { cancelOrderItem, cancelOrderSingleItem, downloadInvoice, getOrders, pla
 import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymentController.js';
 import { applyCoupon, fetchAdsCoupons, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
+import { fetchHomeBanner } from '../controller/admin/bannerController.js';
 
 const router = express.Router();
 const storage=multer.diskStorage({})
@@ -67,5 +68,10 @@ router.get('/fetchAdsCoupons',verifyAccessToken,fetchAdsCoupons)
 
 router.post('/wallet/:userId/:amount/:paymentId',verifyAccessToken,addToWallet)
 router.get('/wallet/:userId',verifyAccessToken,getWallet)
+
+//banner
+
+router.get('/banner/fetchHomeBanner',verifyAccessToken,fetchHomeBanner)
+
 
 export default router;

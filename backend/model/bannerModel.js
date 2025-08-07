@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const bannerSchema = new mongoose.Schema({
   bannerImage: {
     type: String,
-    required: true, // URL or path to the image stored on Cloudinary or server
+    required: true,
   },
   bagroundImage:{
     type:String,
@@ -24,10 +24,14 @@ const bannerSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  buttonLink: {
-    type: String,
-    required: true,
-    trim: true
+  // buttonLink: {
+  //   type: String,
+  //   required: true,
+  //   trim: true
+  // },
+  isActive:{
+    type:Boolean,
+    default:false
   }
 }, {
   timestamps: true

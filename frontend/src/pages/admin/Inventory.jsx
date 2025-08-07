@@ -186,6 +186,7 @@ const Inventory = () => {
         toast.warning("File size should be less than 2MB");
         return;
       }
+      console.log(file)
 
       setBrandLogo(file);
 

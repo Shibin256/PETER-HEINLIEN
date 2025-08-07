@@ -1,21 +1,29 @@
 import React from "react";
 
-import heroimg from "../../assets/herosectionwatch.jpg";
-import heroimg2 from "../../assets/heroSectionWatch2.png";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {fetchHomeBanner } from "../../features/admin/banner/bannerSlice";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/collection");
   };
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchHomeBanner())
+  }, [])
+
+  const { homeBanner } = useSelector(state => state.banner)
 
   return (
     <section className="relative w-full bg-gray-50 overflow-hidden">
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src={heroimg} // Replace with your actual image path
+          src={homeBanner.bannerImage}
           alt="Luxury watches collection"
           className="w-full h-full object-cover opacity-20"
         />
@@ -36,17 +44,16 @@ const HeroSection = () => {
 
             <div className="mb-8">
               <h3 className="text-xl md:text-2xl font-semibold mb-4 text-gray-700">
-                COLLECTION PRECISION
+                {homeBanner.title}
               </h3>
               <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto lg:mx-0 text-gray-600">
-                A series that celebrates the flawless accuracy and timeless
-                elegance of classic timepieces.
+                {homeBanner.description}
               </p>
               <button
                 className="px-8 py-3 bg-black text-white hover:bg-gray-800 transition-colors duration-300 text-lg font-medium"
                 onClick={handleClick}
               >
-                Shop the watches
+                {homeBanner.buttonText}
               </button>
             </div>
 
@@ -69,7 +76,7 @@ const HeroSection = () => {
           <div className="relative w-full lg:w-[500px] h-[400px]">
             <div className="bg-white p-6 rounded-lg shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-500">
               <img
-                src={heroimg2} // Replace with your product image
+                src={homeBanner.bagroundImage} // Replace with your product image
                 alt="Precision Collection Watch"
                 className="w-full h-auto object-contain"
                 width="120px"

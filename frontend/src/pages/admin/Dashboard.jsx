@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
   downloadSalesReportExcel,
   downloadSalesReportPdf,
   fetchSalesReport,
+  getBestSellers,
 } from "../../features/admin/dashboard/dashboardSlice";
+import SalesDistribution from "../../components/admin/SalesDistribution";
+import SalesTrend from "../../components/admin/SalesTrend ";
+import BestSellerChart from "../../components/common/BestSellerChart";
 
 const Dashboard = () => {
   const [reportPeriod, setReportPeriod] = useState("Custom Date Range");
@@ -13,6 +17,7 @@ const Dashboard = () => {
   const [endDate, setEndDate] = useState("");
   const [totalSales, setTotalSales] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
+  const [orders, setOrders] = useState([]);
   const [totalDiscounts, setTotalDiscounts] = useState(0);
   const [avgOrderValue, setAvgOrderValue] = useState(0);
   const [showModal, setShowModal] = useState(false);
@@ -22,11 +27,20 @@ const Dashboard = () => {
   // const { salesReport } = useSelector((state) => state.dashboard);
 
   const handleReportPeriodChange = (e) => {
+    const today = new Date().toISOString().split("T")[0];
     setReportPeriod(e.target.value);
-    setStartDate("");
+    setStartDate(today);
     setEndDate("");
   };
 
+
+  useEffect(() => {
+    dispatch(getBestSellers())
+  }, [])
+
+  const { topProducts, topCategories, topBrands } = useSelector(state => state.dashboard)
+
+  console.log(topProducts, topCategories, topBrands, '-------')
   const applyFilters = async () => {
     console.log(startDate);
     const today = new Date().toISOString().split("T")[0];
@@ -62,6 +76,8 @@ const Dashboard = () => {
     const res = await dispatch(
       fetchSalesReport({ type: reportPeriod, startDate, endDate }),
     );
+    console.log(res, '---')
+    setOrders(res.payload.orders)
     setTotalSales(res.payload.totalSales);
     setTotalOrders(res.payload.totalOrders);
     setTotalDiscounts(res.payload.totalDiscount);
@@ -76,6 +92,7 @@ const Dashboard = () => {
     setTotalOrders(0);
     setTotalDiscounts(0);
     setAvgOrderValue(0);
+    setOrders([])
   };
 
   const handleGenerateReport = () => {
@@ -273,6 +290,7 @@ const Dashboard = () => {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
+
               </div>
             )}
 
@@ -335,14 +353,6 @@ const Dashboard = () => {
               <p className="text-3xl font-bold text-gray-800 mt-2">
                 ₹{totalSales.toLocaleString()}
               </p>
-              {/* <div className="mt-2 text-xs text-indigo-500">
-                <span className="inline-flex items-center">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-                  </svg>
-                  +12% from last period
-                </span>
-              </div> */}
             </div>
 
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl shadow-sm border border-green-50">
@@ -350,14 +360,6 @@ const Dashboard = () => {
               <p className="text-3xl font-bold text-gray-800 mt-2">
                 {totalOrders}
               </p>
-              {/* <div className="mt-2 text-xs text-green-500">
-                <span className="inline-flex items-center">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-                  </svg>
-                  +8% from last period
-                </span>
-              </div> */}
             </div>
 
             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-5 rounded-xl shadow-sm border border-yellow-50">
@@ -365,16 +367,8 @@ const Dashboard = () => {
                 Total Discounts
               </p>
               <p className="text-3xl font-bold text-gray-800 mt-2">
-                ₹{totalDiscounts.toLocaleString()}
+                ₹{totalDiscounts}
               </p>
-              {/* <div className="mt-2 text-xs text-yellow-500">
-                <span className="inline-flex items-center">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1v-5a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clipRule="evenodd" />
-                  </svg>
-                  -3% from last period
-                </span>
-              </div> */}
             </div>
 
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-sm border border-gray-50">
@@ -384,16 +378,24 @@ const Dashboard = () => {
               <p className="text-3xl font-bold text-gray-800 mt-2">
                 ₹{avgOrderValue.toLocaleString()}
               </p>
-              {/* <div className="mt-2 text-xs text-gray-500">
-                <span className="inline-flex items-center">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-                  </svg>
-                  +5% from last period
-                </span>
-              </div> */}
             </div>
           </div>
+          <div className="space-y-6 mt-4">
+            {/* Top Section: 2 Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <SalesDistribution totalSales={totalSales} totalDiscount={totalDiscounts} />
+              <SalesTrend orders={orders} />
+            </div>
+
+            {/* Bottom Section: 3 Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <BestSellerChart title="Top Products" data={topProducts} color="#4285F4" />
+              <BestSellerChart title="Top Categories" data={topCategories} color="#FFBB28" />
+              <BestSellerChart title="Top Brands" data={topBrands} color="#00C49F" />
+            </div>
+          </div>
+
+
         </div>
       </div>
     </div>
