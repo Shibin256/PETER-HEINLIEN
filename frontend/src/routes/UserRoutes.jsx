@@ -29,10 +29,12 @@ import MyOrders from "../pages/user/MyOrders";
 import OrderSuccessPage from "../pages/user/orderSuccess";
 import Wallet from "../pages/user/Wallet";
 import OrderFailed from "../pages/user/orderFailed";
+import ErrorBoundary from "../components/common/ErrorBoundary";
 
 const UserRoutes = () => {
   return (
     <div>
+      <ErrorBoundary>
       <Routes>
         <Route
           path="login"
@@ -189,6 +191,7 @@ const UserRoutes = () => {
           />
         </Route>
       </Routes>
+      </ErrorBoundary>
     </div>
   );
 };

@@ -9,9 +9,11 @@ import {
 import { FaUser } from "react-icons/fa";
 import Swal from "sweetalert2";
 import AuthInput from "../../components/common/AuthInput";
+import { useRef } from "react";
 
 const UserList = () => {
   const dispatch = useDispatch();
+  const inputRef = useRef(null);
   const { users, loading, error, currentPage, totalPages } = useSelector(
     (state) => state.users,
   );
@@ -20,14 +22,27 @@ const UserList = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    dispatch(fetchUsers({ page, limit, search: searchTerm }));
-  };
 
   useEffect(() => {
-    dispatch(fetchUsers({ page, limit }));
-  }, [dispatch, page]);
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      dispatch(fetchUsers({ page, limit, search: searchTerm })).unwrap()
+        .then(() => {
+          console.log('hii')
+          console.log(inputRef)
+          inputRef.current?.focus();
+        })
+    }, 500)
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, page, limit, dispatch])
+
+  useEffect(() => {
+    dispatch(fetchUsers({ page, limit }))
+  }, [page]);
 
   const handleToggleBlock = (user) => {
     const action = user.isBlocked ? "unblock" : "block";
@@ -59,33 +74,6 @@ const UserList = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This will permanently delete the user.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete!",
-      cancelButtonText: "Cancel",
-      buttonsStyling: false,
-      customClass: {
-        confirmButton:
-          "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
-        cancelButton:
-          "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteUser(id)).then((res) => {
-          if (res.type.endsWith("/fulfilled")) {
-            toast.success("✅ User deleted successfully!");
-          } else {
-            toast.error(res?.error?.message || "Failed to delete user.");
-          }
-        });
-      }
-    });
-  };
 
   const totalUsers = users?.length || 0;
   const blockedUsers = users?.filter((user) => user.isBlocked)?.length || 0;
@@ -104,36 +92,17 @@ const UserList = () => {
       <h2 className="text-2xl font-bold mb-4">User List</h2>
       {/* Search Bar */}
       <div className="mb-6">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <AuthInput
-            type="text"
-            name="search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search orders by name..."
-            width="w-full md:w-96"
-            Textcolor="text-gray-700"
-            borderColor="border-gray-300"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Search
-          </button>
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm("");
-                dispatch(fetchUsers({ page, limit })); // Reset search
-              }}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-            >
-              Clear
-            </button>
-          )}
-        </form>
+        <AuthInput
+          type="text"
+          name="search"
+          ref={inputRef}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search orders by name..."
+          width="w-full md:w-96"
+          Textcolor="text-gray-700"
+          borderColor="border-gray-300"
+        />
       </div>
 
       <div className="mb-4 flex flex-wrap justify-between items-center gap-4">
@@ -199,20 +168,13 @@ const UserList = () => {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => handleToggleBlock(user)}
-                      className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        user.isBlocked
-                          ? "bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500"
-                          : "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500"
-                      }`}
+                      className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${user.isBlocked
+                        ? "bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500"
+                        : "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500"
+                        }`}
                     >
                       {user.isBlocked ? "Unblock" : "Block"}
                     </button>
-                    {/* <button
-                      onClick={() => handleDelete(user._id)}
-                      className="inline-flex items-center px-3 py-1 border border-red-200 rounded-md shadow-sm text-sm font-medium text-red-800 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      Delete
-                    </button> */}
                   </div>
                 </td>
               </tr>

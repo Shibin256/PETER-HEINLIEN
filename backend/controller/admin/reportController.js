@@ -2,13 +2,12 @@ import Order from "../../model/orderModel.js";
 import ExcelJS from "exceljs";
 import PDFDocument from 'pdfkit';
 import Product from "../../model/productModel.js";
+import { statusCode } from "../../utils/statusCode.js";
 
 
 export const getSalesReport = async (req, res) => {
     try {
         const { type, startDate, endDate } = req.query;
-        console.log(startDate)
-        console.log(type)
 
         let matchQuery = { Status: { $nin: ['Cancelled', 'Returned'] } }; // Exclude Cancelled & Returned
 
@@ -61,7 +60,7 @@ export const getSalesReport = async (req, res) => {
 
         const avgOrderValue = orders.length ? totalSales / orders.length : 0;
 
-        res.status(200).json({
+        res.status(statusCode.OK).json({
             totalOrders: orders.length,
             totalSales,
             totalDiscount,
@@ -70,7 +69,7 @@ export const getSalesReport = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching sales report:", error);
-        res.status(500).json({ message: "Error fetching sales report" });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Error fetching sales report" });
     }
 };
 
@@ -154,7 +153,7 @@ export const exelReport = async (req, res) => {
 
     } catch (error) {
         console.error("Error generating Excel:", error);
-        res.status(500).json({ message: "Error generating Excel" });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Error generating Excel" });
     }
 }
 
@@ -207,7 +206,7 @@ export const downloadSalesReportPDF = async (req, res) => {
         doc.end();
     } catch (error) {
         console.error("Error generating PDF:", error);
-        res.status(500).json({ message: "Error generating PDF report" });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Error generating PDF report" });
     }
 };
 
@@ -364,9 +363,9 @@ export const getBestSellers = async (req, res) => {
       console.log(topBrands,'category-----')
 
 
-    res.json({ topProducts, topCategories, topBrands });
+    res.status(statusCode.OK).json({ topProducts, topCategories, topBrands });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching best sellers" });
+    res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Error fetching best sellers" });
   }
 };

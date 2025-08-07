@@ -14,6 +14,7 @@ import Banners from "../pages/admin/Banners";
 import OrdersList from "../pages/admin/OrdersList";
 import Coupons from "../pages/admin/coupons";
 import Offers from "../pages/admin/Offer";
+import ErrorBoundary from "../components/common/ErrorBoundary";
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const AdminRoutes = () => {
 
   return (
     <div>
+      <ErrorBoundary>
       <Routes>
         <Route path="login" element={<AdminLogin />} />
         <Route
@@ -54,6 +56,7 @@ const AdminRoutes = () => {
           <Route path="offers" element={<Offers />} />
         </Route>
       </Routes>
+      </ErrorBoundary>
     </div>
   );
 };
