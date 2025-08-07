@@ -21,57 +21,55 @@ const storage=multer.diskStorage({})
 const upload=multer({storage})
 
 //wishlist manage
-router.post('/wishlist/add',verifyAccessToken, addToWishlist);
+router.post('/wishlist',verifyAccessToken, addToWishlist);
 router.post('/wishlist/remove',verifyAccessToken, removeFromWishlist);
 router.get('/wishlist/:userId',verifyAccessToken, getUserWishlist);
-router.get('/wishlist/check/:userId/:productId',verifyAccessToken,getWishedProduct)
+router.get('/wishlist/:userId/:productId',verifyAccessToken,getWishedProduct)
 
 
 //Account manage
-router.patch('/account/:id',verifyAccessToken,upload.none(),changeName)
-router.patch('/account/editMobile/:id',verifyAccessToken,upload.none(),changeOrAddMobile)
-router.patch('/account/editPassword/:id',verifyAccessToken,editPassword)
-router.patch('/account/editImage/:id',verifyAccessToken,upload.single('file'),editImage)
-router.post('/account/addAddress/:id',verifyAccessToken,addAddress)
-router.post('/account/getAllAddress/:id',verifyAccessToken,getAllAddress)
-router.delete('/account/removeAddress/:userId/:addressId',verifyAccessToken,removeAddress)
-router.patch('/account/setDefault/:userId/:addressId',verifyAccessToken,SetDefaultAddress)
-router.put('/account/updateAddress/:addressId',verifyAccessToken,updateAddress)
+router.patch('/account/:id/name',verifyAccessToken,upload.none(),changeName)
+router.patch('/account/:id/mobile',verifyAccessToken,upload.none(),changeOrAddMobile)
+router.patch('/account/:id/password',verifyAccessToken,editPassword)
+router.patch('/account/:id/image',verifyAccessToken,upload.single('file'),editImage)
+router.post('/account/:id/address',verifyAccessToken,addAddress)
+router.get('/account/:id/address',verifyAccessToken,getAllAddress)
+router.delete('/account/:userId/:addressId',verifyAccessToken,removeAddress)
+router.patch('/account/:userId/:addressId/default',verifyAccessToken,SetDefaultAddress)
+router.put('/account/:addressId',verifyAccessToken,updateAddress)
 
 
 //cart manage
-router.post('/cart/add',verifyAccessToken,addItemToCart)
+router.post('/cart',verifyAccessToken,addItemToCart)
 router.get('/cart/:userId',verifyAccessToken,getCart)
 router.delete('/cart/:userId/:productId',verifyAccessToken,removeCartItem)
-router.put('/cart/update',verifyAccessToken,updateCartItem)
-router.post('/cart/wishlistToCart',verifyAccessToken,addFromWishlistToCart)
-router.post('/cart/toggleIsLocked/:userId/:lock',verifyAccessToken,toggleIsLocked)
-
+router.put('/cart',verifyAccessToken,updateCartItem)
+router.post('/cart/from-wishlist',verifyAccessToken,addFromWishlistToCart)
+router.post('/cart/:userId/:lock',verifyAccessToken,toggleIsLocked)
 
 
 //order manage
-router.post('/orders/placeOrder',verifyAccessToken,placeOrder)
+router.post('/orders',verifyAccessToken,placeOrder)
 router.get('/orders/:userId',verifyAccessToken,getOrders)
-router.post('/orders/cancelItem',verifyAccessToken,cancelOrderItem)
-router.post('/orders/cancelSingleItem',verifyAccessToken,cancelOrderSingleItem)
-router.post('/orders/returnItem/:itemOrderId',verifyAccessToken,returnOrderItem) //this is for user side
+router.post('/orders/cancel',verifyAccessToken,cancelOrderItem)
+router.post('/orders/item/cancel',verifyAccessToken,cancelOrderSingleItem)
+router.post('/orders/:itemOrderId/return',verifyAccessToken,returnOrderItem) //this is for user side
 router.get('/invoice/:orderId',verifyAccessToken,downloadInvoice)
+//payment
+router.post('/payments/razorpay/order',verifyAccessToken,createRazorpayOrder)
+router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment,fetchCoupons)
 
-router.post('/create-order',verifyAccessToken,createRazorpayOrder)
-router.post('/verify-payment',verifyAccessToken,verifyRazorpayPayment,fetchCoupons)
 
-
-router.post('/coupons/applyCoupon', verifyAccessToken,applyCoupon);
+router.post('/coupons', verifyAccessToken,applyCoupon);
 router.delete('/coupons/:couponId', verifyAccessToken, removeCoupon);
-router.get('/fetchAdsCoupons',verifyAccessToken,fetchAdsCoupons)
+router.get('/coupons',verifyAccessToken,fetchAdsCoupons)
 
 
 router.post('/wallet/:userId/:amount/:paymentId',verifyAccessToken,addToWallet)
 router.get('/wallet/:userId',verifyAccessToken,getWallet)
 
 //banner
-
-router.get('/banner/fetchHomeBanner',verifyAccessToken,fetchHomeBanner)
+router.get('/banner',verifyAccessToken,fetchHomeBanner)
 
 
 export default router;

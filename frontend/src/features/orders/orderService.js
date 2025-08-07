@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axiosInstance";
 
 const placeOrder = async (orderData) => {
   const response = await axiosInstance.post(
-    "/api/user/orders/placeOrder",
+    "/api/v1/users/orders",
     orderData,
   );
   return response.data;
@@ -15,7 +15,7 @@ const getOrders = async (userId, search, page, limit) => {
     params.append("search", search);
   }
 
-  const response = await axiosInstance.get(`/api/user/orders/${userId}`, {
+  const response = await axiosInstance.get(`/api/v1/users/orders/${userId}`, {
     params: params,
   });
 
@@ -24,7 +24,7 @@ const getOrders = async (userId, search, page, limit) => {
 
 const cancelOrderItem = async (data) => {
   const response = await axiosInstance.post(
-    `/api/user/orders/cancelItem`,
+    `/api/v1/users/orders/cancel`,
     data,
   );
   return response.data;
@@ -32,7 +32,7 @@ const cancelOrderItem = async (data) => {
 
 const cancelSingleOrderItem = async (data) => {
   const response = await axiosInstance.post(
-    `/api/user/orders/cancelSingleItem`,
+    `/api/v1/users/orders/item/cancel`,
     data,
   );
   return response.data;
@@ -40,14 +40,14 @@ const cancelSingleOrderItem = async (data) => {
 
 const cancelVerify = async (itemOrderId) => {
   const response = await adminAxiosInstance.post(
-    `/api/admin/orders/verifyCancel/${itemOrderId}`,
+    `/api/v1/admin/orders/${itemOrderId}/cancel`,
   );
   return response.data;
 };
 
 const changeOrderStatus = async ({ itemOrderId, data }) => {
   const response = await adminAxiosInstance.post(
-    `/api/admin/orders/changeStatus/${itemOrderId}`,
+    `/api/v1/admin/orders/${itemOrderId}/status`,
     data,
   );
   return response.data;
@@ -63,7 +63,7 @@ const getALlOrders = async (search, page, limit, sort) => {
   }
 
   const response = await adminAxiosInstance.get(
-    `/api/admin/orders/getAllOrders`,
+    `/api/v1/admin/orders`,
     {
       params: params,
     },
@@ -77,7 +77,7 @@ const returnOrderItem = async ({ itemOrderId, reason, deatials }) => {
     deatials: deatials,
   };
   const response = await axiosInstance.post(
-    `/api/user/orders/returnItem/${itemOrderId}`,
+    `/api/v1/users/orders/${itemOrderId}/return`,
     data,
   );
   return response.data;
@@ -85,20 +85,20 @@ const returnOrderItem = async ({ itemOrderId, reason, deatials }) => {
 
 const retrunVerify = async (itemId) => {
   const response = await adminAxiosInstance.post(
-    `/api/admin/orders/verifyReturn/${itemId}`,
+    `/api/v1/admin/orders/${itemId}/return`,
   );
   return response.data;
 };
 
 const singleCancelVerify = async (itemId) => {
   const response = await adminAxiosInstance.post(
-    `/api/admin/orders/singleCancelVerify/${itemId}`,
+    `/api/v1/admin/orders/item/${itemId}/verify`,
   );
   return response.data;
 };
 
 const downloadInvoice = async (itemOrderId) => {
-  const response = await axiosInstance.get(`/api/user/invoice/${itemOrderId}`, {
+  const response = await axiosInstance.get(`/api/v1/users/invoice/${itemOrderId}`, {
     responseType: "blob",
   });
   const blob = new Blob([response.data], { type: "application/pdf" });
@@ -114,13 +114,13 @@ const downloadInvoice = async (itemOrderId) => {
 
 const createRazorpayOrder = async (amount) => {
   console.log(amount, "in serviese");
-  const res = await axiosInstance.post("/api/user/create-order", { amount });
+  const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount });
   return res.data;
 };
 
 const verifyRazorpayPayment = async (paymentDetails) => {
   const res = await axiosInstance.post(
-    "/api/user/verify-payment",
+    "/api/v1/users/payments/razorpay/verify",
     paymentDetails,
   );
   return res.data; // returns { success: true/false }

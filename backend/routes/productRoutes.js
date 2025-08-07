@@ -11,17 +11,17 @@ const storage=multer.diskStorage({})
 const upload=multer({storage})
 
 //products manage
-router.get('/getCollection',getCollection)
-router.post('/add',authorizeRole(roles),upload.array("images",4),verifyAccessToken,createProduct)
-router.get('/get',getAllProducts)
-router.delete('/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
-router.put('/update/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken, updateProduct)
+router.get('/products/latest',getCollection)
+router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,createProduct)
+router.get('/products',getAllProducts)
+router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
+router.put('/product/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken, updateProduct)
 
-router.get('/getBrandsAndCollection',getBrandsAndCollection)
-router.get('/getBrandAndCategory',getBrandAndCategory)
+router.get('/products/getBrandsAndCollection',getBrandsAndCollection)
+router.get('/brand/category',getBrandAndCategory)
 
-router.get('/:id',getProductById)
-router.get('/relatedProducts/:productId',getRelatedProducts)
-router.post('/addOffer',authorizeRole(roles),verifyAccessToken,addProductOffer);
-router.delete('/removeOffer/:productId', authorizeRole(roles), verifyAccessToken,removeProductOffer);
+router.get('/product/:id',getProductById)
+router.get('/products/:productId/related',getRelatedProducts)
+router.post('/admin/offers',authorizeRole(roles),verifyAccessToken,addProductOffer);
+router.delete('/admin/offers/:productId', authorizeRole(roles), verifyAccessToken,removeProductOffer);
 export default router

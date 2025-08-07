@@ -50,20 +50,6 @@ export const fetchSalesReport = createAsyncThunk(
   },
 );
 
-//Fetch top-selling products
-export const fetchTopProducts = createAsyncThunk(
-  "dashboard/fetchTopProducts",
-  async (_, { rejectWithValue }) => {
-    try {
-      const res = await dashboardService.getTopProducts();
-      return res; // Should return top-selling products
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data || "Failed to fetch top products",
-      );
-    }
-  },
-);
 
 export const downloadSalesReportExcel = createAsyncThunk(
   "dashboard/downloadSalesReportExcel",
@@ -176,20 +162,6 @@ const dashboardSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Fetch Top Products
-      .addCase(fetchTopProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchTopProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.success = true;
-        state.topProducts = action.payload;
-      })
-      .addCase(fetchTopProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
   },
 });
 

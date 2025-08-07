@@ -346,7 +346,7 @@ const AddAddress = () => {
             </div>
           </div>
 
-          {/* Default Address Checkbox */}
+          {/* Default Address Checkbox
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -362,7 +362,7 @@ const AddAddress = () => {
             >
               Set as default address
             </label>
-          </div>
+          </div> */}
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4 pt-6 border-t">

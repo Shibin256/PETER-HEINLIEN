@@ -2,13 +2,13 @@ import axiosInstance from "../../api/axiosInstance";
 
 const addToWallet = async (userId, amount, paymentId) => {
   const response = await axiosInstance.post(
-    `/api/user/wallet/${userId}/${amount}/${paymentId}`,
+    `/api/v1/users/wallet/${userId}/${amount}/${paymentId}`,
   );
   return response.data;
 };
 
 const getWallet = async (userId) => {
-  const response = await axiosInstance.get(`/api/user/wallet/${userId}`);
+  const response = await axiosInstance.get(`/api/v1/users/wallet/${userId}`);
   return response.data;
 };
 

@@ -37,11 +37,12 @@ app.use(cors({
 
 // app.use(morgan("combined", { stream: { write: (message) => logger.info(message.trim()) } }));
 
-app.use("/api/products", productRoutes);
-app.use('/api/admin',adminRouter)
+// app.use("/api/products", productRoutes);
+// app.use('/api/admin',adminRouter)
 app.use('/api/auth',authRoutes)
-app.use('/api/user',userRouter)
-//app.use('api/v1/users') need to change it in this way
+// app.use('/api/user',userRouter)
+app.use('/api/v1',productRoutes,adminRouter) 
+app.use('/api/v1/users',userRouter) 
 
 //port assigning
 app.listen(process.env.PORT, () => logger.info(`The server started localhost:${process.env.PORT}`))

@@ -357,12 +357,6 @@ export const getBestSellers = async (req, res) => {
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, limit);
 
-
-      console.log(topProducts,'-----')
-      console.log(topCategories,'brans-----')
-      console.log(topBrands,'category-----')
-
-
     res.status(statusCode.OK).json({ topProducts, topCategories, topBrands });
   } catch (error) {
     console.error(error);

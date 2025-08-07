@@ -306,7 +306,7 @@ const Inventory = () => {
               `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
               "success",
             );
-            dispatch(getBrandAndCategory({ page: page, limit: 4 }));
+            dispatch(getBrandAndCategory({ page: 1, limit: 4 }));
           } else {
             Swal.fire(
               "Error!",

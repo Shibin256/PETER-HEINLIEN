@@ -7,7 +7,7 @@ const getUsers = async (page, limit, search) => {
     params.append("search", search);
   }
 
-  const res = await adminAxiosInstance.get(`/api/admin/users/get`, {
+  const res = await adminAxiosInstance.get(`/api/v1/admin/users`, {
     params: params,
   });
   return res.data;
@@ -15,13 +15,13 @@ const getUsers = async (page, limit, search) => {
 //block and ublock user
 const toggleUserBlock = async (userId) => {
   const res = await adminAxiosInstance.patch(
-    `/api/admin/block-toggle/${userId}`,
+    `/api/v1/admin/user/${userId}/block`,
   );
   return res.data;
 };
 //delete user
 const deleteUser = async (userId) => {
-  const res = await adminAxiosInstance.delete(`/api/admin/delete/${userId}`);
+  const res = await adminAxiosInstance.delete(`/api/v1/user/${userId}`);
   return res.data;
 };
 

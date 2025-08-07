@@ -1,16 +1,14 @@
 import adminAxiosInstance from "../../../api/adminAxiosInstance";
 
-// Get overall stats (sales, orders, revenue, users)
 const getStats = async () => {
   const res = await adminAxiosInstance.get("/api/admin/dashboard/stats");
   return res.data;
 };
 
-// Get sales report (daily, weekly, monthly, yearly, or custom range)
 const getSalesReport = async ({ type, startDate, endDate }) => {
   console.log(type, startDate);
   const res = await adminAxiosInstance.get(
-    "/api/admin/dashboard/sales-report",
+    "/api/v1/admin/sales/report",
     {
       params: { type, startDate, endDate },
     },
@@ -18,24 +16,10 @@ const getSalesReport = async ({ type, startDate, endDate }) => {
   return res.data;
 };
 
-// Get top-selling products
-const getTopProducts = async () => {
-  const res = await adminAxiosInstance.get("/api/admin/dashboard/top-products");
-  return res.data;
-};
-
-// Get recent orders for dashboard
-const getRecentOrders = async () => {
-  const res = await adminAxiosInstance.get(
-    "/api/admin/dashboard/recent-orders",
-  );
-  return res.data;
-};
-
 const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
   console.log(type, startDate);
   const res = await adminAxiosInstance.get(
-    "/api/admin/dashboard/sales-report/pdf",
+    "/api/v1/admin/sales/report/pdf",
     {
       params: { type, startDate, endDate },
       responseType: "blob",
@@ -55,7 +39,7 @@ const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
 };
 const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
   const res = await adminAxiosInstance.get(
-    "/api/admin/dashboard/sales-report/excel",
+    "/api/v1/admin/sales/report/excel",
     {
       params: { type, startDate, endDate },
       responseType: "blob",
@@ -83,15 +67,13 @@ const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
 
 
 const getBestSellers = async () => {
-  const res = await adminAxiosInstance.get("/api/admin/dashboard/best-sellers");
+  const res = await adminAxiosInstance.get("/api/v1/admin/bestsellers");
   return res.data;
 };
 
 const dashboardService = {
   getStats,
   getSalesReport,
-  getTopProducts,
-  getRecentOrders,
   downloadSalesReportPdf,
   downloadSalesReportExcel,
   getBestSellers

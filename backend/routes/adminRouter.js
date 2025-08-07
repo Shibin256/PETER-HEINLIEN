@@ -16,52 +16,49 @@ const upload=multer({storage})
 const roles=['admin']
 
 // user managing
-router.get('/users/get',verifyAccessToken,authorizeRole(roles),getAllUsers)
-router.patch('/block-toggle/:id',authorizeRole(roles),verifyAccessToken, toggleUserBlock);
-router.delete('/delete/:id',authorizeRole(roles),verifyAccessToken,deleteUser)
+router.get('/admin/users',verifyAccessToken,authorizeRole(roles),getAllUsers)
+router.patch('/admin/user/:id/block',authorizeRole(roles),verifyAccessToken, toggleUserBlock);
+router.delete('/admin/user/:id',authorizeRole(roles),verifyAccessToken,deleteUser)
 
 //category managing
-router.post('/addCategory',authorizeRole(roles),verifyAccessToken,createCategory)
-router.delete('/deleteCategory/:id',authorizeRole(roles),verifyAccessToken,deleteCategory)
-router.put('/editCategory/:id',authorizeRole(roles),verifyAccessToken,editCategory)
+router.post('/admin/category',authorizeRole(roles),verifyAccessToken,createCategory)
+router.delete('/admin/category/:id',authorizeRole(roles),verifyAccessToken,deleteCategory)
+router.put('/admin/category/:id',authorizeRole(roles),verifyAccessToken,editCategory)
 
 //brand managing
-router.post('/addBrand',authorizeRole(roles),verifyAccessToken, upload.single('logo'), createBrand)
-router.delete('/deleteBrand/:id',authorizeRole(roles),verifyAccessToken,deleteBrand)
-router.put('/editBrand/:id',authorizeRole(roles),verifyAccessToken,upload.single('logo'),editBrand)
+router.post('/admin/brand',authorizeRole(roles),verifyAccessToken, upload.single('logo'), createBrand)
+router.delete('/admin/brand/:id',authorizeRole(roles),verifyAccessToken,deleteBrand)
+router.put('/admin/brand/:id',authorizeRole(roles),verifyAccessToken,upload.single('logo'),editBrand)
 
 //bannerManage
-router.post('/banner/add',authorizeRole(roles),upload.array("images",2),verifyAccessToken,createBanner)
-router.get('/banner/fetchBanners',authorizeRole(roles),verifyAccessToken,fetchBanners)
-router.delete('/banner/deleteBanner/:bannerId',authorizeRole(roles),verifyAccessToken,deleteBanner)
-router.put('/banner/setActiveBanner/:bannerId',authorizeRole(roles),verifyAccessToken,setActiveBanner)
+router.post('/admin/banner',authorizeRole(roles),upload.array("images",2),verifyAccessToken,createBanner)
+router.get('/admin/banner',authorizeRole(roles),verifyAccessToken,fetchBanners)
+router.delete('/admin/banner/:bannerId',authorizeRole(roles),verifyAccessToken,deleteBanner)
+router.put('/admin/banner/:bannerId',authorizeRole(roles),verifyAccessToken,setActiveBanner)
 
 //orderManage
-router.get('/orders/getAllOrders',authorizeRole(roles),verifyAccessToken,getAllOrders)
-router.post('/orders/verifyReturn/:itemOrderId',authorizeRole(roles),verifyAccessToken,retrunVerify)
-router.post('/orders/verifyCancel/:orderId',authorizeRole(roles),verifyAccessToken,verifyCancel)
-router.post('/orders/changeStatus/:orderId',authorizeRole(roles),changeOrderStatus)
-router.post('/orders/singleCancelVerify/:itemOrderId',authorizeRole(roles),verifyAccessToken,singleCancelVerify)
+router.get('/admin/orders',authorizeRole(roles),verifyAccessToken,getAllOrders)
+router.post('/admin/orders/:itemOrderId/return',authorizeRole(roles),verifyAccessToken,retrunVerify)
+router.post('/admin/orders/:orderId/cancel',authorizeRole(roles),verifyAccessToken,verifyCancel)
+router.post('/admin/orders/:orderId/status',authorizeRole(roles),changeOrderStatus)
+router.post('/admin/orders/item/:itemOrderId/verify',authorizeRole(roles),verifyAccessToken,singleCancelVerify)
 
 
 
 //couponManage
-router.post('/coupons/createCoupons',authorizeRole(roles),verifyAccessToken,createCoupons)
-router.get('/coupons',authorizeRole(roles),verifyAccessToken,fetchCoupons)
-router.delete('/coupons/:couponId',authorizeRole(roles),verifyAccessToken,deleteCoupon);
-router.put('/coupons/:couponId',authorizeRole(roles),verifyAccessToken,updateCoupon);
+router.post('/admin/coupons',authorizeRole(roles),verifyAccessToken,createCoupons)
+router.get('/admin/coupons',authorizeRole(roles),verifyAccessToken,fetchCoupons)
+router.delete('/admin/coupons/:couponId',authorizeRole(roles),verifyAccessToken,deleteCoupon);
+router.put('/admin/coupons/:couponId',authorizeRole(roles),verifyAccessToken,updateCoupon);
 
 //offermanage
-
-router.post('/addOffer',authorizeRole(roles),verifyAccessToken,addCategoryOffer);
-router.delete('/removeOffer/:categoryId', authorizeRole(roles), verifyAccessToken,removeCategoryOffer);
+router.post('/admin/offer',authorizeRole(roles),verifyAccessToken,addCategoryOffer);
+router.delete('/admin/offer/:categoryId', authorizeRole(roles), verifyAccessToken,removeCategoryOffer);
 
 //sales report
-router.get('/dashboard/sales-report',authorizeRole(roles),verifyAccessToken,getSalesReport)
-router.get("/dashboard/sales-report/excel", authorizeRole(roles),verifyAccessToken,exelReport);
-router.get("/dashboard/sales-report/pdf",authorizeRole(roles),verifyAccessToken,downloadSalesReportPDF);
-router.get('/dashboard/best-sellers',authorizeRole(roles),verifyAccessToken,getBestSellers)
-
-
+router.get('/admin/sales/report',authorizeRole(roles),verifyAccessToken,getSalesReport)
+router.get("/admin/sales/report/excel", authorizeRole(roles),verifyAccessToken,exelReport);
+router.get("/admin/sales/report/pdf",authorizeRole(roles),verifyAccessToken,downloadSalesReportPDF);
+router.get('/admin/bestsellers',authorizeRole(roles),verifyAccessToken,getBestSellers)
 
 export default router
