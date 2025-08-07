@@ -20,6 +20,8 @@ const Coupons = () => {
   const [usageLimit, setUsageLimit] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
+  const [originalCoupon, setOriginalCoupon] = useState(null);
+
 
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -34,7 +36,6 @@ const Coupons = () => {
     if (
       couponCode == "" ||
       discountType == "" ||
-      discountAmount == "" ||
       discountAmount == "" ||
       minPurchase == "" ||
       usageLimit == "" ||
@@ -93,23 +94,26 @@ const Coupons = () => {
   // Open edit modal with coupon data
   const handleEditCoupon = (coupon) => {
     setEditingCoupon(coupon);
+    setOriginalCoupon({ ...coupon });
     setIsEditModalOpen(true);
   };
 
-  // Handle update coupon
   const handleUpdateCoupon = async (e) => {
     e.preventDefault();
-    if (!editingCoupon) return;
+    if (!editingCoupon || !originalCoupon) return;
 
-    const data = {
-      couponId: editingCoupon._id,
-      couponCode: editingCoupon.code,
-      discountType: editingCoupon.discountType,
-      discountAmount: editingCoupon.discountValue,
-      minPurchase: editingCoupon.minPurchase,
-      usageLimit: editingCoupon.usageLimit,
-      expirationDate: editingCoupon.expiresAt.split("T")[0],
-    };
+    const hasChanges =
+      editingCoupon.code !== originalCoupon.code ||
+      editingCoupon.discountType !== originalCoupon.discountType ||
+      editingCoupon.discountValue !== originalCoupon.discountValue ||
+      editingCoupon.minOrderAmount !== originalCoupon.minOrderAmount ||
+      editingCoupon.usageLimit !== originalCoupon.usageLimit ||
+      editingCoupon.expiresAt.split("T")[0] !== originalCoupon.expiresAt.split("T")[0];
+
+    if (!hasChanges) {
+      toast.info("No changes detected");
+      return;
+    }
 
     if (
       editingCoupon.code === "" ||

@@ -40,10 +40,10 @@ const updateCoupon = async (data) => {
   const response = await adminAxiosInstance.put(
     `/api/v1/admin/coupons/${data.couponId}`,
     {
-      code: data.code,
+      code: data.couponCode,
       discountType: data.discountType,
-      discountValue: data.discountValue,
-      minOrderAmount: data.minOrderAmount,
+      discountValue: data.discountAmount,
+      minOrderAmount: data.minPurchase,
       usageLimit: data.usageLimit,
       expirationDate: data.expirationDate,
     },

@@ -11,8 +11,6 @@ export const createCoupons = async (req, res) => {
             expirationDate,
         } = req.body;
 
-        console.log(expirationDate);
-
         // Await is missing here
         const existingCoupon = await Coupons.findOne({ code: couponCode }).select('-password -createdAt -updatedAt');
         if (existingCoupon) {
@@ -100,6 +98,7 @@ export const updateCoupon = async (req, res) => {
         expirationDate
     } = req.body;
 
+    console.log(req.body)
     try {
         const updatedCoupon = await Coupons.findByIdAndUpdate(couponId, {
             code,
