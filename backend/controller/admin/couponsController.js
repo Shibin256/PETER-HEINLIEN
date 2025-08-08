@@ -11,13 +11,11 @@ export const createCoupons = async (req, res) => {
             expirationDate,
         } = req.body;
 
-        // Await is missing here
         const existingCoupon = await Coupons.findOne({ code: couponCode }).select('-password -createdAt -updatedAt');
         if (existingCoupon) {
             return res.status(400).json({ message: 'A coupon with this code already exists' });
         }
 
-        // Use correct field names as per your schema
         const newCoupon = new Coupons({
             code: couponCode,
             discountType,
@@ -139,7 +137,6 @@ export const applyCoupon = async (req, res) => {
         }
         console.log('Coupon is valid, applying discount');
 
-        // Decrease the usage limit
         coupon.usageLimit -= 1;
         coupon.usersUsed.push(userId);
         await coupon.save();
@@ -150,11 +147,9 @@ export const applyCoupon = async (req, res) => {
     }
 }
 
-
-
 export const removeCoupon = async (req, res) => {
     const { couponId } = req.params;
-    const { userId } = req.body; // Make sure userId is sent in the request body
+    const { userId } = req.body; 
 
     try {
         const coupon = await Coupons.findOne({ code: couponId }).select('-createdAt -updatedAt');
@@ -162,7 +157,6 @@ export const removeCoupon = async (req, res) => {
             return res.status(404).json({ message: 'Coupon not found' });
         }
 
-        // Remove the user from usersUsed array if they exist
         coupon.usersUsed = coupon.usersUsed.filter(id => id.toString() !== userId);
 
         coupon.usageLimit += 1;

@@ -6,7 +6,6 @@ export const createBanner = async (req, res) => {
         const { title, description, buttonText, buttonLink } = req.body
 
         const uploadImage = [];
-        //one by one uploading to cloudinary
         for (const file of req.files) {
             const result = await cloudinary.uploader.upload(file.path);
             uploadImage.push(result.secure_url)

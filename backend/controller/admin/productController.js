@@ -8,9 +8,7 @@ export const createProduct = async (req, res) => {
     try {
         let available = false
         const { name, description, category, brand, tags, price, quantity } = req.body
-        //variable to save the images 
         const uploadImage = [];
-        //one by one uploading to cloudinary
         for (const file of req.files) {
             const result = await cloudinary.uploader.upload(file.path);
             uploadImage.push(result.secure_url)
@@ -49,7 +47,7 @@ export const createProduct = async (req, res) => {
 export const getCollection = async (req, res) => {
     try {
         const latestCollection = await Product.find({ isList: { $ne: true } }).sort({ createdAt: -1 }).limit(10)
-            .populate('brand') // Populate the brand field with data from the Brands collection
+            .populate('brand') 
             .populate('category')
             .select('-createdAt -updatedAt');
 
@@ -60,14 +58,13 @@ export const getCollection = async (req, res) => {
     }
 }
 
-//fetching all products with pagination
+//fetching all products 
 export const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
     const search = req.query.search || '';
 
-    // filter oprtions variables
     const categories = req.query.categories?.split(',') || [];
     const brands = req.query.brands?.split(',') || [];
     const sortField = req.query.sort || 'createdAt';
@@ -80,7 +77,6 @@ export const getAllProducts = async (req, res) => {
     if (brands.length) filter['brand'] = { $in: brands };
 
     try {
-        // getting the number of total products
         const total = await Product.countDocuments(filter);
 
         const products = await Product.find({
@@ -133,13 +129,12 @@ export const updateProduct = async (req, res) => {
 
         if (req.body.quantity <= 0) available = false
 
-        // Step 1: Handle existing image URLs sent from frontend
         let existingImages = [];
         if (req.body.existingImages) {
             if (Array.isArray(req.body.existingImages)) {
                 existingImages = req.body.existingImages;
             } else {
-                existingImages = [req.body.existingImages]; // if only one string was sent
+                existingImages = [req.body.existingImages]; 
             }
         }
 
@@ -220,11 +215,11 @@ export const getBrandAndCategory = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 }
-//get products by its Id with brands and category
+
 export const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
-            .populate('brand') // Populate the brand field with data from the Brands collection
+            .populate('brand') 
             .populate('category')
             .select('-createdAt -updatedAt');
 
@@ -269,7 +264,6 @@ export const addProductOffer = async (req, res) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Calculate the offer price based on the percentage
         const discountAmount = (product.price * percentage) / 100;
         product.offerPrice = product.price - discountAmount;
 
@@ -293,7 +287,7 @@ export const removeProductOffer = async (req, res) => {
         const product = await Product
             .findById(productId)
             .select('offerPrice')
-            .select('-createdAt -updatedAt'); // Select only the offerPrice field
+            .select('-createdAt -updatedAt');
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }

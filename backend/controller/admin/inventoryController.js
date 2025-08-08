@@ -38,7 +38,6 @@ export const createBrand = async (req, res) => {
         const { name, description } = req.body
         const logo = req.file
 
-        //uploads the image to cloudinary
         const result = await cloudinary.uploader.upload(logo.path)
 
         const brandExists = await Brands.findOne({
@@ -47,7 +46,6 @@ export const createBrand = async (req, res) => {
 
         if (brandExists) return res.status(400).json({ message: 'Brand already exists' });
 
-        //creating new brand with a objectId
         const newBrand = new Brands({
             _id: new mongoose.Types.ObjectId(),
             name,
@@ -78,13 +76,11 @@ export const deleteCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        // Mark products with this category as isList: true
         const updatedProducts = await Product.updateMany(
             { category: req.params.id },
             { $set: { isList: true } }
         );
 
-        // Mark the category itself as isList: true
         category.isList = true;
         await category.save();
 
@@ -105,7 +101,6 @@ export const deleteBrand = async (req, res) => {
         const brand = await Brands.findById(req.params.id).select('_id categoryName isList')
         if (!brand) return res.status(404).json({ message: 'Brand not found' });
 
-        // Mark products with this category as isList: true
         const updatedProducts = await Product.updateMany(
             { brand: req.params.id },
             { $set: { isList: true } }
@@ -134,13 +129,11 @@ export const editBrand = async (req, res) => {
             description: req.body.description,
         };
 
-        // If a new logo is uploaded, upload to Cloudinary
         if (logo) {
             const result = await cloudinary.uploader.upload(logo.path);
             updatedData.image = result.secure_url;
         }
 
-        //updating brand
         const updatedBrand = await Brands.findByIdAndUpdate(id, updatedData, {
             new: true,
         }).select('-createdAt -updatedAt');
@@ -162,13 +155,11 @@ export const editCategory = async (req, res) => {
         const { id } = req.params;
         const { name } = req.body;
 
-        // Check if the category exists
         const category = await Category.findById(id).select('-createdAt -updatedAt')
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        // Update the category name
         category.categoryName = name;
         await category.save();
 
@@ -244,7 +235,6 @@ export const removeCategoryOffer = async (req, res) => {
         category.offerAdded = false
         category.save()
 
-        // Remove the offer price
         res.status(200).json({ message: 'Offer removed successfully', products });
     } catch (error) {
         console.error('Error removing offer:', error);

@@ -299,11 +299,9 @@ export const getBestSellers = async (req, res) => {
 
     for (const order of orders) {
       for (const item of order.Items) {
-        // Fetch product details for this item
         const product = await Product.findById(item.productId).populate("category brand");
         if (!product) continue;
 
-        // --- Products ---
         const prodKey = product._id.toString();
         if (!productMap[prodKey]) {
           productMap[prodKey] = {
@@ -315,7 +313,6 @@ export const getBestSellers = async (req, res) => {
         productMap[prodKey].quantity += item.quantity;
         productMap[prodKey].revenue += item.subTotal;
 
-        // --- Categories ---
         if (product.category) {
           const catKey = product.category._id.toString();
           if (!categoryMap[catKey]) {
@@ -329,7 +326,6 @@ export const getBestSellers = async (req, res) => {
           categoryMap[catKey].revenue += item.subTotal;
         }
 
-        // --- Brands ---
         if (product.brand) {
           const brandKey = product.brand._id.toString();
           if (!brandMap[brandKey]) {
