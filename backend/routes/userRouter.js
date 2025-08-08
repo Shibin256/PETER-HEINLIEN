@@ -65,6 +65,8 @@ router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment,
 router.post('/coupons', verifyAccessToken,applyCoupon);
 router.delete('/coupons/:couponId', verifyAccessToken, removeCoupon);
 router.get('/coupons',verifyAccessToken,fetchAdsCoupons)
+router.get('/all/coupons',verifyAccessToken,fetchCoupons)
+
 
 
 router.post('/wallet/:userId/:amount/:paymentId',verifyAccessToken,addToWallet)

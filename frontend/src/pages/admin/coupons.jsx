@@ -100,6 +100,7 @@ const Coupons = () => {
 
   const handleUpdateCoupon = async (e) => {
     e.preventDefault();
+    console.log(editingCoupon)
     if (!editingCoupon || !originalCoupon) return;
 
     const hasChanges =
@@ -125,6 +126,16 @@ const Coupons = () => {
     ) {
       toast.error("All fields are required");
       return;
+    }
+
+    const data = {
+      couponId: editingCoupon._id,
+      couponCode: editingCoupon.code,
+      discountType: editingCoupon.discountType,
+      discountAmount: editingCoupon.discountValue,
+      minPurchase: editingCoupon.minPurchase,
+      usageLimit: editingCoupon.usageLimit,
+      expirationDate: editingCoupon.expiresAt,
     }
 
     const res = await dispatch(updateCoupon(data));

@@ -28,6 +28,12 @@ const fetchAdsCoupons= async () => {
   return response.data;
 };
 
+const fetchUserCoupons= async () => {
+  const response = await axiosInstance.get("/api/v1/users/all/coupons");
+  return response.data;
+
+};
+
 const deleteCoupon = async (couponId) => {
   const response = await adminAxiosInstance.delete(
     `/api/v1/admin/coupons/${couponId}`,
@@ -75,7 +81,8 @@ const couponsService = {
   applyCoupon,
   updateCoupon,
   removeCoupon,
-  fetchAdsCoupons
+  fetchAdsCoupons,
+  fetchUserCoupons
 };
 
 export default couponsService;

@@ -35,6 +35,9 @@ const PaymentPage = () => {
     if (discount > 0) {
         totalPrice -= discount;
     }
+    if(shippingCost){
+        totalPrice-=shippingCost
+    }
 
     const { currency } = useSelector((state) => state.global);
     const { isLocked } = useSelector((state) => state.cart);

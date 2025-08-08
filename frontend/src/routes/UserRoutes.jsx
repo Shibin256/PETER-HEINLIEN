@@ -30,6 +30,7 @@ import OrderSuccessPage from "../pages/user/orderSuccess";
 import Wallet from "../pages/user/Wallet";
 import OrderFailed from "../pages/user/orderFailed";
 import ErrorBoundary from "../components/common/ErrorBoundary";
+import Coupons from "../pages/user/Coupons";
 
 const UserRoutes = () => {
   return (
@@ -63,6 +64,8 @@ const UserRoutes = () => {
           <Route path="verify-otp-forgotpass" element={<OTPFormFrogotpass />} />
           <Route path="reset-password" element={<ForgotPass />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="coupons" element={<Coupons />} />
+
 
           <Route
             path="cart"

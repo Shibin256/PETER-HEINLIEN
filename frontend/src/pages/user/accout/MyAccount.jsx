@@ -54,7 +54,9 @@ const MyAccount = () => {
             icon={<img src={coupon} alt="Coupons" className="rounded-md" />}
             title="COUPONS"
             description="Get exciting offers and discounts"
-            onclickFun={() => {}}
+            onclickFun={() => {
+              navigate('/coupons')
+            }}
           />
 
           <AccountCard

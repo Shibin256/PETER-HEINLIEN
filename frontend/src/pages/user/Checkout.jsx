@@ -13,6 +13,7 @@ const Checkout = () => {
   const location = useLocation();
   const total = location.state?.totalPrice || 0;
   const cartItems = location.state?.cartItems || [];
+  console.log(cartItems,'---items to check')
   const shippingCost = location.state?.shippingCost || 0;
 
   const [couponCode, setCouponCode] = useState("");
@@ -26,7 +27,6 @@ const Checkout = () => {
   const { currency } = useSelector((state) => state.global);
   const { addresses } = useSelector((state) => state.account);
   useEffect(() => {
-    // Block direct access without required state
     if (!location.state || !cartItems || cartItems.length === 0) {
       navigate("/", { replace: true }); // Redirect to home
     }

@@ -29,6 +29,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [localCart, setLocalCart] = useState([]);
   const dispatch = useDispatch();
 
   const storedUser = localStorage.getItem("user");
@@ -37,8 +38,8 @@ const ProductDetails = () => {
   const { singleProduct, productsRelated } = useSelector(
     (state) => state.products,
   );
-  console.log(productsRelated, "realated products");
-  // First: fetch the product
+
+  console.log(localCart, "realated products");
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id));
@@ -46,7 +47,7 @@ const ProductDetails = () => {
     }
   }, [id, dispatch]);
 
-  // Then: check if it's wishlisted (once product and user are available)
+
   useEffect(() => {
     if (user && singleProduct?._id) {
       dispatch(
@@ -132,6 +133,26 @@ const ProductDetails = () => {
     }
   };
 
+
+  const handleBuyNow = async () => {
+    const data={
+      price:singleProduct.price,
+      productId:singleProduct,
+      productSubTotal:singleProduct.price * quantity,
+      quantity:quantity
+    }
+    localCart.push(data)
+    const shipping = data.productSubTotal > 1000 ? 0 : 50;
+    navigate("/checkout", {
+      state: {
+        cartItems: localCart,
+        totalPrice: data.productSubTotal+shipping,
+        shippingCost: shipping,
+        userId: user._id,
+      }
+    })
+
+  }
   return (
     <div className="px-6 md:px-16 lg:px-24 py-12">
       <div className="flex flex-col lg:flex-row gap-12">
@@ -227,19 +248,6 @@ const ProductDetails = () => {
             <p className="text-gray-700 mb-6">{product.description}</p>
           </div>
 
-          {/* Features */}
-          {/* <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Features</h3>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {product.features.map((feature, index) => (
-                <li key={index} className="flex items-center gap-2 text-gray-700">
-                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div> */}
-
           {/* Quantity Selector */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3">Quantity</h3>
@@ -278,9 +286,11 @@ const ProductDetails = () => {
             >
               ADD TO CART
             </button>
-            {/* <button  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
               BUY NOW
-            </button> */}
+            </button>
           </div>
 
           {/* Wishlist */}
@@ -373,7 +383,7 @@ const ProductDetails = () => {
           </p>
         </div>
       </div>
-      
+
       <div className="mt-16">
         {/* Top Separator Line */}
         <div className="border-t border-gray-200 mb-8"></div>
