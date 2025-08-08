@@ -25,7 +25,9 @@ const itemSchema = new mongoose.Schema([{
     returnVerified: { type: Boolean, default: false },
     cancelReason: { type: String, default: '' },
     cancelVerified: { type: Boolean, default: false },
-    rated:{type:Boolean,default:false}
+    rated:{type:Boolean,default:false},
+    rating:{type:String,default:''},
+    comment:{type:String,default:''},
 }, { _id: false }]);
 
 const orderSchema = new mongoose.Schema({

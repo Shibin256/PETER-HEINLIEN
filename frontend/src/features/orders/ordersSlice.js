@@ -174,6 +174,22 @@ export const verifyPayment = createAsyncThunk(
   },
 );
 
+export const addReview = createAsyncThunk(
+  "user/addReview",
+  async ({itemId, rating = 0, review = "" }, { rejectWithValue }) => {
+    try {
+      const res = await orderService.submitReview({
+        itemId: itemId,
+        rating: rating,
+        review: review,
+      });
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
 const orderSlice = createSlice({
   name: "orders",
   initialState: {

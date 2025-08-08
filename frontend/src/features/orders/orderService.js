@@ -126,6 +126,19 @@ const verifyRazorpayPayment = async (paymentDetails) => {
   return res.data; // returns { success: true/false }
 };
 
+const submitReview = async ({ itemId, rating, review }) => {
+  const data = {
+    rating: rating,
+    review: review,
+  };
+  console.log(data,itemId,'-----')
+  const response = await axiosInstance.post(
+    `/api/v1/users/orders/${itemId}/review`,
+    data,
+  );
+  return response.data;
+};
+
 const orderService = {
   placeOrder,
   getOrders,
@@ -140,6 +153,7 @@ const orderService = {
   verifyRazorpayPayment,
   cancelSingleOrderItem,
   singleCancelVerify,
+  submitReview
 };
 
 export default orderService;

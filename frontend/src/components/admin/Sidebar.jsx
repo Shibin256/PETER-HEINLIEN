@@ -25,7 +25,7 @@ const menuItems = [
   { name: "Settings", icon: HiCog6Tooth, path: "/admin/settings" },
   // { name: "Offers", icon: HiGift, path: "/admin/offers" },
   { name: "Banners", icon: HiRectangleGroup, path: "/admin/banners" },
-  { name: "Reviews", icon: HiStar, path: "/admin/reviews" },
+  // { name: "Reviews", icon: HiStar, path: "/admin/reviews" },
 ];
 
 const AdminSidebar = () => {

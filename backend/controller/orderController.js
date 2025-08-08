@@ -67,7 +67,7 @@ export const placeOrder = async (req, res) => {
     }
     try {
         for (const item of orderData.Items) {
-            console.log(item,'--------')
+            console.log(item, '--------')
             const product = await Product.findOne({ _id: item.productId })
             if (item.quantity > product.totalQuantity) {
                 return res.status(404).json({ message: 'The product is on out of stock know' });
@@ -407,7 +407,6 @@ export const returnOrderItem = async (req, res) => {
         await orderItem.save();
 
         const order = await Order.find({ "UserID": UserID });
-        console.log(order, 'in return order item')
 
         return res.status(200).json({ message: 'Return request submitted successfully', order });
     } catch (error) {
@@ -549,24 +548,63 @@ export const downloadInvoice = async (req, res) => {
 
 
 
-
 export const addReview = async (req, res) => {
-    const { rating, comment } = req.body;
-    const product = await Product.findById(req.params.id);
+    const { itemId } = req.params;
+    const { rating, review } = req.body;
 
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    try {
+        const orderItem = await Order.findOne({ "Items.itemOrderId": itemId }).select('-createdAt -updatedAt');
 
-      const alreadyReviewed = product.reviews.find(
-      (r) => r.user.toString() === req.user._id.toString()
-    );
+        if (!orderItem) {
+            return res.status(404).json({ message: 'Order item not found' });
+        }
 
-     const review = {
-      user: req.user._id,
-      name: req.user.name,
-      rating: Number(rating),
-      comment,
-    };
+        const userID = orderItem.UserID;
 
+        const item = orderItem.Items.find(item => item.itemOrderId === itemId);
+        if (!item) {
+            return res.status(404).json({ message: 'Item not found in order' });
+        }
 
+        item.rated = true;
+        item.rating = rating;
+        item.comment = review;
 
-}
+        const productId = item.productId;
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        const alreadyReviewed = product.reviews.find(
+            (r) => r.user.toString() === userID.toString()
+        );
+
+        if (alreadyReviewed) {
+            alreadyReviewed.rating = rating;
+            alreadyReviewed.comment = review;
+        } else {
+            const productReview = {
+                user: userID,
+                rating: Number(rating),
+                comment: review,
+            };
+            product.reviews.push(productReview);
+        }
+
+        product.numReviews = product.reviews.length;
+
+        product.averageRating =
+            product.reviews.reduce((acc, r) => r.rating + acc, 0) / product.reviews.length;
+
+        await product.save();
+        await orderItem.save();
+
+        res.status(200).json({ message: "Review added successfully" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};

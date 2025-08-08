@@ -10,7 +10,7 @@ import { verifyAccessToken } from '../middleware/authMiddleware.js';
 import { addAddress, changeName, changeOrAddMobile, editImage, editPassword, getAllAddress, removeAddress, SetDefaultAddress, updateAddress } from '../controller/accountController.js';
 import multer from 'multer';
 import { addFromWishlistToCart, addItemToCart, getCart, removeCartItem, toggleIsLocked, updateCartItem } from '../controller/cartController.js';
-import { cancelOrderItem, cancelOrderSingleItem, downloadInvoice, getOrders, placeOrder, returnOrderItem} from '../controller/orderController.js';
+import { addReview, cancelOrderItem, cancelOrderSingleItem, downloadInvoice, getOrders, placeOrder, returnOrderItem} from '../controller/orderController.js';
 import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymentController.js';
 import { applyCoupon, fetchAdsCoupons, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
@@ -53,8 +53,10 @@ router.post('/orders',verifyAccessToken,placeOrder)
 router.get('/orders/:userId',verifyAccessToken,getOrders)
 router.post('/orders/cancel',verifyAccessToken,cancelOrderItem)
 router.post('/orders/item/cancel',verifyAccessToken,cancelOrderSingleItem)
-router.post('/orders/:itemOrderId/return',verifyAccessToken,returnOrderItem) //this is for user side
+router.post('/orders/:itemOrderId/return',verifyAccessToken,returnOrderItem)
 router.get('/invoice/:orderId',verifyAccessToken,downloadInvoice)
+router.post('/orders/:itemId/review',verifyAccessToken,addReview) 
+
 //payment
 router.post('/payments/razorpay/order',verifyAccessToken,createRazorpayOrder)
 router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment,fetchCoupons)

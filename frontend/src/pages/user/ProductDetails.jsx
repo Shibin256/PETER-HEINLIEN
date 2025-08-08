@@ -62,7 +62,7 @@ const ProductDetails = () => {
   }, [user, singleProduct, dispatch]);
 
   const product = singleProduct;
-  let shippingCost =0;
+  let shippingCost = 0;
   const totalQuantity = product.totalQuantity;
   if (product && product.price < 500) {
     shippingCost = 50;
@@ -188,14 +188,14 @@ const ProductDetails = () => {
                 {Array(5)
                   .fill()
                   .map((_, i) =>
-                    i < product.rating ? (
+                    i < product.averageRating ? (
                       <FaStar key={i} />
                     ) : (
                       <FaRegStar key={i} />
                     ),
                   )}
               </div>
-              <span className="text-sm text-gray-500">(2 reviews)</span>
+              <span className="text-sm text-gray-500">{product.numReviews}</span>
             </div>
             <div className="mb-4">
               {product.offerPrice ? (
@@ -211,7 +211,7 @@ const ProductDetails = () => {
                       (
                       {Math.round(
                         ((product.price - product.offerPrice) / product.price) *
-                          100,
+                        100,
                       )}
                       % OFF)
                     </span>
@@ -311,45 +311,69 @@ const ProductDetails = () => {
       </div>
 
       {/* Ratings & Reviews Section */}
-      {/* <div className="mt-16 border-t pt-10">
+      <div className="mt-16 border-t pt-10">
         <h2 className="text-2xl font-bold mb-8">Customer Reviews</h2>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          Review 1
-          <div className="bg-gray-50 p-6 rounded-xl">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="font-semibold mb-1">Alex Johnson</p>
-                <div className="flex text-yellow-500 mb-2">
-                  <FaStar /><FaStar /><FaStar /><FaStar /><FaRegStar />
-                </div>
-              </div>
-              <span className="text-sm text-gray-500">2 weeks ago</span>
-            </div>
-            <p className="text-gray-700">
-              "Absolutely love this watch! The build quality is exceptional and it looks even better in person. 
-              The leather strap is comfortable and the face is very readable in all lighting conditions."
-            </p>
-          </div>
 
-          Review 2
-          <div className="bg-gray-50 p-6 rounded-xl">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="font-semibold mb-1">Sarah Miller</p>
-                <div className="flex text-yellow-500 mb-2">
-                  <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
+        {product.reviews && product.reviews.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-8">
+            {product.reviews.map((review) => (
+              <div key={review._id} className="bg-gray-50 p-6 rounded-xl">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="font-semibold mb-1">
+                      {review.user?.name || "Anonymous"}
+                    </p>
+                    <div className="flex text-yellow-500 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        i < review.rating ? (
+                          <FaStar key={i} />
+                        ) : (
+                          <FaRegStar key={i} />
+                        )
+                      ))}
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {new Date(review.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
                 </div>
+                <p className="text-gray-700">
+                  "{review.comment}"
+                </p>
               </div>
-              <span className="text-sm text-gray-500">1 month ago</span>
-            </div>
-            <p className="text-gray-700">
-              "This is my second purchase from this brand and I'm equally impressed. The watch keeps perfect time 
-              and has become my daily wear. Highly recommend for anyone looking for a luxury timepiece."
-            </p>
+            ))}
           </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No reviews yet for this product</p>
+          </div>
+        )}
+
+        {/* Summary stats */}
+        <div className="mt-8 flex items-center gap-4">
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              i < Math.floor(product.averageRating) ? (
+                <FaStar key={i} className="text-yellow-500" />
+              ) : (
+                <FaRegStar key={i} className="text-yellow-500" />
+              )
+            ))}
+          </div>
+          <p className="text-gray-700">
+            {product.averageRating.toFixed(1)} out of 5
+          </p>
+          <span className="text-gray-500">•</span>
+          <p className="text-gray-700">
+            {product.numReviews} review{product.numReviews !== 1 ? 's' : ''}
+          </p>
         </div>
-      </div> */}
+      </div>
+      
       <div className="mt-16">
         {/* Top Separator Line */}
         <div className="border-t border-gray-200 mb-8"></div>

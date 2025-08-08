@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import {
+  addReview,
   cancelOrderItem,
   cancelSingleOrderItem,
   downloadInvoice,
   returnOrderItem,
 } from "../../features/orders/ordersSlice";
 import { Dialog } from "@headlessui/react";
+import { toast } from "react-toastify";
 
 const Order = ({ order, onCancelSuccess }) => {
   const {
@@ -110,15 +112,26 @@ const Order = ({ order, onCancelSuccess }) => {
     setShowReviewForm((prev) => ({ ...prev, [itemId]: !prev[itemId] }));
   };
 
-  const submitReview = (itemId) => {
-
-    
-
-    console.log(`Review submitted for item ${itemId}:`, {
-      rating: ratings[itemId],
-      review: reviews[itemId],
+  const submitReview = async (itemId) => {
+    console.log(itemId)
+    await dispatch(addReview({ itemId: itemId, rating: ratings[itemId], review: reviews[itemId] }))
+    setRatings((prev) => {
+      const updated = { ...prev };
+      delete updated[itemId];
+      return updated;
     });
+
+    setReviews((prev) => {
+      const updated = { ...prev };
+      delete updated[itemId];
+      return updated;
+    });
+
     toggleReviewForm(itemId);
+
+    toast.success("Review submitted!");
+
+
   };
 
   const closeCancelModal = () => {
@@ -180,6 +193,7 @@ const Order = ({ order, onCancelSuccess }) => {
         additionalDetails,
         "in confirm return function",
       );
+      console.log(selectedItemToCancel)
       await dispatch(
         returnOrderItem({
           itemOrderId: selectedItemToReturn,
@@ -318,7 +332,7 @@ const Order = ({ order, onCancelSuccess }) => {
                   </button>
                 )}
 
-                {OrderStatus === "Delivered" && (
+                {(OrderStatus === "Delivered" && !item.rated) && (
                   <button
                     onClick={() => toggleReviewForm(item.itemOrderId)}
                     className="px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-lg text-sm font-medium transition-colors border border-yellow-100"
@@ -330,65 +344,90 @@ const Order = ({ order, onCancelSuccess }) => {
                 )}
               </div>
 
-              {/* Rating and Review Section */}
-              {OrderStatus === "Delivered" &&
-                showReviewForm[item.itemOrderId] && (
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="text-md font-medium text-gray-800 mb-2">
-                      Rate this product
-                    </h4>
-
-                    {/* Star Rating */}
-                    <div className="flex items-center mb-3">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          onClick={() =>
-                            handleRatingChange(item.itemOrderId, star)
-                          }
-                          className="focus:outline-none"
-                        >
+              {OrderStatus === "Delivered" && (
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  {item.rated ? (
+                    <div>
+                      <h4 className="text-md font-medium text-gray-800 mb-1">
+                        Your Rating
+                      </h4>
+                      <div className="flex items-center mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
                           <svg
-                            className={`w-6 h-6 ${star <= ratings[item.itemOrderId] ? "text-yellow-400" : "text-gray-300"}`}
+                            key={star}
+                            className={`w-5 h-5 ${star <= item.rating ? "text-yellow-400" : "text-gray-300"}`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
+                        ))}
+                        <span className="ml-2 text-sm text-gray-600">
+                          {item.rating} star{item.rating !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      {item.comment && (
+                        <div className="text-sm text-gray-700 mt-1">
+                          <p className="font-medium">Your Review:</p>
+                          <p>{item.comment}</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : showReviewForm[item.itemOrderId] ? (
+                    <div>
+                      <h4 className="text-md font-medium text-gray-800 mb-2">
+                        Rate this product
+                      </h4>
+
+                      <div className="flex items-center mb-3">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => handleRatingChange(item.itemOrderId, star)}
+                            className="focus:outline-none"
+                          >
+                            <svg
+                              className={`w-6 h-6 ${star <= ratings[item.itemOrderId] ? "text-yellow-400" : "text-gray-300"}`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </button>
+                        ))}
+                        <span className="ml-2 text-sm text-gray-600">
+                          {ratings[item.itemOrderId] > 0
+                            ? `${ratings[item.itemOrderId]} star${ratings[item.itemOrderId] !== 1 ? "s" : ""}`
+                            : "Not rated"}
+                        </span>
+                      </div>
+
+                      <div className="mb-3">
+                        <textarea
+                          rows="2"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Share your experience..."
+                          value={reviews[item.itemOrderId]}
+                          onChange={(e) =>
+                            handleReviewChange(item.itemOrderId, e.target.value)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => submitReview(item.itemOrderId)}
+                          disabled={ratings[item.itemOrderId] === 0}
+                          className={`px-3 py-1 text-sm rounded-md font-medium text-white ${ratings[item.itemOrderId] === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                        >
+                          Submit
                         </button>
-                      ))}
-                      <span className="ml-2 text-sm text-gray-600">
-                        {ratings[item.itemOrderId] > 0
-                          ? `${ratings[item.itemOrderId]} star${ratings[item.itemOrderId] !== 1 ? "s" : ""}`
-                          : "Not rated"}
-                      </span>
+                      </div>
                     </div>
-
-                    {/* Review Textarea */}
-                    <div className="mb-3">
-                      <textarea
-                        rows="2"
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Share your experience..."
-                        value={reviews[item.itemOrderId]}
-                        onChange={(e) =>
-                          handleReviewChange(item.itemOrderId, e.target.value)
-                        }
-                      />
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => submitReview(item.itemOrderId)}
-                        disabled={ratings[item.itemOrderId] === 0}
-                        className={`px-3 py-1 text-sm rounded-md font-medium text-white ${ratings[item.itemOrderId] === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </div>
-                )}
+                  ) : (<></>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -642,19 +681,19 @@ const Order = ({ order, onCancelSuccess }) => {
 
             {(returnReason === "Other reason" ||
               returnReason === "Item not as described") && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional details
-                </label>
-                <textarea
-                  rows="3"
-                  value={additionalDetails}
-                  onChange={(e) => setAdditionalDetails(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Please provide more information..."
-                />
-              </div>
-            )}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Additional details
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={additionalDetails}
+                    onChange={(e) => setAdditionalDetails(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Please provide more information..."
+                  />
+                </div>
+              )}
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
               <div className="flex">

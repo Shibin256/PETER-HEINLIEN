@@ -13,6 +13,7 @@ import AuthInput from "../../components/common/AuthInput";
 import SelectInput from "../../components/common/SelectInput";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { FaStar } from "react-icons/fa";
 
 const ProductAdmin = () => {
   const dispatch = useDispatch();
@@ -316,6 +317,7 @@ const ProductAdmin = () => {
               <th className="px-4 py-2 border-b">Image</th>
               <th className="px-4 py-2 border-b">Name</th>
               <th className="px-4 py-2 border-b">Quantity</th>
+              <th className="px-4 py-2 border-b">Rating</th>
               <th className="px-4 py-2 border-b">Availability</th>
               <th className="px-4 py-2 border-b">Category</th>
               <th className="px-4 py-2 border-b">Price</th>
@@ -342,13 +344,16 @@ const ProductAdmin = () => {
                   )}
                 </td>
                 <td className="px-4 py-2">{product.totalQuantity}</td>
+                <td className="px-4 py-6 flex items-center gap-1">
+                  {product.averageRating}
+                  <FaStar className="text-yellow-400" />
+                </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      product.availability
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${product.availability
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
-                    }`}
+                      }`}
                   >
                     {product.availability ? "In Stock" : "Out of Stock"}
                   </span>
@@ -568,7 +573,7 @@ const ProductAdmin = () => {
                             const newFile = e.target.files[0];
                             if (
                               editForm.images.length +
-                                editForm.newImages.length <
+                              editForm.newImages.length <
                               4
                             ) {
                               setEditForm({
