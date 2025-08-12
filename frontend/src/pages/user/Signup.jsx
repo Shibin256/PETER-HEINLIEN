@@ -41,25 +41,26 @@ const Signup = () => {
     }
   }, [isAuthenticated, navigate]);
 
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
     }));
 
-    //validating password
     if (name === "password") {
       const validationMsg = usePasswordVal(value);
       setError(validationMsg);
       setIsPasswordValid(!validationMsg);
-    }
-    if (name === "confirmPassword") {
-      if (!isPasswordValid) {
-        setError("Enter a valid password first.");
-        return;
+
+      if (validationMsg) {
+        setFormData((prev) => ({ ...prev, confirmPassword: "" }));
       }
-      //comparing password
+    }
+
+    if (name === "confirmPassword" && isPasswordValid) {
       if (formData.password !== value) {
         setError("Passwords do not match");
       } else {
@@ -67,6 +68,7 @@ const Signup = () => {
       }
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,13 +95,23 @@ const Signup = () => {
           setLoading(false);
           return;
         }
+
         if (formData.phone === "0000000000") {
-          toast.error("dont give zero");
+          toast.error("The phone number not be all zeros");
           setLoading(false);
           return;
         }
-      }
 
+        const validatePhoneNumber = (phone) => {
+          const regex = /^[6-9]\d{9}$/;
+          return regex.test(phone);
+        };
+
+        if (!validatePhoneNumber(formData.phone)) {
+          toast.error("Please enter a valid 10-digit phone number starting with 6-9.");
+          return;
+        }
+      }
       //confirming password is valid
       const validationMsg = usePasswordVal(formData.password);
       if (validationMsg) {
@@ -131,8 +143,11 @@ const Signup = () => {
         toast.error("Registration failed. Please check your inputs.");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      if (error.response && error.response.data.errors) {
+        error.response.data.errors.forEach(msg => toast.error(msg));
+      } else {
+        toast.error("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
@@ -209,7 +224,7 @@ const Signup = () => {
             </div>
 
             <AuthInput
-              label="confirm Password"
+              label="Confirm Password"
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
@@ -218,7 +233,9 @@ const Signup = () => {
               width="w-full"
               Textcolor="text-gray-700"
               borderColor="border-gray-300"
+              disabled={!isPasswordValid}
             />
+
 
             <AuthInput
               label="Phone Number"

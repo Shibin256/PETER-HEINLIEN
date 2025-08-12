@@ -74,26 +74,18 @@ export const register = async (req, res) => {
       ReferralCode
     } = req.body;
 
+    console.log(phone,name)
 
-    // Check if all required fields are present
-    if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).json({ message: "All required fields must be filled." });
-    }
-
-    // Passwords match check
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
-
+  
     // Check if user already exists
     const userExist = await User.findOne({ email }).select('-password -createdAt -updatedAt -googleId');
     if (userExist) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ errors: ["User already exists"] });
     }
 
     const phoneExist = await User.findOne({ phone }).select('-password -createdAt -updatedAt -googleId');
     if (phoneExist && phoneExist.phone != null) {
-      return res.status(400).json({ message: "The mobile number is already exists" });
+      return res.status(400).json({ errors: ["The mobile number already exists"] });
     }
 
     const ReferralUser = await User.findOne({ referralCode:ReferralCode }).select('-password -createdAt -updatedAt -googleId')
@@ -121,21 +113,21 @@ export const register = async (req, res) => {
     const otp = genarateOtp()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     console.log('otp is:----', otp)
-    // Remove any previous OTP
+
     await Otp.findOneAndDelete({ email });
     await Otp.create({ email, otp, expiresAt });
 
     //Otp sending to the corresponding email
     const emailSend = await sendVerificationEmail(email, otp)
     if (!emailSend) {
-      return res.status(400).json({ message: "otp not send email error" });
+      return res.status(400).json({ errors: ["otp not send email error"] });
     }
 
     return res.status(200).json(
       { message: 'The otp send to the email', email })
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(400).json({ errors: ["Server error"] });
   }
 };
 
