@@ -8,6 +8,7 @@ export const createCoupons = createAsyncThunk(
       const res = await couponsService.createCoupons(data);
       return res;
     } catch (error) {
+      console.log(error,'-----')
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   },
@@ -80,6 +81,7 @@ export const applyCoupon = createAsyncThunk(
       console.log(userId, couponCode, "in coupons slice");
       return await couponsService.applyCoupon({ userId, couponCode });
     } catch (error) {
+      console.log(error,'--------')
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || error.message,
       );

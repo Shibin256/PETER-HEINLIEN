@@ -69,22 +69,73 @@ export const addItemToCart = async (req, res) => {
 };
 
 // Get cart
+// export const getCart = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+//     const cart = await Cart.findOne({ userId }).populate('products.productId').select('-createdAt -updatedAt');
+//     console.log(cart, '---------')
+//     if (!cart) return res.status(404).json({ message: 'Cart not found' });
+
+
+//     // let newSubTotal = 0;
+
+//     // cart.products = cart.products.map((item) => {
+//     //   const product = item.productId
+//     //   if (!product) return item
+
+//     //   const finalPrice = product.offerPrice ?? product.price;
+
+
+//     // })
+
+//     // const product = await Product.findOne({ _id: cart.products.productId })
+//     res.status(200).json(cart);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 export const getCart = async (req, res) => {
   try {
     const { userId } = req.params;
-    const cart = await Cart.findOne({ userId }).populate('products.productId').select('-createdAt -updatedAt');
-    if (!cart) return res.status(404).json({ message: 'Cart not found' });
-    console.log(cart)
+
+    const cart = await Cart.findOne({ userId })
+      .populate('products.productId')
+      .select('-createdAt -updatedAt');
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    let newSubTotal = 0;
+
+    cart.products = cart.products.map((item) => {
+      const product = item.productId;
+      if (!product) return item;
+      const finalPrice = product.offerPrice > 0 ? product.offerPrice : product.price;
+
+
+      item.price = finalPrice;
+      item.productSubTotal = finalPrice * item.quantity;
+
+      newSubTotal += item.productSubTotal;
+
+      return item;
+    });
+
+    cart.subTotal = newSubTotal;
+    cart.totalPrice = newSubTotal;
+
     res.status(200).json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+
 export const toggleIsLocked = async (req, res) => {
   try {
     const { userId, lock } = req.params;
-    console.log(userId, lock,'in controller')
+    console.log(userId, lock, 'in controller')
 
     const cart = await Cart.findOne({ userId: userId }).select('-createdAt -updatedAt');
     if (!cart) {

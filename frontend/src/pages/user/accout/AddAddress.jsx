@@ -74,7 +74,9 @@ const AddAddress = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
+    const errors = [];
+
+    // Basic presence check
     const requiredFields = [
       "name",
       "houseNo",
@@ -84,59 +86,93 @@ const AddAddress = () => {
       "pin",
       "phone",
     ];
-    const missingFields = requiredFields.filter(
-      (field) => !addressData[field].trim(),
-    );
 
-    if (missingFields.length > 0) {
-      toast.error(
-        `Please fill in all required fields: ${missingFields.join(", ")}`,
-      );
+    requiredFields.forEach((field) => {
+      if (!addressData[field]?.trim()) {
+        errors.push(`${field} is required`);
+      }
+    });
+
+    if (addressData.name && !/^[a-zA-Z\s]{2,50}$/.test(addressData.name.trim())) {
+      errors.push("Name should only contain letters and be 2–50 characters long");
+    }
+
+    if (
+      addressData.houseNo &&
+      !/^[a-zA-Z0-9\s/-]{1,20}$/.test(addressData.houseNo.trim())
+    ) {
+      errors.push("House number contains invalid characters");
+    }
+
+    ["locality", "city", "state"].forEach((field) => {
+      if (
+        addressData[field] &&
+        !/^[a-zA-Z\s]{2,50}$/.test(addressData[field].trim())
+      ) {
+        errors.push(`${field} should only contain letters`);
+      }
+    });
+
+    if (addressData.pin && !/^\d{6}$/.test(addressData.pin.trim())) {
+      errors.push("PIN code must be a 6-digit number");
+    }
+
+    if (addressData.phone && !/^\d{10}$/.test(addressData.phone.trim())) {
+      errors.push("Phone number must be a valid 10-digit number");
+    }
+
+    if (addressData.altPhone) {
+      if (!/^\d{10}$/.test(addressData.altPhone.trim())) {
+        errors.push("Alternative phone number must be 10 digits");
+      }
+      if (addressData.altPhone === addressData.phone) {
+        errors.push("Alternative phone number cannot be the same as primary");
+      }
+    }
+
+    if (errors.length > 0) {
+      toast.error(errors.join("\n"));
       return;
     }
 
-    if (addressData.altPhone === addressData.phone) {
-      toast.error(
-        "Alternative phone number cannot be the same as the primary phone number.",
-      );
-      return;
-    }
-
-    // Format address data
+    // Prepare formatted data
     const formattedAddress = {
-      name: addressData.name,
-      house: addressData.houseNo,
-      locality: addressData.locality,
-      city: addressData.city,
-      state: addressData.state,
-      pin: addressData.pin,
-      phone: addressData.phone,
-      altPhone: addressData.altPhone,
+      name: addressData.name.trim(),
+      house: addressData.houseNo.trim(),
+      locality: addressData.locality.trim(),
+      city: addressData.city.trim(),
+      state: addressData.state.trim(),
+      pin: addressData.pin.trim(),
+      phone: addressData.phone.trim(),
+      altPhone: addressData.altPhone.trim(),
       addressType: addressData.addressType,
       defaultAddress: addressData.defaultAddress,
     };
 
-    console.log("New Address Data:", formattedAddress);
-
     try {
-      await dispatch(
-        addAddress({ userId: user._id, data: formattedAddress }),
-      ).then((res) => {
-        if (res.type.endsWith("/fulfilled")) {
-          toast.success("✅ address added successfully!");
-          navigate("/my-address");
-        } else {
-          toast.error(res?.error?.message || "Failed to delete user.");
+      const res = await dispatch(
+        addAddress({ userId: user._id, data: formattedAddress })
+      );
+      console.log(res)
+      if (res.type.endsWith("/fulfilled")) {
+        toast.success("✅ Address added successfully!");
+        navigate("/my-address");
+      }else {
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
         }
-      });
+        else {
+          toast.error(res?.error?.message || "Failed to add address.");
+        }
+      }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      if (error.response?.data?.errors) {
+        error.response.data.errors.forEach(err => toast.error(err.msg));
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
     }
 
-    // Here you would typically save to your state management or API
-    // For now, we'll just log and show success message
-    // alert('Address saved successfully!');
 
     // Reset form
     setAddressData({
@@ -152,6 +188,7 @@ const AddAddress = () => {
       defaultAddress: false,
     });
   };
+
 
   const handleCancel = () => {
     // Navigate back or reset form

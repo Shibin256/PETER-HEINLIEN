@@ -33,6 +33,7 @@ const Coupons = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (
       couponCode == "" ||
       discountType == "" ||
@@ -41,27 +42,68 @@ const Coupons = () => {
       usageLimit == "" ||
       expirationDate == ""
     ) {
-      toast.error("all filed required");
+      return toast.error("all filed required");
+    }
+
+    if (!couponCode.trim()) {
+      return toast.error("Coupon code is required");
+    }
+
+    if (!["fixed", "percentage"].includes(discountType)) {
+      return toast.error("Discount type must be 'fixed' or 'percentage'");
+    }
+
+    if (!discountAmount || isNaN(discountAmount) || Number(discountAmount) <= 0) {
+      return toast.error("Discount amount must be a positive number");
+    }
+
+    if (discountType === "percentage" && (Number(discountAmount) > 100 || Number(discountAmount) < 1)) {
+      return toast.error("Percentage discount must be between 1 and 100");
+    }
+
+    if (!minPurchase || isNaN(minPurchase) || Number(minPurchase) <= 0) {
+      return toast.error("Minimum purchase amount must be a positive number");
+    }
+
+    if (!usageLimit || isNaN(usageLimit) || Number(usageLimit) <= 0) {
+      return toast.error("Usage limit must be a positive number");
+    }
+
+    if (!expirationDate || isNaN(new Date(expirationDate).getTime())) {
+      return toast.error("Invalid expiration date");
+    }
+
+    const today = new Date();
+    const expiry = new Date(expirationDate);
+    if (expiry <= today) {
+      return toast.error("Expiration date must be in the future");
+    }
+
+    const data = {
+      couponCode: couponCode.trim(),
+      discountType,
+      discountAmount: Number(discountAmount),
+      minPurchase: Number(minPurchase),
+      usageLimit: Number(usageLimit),
+      expirationDate,
+    };
+
+    const res = await dispatch(createCoupons(data));
+    console.log(res, '---')
+
+    if (res.type === "admin/createCoupons/fulfilled") {
+      toast.success(res?.payload?.message);
+      setCouponCode("");
+      setDiscountType("fixed");
+      setDiscountAmount("");
+      setMinPurchase("");
+      setUsageLimit("");
+      setExpirationDate("");
     } else {
-      const data = {
-        couponCode,
-        discountType,
-        discountAmount,
-        minPurchase,
-        usageLimit,
-        expirationDate,
-      };
-      const res = await dispatch(createCoupons(data));
-      if (res.type === "admin/createCoupons/fulfilled") {
-        toast.success(res?.payload?.message);
-        setCouponCode("");
-        setDiscountType("fixed");
-        setDiscountAmount("");
-        setMinPurchase("");
-        setUsageLimit("");
-        setExpirationDate("");
+      if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+        toast.error(res.payload.errors[0])
       } else {
-        toast.error(res.payload.message);
+        toast.error(res.payload?.message || "Failed to create coupon");
       }
     }
   };

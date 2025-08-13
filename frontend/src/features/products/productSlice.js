@@ -8,6 +8,7 @@ export const addProduct = createAsyncThunk(
       const res = await productService.addProducts(formData);
       return res.data;
     } catch (error) {
+      console.log(error,'erroorrrr')
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   },

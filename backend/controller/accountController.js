@@ -155,6 +155,7 @@ export const addAddress = async (req, res) => {
 
         const { name, house, locality, city, state, pin, phone, altPhone, addressType, defaultAddress } = req.body
 
+        console.log(addressType)
         // console.log(name,'---',locality,phone,city,state,pin)
         const newAddress = new Address({
             _id: new mongoose.Types.ObjectId(),

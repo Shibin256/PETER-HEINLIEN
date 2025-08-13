@@ -121,13 +121,12 @@ const ProductAdmin = () => {
     }
   };
 
-  // Handling edit popup
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setEditForm({
       name: product.name || "",
       description: product.description || "",
-      quantity: product.totalQuantity || "",
+      quantity: product.totalQuantity || 0,
       price: product.price || "",
       category: product.category || "",
       brand: product.brand || "",
@@ -651,6 +650,7 @@ const ProductAdmin = () => {
                   Textcolor="text-gray-700"
                   borderColor="border-gray-300"
                 />
+                {console.log(editForm.quantity)}
               </div>
 
               <div className="flex justify-end gap-3 mt-4">

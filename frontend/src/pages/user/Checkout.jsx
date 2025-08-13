@@ -5,15 +5,15 @@ import { getAllAddress } from "../../features/accountSettings/accountSlice";
 import EditAddressModal from "../../components/common/EditAddress";
 import CheckoutCard from "../../components/user/checkoutCard";
 import { applyCoupon, removeCoupon } from "../../features/coupons/couponsSlice";
+import { fetchCart } from "../../features/cart/cartSlice";
 
 const Checkout = () => {
   const [step, setStep] = useState(2);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const location = useLocation();
-  const total = location.state?.totalPrice || 0;
-  const cartItems = location.state?.cartItems || [];
-  console.log(cartItems, '---items to check')
+  // const total = location.state?.totalPrice || 0;
+  // const cartItems = location.state?.cartItems || [];
   const shippingCost = location.state?.shippingCost || 0;
 
   const [couponCode, setCouponCode] = useState("");
@@ -28,9 +28,21 @@ const Checkout = () => {
   const { addresses } = useSelector((state) => state.account);
   useEffect(() => {
     if (!location.state || !cartItems || cartItems.length === 0) {
-      navigate("/", { replace: true }); // Redirect to home
+      navigate("/cart", { replace: true });
     }
   }, []);
+
+  useEffect(() => {
+    dispatch(fetchCart(user._id));
+  }, [])
+
+
+  const { cartItems = [] } = useSelector((state) => state.cart);
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const [total, setTotal] = useState(subtotal + shippingCost);
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -73,12 +85,12 @@ const Checkout = () => {
     if (!couponCode) {
       return setCouponError("Please enter a coupon code");
     }
-
     try {
       const data = await dispatch(
         applyCoupon({ userId: user._id, couponCode }),
       ).unwrap();
-      console.log("Coupon applied:", data);
+
+
       if (data.error) {
         return setCouponError(data.error);
       }
@@ -91,7 +103,10 @@ const Checkout = () => {
         discountAmount = data.coupon.discountValue;
       }
       if (discountAmount > total) {
-        discountAmount = total; // Ensure discount does not exceed total
+        discountAmount = total;
+      }
+      if ((total - discountAmount) < data.coupon.minOrderAmount) {
+        discountAmount = (total - data.coupon.minOrderAmount)
       }
       console.log("Discount amount:", discountAmount);
       setDiscount(discountAmount);
@@ -122,7 +137,7 @@ const Checkout = () => {
         <button
           className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-all shadow-sm"
           onClick={() => {
-            navigate(-1);
+            navigate('/cart');
           }}
         >
           Back

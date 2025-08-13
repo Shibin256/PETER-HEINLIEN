@@ -3,6 +3,8 @@ import multer from "multer";
 import { addProductOffer, createProduct, deleteProductById, getAllProducts, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, removeProductOffer, updateProduct } from "../controller/admin/productController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
+import { validateProduct } from "../validators/productValidator.js";
+import { validate } from "../middleware/validationMiddleware.js";
 
 const router=express.Router()
 const roles=['admin']
@@ -12,7 +14,7 @@ const upload=multer({storage})
 
 //products manage
 router.get('/products/latest',getCollection)
-router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,createProduct)
+router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,validateProduct,validate,createProduct)
 router.get('/products',getAllProducts)
 router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
 router.put('/product/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken, updateProduct)

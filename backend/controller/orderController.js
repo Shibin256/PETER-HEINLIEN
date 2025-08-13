@@ -53,8 +53,6 @@ export const placeOrder = async (req, res) => {
         quantity: item.quantity
     }))
 
-
-
     const orderData = {
         UserID: userId,
         Order_Address: refinedAddress,
@@ -107,13 +105,8 @@ export const placeOrder = async (req, res) => {
             wallet.transactions.push(transactions)
             newOrder.PaymentStatus = 'Paid'
             newOrder.save()
-
-
         }
-
         await Cart.findOneAndDelete({ userId });
-
-
         res.status(201).json({
             success: true,
             message: "Order placed successfully",

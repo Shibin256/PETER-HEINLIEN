@@ -8,6 +8,8 @@ import { changeOrderStatus, getAllOrders, retrunVerify, singleCancelVerify, veri
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
 import { createCoupons, deleteCoupon, fetchCoupons, updateCoupon } from "../controller/admin/couponsController.js";
 import { downloadSalesReportPDF, exelReport, getBestSellers, getSalesReport } from "../controller/admin/reportController.js";
+import { validateCoupon } from "../validators/couponValidator.js";
+import { validate } from "../middleware/validationMiddleware.js";
 
 const router=express.Router()
 
@@ -46,7 +48,7 @@ router.post('/admin/orders/item/:itemOrderId/verify',authorizeRole(roles),verify
 
 
 //couponManage
-router.post('/admin/coupons',authorizeRole(roles),verifyAccessToken,createCoupons)
+router.post('/admin/coupons',authorizeRole(roles),verifyAccessToken,validateCoupon,validate,createCoupons)
 router.get('/admin/coupons',authorizeRole(roles),verifyAccessToken,fetchCoupons)
 router.delete('/admin/coupons/:couponId',authorizeRole(roles),verifyAccessToken,deleteCoupon);
 router.put('/admin/coupons/:couponId',authorizeRole(roles),verifyAccessToken,updateCoupon);

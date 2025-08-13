@@ -28,7 +28,7 @@ export const createCoupons = async (req, res) => {
         await newCoupon.save();
 
         // Missing await
-        const allCoupons = await Coupons.find();
+        const allCoupons = await Coupons.find().sort({createdAt:-1});
         res.status(201).json({ message: "Coupon created", coupons: allCoupons });
 
     } catch (error) {

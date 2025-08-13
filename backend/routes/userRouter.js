@@ -18,6 +18,7 @@ import { fetchHomeBanner } from '../controller/admin/bannerController.js';
 import { validateUserRegistration } from '../validators/authValidators.js';
 import { validate } from '../middleware/validationMiddleware.js';
 import { validateUsernameChange } from '../validators/nameValidator.js';
+import { validateAddress } from '../validators/addressValidator.js';
 
 const router = express.Router();
 const storage=multer.diskStorage({})
@@ -35,7 +36,7 @@ router.patch('/account/:id/name',verifyAccessToken,upload.none(),changeName)
 router.patch('/account/:id/mobile',verifyAccessToken,upload.none(),changeOrAddMobile)
 router.patch('/account/:id/password',verifyAccessToken,editPassword)
 router.patch('/account/:id/image',verifyAccessToken,upload.single('file'),editImage)
-router.post('/account/:id/address',verifyAccessToken,addAddress)
+router.post('/account/:id/address',verifyAccessToken,validateAddress,validate,addAddress)
 router.get('/account/:id/address',verifyAccessToken,getAllAddress)
 router.delete('/account/:userId/:addressId',verifyAccessToken,removeAddress)
 router.patch('/account/:userId/:addressId/default',verifyAccessToken,SetDefaultAddress)
