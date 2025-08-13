@@ -54,7 +54,6 @@ const Signup = () => {
       const validationMsg = usePasswordVal(value);
       setError(validationMsg);
       setIsPasswordValid(!validationMsg);
-
       if (validationMsg) {
         setFormData((prev) => ({ ...prev, confirmPassword: "" }));
       }

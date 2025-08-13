@@ -6,23 +6,46 @@ import mongoose from "mongoose";
 const saltRounds = parseInt(process.env.SALT_ROUNDS || "10", 10);
 
 export const changeName = async (req, res) => {
-    try {
-        const { id } = req.params
-        const newName = req.body.name
-        const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId')
-        if (!user) return res.status(404).json({ message: 'User not found' })
+  try {
+    const { id } = req.params;
+    const newName = req.body.name?.trim();
 
-        user.username = newName
-
-        await user.save();
-
-        res.status(200).json({ data: user, message: `User name successfully changed to ${user.username}` })
-
-    } catch (error) {
-        console.error('Error changing user name:', error.message);
-        res.status(500).json({ message: 'Server error while changing user name' });
+    if (!newName) {
+      return res.status(400).json({ message: "Name is required" });
     }
-}
+
+    if (newName.length < 3 || newName.length > 30) {
+      return res.status(400).json({
+        message: "Name must be between 3 and 30 characters",
+      });
+    }
+
+    if (!/^[a-zA-Z0-9\s]+$/.test(newName)) {
+      return res.status(400).json({
+        message: "Name can only contain letters, numbers, and spaces",
+      });
+    }
+
+    const user = await User.findById(id).select(
+      "-password -createdAt -updatedAt -googleId"
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.username = newName;
+    await user.save();
+
+    res.status(200).json({
+      data: user,
+      message: `User name successfully changed to ${user.username}`,
+    });
+  } catch (error) {
+    console.error("Error changing user name:", error.message);
+    res.status(400).json({ message: "Server error while changing user name" });
+  }
+};
+
 
 
 

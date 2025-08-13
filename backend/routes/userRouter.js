@@ -15,6 +15,9 @@ import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymen
 import { applyCoupon, fetchAdsCoupons, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
 import { fetchHomeBanner } from '../controller/admin/bannerController.js';
+import { validateUserRegistration } from '../validators/authValidators.js';
+import { validate } from '../middleware/validationMiddleware.js';
+import { validateUsernameChange } from '../validators/nameValidator.js';
 
 const router = express.Router();
 const storage=multer.diskStorage({})
@@ -45,7 +48,7 @@ router.get('/cart/:userId',verifyAccessToken,getCart)
 router.delete('/cart/:userId/:productId',verifyAccessToken,removeCartItem)
 router.put('/cart',verifyAccessToken,updateCartItem)
 router.post('/cart/from-wishlist',verifyAccessToken,addFromWishlistToCart)
-router.post('/cart/:userId/:lock',verifyAccessToken,toggleIsLocked)
+router.post('/cart/cart-lock/:lock/:userId',verifyAccessToken,toggleIsLocked)
 
 
 //order manage
@@ -73,7 +76,7 @@ router.post('/wallet/:userId/:amount/:paymentId',verifyAccessToken,addToWallet)
 router.get('/wallet/:userId',verifyAccessToken,getWallet)
 
 //banner
-router.get('/banner',verifyAccessToken,fetchHomeBanner)
+router.get('/banner',fetchHomeBanner)
 
 
 export default router;

@@ -86,7 +86,7 @@ export const toggleIsLocked = async (req, res) => {
     const { userId, lock } = req.params;
     console.log(userId, lock,'in controller')
 
-    const cart = await Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ userId: userId }).select('-createdAt -updatedAt');
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
@@ -130,18 +130,14 @@ export const updateCartItem = async (req, res) => {
     const oldQuantity = item.quantity;
     const quantityDifference = quantity - oldQuantity;
 
-    // Check stock if increasing quantity
     if (quantityDifference > 0 && quantityDifference > product.totalQuantity) {
       return res.status(400).json({ message: `Only ${product.totalQuantity} item(s) left in stock` });
     }
 
-    // Limit max quantity per item (optional)
     if (quantity > 4) {
       return res.status(400).json({ message: 'Max 4 units allowed per item' });
     }
 
-    // Update product stock
-    // product.totalQuantity -= quantityDifference;
     if (product.totalQuantity < 0) {
       return res.status(400).json({ message: 'Insufficient stock' });
     }

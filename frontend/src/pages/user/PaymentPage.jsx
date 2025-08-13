@@ -35,8 +35,8 @@ const PaymentPage = () => {
     if (discount > 0) {
         totalPrice -= discount;
     }
-    if(shippingCost){
-        totalPrice-=shippingCost
+    if (shippingCost) {
+        totalPrice -= shippingCost
     }
 
     const { currency } = useSelector((state) => state.global);
@@ -54,6 +54,8 @@ const PaymentPage = () => {
 
     useEffect(() => {
         dispatch(getWallet(userId));
+        dispatch(toggleIsLocked({ userID: userId, lock: false }));
+
     }, []);
 
     const { walletAmount } = useSelector((state) => state.wallet);
@@ -154,7 +156,7 @@ const PaymentPage = () => {
                 setOrderId(res.order.orderId);
                 console.log(res, "order placed successfully");
                 const date = new Date(res.order.DeliveryDate);
-              
+
                 // First replace with home
                 navigate("/", { replace: true });
 
@@ -190,7 +192,7 @@ const PaymentPage = () => {
                         ).unwrap();
                         setOrderId(res.order.orderId);
                         const date = new Date(res.order.DeliveryDate);
-                      
+
                         navigate("/order-success", {
                             state: { order: res.order },
                             replace: true,
