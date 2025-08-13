@@ -153,15 +153,14 @@ export const editBrand = async (req, res) => {
 export const editCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name } = req.body;
+        const { category } = req.body;
 
-        const category = await Category.findById(id).select('-createdAt -updatedAt')
-        if (!category) {
+        const Thecategory = await Category.findById(id).select('-createdAt -updatedAt')
+        if (!Thecategory) {
             return res.status(404).json({ message: 'Category not found' });
         }
-
-        category.categoryName = name;
-        await category.save();
+        Thecategory.categoryName = category;
+        await Thecategory.save();
 
         res.status(200).json({ message: 'Category updated successfully', category });
     } catch (error) {

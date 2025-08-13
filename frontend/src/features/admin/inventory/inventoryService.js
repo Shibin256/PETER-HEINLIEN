@@ -14,8 +14,8 @@ const deleteCategory = async (id) => {
   return res.data;
 };
 
-const editCategory = async (id, name) => {
-  const data = { name };
+const editCategory = async (id, category) => {
+  const data = { category };
   const res = await adminAxiosInstance.put(
     `api/v1/admin/category/${id}`,
     data,

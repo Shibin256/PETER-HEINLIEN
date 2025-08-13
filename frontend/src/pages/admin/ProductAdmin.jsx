@@ -150,7 +150,7 @@ const ProductAdmin = () => {
       tags,
     } = editForm;
 
-    if (!name || !description || !quantity || !price || !tags) {
+    if (!name || !description  || !price || !tags) {
       toast.error("Please fill all fields.");
       return;
     }
@@ -185,12 +185,20 @@ const ProductAdmin = () => {
     });
 
     try {
-      await dispatch(
+      const res = await dispatch(
         updateProduct({ id: selectedProduct._id, data: formData }),
-      ).unwrap();
-      toast.success("✅ Product updated successfully!");
-      setShowEditModal(false);
-      setSelectedProduct(null);
+      )
+      if (res.type.endsWith('fulfilled')) {
+        toast.success("✅ Product added successfully!");
+        setShowEditModal(false);
+        setSelectedProduct(null);
+      } else {
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
+        } else {
+          toast.error(res.payload?.message || "Failed to create product");
+        }
+      }
       dispatch(
         fetchProducts({ page: 1, limit: 10, search: searchTerm }),
       ).unwrap();
@@ -350,8 +358,8 @@ const ProductAdmin = () => {
                 <td className="px-4 py-2">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${product.availability
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
                       }`}
                   >
                     {product.availability ? "In Stock" : "Out of Stock"}

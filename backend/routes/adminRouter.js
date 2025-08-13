@@ -10,6 +10,8 @@ import { createCoupons, deleteCoupon, fetchCoupons, updateCoupon } from "../cont
 import { downloadSalesReportPDF, exelReport, getBestSellers, getSalesReport } from "../controller/admin/reportController.js";
 import { validateCoupon } from "../validators/couponValidator.js";
 import { validate } from "../middleware/validationMiddleware.js";
+import { validateCategory } from "../validators/categoryValidator.js";
+import { validateBrand } from "../validators/brandValidator.js";
 
 const router=express.Router()
 
@@ -23,14 +25,14 @@ router.patch('/admin/user/:id/block',authorizeRole(roles),verifyAccessToken, tog
 router.delete('/admin/user/:id',authorizeRole(roles),verifyAccessToken,deleteUser)
 
 //category managing
-router.post('/admin/category',authorizeRole(roles),verifyAccessToken,createCategory)
+router.post('/admin/category',authorizeRole(roles),verifyAccessToken,validateCategory,validate,createCategory)
 router.delete('/admin/category/:id',authorizeRole(roles),verifyAccessToken,deleteCategory)
-router.put('/admin/category/:id',authorizeRole(roles),verifyAccessToken,editCategory)
+router.put('/admin/category/:id',authorizeRole(roles),verifyAccessToken,validateCategory,validate,editCategory)
 
 //brand managing
-router.post('/admin/brand',authorizeRole(roles),verifyAccessToken, upload.single('logo'), createBrand)
+router.post('/admin/brand',authorizeRole(roles),verifyAccessToken, upload.single('logo'),validateBrand,validate,createBrand)
 router.delete('/admin/brand/:id',authorizeRole(roles),verifyAccessToken,deleteBrand)
-router.put('/admin/brand/:id',authorizeRole(roles),verifyAccessToken,upload.single('logo'),editBrand)
+router.put('/admin/brand/:id',authorizeRole(roles),verifyAccessToken,upload.single('logo'),validateBrand,validate,editBrand)
 
 //bannerManage
 router.post('/admin/banner',authorizeRole(roles),upload.array("images",2),verifyAccessToken,createBanner)

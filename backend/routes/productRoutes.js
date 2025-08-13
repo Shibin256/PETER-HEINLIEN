@@ -17,7 +17,7 @@ router.get('/products/latest',getCollection)
 router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,validateProduct,validate,createProduct)
 router.get('/products',getAllProducts)
 router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
-router.put('/product/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken, updateProduct)
+router.put('/product/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken,validateProduct,validate, updateProduct)
 
 router.get('/products/getBrandsAndCollection',getBrandsAndCollection)
 router.get('/brand/category',getBrandAndCategory)
