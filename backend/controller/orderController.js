@@ -179,7 +179,7 @@ export const cancelOrderItem = async (req, res) => {
                 { new: true }
             ).select('-createdAt -updatedAt');
 
-            if (updatedProduct.totalQuantity == 1) {
+            if (updatedProduct.totalQuantity >= 1) {
                 updatedProduct.stockStatus = 'In Stock';
                 await updatedProduct.save();
             }
@@ -220,7 +220,7 @@ export const cancelOrderSingleItem = async (req, res) => {
             { new: true }
         ).select('-createdAt -updatedAt');
 
-        if (updatedProduct.totalQuantity == 1) {
+        if (updatedProduct.totalQuantity >= 1) {
             updatedProduct.stockStatus = 'In Stock';
             await updatedProduct.save();
         }
