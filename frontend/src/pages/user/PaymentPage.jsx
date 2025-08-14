@@ -92,8 +92,9 @@ const PaymentPage = () => {
                             const verifyRes = await dispatch(
                                 verifyPayment(response),
                             ).unwrap();
+                            console.log(verifyRes,'verify res---------')
                             if (verifyRes.success) {
-                                resolve(true); // Payment success
+                                resolve(verifyRes); 
                             } else {
                                 reject("Payment verification failed");
                             }
@@ -116,7 +117,7 @@ const PaymentPage = () => {
                         },
                     },
                     retry: {
-                        enabled: false, // disables auto retry popup
+                        enabled: false, 
                     },
                 };
 
@@ -157,10 +158,8 @@ const PaymentPage = () => {
                 console.log(res, "order placed successfully");
                 const date = new Date(res.order.DeliveryDate);
 
-                // First replace with home
                 navigate("/", { replace: true });
 
-                // Now push order success page as a fresh new entry
                 setTimeout(() => {
                     navigate("/order-success", { state: { order: res.order } });
                 }, 0);
@@ -176,7 +175,7 @@ const PaymentPage = () => {
                         totalPrice: totalAmount,
                     });
                     console.log(paymentSuccess);
-                    if (paymentSuccess) {
+                    if (paymentSuccess.success) {
                         const res = await dispatch(
                             placeOrder({
                                 orderdata: {
@@ -188,6 +187,7 @@ const PaymentPage = () => {
                                     deliveryDate,
                                 },
                                 paymentMethod: selectedPayment,
+                                paymentInfo: paymentSuccess.paymentInfo,
                             }),
                         ).unwrap();
                         setOrderId(res.order.orderId);

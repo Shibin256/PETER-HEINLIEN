@@ -11,7 +11,7 @@ export const createRazorpayOrder = async (req, res) => {
         const { amount } = req.body
 
         const options = {
-            amount: amount * 100, 
+            amount: amount * 100,
             currency: 'INR',
             receipt: `receipt_order_${Math.floor(Math.random() * 1000000)}`,
         }
@@ -33,7 +33,7 @@ export const verifyRazorpayPayment = async (req, res) => {
         razorpay_signature,
     } = req.body;
 
-    console.log(razorpay_payment_id,'--------')
+    console.log(razorpay_payment_id, '--------')
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -46,7 +46,13 @@ export const verifyRazorpayPayment = async (req, res) => {
     if (expectedSignature === razorpay_signature) {
         // Payment is verified 
         //return payment id and catch it in front end
-        return res.status(200).json({ success: true, message: 'Payment verified',paymentId:razorpay_payment_id });
+        return res.status(200).json({
+            success: true, message: 'Payment verified', paymentInfo: {
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature,
+            }
+        });
     } else {
         // Verification failed 
         return res.status(400).json({ success: false, message: 'Invalid signature, verification failed' });

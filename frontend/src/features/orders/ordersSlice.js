@@ -196,7 +196,7 @@ const orderSlice = createSlice({
     orders: [],
     currentPlaceOrder: [],
     page: 1,
-    paymentId:null,
+    paymentInfo:null,
     totalPage: 1,
     loading: false,
     success: false,
@@ -246,7 +246,7 @@ const orderSlice = createSlice({
       .addCase(verifyPayment.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.paymentId = action.payload.paymentId;
+        state.paymentInfo = action.payload.paymentInfo;
         state.paymentVerified = action.payload.success;
       })
       .addCase(verifyPayment.rejected, (state, action) => {
