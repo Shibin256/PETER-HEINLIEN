@@ -113,18 +113,19 @@ const downloadInvoice = async (itemOrderId) => {
 };
 
 const createRazorpayOrder = async (amount) => {
-  console.log(amount, "in serviese");
   const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount });
   return res.data;
 };
 
 const verifyRazorpayPayment = async (paymentDetails) => {
+  console.log(paymentDetails,'in the ordrerserviece')
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/verify",
-    paymentDetails,
+     paymentDetails 
   );
-  return res.data; // returns { success: true/false }
+  return res.data;
 };
+
 
 const submitReview = async ({ itemId, rating, review }) => {
   const data = {

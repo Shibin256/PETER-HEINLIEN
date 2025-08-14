@@ -5,7 +5,6 @@ import Product from "../model/productModel.js";
 import PDFDocument from 'pdfkit';
 import Wallet from "../model/walletModal.js";
 import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto'
 
 const generateOrderId = async () => {
     const year = new Date().getFullYear();
@@ -23,64 +22,46 @@ const generateOrderId = async () => {
 
 export const placeOrder = async (req, res) => {
     const { userId, address, cartItems, totalPrice, shippingCost, deliveryDate } = req.body.orderdata
-    const { paymentMethod, paymentInfo } = req.body;
+    const { paymentMethod } = req.body
+    const mainOrderId = await generateOrderId();
+    const itemsWithIds = cartItems.map((item, index) => ({
+        ...item,
+        itemOrderId: `${mainOrderId}-${index + 1}`,
+    }));
 
+    const refinedAddress = {
+        name: address.name,
+        house: address.house,
+        addressType: address.addressType,
+        locality: address.locality,
+        city: address.city,
+        state: address.state,
+        pincode: address.pincode,
+        alternativePhone: address.alternativePhone,
+        phone: address.phone,
+    }
+
+    const refinedItems = itemsWithIds.map(item => ({
+        itemOrderId: item.itemOrderId,
+        productId: item.productId._id,
+        productImage: item.productId.images,
+        productName: item.productId.name,
+        productPrice: item.price,
+        subTotal: item.productSubTotal,
+        quantity: item.quantity
+    }))
+
+    const orderData = {
+        UserID: userId,
+        Order_Address: refinedAddress,
+        Items: refinedItems,
+        TotalAmount: totalPrice,
+        DeliveryCharge: shippingCost,
+        DeliveryDate: deliveryDate,
+        PaymentMethod: paymentMethod,
+        orderId: mainOrderId
+    }
     try {
-        if (paymentMethod == 'razorpay') {
-            const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = paymentInfo || {};
-
-            if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-                return res.status(400).json({ message: "Missing payment information" });
-            }
-
-            const generatedSignature = crypto
-                .createHmac("sha256", process.env.RAZORPAY_SECRET)
-                .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-                .digest("hex");
-
-            if (generatedSignature !== razorpay_signature) {
-                return res.status(400).json({ message: "Payment verification failed" });
-            }
-        }
-
-        const mainOrderId = await generateOrderId();
-        const itemsWithIds = cartItems.map((item, index) => ({
-            ...item,
-            itemOrderId: `${mainOrderId}-${index + 1}`,
-        }));
-
-        const refinedAddress = {
-            name: address.name,
-            house: address.house,
-            addressType: address.addressType,
-            locality: address.locality,
-            city: address.city,
-            state: address.state,
-            pincode: address.pincode,
-            alternativePhone: address.alternativePhone,
-            phone: address.phone,
-        }
-
-        const refinedItems = itemsWithIds.map(item => ({
-            itemOrderId: item.itemOrderId,
-            productId: item.productId._id,
-            productImage: item.productId.images,
-            productName: item.productId.name,
-            productPrice: item.price,
-            subTotal: item.productSubTotal,
-            quantity: item.quantity
-        }))
-
-        const orderData = {
-            UserID: userId,
-            Order_Address: refinedAddress,
-            Items: refinedItems,
-            TotalAmount: totalPrice,
-            DeliveryCharge: shippingCost,
-            DeliveryDate: deliveryDate,
-            PaymentMethod: paymentMethod,
-            orderId: mainOrderId
-        }
         for (const item of orderData.Items) {
             console.log(item, '--------')
             const product = await Product.findOne({ _id: item.productId })
@@ -104,7 +85,7 @@ export const placeOrder = async (req, res) => {
         }
 
         if (paymentMethod == 'razorpay') {
-            newOrder.PaymentStatus = 'paid'
+            newOrder.PaymentStatus = 'Pending'
             newOrder.save()
         } else if (paymentMethod == 'walletPay') {
             const wallet = await Wallet.findOne({ userId })

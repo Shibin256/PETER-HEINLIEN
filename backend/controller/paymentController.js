@@ -1,5 +1,6 @@
 import Razorpay from 'razorpay'
 import crypto from 'crypto'
+import Order from '../model/orderModel.js'
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -27,13 +28,16 @@ export const createRazorpayOrder = async (req, res) => {
 }
 
 export const verifyRazorpayPayment = async (req, res) => {
+    console.log(req.body,'=------=====')
     const {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-    } = req.body;
+    } = req.body.paymentDetails;
+    console.log(req.body.paymentDetails,'payment deatialsss')
+    const orderId=req.body.orderId
 
-    console.log(razorpay_payment_id, '--------')
+    console.log(razorpay_payment_id, '--------',orderId)
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -44,8 +48,9 @@ export const verifyRazorpayPayment = async (req, res) => {
         .digest('hex');
 
     if (expectedSignature === razorpay_signature) {
-        // Payment is verified 
-        //return payment id and catch it in front end
+        const order=await Order.findOne({orderId:orderId})
+        order.PaymentStatus='Paid'
+        order.save()
         return res.status(200).json({
             success: true, message: 'Payment verified', paymentInfo: {
                 razorpay_order_id,
@@ -54,7 +59,6 @@ export const verifyRazorpayPayment = async (req, res) => {
             }
         });
     } else {
-        // Verification failed 
         return res.status(400).json({ success: false, message: 'Invalid signature, verification failed' });
     }
 }

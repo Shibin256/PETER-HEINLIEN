@@ -153,8 +153,7 @@ export const downloadInvoice = createAsyncThunk(
 
 export const createPaymentOrder = createAsyncThunk(
   "order/createPaymentOrder",
-  async ({ totalPrice }, thunkAPI) => {
-    console.log(totalPrice, "in slice");
+  async ( totalPrice , thunkAPI) => {
     try {
       return await orderService.createRazorpayOrder(totalPrice);
     } catch (err) {
@@ -166,6 +165,7 @@ export const createPaymentOrder = createAsyncThunk(
 export const verifyPayment = createAsyncThunk(
   "order/verifyPayment",
   async (paymentDetails, thunkAPI) => {
+    console.log(paymentDetails,'-------')
     try {
       return await orderService.verifyRazorpayPayment(paymentDetails);
     } catch (err) {
