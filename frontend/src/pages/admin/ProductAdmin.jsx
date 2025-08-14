@@ -82,15 +82,20 @@ const ProductAdmin = () => {
     }
 
     try {
-      dispatch(
+      const res = await dispatch(
         addProductOffer({
           productId: selectedProductForOffer._id,
           percentage: offerPercentage,
         }),
-      ).unwrap();
-      toast.success(
-        `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
-      );
+      )
+      console.log(res, '-----')
+      if (res.type.endsWith('fulfilled')) {
+        toast.success(
+          `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
+        );
+      }else{
+        toast.error(res.payload?.message)
+      }
       setSelectedProductForOffer(null);
       setOfferPercentage("");
       dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
@@ -150,7 +155,7 @@ const ProductAdmin = () => {
       tags,
     } = editForm;
 
-    if (!name || !description  || !price || !tags) {
+    if (!name || !description || !price || !tags) {
       toast.error("Please fill all fields.");
       return;
     }
@@ -384,7 +389,7 @@ const ProductAdmin = () => {
                 </td>
 
                 <td className="px-4 py-2 whitespace-nowrap">
-                  {product.offerPrice ? (
+                  {product.offerPercentage ? (
                     <button
                       onClick={() => handleRemoveOffer(product._id)}
                       className="text-red-600 hover:text-red-800"

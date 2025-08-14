@@ -17,10 +17,22 @@ export const addProduct = createAsyncThunk(
 //handle fetchinng product
 export const fetchCollection = createAsyncThunk(
   "products/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async ({userId}, { rejectWithValue }) => {
     try {
-      const latestCollection = await productService.getLatestCollection();
+      const latestCollection = await productService.getLatestCollection(userId);
       return latestCollection;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
+export const topRatedCollections = createAsyncThunk(
+  "products/topRatedCollections",
+  async ({userId}, { rejectWithValue }) => {
+    try {
+      const topRatedCollections = await productService.topRatedCollections(userId);
+      return topRatedCollections;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
@@ -128,9 +140,9 @@ export const getProducById = createAsyncThunk(
 
 export const relatedProducts = createAsyncThunk(
   "product/relatedProduct",
-  async (id, { rejectWithValue }) => {
+  async ({id,userId}, { rejectWithValue }) => {
     try {
-      const res = await productService.getRelatedProducts(id);
+      const res = await productService.getRelatedProducts(id,userId);
       return res;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
@@ -172,6 +184,7 @@ const productSlice = createSlice({
     products: [],
     productsRelated: [],
     latestCollection: [],
+    topRated:[],
     page: 1,
     totalPages: 1,
     brands: [],
@@ -248,6 +261,19 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
+      .addCase(topRatedCollections.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(topRatedCollections.fulfilled, (state, action) => {
+        state.loading = false;
+        state.topRated = action.payload.topRatedCollections;
+      })
+      .addCase(topRatedCollections.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // getBrandAndCollection
       .addCase(getBrandAndCollection.pending, (state) => {
         state.loading = true;
@@ -303,7 +329,7 @@ const productSlice = createSlice({
       })
       .addCase(relatedProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.productsRelated = action.payload;
+        state.productsRelated = action.payload.similarProducts;
       })
       .addCase(relatedProducts.rejected, (state, action) => {
         state.loading = false;

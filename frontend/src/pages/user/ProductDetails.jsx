@@ -39,11 +39,10 @@ const ProductDetails = () => {
     (state) => state.products,
   );
 
-  console.log(localCart, "realated products");
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id));
-      dispatch(relatedProducts(id));
+      dispatch(relatedProducts({id:id,userId:user._id}));
     }
   }, [id, dispatch]);
 

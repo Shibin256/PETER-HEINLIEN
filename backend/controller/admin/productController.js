@@ -1,6 +1,7 @@
 import Brands from "../../model/brandModel.js";
 import Category from "../../model/categoryModel.js";
 import Product from "../../model/productModel.js";
+import wishlistModel from "../../model/wishlistModel.js";
 import cloudinary from "../../utils/cloudinary.js";
 
 //creating new product
@@ -46,17 +47,62 @@ export const createProduct = async (req, res) => {
 //fetch latest collection for home page
 export const getCollection = async (req, res) => {
     try {
+        const { userId } = req.params
         const latestCollection = await Product.find({ isList: { $ne: true } }).sort({ createdAt: -1 }).limit(10)
-            .populate('brand') 
+            .populate('brand')
             .populate('category')
-            .select('-createdAt -updatedAt');
+            .select('-createdAt -updatedAt')
+            .lean()
 
-        res.json({ latestCollection });
+        let wishlistProductIds = [];
+
+        if (userId) {
+            const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
+            wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+        }
+
+        const latestWithWishlist = latestCollection.map(product => ({
+            ...product,
+            isWishlisted: wishlistProductIds.includes(product._id.toString())
+        }));
+
+        res.json({ latestCollection: latestWithWishlist });
+
     } catch (error) {
         console.error('Error fetching products:', error.message);
         res.status(500).json({ message: 'Server error fetching products' });
     }
 }
+
+export const getTopRatedProduct = async (req, res) => {
+    try {
+        const { userId } = req.params
+        const topRatedCollections = await Product.find({ isList: { $ne: true } }).sort({ averageRating: -1 }).limit(10)
+            .populate('brand')
+            .populate('category')
+            .select('-createdAt -updatedAt')
+            .lean()
+
+        let wishlistProductIds = [];
+
+        if (userId) {
+            const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
+            wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+        }
+
+        const latestWithWishlist = topRatedCollections.map(product => ({
+            ...product,
+            isWishlisted: wishlistProductIds.includes(product._id.toString())
+        }));
+
+        res.json({ topRatedCollections: latestWithWishlist });
+    } catch (error) {
+        console.error('Error fetching products:', error.message);
+        res.status(500).json({ message: 'Server error fetching products' });
+    }
+}
+
+
 
 //fetching all products 
 export const getAllProducts = async (req, res) => {
@@ -134,7 +180,7 @@ export const updateProduct = async (req, res) => {
             if (Array.isArray(req.body.existingImages)) {
                 existingImages = req.body.existingImages;
             } else {
-                existingImages = [req.body.existingImages]; 
+                existingImages = [req.body.existingImages];
             }
         }
 
@@ -205,7 +251,7 @@ export const getBrandAndCategory = async (req, res) => {
         const brands = await Brands.find({ isList: { $ne: true } }).sort({ name: 1 }).select('-createdAt -updatedAt').skip(skip).limit(limit)
 
         res.status(200).json({
-            category, 
+            category,
             brands,
             page,
             totalPages: Math.ceil(total / limit),
@@ -219,7 +265,7 @@ export const getBrandAndCategory = async (req, res) => {
 export const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
-            .populate('brand') 
+            .populate('brand')
             .populate('category')
             .select('-createdAt -updatedAt');
 
@@ -234,8 +280,7 @@ export const getProductById = async (req, res) => {
 
 export const getRelatedProducts = async (req, res) => {
     try {
-        const { productId } = req.params
-        console.log(productId)
+        const { productId, userId } = req.params
         const currentProduct = await Product.findById(productId)
         if (!currentProduct) return res.status(404).json({ message: 'product not found' });
 
@@ -243,9 +288,21 @@ export const getRelatedProducts = async (req, res) => {
             _id: { $ne: productId },
             isList: { $ne: true },
             category: currentProduct.category
-        }).limit(6).select('-createdAt -updatedAt')
+        }).limit(6).select('-createdAt -updatedAt').lean()
 
-        res.status(200).json(similarProducts);
+        let wishlistProductIds = [];
+
+        if (userId) {
+            const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
+            wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+        }
+
+        const latestWithWishlist = similarProducts.map(product => ({
+            ...product,
+            isWishlisted: wishlistProductIds.includes(product._id.toString())
+        }));
+
+        res.status(200).json({ similarProducts: latestWithWishlist });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error });
     }
@@ -265,7 +322,17 @@ export const addProductOffer = async (req, res) => {
         }
 
         const discountAmount = (product.price * percentage) / 100;
-        product.offerPrice = product.price - discountAmount;
+        if (product.offerPrice) {
+            if (product.offerPrice > product.price-discountAmount) {
+                product.offerPercentage = percentage
+                product.offerPrice = product.price - discountAmount;
+            } else {
+                return res.status(404).json({ message: 'The Category offer is heigher than this offer' });
+            }
+        } else {
+            product.offerPercentage = percentage
+            product.offerPrice = product.price - discountAmount;
+        }
 
         await product.save();
 
@@ -286,13 +353,22 @@ export const removeProductOffer = async (req, res) => {
         }
         const product = await Product
             .findById(productId)
-            .select('offerPrice')
+            .select('offerPrice category price offerPercentage')
             .select('-createdAt -updatedAt');
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        // Remove the offer price
-        product.offerPrice = 0;
+        const category = await Category.findById(product.category).select('-createdAt -updatedAt');
+        if (category.offerPersentage) {
+            const discountAmount = (product.price * category.offerPersentage) / 100;
+            console.log(discountAmount,product.price)
+            product.offerPrice = product.price - discountAmount
+            product.offerPercentage = 0
+        } else {
+            product.offerPercentage = 0
+            product.offerPrice = 0;
+        }
+
         await product.save();
         res.status(200).json({ message: 'Offer removed successfully', product });
     } catch (error) {

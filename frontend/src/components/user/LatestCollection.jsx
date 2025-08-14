@@ -6,8 +6,9 @@ import { fetchCollection } from "../../features/products/productSlice";
 
 const LatestCollection = () => {
   const dispatch = useDispatch();
+  const {user} = useSelector((state) => state.auth);
   useEffect(() => {
-    dispatch(fetchCollection());
+    dispatch(fetchCollection({userId:user._id}));
   }, []);
 
   const { latestCollection } = useSelector((state) => state.products);
