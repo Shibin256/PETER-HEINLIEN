@@ -127,7 +127,6 @@ const bannerSlice = createSlice({
       .addCase(fetchBanners.fulfilled, (state,action) => {
         state.loading = false;
         state.success = true;
-        console.log(action.payload,'------')
         state.banners=action.payload.banners
       })
       .addCase(fetchBanners.rejected, (state, action) => {
@@ -141,7 +140,6 @@ const bannerSlice = createSlice({
       .addCase(fetchHomeBanner.fulfilled, (state,action) => {
         state.loading = false;
         state.success = true;
-        console.log(action.payload,'------')
         state.homeBanner=action.payload.banner
       })
       .addCase(fetchHomeBanner.rejected, (state, action) => {

@@ -292,7 +292,7 @@ export const addFromWishlistToCart = async (req, res) => {
           productSubTotal: product.price * quantity,
         });
       }
-      await product.save();
+      // await product.save();
     }
     // Remove products from wishlist
     const wishlist = await wishlistModel.findOne({ userId });

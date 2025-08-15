@@ -284,12 +284,20 @@ const Signup = () => {
 
             <GoogleAuthButton onSuccess={handleLoginSuccess} />
 
-            <p className="text-center text-sm text-gray-600">
-              Already have an account?{" "}
+            <div className="flex justify-between items-center text-sm text-gray-600">
+              <span>
+                Already have an account?{" "}
               <Link to="/login" className="text-blue-500">
                 Log in
               </Link>
-            </p>
+              </span>
+              <span>
+                <Link to="/" className="text-yellow-500 font-semibold hover:underline">
+                  Go to Home
+                </Link>
+              </span>
+            </div>
+
           </form>
         </div>
       </main>

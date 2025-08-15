@@ -14,7 +14,10 @@ const upload=multer({storage})
 
 //products manage
 router.get('/products/latest/:userId',getCollection)
+router.get('/products/latest',getCollection)
 router.get('/products/top-rated/:userId',getTopRatedProduct)
+router.get('/products/top-rated',getTopRatedProduct)
+
 router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,validateProduct,validate,createProduct)
 router.get('/products',getAllProducts)
 router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)

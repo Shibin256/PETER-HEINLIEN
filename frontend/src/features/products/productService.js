@@ -12,6 +12,7 @@ const getProducts = async (params) => {
 //fetching producs  for collection
 const getLatestCollection = async (userId) => {
   const response = await axiosInstance.get(`/api/v1/products/latest/${userId}`);
+  console.log(response.data,'----')
   return response.data;
 };
 
@@ -84,7 +85,19 @@ const getBrandAndCategory = async (page, limit) => {
   return res.data;
 };
 
+const fetchCollectionWithoutUser = async () => {
+  const response = await axiosInstance.get(`/api/v1/products/latest`);
+  return response.data;
+};
+
+const topRatedCollectionsWithOutUser = async (userId) => {
+  const response = await axiosInstance.get(`/api/v1/products/top-rated`);
+  return response.data;
+};
+
 const productService = {
+  topRatedCollectionsWithOutUser,
+  fetchCollectionWithoutUser,
   topRatedCollections,
   getProducts,
   addProducts,

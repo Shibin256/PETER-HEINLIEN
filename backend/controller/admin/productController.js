@@ -54,19 +54,24 @@ export const getCollection = async (req, res) => {
             .select('-createdAt -updatedAt')
             .lean()
 
-        let wishlistProductIds = [];
 
         if (userId) {
+            let wishlistProductIds = [];
+
             const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
             wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+
+            const latestWithWishlist = latestCollection.map(product => ({
+                ...product,
+                isWishlisted: wishlistProductIds.includes(product._id.toString())
+            }));
+
+            res.json({ latestCollection: latestWithWishlist });
         }
 
-        const latestWithWishlist = latestCollection.map(product => ({
-            ...product,
-            isWishlisted: wishlistProductIds.includes(product._id.toString())
-        }));
 
-        res.json({ latestCollection: latestWithWishlist });
+        res.json(latestCollection);
+
 
     } catch (error) {
         console.error('Error fetching products:', error.message);
@@ -76,6 +81,7 @@ export const getCollection = async (req, res) => {
 
 export const getTopRatedProduct = async (req, res) => {
     try {
+        console.log('hii')
         const { userId } = req.params
         const topRatedCollections = await Product.find({ isList: { $ne: true } }).sort({ averageRating: -1 }).limit(10)
             .populate('brand')
@@ -83,19 +89,24 @@ export const getTopRatedProduct = async (req, res) => {
             .select('-createdAt -updatedAt')
             .lean()
 
-        let wishlistProductIds = [];
 
         if (userId) {
+            let wishlistProductIds = [];
+
             const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
+
             wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+            const latestWithWishlist = topRatedCollections.map(product => ({
+                ...product,
+                isWishlisted: wishlistProductIds.includes(product._id.toString())
+            }));
+
+            res.json({ topRatedCollections: latestWithWishlist });
+
         }
 
-        const latestWithWishlist = topRatedCollections.map(product => ({
-            ...product,
-            isWishlisted: wishlistProductIds.includes(product._id.toString())
-        }));
+            res.json({ topRatedCollections: topRatedCollections });
 
-        res.json({ topRatedCollections: latestWithWishlist });
     } catch (error) {
         console.error('Error fetching products:', error.message);
         res.status(500).json({ message: 'Server error fetching products' });
@@ -323,7 +334,7 @@ export const addProductOffer = async (req, res) => {
 
         const discountAmount = (product.price * percentage) / 100;
         if (product.offerPrice) {
-            if (product.offerPrice > product.price-discountAmount) {
+            if (product.offerPrice > product.price - discountAmount) {
                 product.offerPercentage = percentage
                 product.offerPrice = product.price - discountAmount;
             } else {
@@ -361,7 +372,7 @@ export const removeProductOffer = async (req, res) => {
         const category = await Category.findById(product.category).select('-createdAt -updatedAt');
         if (category.offerPersentage) {
             const discountAmount = (product.price * category.offerPersentage) / 100;
-            console.log(discountAmount,product.price)
+            console.log(discountAmount, product.price)
             product.offerPrice = product.price - discountAmount
             product.offerPercentage = 0
         } else {

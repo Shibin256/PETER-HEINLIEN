@@ -30,16 +30,32 @@ ConnectDB()
 app.use(express.json())
 
 //enabling cors with port
+// app.use(cors({
+//   origin: 'http://localhost:5173',
+//   credentials: true,
+// }));
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://346d5cdda7cf.ngrok-free.app" 
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}))
 
 // app.use(morgan("combined", { stream: { write: (message) => logger.info(message.trim()) } }));
 
-app.use('/api/auth',authRoutes)
-app.use('/api/v1',productRoutes,adminRouter) 
-app.use('/api/v1/users',userRouter) 
+app.use('/api/auth', authRoutes)
+app.use('/api/v1', productRoutes, adminRouter)
+app.use('/api/v1/users', userRouter)
 
 //port assigning
 app.listen(process.env.PORT, () => logger.info(`The server started localhost:${process.env.PORT}`))

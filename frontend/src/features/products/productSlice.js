@@ -8,7 +8,7 @@ export const addProduct = createAsyncThunk(
       const res = await productService.addProducts(formData);
       return res.data;
     } catch (error) {
-      console.log(error,'erroorrrr')
+      console.log(error, 'erroorrrr')
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   },
@@ -17,7 +17,7 @@ export const addProduct = createAsyncThunk(
 //handle fetchinng product
 export const fetchCollection = createAsyncThunk(
   "products/fetchAll",
-  async ({userId}, { rejectWithValue }) => {
+  async ({ userId = '' }, { rejectWithValue }) => {
     try {
       const latestCollection = await productService.getLatestCollection(userId);
       return latestCollection;
@@ -27,9 +27,21 @@ export const fetchCollection = createAsyncThunk(
   },
 );
 
+export const fetchCollectionWithoutUser = createAsyncThunk(
+  "products/fetchCollectionWithoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const latestCollection = await productService.fetchCollectionWithoutUser();
+      return latestCollection;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
 export const topRatedCollections = createAsyncThunk(
   "products/topRatedCollections",
-  async ({userId}, { rejectWithValue }) => {
+  async ({ userId = '' }, { rejectWithValue }) => {
     try {
       const topRatedCollections = await productService.topRatedCollections(userId);
       return topRatedCollections;
@@ -38,6 +50,20 @@ export const topRatedCollections = createAsyncThunk(
     }
   },
 );
+
+export const topRatedCollectionsWithOutUser = createAsyncThunk(
+  "products/topRatedCollectionsWithOutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const topRatedCollections = await productService.topRatedCollectionsWithOutUser();
+      return topRatedCollections;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
+
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
@@ -140,9 +166,9 @@ export const getProducById = createAsyncThunk(
 
 export const relatedProducts = createAsyncThunk(
   "product/relatedProduct",
-  async ({id,userId}, { rejectWithValue }) => {
+  async ({ id, userId = '' }, { rejectWithValue }) => {
     try {
-      const res = await productService.getRelatedProducts(id,userId);
+      const res = await productService.getRelatedProducts(id, userId);
       return res;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Something went wrong");
@@ -184,7 +210,7 @@ const productSlice = createSlice({
     products: [],
     productsRelated: [],
     latestCollection: [],
-    topRated:[],
+    topRated: [],
     page: 1,
     totalPages: 1,
     brands: [],
@@ -261,6 +287,21 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
+      // latestCollection
+      .addCase(fetchCollectionWithoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCollectionWithoutUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.latestCollection = action.payload;
+      })
+      .addCase(fetchCollectionWithoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+
       .addCase(topRatedCollections.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -270,6 +311,19 @@ const productSlice = createSlice({
         state.topRated = action.payload.topRatedCollections;
       })
       .addCase(topRatedCollections.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+        .addCase(topRatedCollectionsWithOutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(topRatedCollectionsWithOutUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.topRated = action.payload.topRatedCollections;
+      })
+      .addCase(topRatedCollectionsWithOutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

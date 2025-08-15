@@ -82,7 +82,6 @@ export const setActiveBanner = async (req, res) => {
 export const fetchHomeBanner=async(req, res)=>{
     try {
         const banner = await Banners.findOne({ isActive: true }).sort({ createdAt: -1 });
-        console.log(banner,'------this is banner')
         res.status(201).json({ message: 'banner fetched', banner });
     } catch (error) {
         console.error('Error fetch banners:', error.message);

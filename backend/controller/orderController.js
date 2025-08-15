@@ -71,16 +71,18 @@ export const placeOrder = async (req, res) => {
         }
         const newOrder = await Order.create(orderData);
 
-        for (const item of newOrder.Items) {
-            const updatedProduct = await Product.findByIdAndUpdate(
-                item.productId,
-                { $inc: { totalQuantity: -item.quantity } },
-                { new: true }
-            );
+        if (paymentMethod !== 'razorpay') {
+            for (const item of newOrder.Items) {
+                const updatedProduct = await Product.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { totalQuantity: -item.quantity } },
+                    { new: true }
+                );
 
-            if (updatedProduct.totalQuantity <= 0) {
-                updatedProduct.stockStatus = 'Out of Stock';
-                await updatedProduct.save();
+                if (updatedProduct.totalQuantity <= 0) {
+                    updatedProduct.stockStatus = 'Out of Stock';
+                    await updatedProduct.save();
+                }
             }
         }
 

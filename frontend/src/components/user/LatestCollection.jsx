@@ -2,16 +2,24 @@ import React, { useEffect } from "react";
 import Title from "../common/Title";
 import ProductCard from "../common/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCollection } from "../../features/products/productSlice";
+import { fetchCollection, fetchCollectionWithoutUser } from "../../features/products/productSlice";
 
 const LatestCollection = () => {
   const dispatch = useDispatch();
-  const {user} = useSelector((state) => state.auth);
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const { latestCollection } = useSelector((state) => state.products);
+
+
   useEffect(() => {
-    dispatch(fetchCollection({userId:user._id}));
+    if (user) {
+      dispatch(fetchCollection({ userId: user._id }));
+    }
+     else {
+      dispatch(fetchCollectionWithoutUser());
+    }
   }, []);
 
-  const { latestCollection } = useSelector((state) => state.products);
   return (
     <div className="latest-collection my-10 px-2 sm:px-4">
       {/* Heading Section */}
