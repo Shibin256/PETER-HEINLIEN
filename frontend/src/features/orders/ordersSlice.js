@@ -190,6 +190,20 @@ export const addReview = createAsyncThunk(
   },
 );
 
+
+export const updateOrderStatus = createAsyncThunk(
+  "user/updateOrderStatus",
+  async (orderId , { rejectWithValue }) => {
+    console.log(orderId,'in slicee')
+    try {
+      const res = await orderService.updateOrderStatus(orderId);
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
 const orderSlice = createSlice({
   name: "orders",
   initialState: {

@@ -18,37 +18,21 @@ const ProductCard = ({ product }) => {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  // useEffect(() => {
-  //   if (user && product?._id) {
-  //     dispatch(
-  //       getWishedProduct({ userId: user._id, productId: product._id }),
-  //     ).then((res) => {
-  //       if (res.payload?.wished) {
-  //         setIsFavorite(true);
-  //       } else {
-  //         setIsFavorite(false);
-  //       }
-  //     });
-  //   }
-  // }, []);
-
   // Function to render star ratings
   const renderRatingStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
 
-    // Full stars
+
     for (let i = 0; i < fullStars; i++) {
       stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
     }
 
-    // Half star
     if (hasHalfStar) {
       stars.push(<FaStarHalfAlt key="half" className="text-yellow-400" />);
     }
 
-    // Empty stars
     const emptyStars = 5 - stars.length;
     for (let i = 0; i < emptyStars; i++) {
       stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
@@ -156,16 +140,17 @@ const ProductCard = ({ product }) => {
           </h3>
 
           {/* Rating */}
-          {product.averageRating && (
-            <div className="flex items-center gap-1">
-              <div className="flex">
-                {renderRatingStars(product.averageRating)}
-              </div>
+          {/* Rating */}
+          <div className="flex items-center gap-1">
+            <div className="flex">
+              {renderRatingStars(product.averageRating)}
+            </div>
+            {product.averageRating && (
               <span className="text-sm text-gray-600 ml-1">
                 ({product.averageRating.toFixed(1)})
               </span>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="flex justify-between items-center">
             <p className="text-gray-500 text-sm line-clamp-2 w-[70%]">

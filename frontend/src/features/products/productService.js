@@ -12,7 +12,6 @@ const getProducts = async (params) => {
 //fetching producs  for collection
 const getLatestCollection = async (userId) => {
   const response = await axiosInstance.get(`/api/v1/products/latest/${userId}`);
-  console.log(response.data,'----')
   return response.data;
 };
 

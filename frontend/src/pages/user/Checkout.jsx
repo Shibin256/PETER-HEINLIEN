@@ -14,6 +14,8 @@ const Checkout = () => {
   const location = useLocation();
   // const total = location.state?.totalPrice || 0;
   // const cartItems = location.state?.cartItems || [];
+  const from = location.state?.from || false;
+
   const shippingCost = location.state?.shippingCost || 0;
 
   const [couponCode, setCouponCode] = useState("");
@@ -37,12 +39,22 @@ const Checkout = () => {
   }, [])
 
 
-  const { cartItems = [] } = useSelector((state) => state.cart);
+  let { cartItems = [] } = useSelector((state) => state.cart);
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+
   const [total, setTotal] = useState(subtotal + shippingCost);
+  if (from) {
+    cartItems = location.state?.cartItems || [];
+  }
+  useEffect(() => {
+    if (from) {
+      setTotal(location.state?.totalPrice || 0);
+    }
+  }, [from, location.state?.totalPrice]);
+
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);

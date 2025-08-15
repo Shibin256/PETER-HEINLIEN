@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
     createPaymentOrder,
     placeOrder,
+    updateOrderStatus,
     verifyPayment,
 } from "../../features/orders/ordersSlice";
 import { toast } from "react-toastify";
@@ -74,10 +75,9 @@ const PaymentPage = () => {
         }
     }, []);
 
-    const handlePayment = async ({totalPrice,orderId}) => {
+    const handlePayment = async ({ totalPrice, orderId }) => {
         try {
-            const amount=totalPrice
-            console.log(amount,'in fornt tned')
+            const amount = totalPrice
             const result = await dispatch(createPaymentOrder(amount)).unwrap();
             const { order } = result;
 
@@ -91,12 +91,11 @@ const PaymentPage = () => {
                     order_id: order.id,
                     handler: async (response) => {
                         try {
-                            console.log(response)
                             const verifyRes = await dispatch(
-                                verifyPayment({paymentDetails:response,orderId:orderId}),
+                                verifyPayment({ paymentDetails: response, orderId: orderId }),
                             ).unwrap();
                             if (verifyRes.success) {
-                                resolve(true); // Payment success
+                                resolve(true); 
                             } else {
                                 reject("Payment verification failed");
                             }
@@ -160,17 +159,15 @@ const PaymentPage = () => {
                 console.log(res, "order placed successfully");
                 const date = new Date(res.order.DeliveryDate);
 
-                // First replace with home
                 navigate("/", { replace: true });
 
-                // Now push order success page as a fresh new entry
                 setTimeout(() => {
                     navigate("/order-success", { state: { order: res.order } });
                 }, 0);
-            } 
-            
-            
-            
+            }
+
+
+
             else if (selectedPayment === "razorpay") {
                 if (isLocked) {
                     toast.error("The cart is already locked and payment is pending.");
@@ -196,13 +193,15 @@ const PaymentPage = () => {
                 ).unwrap();
 
                 setOrderId(pendingOrder.order.orderId);
+                console.log(pendingOrder,'in thepending')
 
                 let totalAmount = totalPrice + (shippingCost || 0);
 
                 const paymentSuccess = await handlePayment({
                     totalPrice: totalAmount,
-                    orderId: pendingOrder.order.orderId 
+                    orderId: pendingOrder.order.orderId
                 });
+                console.log(paymentSuccess, '--payment success')
 
                 if (paymentSuccess) {
                     dispatch(resetCart());
@@ -211,7 +210,6 @@ const PaymentPage = () => {
                     toast.error("Payment failed");
                     await dispatch(updateOrderStatus({
                         orderId: pendingOrder.order.orderId,
-                        status: "failed"
                     }));
                     await dispatch(toggleIsLocked({ userID: userId, lock: false }));
                 }

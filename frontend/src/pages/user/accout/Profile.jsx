@@ -267,12 +267,12 @@ const Profile = () => {
           >
             LOG OUT
           </button>
-          <button
+          {/* <button
             onClick={handleDelete}
             className="w-full py-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors duration-300"
           >
             DELETE ACCOUNT
-          </button>
+          </button> */}
         </div>
       </div>
       <ProfileImageModal

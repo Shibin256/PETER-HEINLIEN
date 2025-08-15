@@ -152,6 +152,7 @@ const ProductDetails = () => {
         totalPrice: data.productSubTotal + shipping,
         shippingCost: shipping,
         userId: user._id,
+        from:true
       }
     })
 

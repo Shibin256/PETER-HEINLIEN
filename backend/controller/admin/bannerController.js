@@ -3,7 +3,18 @@ import cloudinary from "../../utils/cloudinary.js";
 
 export const createBanner = async (req, res) => {
     try {
-        const { title, description, buttonText, buttonLink } = req.body
+        const { title, description, buttonText } = req.body
+
+         if (!title?.trim()) {
+            return res.status(400).json({ error: "Title is required" });
+        }
+        if (!description?.trim()) {
+            return res.status(400).json({ error: "Description is required" });
+        }
+        if (!buttonText?.trim()) {
+            return res.status(400).json({ error: "Button text is required" });
+        }
+        
 
         const uploadImage = [];
         for (const file of req.files) {

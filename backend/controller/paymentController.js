@@ -2,6 +2,7 @@ import Razorpay from 'razorpay'
 import crypto from 'crypto'
 import Order from '../model/orderModel.js'
 import Product from '../model/productModel.js'
+import Cart from '../model/cartModal.js'
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -51,6 +52,10 @@ export const verifyRazorpayPayment = async (req, res) => {
     if (expectedSignature === razorpay_signature) {
         const order = await Order.findOne({ orderId: orderId })
         order.PaymentStatus = 'Paid'
+        order.OrderStatus='Processing'
+        
+        await Cart.findOneAndDelete({ userId:order.UserID });
+
         for (const item of order.Items) {
             const updatedProduct = await Product.findByIdAndUpdate(
                 item.productId,

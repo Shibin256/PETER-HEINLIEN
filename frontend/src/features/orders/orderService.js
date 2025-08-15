@@ -140,7 +140,17 @@ const submitReview = async ({ itemId, rating, review }) => {
   return response.data;
 };
 
+const updateOrderStatus = async (orderID) => {
+  console.log(orderID,'in serviece')
+  const response = await adminAxiosInstance.delete(
+    `/api/v1/admin/orders/${itemOrderId}`,
+    data,
+  );
+  return response.data;
+};
+
 const orderService = {
+  updateOrderStatus,
   placeOrder,
   getOrders,
   cancelOrderItem,
