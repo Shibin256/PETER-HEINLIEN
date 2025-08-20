@@ -10,6 +10,10 @@ export const createProduct = async (req, res) => {
         let available = false
         const { name, description, category, brand, tags, price, quantity } = req.body
         const uploadImage = [];
+        console.log(req.files.length, 'length')
+        if (req.files.length < 3) {
+            return res.status(404).json({ message: 'The total of 3 images needed to proceed' });
+        }
         for (const file of req.files) {
             const result = await cloudinary.uploader.upload(file.path);
             uploadImage.push(result.secure_url)
@@ -105,7 +109,7 @@ export const getTopRatedProduct = async (req, res) => {
 
         }
 
-            res.json({ topRatedCollections: topRatedCollections });
+        res.json({ topRatedCollections: topRatedCollections });
 
     } catch (error) {
         console.error('Error fetching products:', error.message);

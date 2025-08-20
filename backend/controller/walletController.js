@@ -26,7 +26,7 @@ export const addToWallet = async (req, res) => {
       wallet.balance += numericAmount;
       wallet.transactions.push(transactions)
     } else {
-      wallet = new Wallet({ userId, balance: numericAmount,transactions:[transactions] });
+      wallet = new Wallet({ userId, balance: numericAmount, transactions: [transactions] });
     }
 
     await wallet.save();
@@ -43,7 +43,9 @@ export const getWallet = async (req, res) => {
   const { userId } = req.params
 
   const wallet = await Wallet.findOne({ userId }).sort({ createdAt: -1 })
+  wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+  console.log(wallet, '---- in the wallet page')
   res.status(200).json({ wallet });
 }
 

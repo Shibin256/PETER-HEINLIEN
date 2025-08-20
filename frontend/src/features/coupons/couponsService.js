@@ -50,6 +50,7 @@ const updateCoupon = async (data) => {
       discountType: data.discountType,
       discountValue: data.discountAmount,
       minOrderAmount: data.minPurchase,
+      maxDiscount:data.maxDiscount,
       usageLimit: data.usageLimit,
       expirationDate: data.expirationDate,
     },

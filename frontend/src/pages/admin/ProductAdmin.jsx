@@ -93,7 +93,7 @@ const ProductAdmin = () => {
         toast.success(
           `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
         );
-      }else{
+      } else {
         toast.error(res.payload?.message)
       }
       setSelectedProductForOffer(null);
@@ -127,14 +127,14 @@ const ProductAdmin = () => {
   };
 
   const handleEdit = (product) => {
-    setSelectedProduct(product);
+    setSelectedProduct(product, '====');
     setEditForm({
       name: product.name || "",
       description: product.description || "",
       quantity: product.totalQuantity || 0,
       price: product.price || "",
-      category: product.category || "",
-      brand: product.brand || "",
+      category: product.category._id || "",
+      brand: product.brand._id || "",
       tags: product.tags || "",
       images: product.images,
       newImages: [],
@@ -486,6 +486,7 @@ const ProductAdmin = () => {
                 borderColor="border-gray-300"
               />
 
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
@@ -611,6 +612,7 @@ const ProductAdmin = () => {
                   options={categoryOptions}
                   name="category"
                 />
+                {console.log(categoryOptions, '-----')}
                 <SelectInput
                   label="Brand"
                   value={editForm.brand}
@@ -663,7 +665,6 @@ const ProductAdmin = () => {
                   Textcolor="text-gray-700"
                   borderColor="border-gray-300"
                 />
-                {console.log(editForm.quantity)}
               </div>
 
               <div className="flex justify-end gap-3 mt-4">

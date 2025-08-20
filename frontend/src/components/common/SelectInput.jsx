@@ -21,7 +21,7 @@ const SelectInput = ({
       <div className="relative text-sm font-medium text-gray-700 mb-2 tracking-wider">
         <select
           name={name}
-          value={value}
+          value={value || ''}
           onChange={(e) => onChange(e.target.value)}
           required={required}
           className="block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white transition-all duration-200"

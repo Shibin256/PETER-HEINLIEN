@@ -118,7 +118,7 @@ const Checkout = () => {
         discountAmount = total;
       }
       if ((total - discountAmount) < data.coupon.minOrderAmount) {
-        discountAmount = (total - data.coupon.minOrderAmount)
+        discountAmount = data.coupon.maxDiscount
       }
       console.log("Discount amount:", discountAmount);
       setDiscount(discountAmount);

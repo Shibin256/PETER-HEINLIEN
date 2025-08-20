@@ -17,6 +17,7 @@ const Coupons = () => {
   const [discountType, setDiscountType] = useState("fixed");
   const [discountAmount, setDiscountAmount] = useState("");
   const [minPurchase, setMinPurchase] = useState("");
+  const [maxDiscount, setMaxDiscount] = useState("");
   const [usageLimit, setUsageLimit] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
@@ -44,6 +45,9 @@ const Coupons = () => {
     ) {
       return toast.error("all filed required");
     }
+    if (discountType == 'fixed' && maxDiscount == "") {
+      return toast.error("all filed required");
+    }
 
     if (!couponCode.trim()) {
       return toast.error("Coupon code is required");
@@ -65,6 +69,21 @@ const Coupons = () => {
       return toast.error("Minimum purchase amount must be a positive number");
     }
 
+
+    if (discountType !== "percentage") {
+      if (!maxDiscount || isNaN(maxDiscount) || Number(maxDiscount) <= 0) {
+        return toast.error("Maximum discount must be a positive number");
+      }
+
+      if (Number(maxDiscount) > Number(discountAmount)) {
+        return toast.error("Maximum discount must be lesser than the discount amount");
+      }
+
+      if (Number(maxDiscount) > Number(minPurchase)) {
+        return toast.error("Maximum discount must be lesser than the minimum purchase amount");
+      }
+    }
+
     if (!usageLimit || isNaN(usageLimit) || Number(usageLimit) <= 0) {
       return toast.error("Usage limit must be a positive number");
     }
@@ -84,6 +103,7 @@ const Coupons = () => {
       discountType,
       discountAmount: Number(discountAmount),
       minPurchase: Number(minPurchase),
+      maxDiscount: Number(maxDiscount) || 0,
       usageLimit: Number(usageLimit),
       expirationDate,
     };
@@ -97,6 +117,7 @@ const Coupons = () => {
       setDiscountType("fixed");
       setDiscountAmount("");
       setMinPurchase("");
+      setMaxDiscount("")
       setUsageLimit("");
       setExpirationDate("");
     } else {
@@ -150,6 +171,7 @@ const Coupons = () => {
       editingCoupon.discountType !== originalCoupon.discountType ||
       editingCoupon.discountValue !== originalCoupon.discountValue ||
       editingCoupon.minOrderAmount !== originalCoupon.minOrderAmount ||
+      editingCoupon.maxDiscount !== originalCoupon.maxDiscount ||
       editingCoupon.usageLimit !== originalCoupon.usageLimit ||
       editingCoupon.expiresAt.split("T")[0] !== originalCoupon.expiresAt.split("T")[0];
 
@@ -176,6 +198,7 @@ const Coupons = () => {
       discountType: editingCoupon.discountType,
       discountAmount: editingCoupon.discountValue,
       minPurchase: editingCoupon.minPurchase,
+      maxDiscount: editingCoupon.maxDiscount,
       usageLimit: editingCoupon.usageLimit,
       expirationDate: editingCoupon.expiresAt,
     }
@@ -256,24 +279,51 @@ const Coupons = () => {
               </div>
             </div>
 
-            {/* Minimum Purchase */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Minimum Purchase (₹)
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  value={minPurchase}
-                  onChange={(e) => setMinPurchase(e.target.value)}
-                  step="0.01"
-                  min="0"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+            {/* Purchase & Discount Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Minimum Purchase */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Minimum Purchase (₹)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    value={minPurchase}
+                    onChange={(e) => setMinPurchase(e.target.value)}
+                    step="0.01"
+                    min="0"
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
+
+              {/* Maximum Discount (only for flat) */}
+              {discountType === "fixed" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Maximum Discount (₹)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={maxDiscount}
+                      onChange={(e) => setMaxDiscount(e.target.value)}
+                      step="0.01"
+                      min="0"
+                      className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md 
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Usage Limit */}
@@ -377,6 +427,12 @@ const Coupons = () => {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  MAX DISCOUNT
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   USAGE
                 </th>
                 <th
@@ -404,6 +460,7 @@ const Coupons = () => {
                       ? `₹ ${coupon.discountValue}.00 off`
                       : `${coupon.discountValue} % `}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${coupon.maxDiscount}`}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${coupon.usersUsed.length}/${coupon.usageLimit}`}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {coupon.expiresAt.split("T")[0]}
@@ -573,6 +630,33 @@ const Coupons = () => {
                 </div>
 
                 {/* Minimum Purchase */}
+                {editingCoupon.discountType === "fixed" && (
+                  < div >
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Maximum Discount (₹)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        ₹
+                      </span>
+                      <input
+                        type="number"
+                        value={editingCoupon.maxDiscount}
+                        onChange={(e) =>
+                          setEditingCoupon({
+                            ...editingCoupon,
+                            maxDiscount: e.target.value,
+                          })
+                        }
+                        step="0.01"
+                        min="0"
+                        className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>)
+                }
+
+                {/* Minimum Purchase */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Minimum Purchase (₹)
@@ -652,9 +736,9 @@ const Coupons = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div >
       )}
-    </div>
+    </div >
   );
 };
 

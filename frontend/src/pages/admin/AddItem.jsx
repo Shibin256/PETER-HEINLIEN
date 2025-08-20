@@ -124,6 +124,11 @@ function AddItem() {
       return;
     }
 
+     if(images.length <3){
+      toast.error("The minimum of 3 images need to proceed")
+      return
+    }
+
     const nameRegex = /^[A-Za-z0-9 ]+$/;
     if (!trimmedName || trimmedName.length < 3 || !nameRegex.test(trimmedName)) {
       toast.error(
