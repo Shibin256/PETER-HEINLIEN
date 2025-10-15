@@ -155,6 +155,7 @@ export const createPaymentOrder = createAsyncThunk(
   "order/createPaymentOrder",
   async ( totalPrice , thunkAPI) => {
     try {
+      console.log(totalPrice)
       return await orderService.createRazorpayOrder(totalPrice);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
@@ -168,6 +169,18 @@ export const verifyPayment = createAsyncThunk(
     console.log(paymentDetails,'-------')
     try {
       return await orderService.verifyRazorpayPayment(paymentDetails);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const verifyPaymentForWallet = createAsyncThunk(
+  "order/verifyPayment",
+  async (paymentDetails, thunkAPI) => {
+    console.log(paymentDetails,'-------')
+    try {
+      return await orderService.verifyPaymentForWallet(paymentDetails);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
     }

@@ -3,6 +3,7 @@ import Title from "../../components/common/Title";
 import {
   createPaymentOrder,
   verifyPayment,
+  verifyPaymentForWallet,
 } from "../../features/orders/ordersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -30,10 +31,10 @@ const Wallet = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(getWallet(user._id));
+    dispatch(getWallet({userId:user._id,page: 1, limit: 10 }));
   }, []);
 
-  const { walletAmount, loading, transactions } = useSelector(
+  const { walletAmount,page,totalPages, loading, transactions } = useSelector(
     (state) => state.wallet,
   );
 
@@ -53,7 +54,7 @@ const Wallet = () => {
           handler: async (response) => {
             try {
               const verifyRes = await dispatch(
-                verifyPayment(response),
+                verifyPaymentForWallet(response),
               ).unwrap();
               if (verifyRes.success) {
                 resolve(response.razorpay_payment_id);
@@ -337,6 +338,44 @@ const Wallet = () => {
                     </td>
                   </tr>
                 ))}
+                {/* Pagination Buttons */}
+                        <div className="flex justify-center items-center gap-4 mt-6">
+                          <button
+                            disabled={page <= 1}
+                            onClick={() =>
+                              dispatch(
+                                getWallet({
+                                  userId:user._id,
+                                  page: page - 1,
+                                  limit: 10,
+                                }),
+                              )
+                            }
+                            className={`px-4 py-2 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+                          >
+                            Previous
+                          </button>
+                
+                          <span className="text-sm text-gray-700">
+                            Page {page} of {totalPages}
+                          </span>
+                
+                          <button
+                            disabled={page >= totalPages}
+                            onClick={() =>
+                              dispatch(
+                                getWallet({
+                                  userId:user._id,
+                                  page: page + 1,
+                                  limit: 10,
+                                }),
+                              )
+                            }
+                            className={`px-4 py-2 rounded ${page >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+                          >
+                            Next
+                          </button>
+                        </div>
               </tbody>
             </table>
           </div>

@@ -113,7 +113,8 @@ const downloadInvoice = async (itemOrderId) => {
 };
 
 const createRazorpayOrder = async (amount) => {
-  const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount });
+  console.log(amount)
+  const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount:amount.totalPrice });
   return res.data;
 };
 
@@ -121,6 +122,14 @@ const verifyRazorpayPayment = async (paymentDetails) => {
   console.log(paymentDetails,'in the ordrerserviece')
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/verify",
+     paymentDetails 
+  );
+  return res.data;
+};
+
+const verifyPaymentForWallet = async (paymentDetails) => {
+  const res = await axiosInstance.post(
+    "/api/v1/users/payments/razorpay/wallet/verify",
      paymentDetails 
   );
   return res.data;
@@ -150,6 +159,7 @@ const updateOrderStatus = async (orderID) => {
 };
 
 const orderService = {
+  verifyPaymentForWallet,
   updateOrderStatus,
   placeOrder,
   getOrders,

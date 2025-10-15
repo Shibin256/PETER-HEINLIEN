@@ -11,7 +11,7 @@ import { addAddress, changeName, changeOrAddMobile, editImage, editPassword, get
 import multer from 'multer';
 import { addFromWishlistToCart, addItemToCart, getCart, removeCartItem, toggleIsLocked, updateCartItem } from '../controller/cartController.js';
 import { addReview, cancelOrderItem, cancelOrderSingleItem, downloadInvoice, getOrders, placeOrder, returnOrderItem} from '../controller/orderController.js';
-import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymentController.js';
+import { createRazorpayOrder, verifyRazorpayPayment, verifyRazorpayPaymentForWallet } from '../controller/paymentController.js';
 import { applyCoupon, fetchAdsCoupons, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
 import { fetchHomeBanner } from '../controller/admin/bannerController.js';
@@ -63,7 +63,9 @@ router.post('/orders/:itemId/review',verifyAccessToken,addReview)
 
 //payment
 router.post('/payments/razorpay/order',verifyAccessToken,createRazorpayOrder)
-router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment,fetchCoupons)
+router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment)
+router.post('/payments/razorpay/wallet/verify',verifyAccessToken,verifyRazorpayPaymentForWallet)
+
 
 
 router.post('/coupons', verifyAccessToken,applyCoupon);
