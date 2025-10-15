@@ -60,10 +60,8 @@ export const getWishedProduct = async (req, res) => {
   try {
     const { userId, productId } = req.params;
 
-    // Find the wishlist for the user
     const wishlist = await Wishlist.findOne({ userId }).select('-createdAt -updatedAt');
 
-    // Check if the product exists in the wishlist
     const isWished = wishlist?.productIds?.some(
       (id) => id.toString() === productId
     );

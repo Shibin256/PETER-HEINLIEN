@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaShoppingCart, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -12,28 +12,37 @@ import { addToCart } from "../../features/cart/cartSlice";
 import { useEffect } from "react";
 
 const ProductCard = ({ product }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(product.isWishlisted);
   const dispatch = useDispatch();
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  useEffect(() => {
-    if (user && product?._id) {
-      dispatch(
-        getWishedProduct({ userId: user._id, productId: product._id }),
-      ).then((res) => {
-        if (res.payload?.wished) {
-          setIsFavorite(true);
-        } else {
-          setIsFavorite(false);
-        }
-      });
+  // Function to render star ratings
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
     }
-  }, []);
+
+    if (hasHalfStar) {
+      stars.push(<FaStarHalfAlt key="half" className="text-yellow-400" />);
+    }
+
+    const emptyStars = 5 - stars.length;
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
+    }
+
+    return stars;
+  };
 
   const toggleFavorite = async (e) => {
-    e.preventDefault(); // Prevent link navigation when clicking the heart icon
+    e.preventDefault();
     if (!user) {
       toast.warning("Please login to use wishlist");
       return;
@@ -41,11 +50,9 @@ const ProductCard = ({ product }) => {
 
     try {
       if (!isFavorite) {
-        // Add to wishlist
         dispatch(addToWishlist({ userId: user._id, productId: product._id }));
         toast.success("Added to wishlist");
       } else {
-        // Remove from wishlist
         dispatch(
           removeFromWishlist({ userId: user._id, productId: product._id }),
         );
@@ -68,7 +75,6 @@ const ProductCard = ({ product }) => {
       const res = await dispatch(
         addToCart({ userId: user._id, productId: product._id }),
       );
-      console.log(res.payload);
       if (res.payload == "max quantity added") {
         toast.warning("max quantity added");
       } else if (res.payload == "Product is out of stock") {
@@ -133,6 +139,19 @@ const ProductCard = ({ product }) => {
             {product.name}
           </h3>
 
+          {/* Rating */}
+          {/* Rating */}
+          <div className="flex items-center gap-1">
+            <div className="flex">
+              {renderRatingStars(product.averageRating)}
+            </div>
+            {product.averageRating && (
+              <span className="text-sm text-gray-600 ml-1">
+                ({product.averageRating.toFixed(1)})
+              </span>
+            )}
+          </div>
+
           <div className="flex justify-between items-center">
             <p className="text-gray-500 text-sm line-clamp-2 w-[70%]">
               {product.description}
@@ -140,13 +159,19 @@ const ProductCard = ({ product }) => {
 
             {/* Price */}
             <div className="text-right">
-              <span className="text-base font-semibold text-gray-800">
-                {product.price} Rs
-              </span>
-              {product.discountedPrice && (
-                <div className="text-xs text-gray-400 line-through">
-                  {product.originalPrice} Rs
-                </div>
+              {product.offerPrice ? (
+                <>
+                  <span className="text-base font-semibold text-green-600">
+                    {product.offerPrice.toFixed()} Rs
+                  </span>
+                  <div className="text-xs text-gray-400 line-through">
+                    {product.price.toFixed()} Rs
+                  </div>
+                </>
+              ) : (
+                <span className="text-base font-semibold text-gray-800">
+                  {product.price} Rs
+                </span>
               )}
             </div>
           </div>

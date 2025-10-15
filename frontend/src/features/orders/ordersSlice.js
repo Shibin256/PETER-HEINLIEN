@@ -153,9 +153,9 @@ export const downloadInvoice = createAsyncThunk(
 
 export const createPaymentOrder = createAsyncThunk(
   "order/createPaymentOrder",
-  async ({ totalPrice }, thunkAPI) => {
-    console.log(totalPrice, "in slice");
+  async ( totalPrice , thunkAPI) => {
     try {
+      console.log(totalPrice)
       return await orderService.createRazorpayOrder(totalPrice);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
@@ -166,8 +166,21 @@ export const createPaymentOrder = createAsyncThunk(
 export const verifyPayment = createAsyncThunk(
   "order/verifyPayment",
   async (paymentDetails, thunkAPI) => {
+    console.log(paymentDetails,'-------')
     try {
       return await orderService.verifyRazorpayPayment(paymentDetails);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const verifyPaymentForWallet = createAsyncThunk(
+  "order/verifyPayment",
+  async (paymentDetails, thunkAPI) => {
+    console.log(paymentDetails,'-------')
+    try {
+      return await orderService.verifyPaymentForWallet(paymentDetails);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
     }
@@ -190,13 +203,27 @@ export const addReview = createAsyncThunk(
   },
 );
 
+
+export const updateOrderStatus = createAsyncThunk(
+  "user/updateOrderStatus",
+  async (orderId , { rejectWithValue }) => {
+    console.log(orderId,'in slicee')
+    try {
+      const res = await orderService.updateOrderStatus(orderId);
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  },
+);
+
 const orderSlice = createSlice({
   name: "orders",
   initialState: {
     orders: [],
     currentPlaceOrder: [],
     page: 1,
-    paymentId:null,
+    paymentInfo:null,
     totalPage: 1,
     loading: false,
     success: false,
@@ -246,7 +273,7 @@ const orderSlice = createSlice({
       .addCase(verifyPayment.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.paymentId = action.payload.paymentId;
+        state.paymentInfo = action.payload.paymentInfo;
         state.paymentVerified = action.payload.success;
       })
       .addCase(verifyPayment.rejected, (state, action) => {

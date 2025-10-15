@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
     createPaymentOrder,
     placeOrder,
+    updateOrderStatus,
     verifyPayment,
 } from "../../features/orders/ordersSlice";
 import { toast } from "react-toastify";
@@ -35,8 +36,8 @@ const PaymentPage = () => {
     if (discount > 0) {
         totalPrice -= discount;
     }
-    if(shippingCost){
-        totalPrice-=shippingCost
+    if (shippingCost) {
+        totalPrice -= shippingCost
     }
 
     const { currency } = useSelector((state) => state.global);
@@ -54,6 +55,8 @@ const PaymentPage = () => {
 
     useEffect(() => {
         dispatch(getWallet(userId));
+        dispatch(toggleIsLocked({ userID: userId, lock: false }));
+
     }, []);
 
     const { walletAmount } = useSelector((state) => state.wallet);
@@ -72,8 +75,9 @@ const PaymentPage = () => {
         }
     }, []);
 
-    const handlePayment = async (amount) => {
+    const handlePayment = async ({ totalPrice, orderId }) => {
         try {
+            const amount = totalPrice
             const result = await dispatch(createPaymentOrder(amount)).unwrap();
             const { order } = result;
 
@@ -88,10 +92,10 @@ const PaymentPage = () => {
                     handler: async (response) => {
                         try {
                             const verifyRes = await dispatch(
-                                verifyPayment(response),
+                                verifyPayment({ paymentDetails: response, orderId: orderId }),
                             ).unwrap();
                             if (verifyRes.success) {
-                                resolve(true); // Payment success
+                                resolve(true); 
                             } else {
                                 reject("Payment verification failed");
                             }
@@ -154,59 +158,66 @@ const PaymentPage = () => {
                 setOrderId(res.order.orderId);
                 console.log(res, "order placed successfully");
                 const date = new Date(res.order.DeliveryDate);
-              
-                // First replace with home
+
                 navigate("/", { replace: true });
 
-                // Now push order success page as a fresh new entry
                 setTimeout(() => {
                     navigate("/order-success", { state: { order: res.order } });
                 }, 0);
-            } else if (selectedPayment === "razorpay") {
-                if (isLocked === true) {
-                    toast.error("the cart already locked and need to payment complete");
+            }
+
+
+
+            else if (selectedPayment === "razorpay") {
+                if (isLocked) {
+                    toast.error("The cart is already locked and payment is pending.");
                     navigate("/");
-                } else {
-                    await dispatch(toggleIsLocked({ userID: userId, lock: true }));
-
-                    let totalAmount = totalPrice + (shippingCost || 0);
-                    const paymentSuccess = await handlePayment({
-                        totalPrice: totalAmount,
-                    });
-                    console.log(paymentSuccess);
-                    if (paymentSuccess) {
-                        const res = await dispatch(
-                            placeOrder({
-                                orderdata: {
-                                    address,
-                                    cartItems,
-                                    totalPrice,
-                                    shippingCost,
-                                    userId,
-                                    deliveryDate,
-                                },
-                                paymentMethod: selectedPayment,
-                            }),
-                        ).unwrap();
-                        setOrderId(res.order.orderId);
-                        const date = new Date(res.order.DeliveryDate);
-                      
-                        navigate("/order-success", {
-                            state: { order: res.order },
-                            replace: true,
-                        });
-                        dispatch(resetCart());
-                        // First replace with home
-                        navigate("/", { replace: true });
-
-                        // Now push order success page as a fresh new entry
-                        setTimeout(() => {
-                            navigate("/order-success", { state: { order: res.order } });
-                        }, 0);
-                    }
-                    // await dispatch(toggleIsLocked({ userID: userId, lock: false }))
+                    return;
                 }
-            } else if (selectedPayment === "walletPay") {
+
+                await dispatch(toggleIsLocked({ userID: userId, lock: true }));
+
+                const pendingOrder = await dispatch(
+                    placeOrder({
+                        orderdata: {
+                            address,
+                            cartItems,
+                            totalPrice,
+                            shippingCost,
+                            userId,
+                            deliveryDate,
+                            status: "pending"
+                        },
+                        paymentMethod: selectedPayment,
+                    })
+                ).unwrap();
+
+                setOrderId(pendingOrder.order.orderId);
+                console.log(pendingOrder,'in thepending')
+
+                let totalAmount = totalPrice + (shippingCost || 0);
+
+                const paymentSuccess = await handlePayment({
+                    totalPrice: totalAmount,
+                    orderId: pendingOrder.order.orderId
+                });
+                console.log(paymentSuccess, '--payment success')
+
+                if (paymentSuccess) {
+                    dispatch(resetCart());
+                    navigate("/order-success", { state: { order: pendingOrder.order } });
+                } else {
+                    toast.error("Payment failed");
+                    await dispatch(updateOrderStatus({
+                        orderId: pendingOrder.order.orderId,
+                    }));
+                    await dispatch(toggleIsLocked({ userID: userId, lock: false }));
+                }
+            }
+
+
+
+            else if (selectedPayment === "walletPay") {
                 let totalAmount = totalPrice + (shippingCost || 0);
                 if (totalAmount > walletAmount) {
                     setShowModal(true);

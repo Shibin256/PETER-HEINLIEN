@@ -126,12 +126,19 @@ const Login = () => {
 
           <GoogleAuthButton onSuccess={handleLoginSuccess} />
 
-          <p className="text-center text-sm text-gray-600">
-            New to The App?{" "}
-            <Link to="/register" className="text-blue-500">
-              SignUp
-            </Link>
-          </p>
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>
+              New to The App?{" "}
+              <Link to="/register" className="text-blue-500 hover:underline">
+                Sign Up
+              </Link>
+            </span>
+            <span>
+              <Link to="/" className="text-yellow-500 font-semibold hover:underline">
+                Go to Home
+              </Link>
+            </span>
+          </div>
         </form>
       </AuthLayout>
     </>

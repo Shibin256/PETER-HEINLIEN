@@ -6,6 +6,7 @@ export const createCoupons = async (req, res) => {
             couponCode,
             discountType,
             discountAmount,
+            maxDiscount,
             minPurchase,
             usageLimit,
             expirationDate,
@@ -21,6 +22,7 @@ export const createCoupons = async (req, res) => {
             discountType,
             discountValue: discountAmount,
             minOrderAmount: minPurchase,
+            maxDiscount,
             usageLimit,
             expiresAt: expirationDate,
         });
@@ -28,7 +30,7 @@ export const createCoupons = async (req, res) => {
         await newCoupon.save();
 
         // Missing await
-        const allCoupons = await Coupons.find();
+        const allCoupons = await Coupons.find().sort({createdAt:-1});
         res.status(201).json({ message: "Coupon created", coupons: allCoupons });
 
     } catch (error) {
@@ -92,6 +94,7 @@ export const updateCoupon = async (req, res) => {
         discountType,
         discountValue,
         minOrderAmount,
+        maxDiscount,
         usageLimit,
         expirationDate
     } = req.body;
@@ -103,6 +106,7 @@ export const updateCoupon = async (req, res) => {
             discountType,
             discountValue,
             minOrderAmount,
+            maxDiscount,
             usageLimit,
             expiresAt: expirationDate
         }, { new: true });

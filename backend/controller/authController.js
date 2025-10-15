@@ -11,6 +11,7 @@ const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
 import { OAuth2Client } from 'google-auth-library';
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import Wallet from "../model/walletModal.js";
+import PendingUser from "../model/pendingUserModal.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //generate otp with random 6 digit number
@@ -71,32 +72,23 @@ export const register = async (req, res) => {
       password,
       confirmPassword,
       phone,
+      gender,
       ReferralCode
     } = req.body;
 
+    console.log(req.body,'-----')
 
-    // Check if all required fields are present
-    if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).json({ message: "All required fields must be filled." });
-    }
-
-    // Passwords match check
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
-
-    // Check if user already exists
     const userExist = await User.findOne({ email }).select('-password -createdAt -updatedAt -googleId');
     if (userExist) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ errors: ["User already exists"] });
     }
 
     const phoneExist = await User.findOne({ phone }).select('-password -createdAt -updatedAt -googleId');
     if (phoneExist && phoneExist.phone != null) {
-      return res.status(400).json({ message: "The mobile number is already exists" });
+      return res.status(400).json({ errors: ["The mobile number already exists"] });
     }
 
-    const ReferralUser = await User.findOne({ referralCode:ReferralCode }).select('-password -createdAt -updatedAt -googleId')
+    const ReferralUser = await User.findOne({ referralCode: ReferralCode }).select('-password -createdAt -updatedAt -googleId')
 
     if (ReferralUser) {
       let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
@@ -109,10 +101,10 @@ export const register = async (req, res) => {
         description: ' Referral Amount'
       }
       if (wallet) {
-        wallet.balance +=50;
+        wallet.balance += 50;
         wallet.transactions.push(transactions)
       } else {
-        wallet = new Wallet({ userId:ReferralUser._id, balance: 50, transactions: [transactions] });
+        wallet = new Wallet({ userId: ReferralUser._id, balance: 50, transactions: [transactions] });
       }
       await wallet.save();
     }
@@ -121,66 +113,84 @@ export const register = async (req, res) => {
     const otp = genarateOtp()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     console.log('otp is:----', otp)
-    // Remove any previous OTP
-    await Otp.findOneAndDelete({ email });
-    await Otp.create({ email, otp, expiresAt });
 
-    //Otp sending to the corresponding email
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await PendingUser.deleteOne({ email });
+
+    await PendingUser.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      gender,
+      referralCode: ReferralCode,
+      otp,
+      expiresAt
+    });
     const emailSend = await sendVerificationEmail(email, otp)
     if (!emailSend) {
-      return res.status(400).json({ message: "otp not send email error" });
+      return res.status(400).json({ errors: ["otp not send email error"] });
     }
 
     return res.status(200).json(
       { message: 'The otp send to the email', email })
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(400).json({ errors: ["Server error"] });
   }
 };
-
-
 
 
 //verify otp after register with form data
 export const verifyOTP = async (req, res) => {
   try {
     const { formData, otp } = req.body;
-    const { name, email, password, phone, gender } = formData
-    const record = await Otp.findOne({ email, otp });
-    if (record) {
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, saltround);
-      // Create new user
-      const user = await User.create({
-        username: name,
-        email,
-        password: hashedPassword,
-        isAdmin: false,
-        phone,
-        gender,
-      });
+    const{email}=formData
 
-      // Send response
-      res.status(201).json({
-        message: "User registered successfully",
-        user: {
-          _id: user._id,
-          name: user.username,
-          email: user.email,
-          isAdmin: user.isAdmin,
-        },
-      });
-
-    } else {
-      console.log('The otp is not matching')
-      res.status(400).json({ message: "The otp is not matching" })
+    const record = await PendingUser.findOne({
+      email,
+    });
+    if (!record) {
+      return res.status(400).json({ message: "The User not found something fraud happend" });
     }
+
+    if (record.expiresAt < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    if(record.otp!==otp){
+      return res.status(400).json({ message: "The OTP is not matching" });
+    }
+
+    // Create new user from stored server data
+    const user = await User.create({
+      username: record.name,
+      email: record.email,
+      password: record.password,
+      isAdmin: false,
+      phone: record.phone,
+      gender: record.gender,
+    });
+
+    await Otp.deleteOne({ email });
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        _id: user._id,
+        name: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: "Error logging in" });
+    console.error(error);
+    res.status(500).json({ message: "Error registering user" });
   }
-}
+};
+
 
 //google auth for user
 export const googleAuth = async (req, res) => {
@@ -289,7 +299,7 @@ export const login = async (req, res) => {
         phone: user.phone,
         gender: user.gender,
         profileImage: user.profileImage,
-        referralCode:user.referralCode
+        referralCode: user.referralCode
       },
     });
   } catch (error) {

@@ -153,15 +153,14 @@ export const editBrand = async (req, res) => {
 export const editCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name } = req.body;
+        const { category } = req.body;
 
-        const category = await Category.findById(id).select('-createdAt -updatedAt')
-        if (!category) {
+        const Thecategory = await Category.findById(id).select('-createdAt -updatedAt')
+        if (!Thecategory) {
             return res.status(404).json({ message: 'Category not found' });
         }
-
-        category.categoryName = name;
-        await category.save();
+        Thecategory.categoryName = category;
+        await Thecategory.save();
 
         res.status(200).json({ message: 'Category updated successfully', category });
     } catch (error) {
@@ -192,14 +191,12 @@ export const addCategoryOffer = async (req, res) => {
         const products = await Product.find({ category: categoryId }).select('-createdAt -updatedAt');
 
         for (let product of products) {
-            const discountAmount = (product.price * percentage) / 100;
-            console.log(product.offerPrice, product.price, discountAmount)
-            if (product.offerPrice && product.offerPrice > product.price - discountAmount) {
+            if (!product.offerPercentage || product.offerPercentage < percentage) {
+                const discountAmount = (product.price * percentage) / 100;
                 product.offerPrice = product.price - discountAmount;
                 await product.save();
             } else {
-                product.offerPrice = product.price - discountAmount;
-                await product.save();
+                console.log(`Skipping product ${product._id}, higher/equal offer already set`);
             }
         }
 
@@ -209,6 +206,7 @@ export const addCategoryOffer = async (req, res) => {
         res.status(500).json({ message: 'Server error while adding offer' });
     }
 }
+
 
 
 
@@ -225,11 +223,17 @@ export const removeCategoryOffer = async (req, res) => {
         }
 
         const products = await Product.find({ category: categoryId }).select('-createdAt -updatedAt');
-
         for (let product of products) {
-            product.offerPrice = 0;
+            if (product.offerPercentage && product.offerPercentage > 0) {
+                const discountAmount = (product.price * product.offerPercentage) / 100;
+                product.offerPrice = product.price - discountAmount;
+            } else {
+                product.offerPrice = 0;
+            }
             await product.save();
+            console.log(product, '=====');
         }
+
 
         category.offerPersentage = 0
         category.offerAdded = false

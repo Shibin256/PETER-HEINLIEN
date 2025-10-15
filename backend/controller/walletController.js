@@ -26,7 +26,7 @@ export const addToWallet = async (req, res) => {
       wallet.balance += numericAmount;
       wallet.transactions.push(transactions)
     } else {
-      wallet = new Wallet({ userId, balance: numericAmount,transactions:[transactions] });
+      wallet = new Wallet({ userId, balance: numericAmount, transactions: [transactions] });
     }
 
     await wallet.save();
@@ -40,10 +40,39 @@ export const addToWallet = async (req, res) => {
 
 
 export const getWallet = async (req, res) => {
-  const { userId } = req.params
+  const { userId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 8;
+  const skip = (page - 1) * limit;
 
-  const wallet = await Wallet.findOne({ userId }).sort({ createdAt: -1 })
+  try {
+    const wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+      return res.status(404).json({ message: "Wallet not found" });
+    }
 
-  res.status(200).json({ wallet });
-}
+    const total = wallet.transactions.length;
+    const totalPage = Math.ceil(total / limit);
+
+    const transactions = [...wallet.transactions]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(skip, skip + limit);
+
+    res.status(200).json({
+      wallet: {
+        _id: wallet._id,
+        userId: wallet.userId,
+        balance: wallet.balance,
+        transactions,
+      },
+      total,
+      page,
+      totalPage,
+    });
+  } catch (error) {
+    console.error("Error fetching wallet:", error);
+    return res.status(500).json({ message: "Failed to fetch wallet" });
+  }
+};
+
 

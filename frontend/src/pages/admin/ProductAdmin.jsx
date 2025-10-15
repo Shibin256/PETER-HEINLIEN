@@ -82,15 +82,20 @@ const ProductAdmin = () => {
     }
 
     try {
-      dispatch(
+      const res = await dispatch(
         addProductOffer({
           productId: selectedProductForOffer._id,
           percentage: offerPercentage,
         }),
-      ).unwrap();
-      toast.success(
-        `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
-      );
+      )
+      console.log(res, '-----')
+      if (res.type.endsWith('fulfilled')) {
+        toast.success(
+          `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
+        );
+      } else {
+        toast.error(res.payload?.message)
+      }
       setSelectedProductForOffer(null);
       setOfferPercentage("");
       dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
@@ -121,16 +126,15 @@ const ProductAdmin = () => {
     }
   };
 
-  // Handling edit popup
   const handleEdit = (product) => {
-    setSelectedProduct(product);
+    setSelectedProduct(product, '====');
     setEditForm({
       name: product.name || "",
       description: product.description || "",
-      quantity: product.totalQuantity || "",
+      quantity: product.totalQuantity || 0,
       price: product.price || "",
-      category: product.category || "",
-      brand: product.brand || "",
+      category: product.category._id || "",
+      brand: product.brand._id || "",
       tags: product.tags || "",
       images: product.images,
       newImages: [],
@@ -151,7 +155,7 @@ const ProductAdmin = () => {
       tags,
     } = editForm;
 
-    if (!name || !description || !quantity || !price || !tags) {
+    if (!name || !description || !price || !tags) {
       toast.error("Please fill all fields.");
       return;
     }
@@ -186,12 +190,20 @@ const ProductAdmin = () => {
     });
 
     try {
-      await dispatch(
+      const res = await dispatch(
         updateProduct({ id: selectedProduct._id, data: formData }),
-      ).unwrap();
-      toast.success("✅ Product updated successfully!");
-      setShowEditModal(false);
-      setSelectedProduct(null);
+      )
+      if (res.type.endsWith('fulfilled')) {
+        toast.success("✅ Product added successfully!");
+        setShowEditModal(false);
+        setSelectedProduct(null);
+      } else {
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
+        } else {
+          toast.error(res.payload?.message || "Failed to create product");
+        }
+      }
       dispatch(
         fetchProducts({ page: 1, limit: 10, search: searchTerm }),
       ).unwrap();
@@ -351,8 +363,8 @@ const ProductAdmin = () => {
                 <td className="px-4 py-2">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${product.availability
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
                       }`}
                   >
                     {product.availability ? "In Stock" : "Out of Stock"}
@@ -377,7 +389,7 @@ const ProductAdmin = () => {
                 </td>
 
                 <td className="px-4 py-2 whitespace-nowrap">
-                  {product.offerPrice ? (
+                  {product.offerPercentage ? (
                     <button
                       onClick={() => handleRemoveOffer(product._id)}
                       className="text-red-600 hover:text-red-800"
@@ -473,6 +485,7 @@ const ProductAdmin = () => {
                 Textcolor="text-gray-700"
                 borderColor="border-gray-300"
               />
+
 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -599,6 +612,7 @@ const ProductAdmin = () => {
                   options={categoryOptions}
                   name="category"
                 />
+                {console.log(categoryOptions, '-----')}
                 <SelectInput
                   label="Brand"
                   value={editForm.brand}

@@ -59,14 +59,18 @@ export const addAddress = createAsyncThunk(
   async ({ userId, data }, thunkAPI) => {
     try {
       const res = await accountService.addAddress(userId, data);
+      console.log(res, '------');
       return res;
     } catch (error) {
+      console.error(error);
+
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data || { message: error.message }
       );
     }
-  },
+  }
 );
+
 
 export const getAllAddress = createAsyncThunk(
   "user/account/getAllAddress",

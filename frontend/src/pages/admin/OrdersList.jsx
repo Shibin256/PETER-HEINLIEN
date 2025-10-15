@@ -128,6 +128,8 @@ const OrdersList = () => {
                   ? "bg-green-100 text-green-800"
                   : status === "Cancelled"
                     ? "bg-red-100 text-red-800"
+                    :status === "Failed"
+                    ? "bg-red-100 text-red-800"
                     : "bg-gray-100 text-gray-800"
             }`}
         >
@@ -142,6 +144,8 @@ const OrdersList = () => {
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${status === "Paid"
               ? "bg-green-100 text-green-800"
+              :status === "Failed"
+              ? "bg-red-100 text-red-800"
               : "bg-gray-100 text-gray-800"
             }`}
         >
@@ -175,7 +179,7 @@ const OrdersList = () => {
 
   const renderActions = (item) => (
     <div className="flex justify-end">
-      {item.OrderStatus === "Processing" && (
+      {(item.OrderStatus === "Processing" && item.PaymentStatus != 'Failed') && (
         <button
           onClick={() => changeStatus(item.orderId, "Shipped")}
           className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded transition-colors"

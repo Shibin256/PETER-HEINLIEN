@@ -113,18 +113,28 @@ const downloadInvoice = async (itemOrderId) => {
 };
 
 const createRazorpayOrder = async (amount) => {
-  console.log(amount, "in serviese");
-  const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount });
+  console.log(amount)
+  const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount:amount.totalPrice });
   return res.data;
 };
 
 const verifyRazorpayPayment = async (paymentDetails) => {
+  console.log(paymentDetails,'in the ordrerserviece')
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/verify",
-    paymentDetails,
+     paymentDetails 
   );
-  return res.data; // returns { success: true/false }
+  return res.data;
 };
+
+const verifyPaymentForWallet = async (paymentDetails) => {
+  const res = await axiosInstance.post(
+    "/api/v1/users/payments/razorpay/wallet/verify",
+     paymentDetails 
+  );
+  return res.data;
+};
+
 
 const submitReview = async ({ itemId, rating, review }) => {
   const data = {
@@ -139,7 +149,18 @@ const submitReview = async ({ itemId, rating, review }) => {
   return response.data;
 };
 
+const updateOrderStatus = async (orderID) => {
+  console.log(orderID,'in serviece')
+  const response = await adminAxiosInstance.delete(
+    `/api/v1/admin/orders/${itemOrderId}`,
+    data,
+  );
+  return response.data;
+};
+
 const orderService = {
+  verifyPaymentForWallet,
+  updateOrderStatus,
   placeOrder,
   getOrders,
   cancelOrderItem,

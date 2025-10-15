@@ -5,15 +5,17 @@ import { getAllAddress } from "../../features/accountSettings/accountSlice";
 import EditAddressModal from "../../components/common/EditAddress";
 import CheckoutCard from "../../components/user/checkoutCard";
 import { applyCoupon, removeCoupon } from "../../features/coupons/couponsSlice";
+import { fetchCart } from "../../features/cart/cartSlice";
 
 const Checkout = () => {
   const [step, setStep] = useState(2);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const location = useLocation();
-  const total = location.state?.totalPrice || 0;
-  const cartItems = location.state?.cartItems || [];
-  console.log(cartItems,'---items to check')
+  // const total = location.state?.totalPrice || 0;
+  // const cartItems = location.state?.cartItems || [];
+  const from = location.state?.from || false;
+
   const shippingCost = location.state?.shippingCost || 0;
 
   const [couponCode, setCouponCode] = useState("");
@@ -28,9 +30,31 @@ const Checkout = () => {
   const { addresses } = useSelector((state) => state.account);
   useEffect(() => {
     if (!location.state || !cartItems || cartItems.length === 0) {
-      navigate("/", { replace: true }); // Redirect to home
+      navigate("/cart", { replace: true });
     }
   }, []);
+
+  useEffect(() => {
+    dispatch(fetchCart(user._id));
+  }, [])
+
+
+  let { cartItems = [] } = useSelector((state) => state.cart);
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const [total, setTotal] = useState(subtotal + shippingCost);
+  if (from) {
+    cartItems = location.state?.cartItems || [];
+  }
+  useEffect(() => {
+    if (from) {
+      setTotal(location.state?.totalPrice || 0);
+    }
+  }, [from, location.state?.totalPrice]);
+
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -44,17 +68,14 @@ const Checkout = () => {
     dispatch(getAllAddress(user._id));
   }, [dispatch, user._id]);
 
-  // Automatically select default address when addresses are loaded
   useEffect(() => {
     if (addresses && addresses.length > 0) {
-      // Find the default address
       const defaultAddr = addresses.find(
         (addr) => addr.defaultAddress === true,
       );
       if (defaultAddr) {
         setSelectedAddress(defaultAddr);
       } else if (addresses.length > 0) {
-        // If no default address is set, select the first one
         setSelectedAddress(addresses[0]);
       }
     }
@@ -76,12 +97,12 @@ const Checkout = () => {
     if (!couponCode) {
       return setCouponError("Please enter a coupon code");
     }
-
     try {
       const data = await dispatch(
         applyCoupon({ userId: user._id, couponCode }),
       ).unwrap();
-      console.log("Coupon applied:", data);
+
+
       if (data.error) {
         return setCouponError(data.error);
       }
@@ -94,7 +115,10 @@ const Checkout = () => {
         discountAmount = data.coupon.discountValue;
       }
       if (discountAmount > total) {
-        discountAmount = total; // Ensure discount does not exceed total
+        discountAmount = total;
+      }
+      if ((total - discountAmount) < data.coupon.minOrderAmount) {
+        discountAmount = data.coupon.maxDiscount
       }
       console.log("Discount amount:", discountAmount);
       setDiscount(discountAmount);
@@ -118,9 +142,19 @@ const Checkout = () => {
 
   return (
     <div className="max-w-6xl mx-auto my-10 p-6">
-      <h2 className="text-3xl font-bold text-green-700 border-b-2 border-green-500 pb-3 mb-8">
-        CHECKOUT
-      </h2>
+      <div className="flex justify-between items-center border-b-2 border-green-500 pb-3 mb-8">
+        <h2 className="text-3xl font-bold text-green-700">
+          CHECKOUT
+        </h2>
+        <button
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-all shadow-sm"
+          onClick={() => {
+            navigate('/cart');
+          }}
+        >
+          Back
+        </button>
+      </div>
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Column - Checkout Steps */}
         <div className="lg:w-2/3">
@@ -168,11 +202,10 @@ const Checkout = () => {
                     addresses.map((addr, index) => (
                       <div
                         key={addr._id || index}
-                        className={`border-2 ${
-                          selectedAddress?._id === addr._id
-                            ? "border-green-500 bg-green-50"
-                            : "border-gray-200"
-                        } p-4 rounded-md flex items-start justify-between transition-colors duration-200`}
+                        className={`border-2 ${selectedAddress?._id === addr._id
+                          ? "border-green-500 bg-green-50"
+                          : "border-gray-200"
+                          } p-4 rounded-md flex items-start justify-between transition-colors duration-200`}
                       >
                         <div className="flex-grow">
                           <label className="flex items-center space-x-2 cursor-pointer">
@@ -238,7 +271,7 @@ const Checkout = () => {
                   <button
                     className="text-blue-600 hover:text-blue-800 text-sm flex items-center font-medium"
                     onClick={() => {
-                      navigate("/add-address");
+                      navigate("/add-address-checkout")
                     }}
                   >
                     <span className="text-xl mr-1">+</span> Add a new address
@@ -411,15 +444,6 @@ const Checkout = () => {
                 </span>
               </div>
             </div>
-
-            <button
-              className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md transition-all shadow-md"
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              CANCEL ORDER
-            </button>
           </div>
         </div>
       </div>

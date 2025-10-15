@@ -52,6 +52,7 @@ const addAddress = async (userId, data) => {
     `/api/v1/users/account/${userId}/address`,
     data,
   );
+  console.log(res,'-----000')
   return res.data;
 };
 

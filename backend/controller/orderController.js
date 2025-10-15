@@ -5,6 +5,7 @@ import Product from "../model/productModel.js";
 import PDFDocument from 'pdfkit';
 import Wallet from "../model/walletModal.js";
 import { v4 as uuidv4 } from 'uuid';
+import User from "../model/userModel.js";
 
 const generateOrderId = async () => {
     const year = new Date().getFullYear();
@@ -21,51 +22,94 @@ const generateOrderId = async () => {
 
 
 export const placeOrder = async (req, res) => {
-    const { userId, address, cartItems, totalPrice, shippingCost, deliveryDate } = req.body.orderdata
-    console.log(cartItems, 'cart items')
-    const { paymentMethod } = req.body
-    console.log(paymentMethod)
-    const mainOrderId = await generateOrderId();
-    const itemsWithIds = cartItems.map((item, index) => ({
-        ...item,
-        itemOrderId: `${mainOrderId}-${index + 1}`,
-    }));
-
-    const refinedAddress = {
-        name: address.name,
-        house: address.house,
-        addressType: address.addressType,
-        locality: address.locality,
-        city: address.city,
-        state: address.state,
-        pincode: address.pincode,
-        alternativePhone: address.alternativePhone,
-        phone: address.phone,
-    }
-
-    const refinedItems = itemsWithIds.map(item => ({
-        itemOrderId: item.itemOrderId,
-        productId: item.productId._id,
-        productImage: item.productId.images,
-        productName: item.productId.name,
-        productPrice: item.price,
-        subTotal: item.productSubTotal,
-        quantity: item.quantity
-    }))
-
-
-
-    const orderData = {
-        UserID: userId,
-        Order_Address: refinedAddress,
-        Items: refinedItems,
-        TotalAmount: totalPrice,
-        DeliveryCharge: shippingCost,
-        DeliveryDate: deliveryDate,
-        PaymentMethod: paymentMethod,
-        orderId: mainOrderId
-    }
     try {
+        const { userId, address, cartItems, totalPrice, shippingCost, deliveryDate } = req.body.orderdata
+        const { paymentMethod } = req.body
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid user" });
+        }
+
+        console.log(cartItems, 'carrt itemsss')
+
+        const validatedItems = [];
+        let calculatedTotal = 0;
+
+        for (const clientItem of cartItems) {
+            const product = await Product.findById(clientItem.productId._id);
+
+            if (!product) {
+                return res.status(400).json({ message: `Product not found: ${clientItem.productId._id}` });
+            }
+
+            if (clientItem.quantity > product.totalQuantity) {
+                return res.status(400).json({ message: `${product.name} is out of stock` });
+            }
+
+            const currentPrice = product.offerPrice || product.price;
+            if (clientItem.price !== currentPrice) {
+                return res.status(400).json({
+                    message: `Price mismatch for ${product.name}. Please refresh your cart.`
+                });
+            }
+
+            const itemOrderId = `${await generateOrderId()}-${validatedItems.length + 1}`;
+            validatedItems.push({
+                itemOrderId,
+                productId: product._id,
+                productImage: product.images,
+                productName: product.name,
+                productPrice: currentPrice,
+                subTotal: currentPrice * clientItem.quantity,
+                quantity: clientItem.quantity
+            });
+
+            calculatedTotal += currentPrice * clientItem.quantity;
+        }
+
+        if (calculatedTotal !== totalPrice) {
+            return res.status(400).json({ message: "Total price mismatch" });
+        }
+
+        const mainOrderId = await generateOrderId();
+        const itemsWithIds = cartItems.map((item, index) => ({
+            ...item,
+            itemOrderId: `${mainOrderId}-${index + 1}`,
+        }));
+
+        const refinedAddress = {
+            name: address.name,
+            house: address.house,
+            addressType: address.addressType,
+            locality: address.locality,
+            city: address.city,
+            state: address.state,
+            pincode: address.pincode,
+            alternativePhone: address.alternativePhone,
+            phone: address.phone,
+        }
+
+        const refinedItems = itemsWithIds.map(item => ({
+            itemOrderId: item.itemOrderId,
+            productId: item.productId._id,
+            productImage: item.productId.images,
+            productName: item.productId.name,
+            productPrice: item.price,
+            subTotal: item.productSubTotal,
+            quantity: item.quantity
+        }))
+
+        const orderData = {
+            UserID: userId,
+            Order_Address: refinedAddress,
+            Items: refinedItems,
+            TotalAmount: totalPrice,
+            DeliveryCharge: shippingCost,
+            DeliveryDate: deliveryDate,
+            PaymentMethod: paymentMethod,
+            orderId: mainOrderId
+        }
         for (const item of orderData.Items) {
             console.log(item, '--------')
             const product = await Product.findOne({ _id: item.productId })
@@ -75,21 +119,24 @@ export const placeOrder = async (req, res) => {
         }
         const newOrder = await Order.create(orderData);
 
-        for (const item of newOrder.Items) {
-            const updatedProduct = await Product.findByIdAndUpdate(
-                item.productId,
-                { $inc: { totalQuantity: -item.quantity } },
-                { new: true }
-            );
+        if (paymentMethod !== 'razorpay') {
+            for (const item of newOrder.Items) {
+                const updatedProduct = await Product.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { totalQuantity: -item.quantity } },
+                    { new: true }
+                );
 
-            if (updatedProduct.totalQuantity <= 0) {
-                updatedProduct.stockStatus = 'Out of Stock';
-                await updatedProduct.save();
+                if (updatedProduct.totalQuantity <= 0) {
+                    updatedProduct.stockStatus = 'Out of Stock';
+                    await updatedProduct.save();
+                }
             }
         }
 
         if (paymentMethod == 'razorpay') {
-            newOrder.PaymentStatus = 'Paid'
+            newOrder.PaymentStatus = 'Failed'
+            newOrder.OrderStatus = 'Failed'
             newOrder.save()
         } else if (paymentMethod == 'walletPay') {
             const wallet = await Wallet.findOne({ userId })
@@ -107,13 +154,10 @@ export const placeOrder = async (req, res) => {
             wallet.transactions.push(transactions)
             newOrder.PaymentStatus = 'Paid'
             newOrder.save()
-
-
         }
-
-        await Cart.findOneAndDelete({ userId });
-
-
+        if (paymentMethod != 'razorpay') {
+            await Cart.findOneAndDelete({ userId });
+        }
         res.status(201).json({
             success: true,
             message: "Order placed successfully",
@@ -179,7 +223,7 @@ export const cancelOrderItem = async (req, res) => {
                 { new: true }
             ).select('-createdAt -updatedAt');
 
-            if (updatedProduct.totalQuantity == 1) {
+            if (updatedProduct.totalQuantity >= 1) {
                 updatedProduct.stockStatus = 'In Stock';
                 await updatedProduct.save();
             }
@@ -220,7 +264,7 @@ export const cancelOrderSingleItem = async (req, res) => {
             { new: true }
         ).select('-createdAt -updatedAt');
 
-        if (updatedProduct.totalQuantity == 1) {
+        if (updatedProduct.totalQuantity >= 1) {
             updatedProduct.stockStatus = 'In Stock';
             await updatedProduct.save();
         }

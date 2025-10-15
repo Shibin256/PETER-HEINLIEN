@@ -1,13 +1,30 @@
-function usePasswordVal(value) {
-  if (value.length < 6) {
-    return "Password must be at least 6 characters long.";
+function usePasswordVal(password) {
+  const errors = [];
+
+  if (password.length < 6) {
+    errors.push("at least 8 characters long");
   }
-  if (/\s/.test(value)) {
-    return "Password must not contain spaces.";
+  if (!/[A-Z]/.test(password)) {
+    errors.push("one uppercase letter");
   }
-  if (!/[!@#$%^&*]/.test(value)) {
-    return "Password must contain at least one special character.";
+  if (!/[a-z]/.test(password)) {
+    errors.push("one lowercase letter");
   }
+  if (!/[0-9]/.test(password)) {
+    errors.push("one number");
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push("one special character (!@#$%^&*)");
+  }
+  if (/\s/.test(password)) {
+    errors.push("no spaces");
+  }
+
+  if (errors.length > 0) {
+    return `Password must contain ${errors.join(", ")}.`;
+  }
+
   return "";
 }
+
 export default usePasswordVal;

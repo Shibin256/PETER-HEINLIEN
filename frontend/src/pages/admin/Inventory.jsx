@@ -144,35 +144,59 @@ const Inventory = () => {
   const handleSubmitCategory = async (e) => {
     e.preventDefault();
     try {
-      if (!newCategory.trim()) {
+      const trimmedCategory = newCategory.trim();
+
+      if (!trimmedCategory) {
         toast.warning("Category name is required");
         setNewCategory("");
         return;
-      } else {
-        const res = await dispatch(addCategory(newCategory.trim()));
-        if (res.payload?.message === "Category created") {
-          toast.success("Category created successfully");
-          dispatch(getBrandAndCategory({ page: page, limit: 4 }));
-        } else if (res.payload?.message === "Category already exists") {
-          toast.warning("Category already exists");
-        } else {
-          toast.error("Something went wrong");
-        }
-        setNewCategory("");
       }
+
+      if (trimmedCategory.length < 3) {
+        toast.warning("Category name must be at least 3 characters long");
+        return;
+      }
+
+      if (trimmedCategory.length > 50) {
+        toast.warning("Category name must be less than 50 characters");
+        return;
+      }
+
+      if (!/^[A-Za-z&\-\s]+$/.test(trimmedCategory)) {
+        toast.warning("Category name can only contain letters, spaces, '&', and '-'");
+        return;
+      }
+
+      if (/\s{2,}/.test(trimmedCategory)) {
+        toast.warning("Category name cannot have multiple consecutive spaces");
+        return;
+      }
+
+      const res = await dispatch(addCategory(newCategory.trim()));
+
+      if (res.payload?.message === "Category created") {
+        toast.success("Category created successfully");
+        dispatch(getBrandAndCategory({ page: page, limit: 4 }));
+      } else if (res.payload?.message === "Category already exists") {
+        toast.warning("Category already exists");
+      } else {
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
+        }
+      }
+      setNewCategory("");
+
       setIsAddingCategory(false);
     } catch (error) {
       toast.error(error?.message || "Failed to update category.");
     }
   };
 
-  // Add brand modal shows
   const handleAddBrand = () => {
     setIsAddingCategory(false);
     setIsAddingBrand(true);
   };
 
-  // File change of images
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -206,14 +230,34 @@ const Inventory = () => {
   const handleSubmitBrand = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
       if (!newBrand.trim()) {
         toast.warning("Brand name is required");
         return;
       }
-
+      if (newBrand.length < 2 || newBrand.length > 50) {
+        toast.warning("Brand name must be between 2 and 50 characters");
+        return;
+      }
+      if (!/^[a-zA-Z0-9\s\-]+$/.test(newBrand)) {
+        toast.warning("Brand name can only contain letters, numbers, spaces, and hyphens");
+        return;
+      }
+      if (brandDescription && brandDescription.length > 200) {
+        toast.warning("Description must not exceed 200 characters");
+        return;
+      }
       if (!brandLogo) {
         toast.warning("Brand logo is required");
+        return;
+      }
+      if (!["image/jpeg", "image/png", "image/webp"].includes(brandLogo.type)) {
+        toast.warning("Only JPG, PNG, and WEBP formats are allowed");
+        return;
+      }
+      if (brandLogo.size > 2 * 1024 * 1024) {
+        toast.warning("Logo must be less than 2MB");
         return;
       }
 
@@ -222,8 +266,9 @@ const Inventory = () => {
       formData.append("description", brandDescription);
       formData.append("logo", brandLogo);
 
-      const res = await dispatch(addBrand(formData)).unwrap();
-      if (res) {
+      const res = await dispatch(addBrand(formData));
+      console.log(res)
+      if (res.type.endsWith('fulfilled')) {
         toast.success("Brand added successfully");
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setNewBrand("");
@@ -232,7 +277,11 @@ const Inventory = () => {
         setLogoPreview(null);
         setIsAddingBrand(false);
       } else {
-        toast.error(res.payload?.message || "Failed to add brand");
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
+        } else {
+          toast.error(res.payload?.message || "Failed to create product");
+        }
       }
     } catch (error) {
       toast.error(error?.message || "Failed to add brand");
@@ -240,6 +289,7 @@ const Inventory = () => {
       setIsLoading(false);
     }
   };
+
 
   // Brand edit
   const handleBrandEdit = (brand) => {
@@ -260,6 +310,30 @@ const Inventory = () => {
         toast.warning("Brand name is required");
         return;
       }
+      if (editingBrandName.length < 2 || editingBrandName.length > 50) {
+        toast.warning("Brand name must be between 2 and 50 characters");
+        return;
+      }
+      if (!/^[a-zA-Z0-9\s\-]+$/.test(editingBrandName)) {
+        toast.warning("Brand name can only contain letters, numbers, spaces, and hyphens");
+        return;
+      }
+      if (editingBrandDescription && editingBrandDescription.length > 200) {
+        toast.warning("Description must not exceed 200 characters");
+        return;
+      }
+      if (!editingBrandLogo) {
+        toast.warning("Brand logo is required");
+        return;
+      }
+      if (!["image/jpeg", "image/png", "image/webp"].includes(editingBrandLogo.type)) {
+        toast.warning("Only JPG, PNG, and WEBP formats are allowed");
+        return;
+      }
+      if (editingBrandLogo.size > 2 * 1024 * 1024) {
+        toast.warning("Logo must be less than 2MB");
+        return;
+      }
       const formData = new FormData();
       formData.append("name", editingBrandName);
       formData.append("description", editingBrandDescription);
@@ -267,12 +341,19 @@ const Inventory = () => {
 
       const res = await dispatch(
         editBrand({ id: editingBrandId, data: formData }),
-      ).unwrap();
+      );
+      console.log(res,'---')
 
-      if (res) {
+      if (res.type.endsWith('fulfilled')) {
         toast.success("Brand updated successfully");
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setIsEditingBrand(false);
+      }else{
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
+        } else {
+          toast.error(res.payload?.message || "Failed to create product");
+        }
       }
     } catch (error) {
       toast.error(error?.message || "Failed to update brand");
@@ -324,22 +405,51 @@ const Inventory = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      if (!editingCategoryName.trim()) {
+      const trimmedCategory = editingCategoryName.trim();
+
+      if (!trimmedCategory) {
         toast.warning("Category name is required");
+        setNewCategory("");
+        return;
+      }
+
+      if (trimmedCategory.length < 3) {
+        toast.warning("Category name must be at least 3 characters long");
+        return;
+      }
+
+      if (trimmedCategory.length > 50) {
+        toast.warning("Category name must be less than 50 characters");
+        return;
+      }
+
+      if (!/^[A-Za-z&\-\s]+$/.test(trimmedCategory)) {
+        toast.warning("Category name can only contain letters, spaces, '&', and '-'");
+        return;
+      }
+
+      if (/\s{2,}/.test(trimmedCategory)) {
+        toast.warning("Category name cannot have multiple consecutive spaces");
         return;
       }
 
       const res = await dispatch(
         editCategory({
           id: editingCategoryId,
-          name: editingCategoryName,
+          category: editingCategoryName,
         }),
-      ).unwrap();
+      )
 
-      if (res) {
-        toast.success("Category updated successfully");
-        dispatch(getBrandAndCategory({ page: page, limit: 4 }));
-        setIsEditingCategory(false);
+      if (res.type.endsWith('fulfilled')) {
+        toast.success("✅ category added successfully!");
+        setIsEditingCategory(false)
+        dispatch(getBrandAndCategory({ page: page, limit: 4 }))
+      } else {
+        if (res.payload?.errors && Array.isArray(res.payload.errors)) {
+          toast.error(res.payload.errors[0])
+        } else {
+          toast.error(res.payload?.message || "Failed to create product");
+        }
       }
     } catch (error) {
       toast.error(error?.message || "Failed to update category");

@@ -54,14 +54,14 @@ const Footer = () => {
                     Collection
                   </a>
                 </li>{" "}
-                <li>
+                {/* <li>
                   <a
                     href="/about"
                     className="text-gray-500 hover:text-teal-600 transition-colors"
                   >
                     Our Story
                   </a>
-                </li>
+                </li> */}
               </ul>
             </div>
 
@@ -72,16 +72,16 @@ const Footer = () => {
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <a
+                  {/* <a
                     href="#"
                     className="text-gray-500 hover:text-teal-600 transition-colors"
                   >
                     Payment Options
-                  </a>
+                  </a> */}
                 </li>{" "}
                 <li>
                   <a
-                    href="#"
+                    href="/my-orders"
                     className="text-gray-500 hover:text-teal-600 transition-colors"
                   >
                     Track Order

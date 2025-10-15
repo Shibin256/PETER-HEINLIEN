@@ -28,7 +28,7 @@ const updateCart = async (data) => {
 const toggleIsLocked = async ({ userID, lock }) => {
   console.log("userID:", userID, "lock", lock, "====");
   const response = await axiosInstance.post(
-    `/api/v1/users/cart/${userID}/${lock}`,
+    `/api/v1/users/cart/cart-lock/${lock}/${userID}`,
   );
   return response.data;
 };

@@ -32,9 +32,9 @@ export const deleteCategory = createAsyncThunk(
 
 export const editCategory = createAsyncThunk(
   "admin/editBrand",
-  async ({ id, name }, { rejectWithValue }) => {
+  async ({ id, category }, { rejectWithValue }) => {
     try {
-      const res = await inventoryService.editCategory(id, name);
+      const res = await inventoryService.editCategory(id, category);
       return res;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

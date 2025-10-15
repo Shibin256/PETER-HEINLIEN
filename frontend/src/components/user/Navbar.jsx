@@ -134,9 +134,9 @@ const Navbar = () => {
           >
             <FaHeart />
           </a>
-          <button onClick={handleLogout}>
+          {/* <button onClick={handleLogout}>
             <HiArrowLeftOnRectangle className="hover:text-teal-200 transition-colors text-xl" />
-          </button>
+          </button> */}
         </div>
       </div>
     </header>

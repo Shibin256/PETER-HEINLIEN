@@ -39,11 +39,14 @@ const ProductDetails = () => {
     (state) => state.products,
   );
 
-  console.log(localCart, "realated products");
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id));
-      dispatch(relatedProducts(id));
+      if (user) {
+        dispatch(relatedProducts({ id: id, userId: user._id }));
+      }else{
+        dispatch(relatedProducts({id:id}));
+      }
     }
   }, [id, dispatch]);
 
@@ -135,20 +138,21 @@ const ProductDetails = () => {
 
 
   const handleBuyNow = async () => {
-    const data={
-      price:singleProduct.price,
-      productId:singleProduct,
-      productSubTotal:singleProduct.price * quantity,
-      quantity:quantity
+    const data = {
+      price: singleProduct.price,
+      productId: singleProduct,
+      productSubTotal: singleProduct.price * quantity,
+      quantity: quantity
     }
     localCart.push(data)
     const shipping = data.productSubTotal > 1000 ? 0 : 50;
     navigate("/checkout", {
       state: {
         cartItems: localCart,
-        totalPrice: data.productSubTotal+shipping,
+        totalPrice: data.productSubTotal + shipping,
         shippingCost: shipping,
         userId: user._id,
+        from:true
       }
     })
 

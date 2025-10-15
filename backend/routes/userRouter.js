@@ -11,10 +11,14 @@ import { addAddress, changeName, changeOrAddMobile, editImage, editPassword, get
 import multer from 'multer';
 import { addFromWishlistToCart, addItemToCart, getCart, removeCartItem, toggleIsLocked, updateCartItem } from '../controller/cartController.js';
 import { addReview, cancelOrderItem, cancelOrderSingleItem, downloadInvoice, getOrders, placeOrder, returnOrderItem} from '../controller/orderController.js';
-import { createRazorpayOrder, verifyRazorpayPayment } from '../controller/paymentController.js';
+import { createRazorpayOrder, verifyRazorpayPayment, verifyRazorpayPaymentForWallet } from '../controller/paymentController.js';
 import { applyCoupon, fetchAdsCoupons, fetchCoupons, removeCoupon } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
 import { fetchHomeBanner } from '../controller/admin/bannerController.js';
+import { validateUserRegistration } from '../validators/authValidators.js';
+import { validate } from '../middleware/validationMiddleware.js';
+import { validateUsernameChange } from '../validators/nameValidator.js';
+import { validateAddress } from '../validators/addressValidator.js';
 
 const router = express.Router();
 const storage=multer.diskStorage({})
@@ -32,7 +36,7 @@ router.patch('/account/:id/name',verifyAccessToken,upload.none(),changeName)
 router.patch('/account/:id/mobile',verifyAccessToken,upload.none(),changeOrAddMobile)
 router.patch('/account/:id/password',verifyAccessToken,editPassword)
 router.patch('/account/:id/image',verifyAccessToken,upload.single('file'),editImage)
-router.post('/account/:id/address',verifyAccessToken,addAddress)
+router.post('/account/:id/address',verifyAccessToken,validateAddress,validate,addAddress)
 router.get('/account/:id/address',verifyAccessToken,getAllAddress)
 router.delete('/account/:userId/:addressId',verifyAccessToken,removeAddress)
 router.patch('/account/:userId/:addressId/default',verifyAccessToken,SetDefaultAddress)
@@ -45,7 +49,7 @@ router.get('/cart/:userId',verifyAccessToken,getCart)
 router.delete('/cart/:userId/:productId',verifyAccessToken,removeCartItem)
 router.put('/cart',verifyAccessToken,updateCartItem)
 router.post('/cart/from-wishlist',verifyAccessToken,addFromWishlistToCart)
-router.post('/cart/:userId/:lock',verifyAccessToken,toggleIsLocked)
+router.post('/cart/cart-lock/:lock/:userId',verifyAccessToken,toggleIsLocked)
 
 
 //order manage
@@ -59,12 +63,14 @@ router.post('/orders/:itemId/review',verifyAccessToken,addReview)
 
 //payment
 router.post('/payments/razorpay/order',verifyAccessToken,createRazorpayOrder)
-router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment,fetchCoupons)
+router.post('/payments/razorpay/verify',verifyAccessToken,verifyRazorpayPayment)
+router.post('/payments/razorpay/wallet/verify',verifyAccessToken,verifyRazorpayPaymentForWallet)
+
 
 
 router.post('/coupons', verifyAccessToken,applyCoupon);
 router.delete('/coupons/:couponId', verifyAccessToken, removeCoupon);
-router.get('/coupons',verifyAccessToken,fetchAdsCoupons)
+router.get('/coupons',fetchAdsCoupons)
 router.get('/all/coupons',verifyAccessToken,fetchCoupons)
 
 
@@ -73,7 +79,7 @@ router.post('/wallet/:userId/:amount/:paymentId',verifyAccessToken,addToWallet)
 router.get('/wallet/:userId',verifyAccessToken,getWallet)
 
 //banner
-router.get('/banner',verifyAccessToken,fetchHomeBanner)
+router.get('/banner',fetchHomeBanner)
 
 
 export default router;

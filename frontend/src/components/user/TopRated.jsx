@@ -2,15 +2,23 @@ import { useEffect } from "react";
 import Title from "../common/Title";
 import ProductCard from "../common/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
+import { topRatedCollections, topRatedCollectionsWithOutUser } from "../../features/products/productSlice";
 
 const TopRated = () => {
   const dispatch = useDispatch();
-  const { products } = useSelector((state) => state.products);
-  // console.log(products)
+  // const { user } = useSelector((state) => state.auth);
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
+  const { topRated } = useSelector((state) => state.products);
+  const products = topRated
   useEffect(() => {
-    // dispatch(fetchProducts())
-  }, []); // Create array of 10 products
+    if (user) {
+      dispatch(topRatedCollections({ userId: user._id }))
+    } else {
+      dispatch(topRatedCollectionsWithOutUser())
+    }
+  }, []);
 
   return (
     <div className="latest-collection my-10 px-2 sm:px-4">

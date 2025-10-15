@@ -43,6 +43,7 @@ const Order = ({ order, onCancelSuccess }) => {
     Delivered: "bg-green-100 text-green-800",
     Cancelled: "bg-red-100 text-red-800",
     Returned: "bg-orange-100 text-orange-800",
+    Failed:'bg-red-100 text-red-800'
   };
 
   // Payment status styling
@@ -243,7 +244,7 @@ const Order = ({ order, onCancelSuccess }) => {
             <p className="text-lg font-bold text-gray-900">₹{TotalAmount}</p>
           </div>
           <div>
-            {OrderStatus !== "Cancelled" && OrderStatus !== "Delivered" && (
+            {OrderStatus !== "Cancelled" && OrderStatus !== "Delivered" && OrderStatus !== "Failed"  && (
               <button
                 onClick={() => (
                   setSelectedItemToCancel(orderId),
@@ -255,7 +256,7 @@ const Order = ({ order, onCancelSuccess }) => {
               </button>
             )}
 
-            {OrderStatus !== "Cancelled" && (
+            {OrderStatus !== "Cancelled" && OrderStatus !== "Failed" && (
               <button
                 onClick={() => handleInvoice(orderId)}
                 className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors border border-blue-100"
