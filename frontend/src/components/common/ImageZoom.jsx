@@ -1,27 +1,24 @@
 import React from "react";
-import ReactImageMagnify from "react-image-magnify";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 const ImageZoom = ({ imageUrl }) => {
   return (
-    <ReactImageMagnify
-      {...{
-        smallImage: {
-          alt: "Product",
-          isFluidWidth: true,
-          src: imageUrl,
-        },
-        largeImage: {
-          src: imageUrl,
-          width: 1200,
-          height: 1800,
-        },
-        enlargedImageContainerDimensions: {
-          width: "185%",
-          height: "105%",
-        },
-        enlargedImagePosition: "beside", // This is key
-      }}
-    />
+    <div className="flex justify-center items-center">
+      <Zoom>
+        <img
+          src={imageUrl}
+          alt="Product"
+          style={{
+            width: "100%",
+            maxWidth: "450px",
+            borderRadius: "10px",
+            objectFit: "cover",
+            cursor: "zoom-in",
+          }}
+        />
+      </Zoom>
+    </div>
   );
 };
 
