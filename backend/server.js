@@ -37,7 +37,8 @@ app.use(express.json())
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://346d5cdda7cf.ngrok-free.app" 
+  "https://346d5cdda7cf.ngrok-free.app",
+  "https://peter-heinlien.vercel.app"
 ];
 
 app.use(cors({
