@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getAllAddress } from "../../features/accountSettings/accountSlice";
 import EditAddressModal from "../../components/common/EditAddress";
-import CheckoutCard from "../../components/user/checkoutCard";
+import CheckoutCard from "../../components/user/CheckoutCard";
 import { applyCoupon, removeCoupon } from "../../features/coupons/couponsSlice";
 import { fetchCart } from "../../features/cart/cartSlice";
 
