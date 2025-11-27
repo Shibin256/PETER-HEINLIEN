@@ -2,6 +2,21 @@
 import express from 'express'
 const app = express()
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// serve static frontend
+app.use(express.static(path.join(__dirname, "dist")));
+
+// for any unknown route, send frontend
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
+
 import cookieParser from 'cookie-parser'
 app.use(cookieParser())
 
@@ -59,4 +74,7 @@ app.use('/api/v1', productRoutes, adminRouter)
 app.use('/api/v1/users', userRouter)
 
 //port assigning
-app.listen(process.env.PORT, () => logger.info(`The server started localhost:${process.env.PORT}`))
+// app.listen(process.env.PORT, () => logger.info(`The server started localhost:${process.env.PORT}`))
+app.listen(process.env.PORT, '0.0.0.0', () => {
+  logger.info(`Server running on port ${process.env.PORT}`)
+})
