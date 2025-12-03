@@ -8,13 +8,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// serve static frontend
-app.use(express.static(path.join(__dirname, "dist")));
+// // serve static frontend
+// app.use(express.static(path.join(__dirname, "dist")));
 
-// for any unknown route, send frontend
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
+// // for any unknown route, send frontend
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "dist", "index.html"));
+// });
 
 
 import cookieParser from 'cookie-parser'
@@ -70,7 +70,8 @@ app.use(cors({
 // app.use(morgan("combined", { stream: { write: (message) => logger.info(message.trim()) } }));
 
 app.use('/api/auth', authRoutes)
-app.use('/api/v1', productRoutes, adminRouter)
+app.use('/api/v1', productRoutes)
+app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/users', userRouter)
 
 //port assigning

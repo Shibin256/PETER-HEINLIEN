@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { addProductOffer, createProduct, deleteProductById, getAllProducts, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, getTopRatedProduct, removeProductOffer, updateProduct } from "../controller/admin/productController.js";
+import {createProduct, deleteProductById, getAllProducts, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, getTopRatedProduct, updateProduct } from "../controller/admin/productController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
 import { validateProduct } from "../validators/productValidator.js";
@@ -28,6 +28,6 @@ router.get('/brand/category',getBrandAndCategory)
 
 router.get('/product/:id',getProductById)
 router.get('/products/:productId/:userId/related',getRelatedProducts)
-router.post('/admin/offers',authorizeRole(roles),verifyAccessToken,addProductOffer);
-router.delete('/admin/offers/:productId', authorizeRole(roles), verifyAccessToken,removeProductOffer);
+// router.post('/offers',authorizeRole(roles),verifyAccessToken,addProductOffer);
+// router.delete('/offers/:productId', authorizeRole(roles), verifyAccessToken,removeProductOffer);
 export default router
