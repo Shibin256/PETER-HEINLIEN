@@ -48,40 +48,78 @@ export const createProduct = async (req, res) => {
     }
 }
 
-//fetch latest collection for home page
+// //fetch latest collection for home page
+// export const getCollection = async (req, res) => {
+//     try {
+//         const { userId } = req.params
+//         const latestCollection = await Product.find({ isList: { $ne: true } }).sort({ createdAt: -1 }).limit(10)
+//             .populate('brand')
+//             .populate('category')
+//             .select('-createdAt -updatedAt')
+//             .lean()
+
+
+//         if (userId) {
+//             let wishlistProductIds = [];
+
+//             const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
+//             wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+
+//             const latestWithWishlist = latestCollection.map(product => ({
+//                 ...product,
+//                 isWishlisted: wishlistProductIds.includes(product._id.toString())
+//             }));
+
+//             res.json({ latestCollection: latestWithWishlist });
+//         }
+
+
+//         res.json(latestCollection);
+
+
+//     } catch (error) {
+//         console.error('Error fetching products:', error.message);
+//         res.status(500).json({ message: 'Server error fetching products' });
+//     }
+// }
+
+// controller/admin/productController.js
 export const getCollection = async (req, res) => {
-    try {
-        const { userId } = req.params
-        const latestCollection = await Product.find({ isList: { $ne: true } }).sort({ createdAt: -1 }).limit(10)
-            .populate('brand')
-            .populate('category')
-            .select('-createdAt -updatedAt')
-            .lean()
+  try {
+    const { userId } = req.params;
 
+    const latestCollection = await Product.find({ isList: { $ne: true } })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('brand')
+      .populate('category')
+      .select('-createdAt -updatedAt')
+      .lean();
 
-        if (userId) {
-            let wishlistProductIds = [];
+    // If userId exists → add wishlist flag
+    if (userId) {
+      const wishlist = await wishlistModel.findOne({ userId }).lean();
+      const wishlistIds = wishlist?.productIds?.map(id => id.toString()) || [];
 
-            const wishlist = await wishlistModel.findOne({ userId }).select("productIds");
-            wishlistProductIds = wishlist ? wishlist.productIds.map(id => id.toString()) : [];
+      const withWishlist = latestCollection.map(product => ({
+        ...product,
+        isWishlisted: wishlistIds.includes(product._id.toString())
+      }));
 
-            const latestWithWishlist = latestCollection.map(product => ({
-                ...product,
-                isWishlisted: wishlistProductIds.includes(product._id.toString())
-            }));
-
-            res.json({ latestCollection: latestWithWishlist });
-        }
-
-
-        res.json(latestCollection);
-
-
-    } catch (error) {
-        console.error('Error fetching products:', error.message);
-        res.status(500).json({ message: 'Server error fetching products' });
+      return res.json({ latestCollection: withWishlist });  // ← RETURN + EXIT
     }
-}
+
+    // Only runs when no userId
+    console.log(latestCollection)
+    return res.json(latestCollection );  // ← RETURN + EXIT
+
+  } catch (error) {
+    console.error('Error fetching products:', error.message);
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+};
 
 export const getTopRatedProduct = async (req, res) => {
     try {
@@ -105,11 +143,11 @@ export const getTopRatedProduct = async (req, res) => {
                 isWishlisted: wishlistProductIds.includes(product._id.toString())
             }));
 
-            res.json({ topRatedCollections: latestWithWishlist });
+            return res.json({ topRatedCollections: latestWithWishlist });
 
         }
 
-        res.json({ topRatedCollections: topRatedCollections });
+        return res.json({ topRatedCollections: topRatedCollections });
 
     } catch (error) {
         console.error('Error fetching products:', error.message);

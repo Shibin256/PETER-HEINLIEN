@@ -136,9 +136,10 @@ app.use(cors({
 
 // API Routes (must be before React frontend route)
 app.use('/api/auth', authRoutes);
-app.use('/api/v1', productRoutes);
-app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1', productRoutes);
+
 
 // Serve React frontend for unknown routes
 app.use(express.static(path.join(__dirname, "dist")));

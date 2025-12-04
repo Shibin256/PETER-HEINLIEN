@@ -40,7 +40,7 @@ router.post('/account/:id/address',verifyAccessToken,validateAddress,validate,ad
 router.get('/account/:id/address',verifyAccessToken,getAllAddress)
 router.delete('/account/:userId/:addressId',verifyAccessToken,removeAddress)
 router.patch('/account/:userId/:addressId/default',verifyAccessToken,SetDefaultAddress)
-router.put('/account/:addressId',verifyAccessToken,updateAddress)
+router.put('/account/adress/:addressId',verifyAccessToken,updateAddress)
 
 
 //cart manage
