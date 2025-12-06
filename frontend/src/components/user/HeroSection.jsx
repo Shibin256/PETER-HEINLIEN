@@ -18,12 +18,21 @@ const HeroSection = () => {
 
   const { homeBanner } = useSelector(state => state.banner)
 
+  const fallbackBanner =
+  homeBanner?.bannerImage ||
+  "https://placehold.co/1200x600?text=Banner+Not+Available";
+
+const fallbackBg =
+  homeBanner?.bagroundImage ||
+  "https://placehold.co/600x800?text=Background+Not+Available";
+
+
   return (
     <section className="relative w-full bg-gray-50 overflow-hidden">
       {/* Background image with overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src={homeBanner.bannerImage}
+          src={fallbackBanner}
           alt="Luxury watches collection"
           className="w-full h-full object-cover opacity-20"
         />
@@ -76,7 +85,7 @@ const HeroSection = () => {
           <div className="relative w-full lg:w-[500px] h-[400px]">
             <div className="bg-white p-6 rounded-lg shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-500">
               <img
-                src={homeBanner.bagroundImage} // Replace with your product image
+                src={fallbackBg} // Replace with your product image
                 alt="Precision Collection Watch"
                 className="w-full h-auto object-contain"
                 width="120px"

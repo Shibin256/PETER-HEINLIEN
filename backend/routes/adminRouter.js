@@ -37,7 +37,7 @@ router.put('/brand/:id',authorizeRole(roles),verifyAccessToken,upload.single('lo
 
 //bannerManage
 router.post('/banner',authorizeRole(roles),upload.array("images",2),verifyAccessToken,createBanner)
-router.get('/banner',authorizeRole(roles),verifyAccessToken,fetchBanners)
+router.get('/banner',fetchBanners)
 router.delete('/banner/:bannerId',authorizeRole(roles),verifyAccessToken,deleteBanner)
 router.put('/banner/:bannerId',authorizeRole(roles),verifyAccessToken,setActiveBanner)
 

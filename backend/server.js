@@ -117,11 +117,20 @@ app.use(cookieParser());
 // app.use(morgan("combined", { stream: { write: (msg) => logger.info(msg.trim()) } }));
 
 // CORS setup
+// const allowedOrigins = [
+//   "http://localhost:5173",
+//   "https://346d5cdda7cf.ngrok-free.app",
+//   "https://peter-heinlien-pfoi-qr57fzs8j-shibin-shajan-kps-projects.vercel.app"
+// ];
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://346d5cdda7cf.ngrok-free.app",
-  "https://peter-heinlien-pfoi-qr57fzs8j-shibin-shajan-kps-projects.vercel.app"
+  "https://peter-heinlien-pfoi-qr57fzs8j-shibin-shajan-kps-projects.vercel.app",
+  "https://peterheinlien.shop",
+  "https://www.peterheinlien.shop"
 ];
+
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -141,11 +150,20 @@ app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1', productRoutes);
 
 
-// Serve React frontend for unknown routes
-app.use(express.static(path.join(__dirname, "dist")));
+// // Serve React frontend for unknown routes
+// app.use(express.static(path.join(__dirname, "dist")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "dist", "index.html"));
+// });
+// Serve React frontend (correct path)
+const frontendPath = path.join(__dirname, "../frontend/dist");
+
+app.use(express.static(frontendPath));
+
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
+
 
 // Start server
 const PORT = process.env.PORT || 2028;

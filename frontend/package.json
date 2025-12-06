@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --ext .js,.jsx --fix",
     "preview": "vite preview",
+    "deploy": "npm run build && cp -r dist ../backend/",
     "vercel-build": "npm install --legacy-peer-deps && npm run build"
   },
   "dependencies": {
