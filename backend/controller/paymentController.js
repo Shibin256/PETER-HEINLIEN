@@ -12,7 +12,7 @@ const razorpay = new Razorpay({
 export const createRazorpayOrder = async (req, res) => {
     try {
         const { amount } = req.body
-
+        console.log(amount,'--')
         const options = {
             amount: amount * 100,
             currency: 'INR',
@@ -30,7 +30,8 @@ export const createRazorpayOrder = async (req, res) => {
 }
 
 export const verifyRazorpayPayment = async (req, res) => {
-    console.log(req.body, '=------=====')
+    // console.log(req.body, '=------=====')
+    console.log('verify')
     const {
         razorpay_order_id,
         razorpay_payment_id,

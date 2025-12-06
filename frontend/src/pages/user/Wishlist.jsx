@@ -98,9 +98,9 @@ const Wishlist = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                {/* <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
                   Select
-                </th>
+                </th> */}
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
                   Product
                 </th>
@@ -121,12 +121,12 @@ const Wishlist = () => {
                   key={item._id}
                   className="hover:bg-gray-50 transition-colors duration-150"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded text-green-600 focus:ring-green-500"
                     />
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img
@@ -246,7 +246,8 @@ const Wishlist = () => {
 
         {wishlist?.length > 0 && (
           <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center space-x-4 w-full sm:w-auto">
+
+            {/* <div className="flex items-center space-x-4 w-full sm:w-auto">
               <select
                 value={selectedAction}
                 onChange={handleActionChange}
@@ -267,7 +268,8 @@ const Wishlist = () => {
               >
                 {isProcessing ? "Processing..." : "Apply Action"}
               </button>
-            </div>
+            </div> */}
+
             <button
               onClick={handleAddAllToCart}
               disabled={wishlist?.length === 0 || isProcessing}

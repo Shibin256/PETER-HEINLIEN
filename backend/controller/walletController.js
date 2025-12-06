@@ -41,6 +41,7 @@ export const addToWallet = async (req, res) => {
 
 export const getWallet = async (req, res) => {
   const { userId } = req.params;
+  console.log(userId,'----')
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 8;
   const skip = (page - 1) * limit;

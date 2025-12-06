@@ -31,7 +31,6 @@ export const placeOrder = async (req, res) => {
             return res.status(400).json({ message: "Invalid user" });
         }
 
-        console.log(cartItems, 'carrt itemsss')
 
         const validatedItems = [];
         let calculatedTotal = 0;
@@ -250,7 +249,7 @@ export const cancelOrderSingleItem = async (req, res) => {
         }
 
         const UserID = orderItem.UserID;
-        console.log(orderItem.Items.length, '---')
+        // console.log(orderItem.Items.length, '---')
 
         // Find the specific item in the order
         const item = orderItem.Items.find(item => item.itemOrderId === itemOrderId);

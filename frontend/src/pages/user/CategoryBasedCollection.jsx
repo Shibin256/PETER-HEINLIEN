@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FiX } from "react-icons/fi";
 import Title from "../../components/common/Title";
 import ProductCard from "../../components/common/ProductCard";
 import {

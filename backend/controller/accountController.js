@@ -262,6 +262,7 @@ export const SetDefaultAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
     const { addressId } = req.params
+    console.log(addressId)
     const { name, house, locality, city, state, pincode, phone, alternativePhone, addressType, defaultAddress } = req.body
     const updatedData = {
         name,

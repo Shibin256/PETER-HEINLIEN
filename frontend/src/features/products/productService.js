@@ -55,9 +55,15 @@ const getProducById = async (id) => {
   return res.data;
 };
 
-const getRelatedProducts = async (id,userId) => {
-  const res = await axiosInstance.get(`/api/v1/products/${id}/${userId}/related`);
-  return res.data;
+const getRelatedProducts = async (id, userId) => {
+  if (userId) {
+    const res = await axiosInstance.get(`/api/v1/products/${id}/${userId}/related`);
+    return res.data;
+  } else {
+    const res = await axiosInstance.get(`/api/v1/products/${id}/related`);
+    return res.data;
+  }
+
 };
 
 const addProductOffer = async ({ productId, percentage }) => {

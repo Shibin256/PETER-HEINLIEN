@@ -42,7 +42,6 @@ const PaymentPage = () => {
 
     const { currency } = useSelector((state) => state.global);
     const { isLocked } = useSelector((state) => state.cart);
-    console.log(isLocked);
 
     const handlePaymentChange = (method) => {
         setSelectedPayment(method);
@@ -54,7 +53,7 @@ const PaymentPage = () => {
     };
 
     useEffect(() => {
-        dispatch(getWallet(userId));
+        dispatch(getWallet({userId:userId}));
         dispatch(toggleIsLocked({ userID: userId, lock: false }));
 
     }, []);
@@ -78,6 +77,7 @@ const PaymentPage = () => {
     const handlePayment = async ({ totalPrice, orderId }) => {
         try {
             const amount = totalPrice
+            console.log(amount,'amount in handle pay')
             const result = await dispatch(createPaymentOrder(amount)).unwrap();
             const { order } = result;
 
