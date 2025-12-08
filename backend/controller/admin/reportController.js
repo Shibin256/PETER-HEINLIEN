@@ -113,7 +113,7 @@ const getSalesReportCall = async (type, startDate, endDate) => {
             }
         }
 
-        return await Order.find(matchQuery).select('-createdAt -updatedAt');
+        return await Order.find(matchQuery).select('-updatedAt');
 
     } catch (error) {
         console.log(error)
@@ -125,6 +125,7 @@ export const exelReport = async (req, res) => {
         const { type, startDate, endDate } = req.query;
         console.log(type)
         const orders = await getSalesReportCall(type, startDate, endDate);
+        console.log(orders,'--------')
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet("Sales Report");
 

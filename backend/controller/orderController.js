@@ -42,12 +42,14 @@ export const placeOrder = async (req, res) => {
                 return res.status(400).json({ message: `Product not found: ${clientItem.productId._id}` });
             }
 
+            console.log(clientItem.quantity,'----',product)
             if (clientItem.quantity > product.totalQuantity) {
                 return res.status(400).json({ message: `${product.name} is out of stock` });
             }
 
             const currentPrice = product.offerPrice || product.price;
             if (clientItem.price !== currentPrice) {
+                console.log('joooo')
                 return res.status(400).json({
                     message: `Price mismatch for ${product.name}. Please refresh your cart.`
                 });
@@ -413,7 +415,7 @@ export const getAllOrders = async (req, res) => {
     try {
         const total = await Order.countDocuments(filter);
         const totalPage = Math.ceil(total / limit);
-        let orders = await Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('Items').select('-createdAt -updatedAt');
+        let orders = await Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('Items').select('-updatedAt');
 
         res.status(200).json({
             orders,

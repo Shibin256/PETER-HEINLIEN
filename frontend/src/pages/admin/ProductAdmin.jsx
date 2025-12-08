@@ -127,7 +127,8 @@ const ProductAdmin = () => {
   };
 
   const handleEdit = (product) => {
-    setSelectedProduct(product, '====');
+    console.log(product.category._id,'hndle edot')
+    setSelectedProduct(product);
     setEditForm({
       name: product.name || "",
       description: product.description || "",
@@ -175,8 +176,8 @@ const ProductAdmin = () => {
     formData.append("description", description);
     formData.append("quantity", quantity);
     formData.append("price", price);
-    formData.append("category", category._id);
-    formData.append("brand", brand._id);
+    formData.append("category", category);
+    formData.append("brand", brand);
     formData.append("tags", tags);
 
     editForm.newImages.forEach((file, index) => {

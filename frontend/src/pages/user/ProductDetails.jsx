@@ -138,10 +138,13 @@ const ProductDetails = () => {
 
 
   const handleBuyNow = async () => {
+    console.log(singleProduct)
+    const forwardprice= singleProduct.offerPrice || singleProduct.price
+    console.log(forwardprice)
     const data = {
-      price: singleProduct.price,
+      price: forwardprice,
       productId: singleProduct,
-      productSubTotal: singleProduct.price * quantity,
+      productSubTotal: forwardprice * quantity,
       quantity: quantity
     }
     localCart.push(data)

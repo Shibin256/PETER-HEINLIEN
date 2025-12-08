@@ -6,6 +6,7 @@ import EditAddressModal from "../../components/common/EditAddress";
 import CheckoutCard from "../../components/user/CheckoutCard";
 import { applyCoupon, removeCoupon } from "../../features/coupons/couponsSlice";
 import { fetchCart } from "../../features/cart/cartSlice";
+import { toast } from "react-toastify";
 
 const Checkout = () => {
   const [step, setStep] = useState(2);
@@ -113,6 +114,10 @@ const Checkout = () => {
         discountAmount = (total * data.coupon.discountValue) / 100;
       } else if (data.coupon.discountType === "fixed") {
         discountAmount = data.coupon.discountValue;
+      }
+      if(total<discountAmount){
+        toast.error('The coupon not applicable');
+        return
       }
       if (discountAmount > total) {
         discountAmount = total;

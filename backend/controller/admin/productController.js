@@ -225,6 +225,7 @@ export const updateProduct = async (req, res) => {
     try {
         let available = true
         const { id } = req.params
+        console.log(req.body)
 
         if (req.body.quantity <= 0) available = false
 

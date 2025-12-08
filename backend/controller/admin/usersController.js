@@ -11,7 +11,7 @@ export const getAllUsers = async (req, res) => {
         const query = { isAdmin: { $ne: true } };
 
         let [users, total] = await Promise.all([
-            User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).select('-password -createdAt -updatedAt -googleId'),
+            User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).select('-password -updatedAt -googleId'),
             User.countDocuments(query)
         ]);
 
