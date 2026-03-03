@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { addToCart } from "../../features/cart/cartSlice";
 import Title from "../../components/common/Title";
 import ProductCard from "../../components/common/ProductCard";
-import ProductDetailsSkeleton from "../../components/common/skeletion/ProductDetailsSkeleton";
+import ProductDetailsSkeleton from "../../components/common/sketion/ProductDetailsSkeleton";
 
 const ProductDetails = () => {
   const navigate = useNavigate();

@@ -11,7 +11,7 @@ import {
 import SalesDistribution from "../../components/admin/SalesDistribution";
 import SalesTrend from "../../components/admin/SalesTrend ";
 import BestSellerChart from "../../components/common/BestSellerChart";
-import BestSellerChartSkeleton from "../../components/common/skeletion/BestSellerChartSkeleton";
+import BestSellerChartSkeleton from "../../components/common/sketion/BestSellerChartSkeleton";
 
 
 const Dashboard = () => {
