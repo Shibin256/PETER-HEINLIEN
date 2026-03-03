@@ -115,6 +115,7 @@ const downloadInvoice = async (itemOrderId) => {
 const createRazorpayOrder = async (amount) => {
   console.log(amount)
   const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount:amount });
+  console.log(res.data)
   return res.data;
 };
 

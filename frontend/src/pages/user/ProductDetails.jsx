@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { addToCart } from "../../features/cart/cartSlice";
 import Title from "../../components/common/Title";
 import ProductCard from "../../components/common/ProductCard";
+import ProductDetailsSkeleton from "../../components/common/skeletion/ProductDetailsSkeleton";
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -44,12 +45,15 @@ const ProductDetails = () => {
       dispatch(getProducById(id));
       if (user) {
         dispatch(relatedProducts({ id: id, userId: user._id }));
-      }else{
-        dispatch(relatedProducts({id:id}));
+      } else {
+        dispatch(relatedProducts({ id: id }));
       }
     }
   }, [id, dispatch]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   useEffect(() => {
     if (user && singleProduct?._id) {
@@ -72,10 +76,23 @@ const ProductDetails = () => {
     shippingCost = 50;
   }
 
-  if (!product || !product.images || product.images.length === 0) {
-    return <div className="text-center p-10">Loading product details...</div>;
-  }
+  // if (!product || product._id !== id) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-[60vh]">
+  //       <div className="text-5xl animate-bounce mb-4">🛍️</div>
+  //       <p className="text-gray-600 text-lg font-medium">
+  //         Loading your product...
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
+  if (!product || product._id !== id) {
+  return (
+    <ProductDetailsSkeleton/>
+  );
+}
+  
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
   };
@@ -139,7 +156,7 @@ const ProductDetails = () => {
 
   const handleBuyNow = async () => {
     console.log(singleProduct)
-    const forwardprice= singleProduct.offerPrice || singleProduct.price
+    const forwardprice = singleProduct.offerPrice || singleProduct.price
     console.log(forwardprice)
     const data = {
       price: forwardprice,
@@ -155,7 +172,7 @@ const ProductDetails = () => {
         totalPrice: data.productSubTotal + shipping,
         shippingCost: shipping,
         userId: user._id,
-        from:true
+        from: true
       }
     })
 

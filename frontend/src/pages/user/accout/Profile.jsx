@@ -11,6 +11,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  console.log(user,'user---')
   const [showModal, setShowModal] = useState(false);
   const [nameImg, setNameImg] = useState([]);
   const [profileData, setProfileData] = useState({
@@ -228,7 +229,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="bg-gray-50 px-4 py-3 rounded-lg">
+          {user.googleId == 'true' ?<></>:<div className="bg-gray-50 px-4 py-3 rounded-lg">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-500">Password</p>
@@ -236,6 +237,7 @@ const Profile = () => {
                   {profileData.password}
                 </p>
               </div>
+              
               <button
                 onClick={() => navigateToEdit("password")}
                 className="text-[#003543] hover:text-[#004d5f] transition-colors duration-300"
@@ -256,7 +258,8 @@ const Profile = () => {
                 </svg>
               </button>
             </div>
-          </div>
+          </div>}
+          
         </div>
 
         {/* Action Buttons */}

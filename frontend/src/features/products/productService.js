@@ -32,6 +32,16 @@ const deleteProduct = async (id) => {
   return response.data;
 };
 
+const listProduct = async (id) => {
+  const response = await adminAxiosInstance.post(`/api/v1/product/${id}`);
+  return response.data;
+};
+
+const unlistProduct = async (id) => {
+  const response = await adminAxiosInstance.post(`/api/v1/product/unlist/${id}`);
+  return response.data;
+};
+
 //editing product
 const updateProduct = async (id, data) => {
   const res = await adminAxiosInstance.put(`/api/v1/product/${id}`, data, {
@@ -115,6 +125,8 @@ const productService = {
   addProductOffer,
   removeProductOffer,
   getBrandAndCategory,
+  listProduct,
+  unlistProduct
 };
 
 export default productService;

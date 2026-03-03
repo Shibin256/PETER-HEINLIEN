@@ -50,7 +50,7 @@ const AdminRoutes = () => {
           <Route path="products" element={<ProductAdmin />} />
           <Route path="user-list" element={<UserList />} />
           <Route path="inventory" element={<Inventory />} />
-          <Route path="settings" element={<Settings />} />
+          {/* <Route path="settings" element={<Settings />} /> */}
           <Route path="banners" element={<Banners />} />
           <Route path="coupons" element={<Coupons />} />
           <Route path="offers" element={<Offers />} />

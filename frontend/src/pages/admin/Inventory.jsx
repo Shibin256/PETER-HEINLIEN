@@ -1009,7 +1009,7 @@ const Inventory = () => {
             <p className="mb-4">Are you sure you want to remove this offer?</p>
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowRemoveConfirm(false)}
+                onClick={() => (setShowRemoveConfirm(false),setSelectedCategoryForOffer(null) )}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
                 Cancel

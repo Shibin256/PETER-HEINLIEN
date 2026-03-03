@@ -53,6 +53,7 @@ export const changeOrAddMobile = async (req, res) => {
     try {
         const { id } = req.params;
         const newNumber = req.body.phone;
+        console.log(newNumber,'new number')
 
         if (!newNumber) {
             return res.status(400).json({ message: 'Mobile number is required' });
@@ -66,7 +67,8 @@ export const changeOrAddMobile = async (req, res) => {
 
         const phoneExist = await User.findOne({ phone: newNumber }).select('-password -createdAt -updatedAt -googleId');
         if (phoneExist && phoneExist.phone != null) {
-            return res.status(400).json({ message: "The mobile number is already exists" });
+            // console.log('existss')
+            return res.status(400).json({ data:user,message: "The mobile number is already exists" });
         }
 
         const isNew = !user.phone;

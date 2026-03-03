@@ -2,7 +2,6 @@ import Wallet from "../model/walletModal.js";
 
 export const addToWallet = async (req, res) => {
   const { userId, amount, paymentId } = req.params;
-  console.log(paymentId, 'in the walet')
 
   const numericAmount = parseFloat(amount);
 
@@ -30,6 +29,7 @@ export const addToWallet = async (req, res) => {
     }
 
     await wallet.save();
+    wallet.transactions.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))
     res.status(200).json({ message: 'Wallet updated', wallet });
   } catch (error) {
     console.error('Error adding to wallet:', error);

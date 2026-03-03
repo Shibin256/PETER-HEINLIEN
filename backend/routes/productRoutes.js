@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import {createProduct, deleteProductById, getAllProducts, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, getTopRatedProduct, updateProduct } from "../controller/admin/productController.js";
+import {createProduct, deleteProductById, getAllProducts, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, getTopRatedProduct, listProduct, unlistProduct, updateProduct } from "../controller/admin/productController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
 import { validateProduct } from "../validators/productValidator.js";
@@ -27,6 +27,11 @@ router.get('/products/top-rated/:userId', getTopRatedProduct);
 router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,validateProduct,validate,createProduct)
 router.get('/products',getAllProducts)
 router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
+
+router.post('/product/unlist/:id',authorizeRole(roles),verifyAccessToken,unlistProduct)
+
+router.post('/product/:id',authorizeRole(roles),verifyAccessToken,listProduct)
+
 router.put('/product/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken,validateProduct,validate, updateProduct)
 
 router.get('/products/getBrandsAndCollection',getBrandsAndCollection)

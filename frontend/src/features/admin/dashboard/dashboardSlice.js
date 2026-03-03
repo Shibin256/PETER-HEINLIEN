@@ -21,7 +21,7 @@ export const getBestSellers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await dashboardService.getBestSellers();
-      return res; // Should return { totalSales, totalOrders, totalUsers, revenue }
+      return res; 
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Failed to fetch dashboard stats",
@@ -40,7 +40,7 @@ export const fetchSalesReport = createAsyncThunk(
         startDate,
         endDate,
       });
-      console.log(res);
+      // console.log(res);
       return res; // Should return detailed sales data
     } catch (error) {
       return rejectWithValue(
@@ -60,7 +60,7 @@ export const downloadSalesReportExcel = createAsyncThunk(
         startDate,
         endDate,
       });
-      console.log(res);
+      // console.log(res);
       return res;
     } catch (error) {
       return rejectWithValue(
@@ -79,7 +79,7 @@ export const downloadSalesReportPdf = createAsyncThunk(
         startDate,
         endDate,
       });
-      console.log(res);
+      // console.log(res);
       return res;
     } catch (error) {
       return rejectWithValue(

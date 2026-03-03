@@ -169,7 +169,7 @@ export const getAllProducts = async (req, res) => {
     const sortField = req.query.sort || 'createdAt';
     const sortOrder = req.query.order === 'asc' ? 1 : -1;
 
-    const filter = { isList: false };
+    const filter = {};
 
     if (search) filter.name = { $regex: search, $options: 'i' };
     if (categories.length) filter['category'] = { $in: categories };
@@ -178,10 +178,7 @@ export const getAllProducts = async (req, res) => {
     try {
         const total = await Product.countDocuments(filter);
 
-        const products = await Product.find({
-            ...filter,
-            isList: { $ne: true },
-        })
+        const products = await Product.find({...filter,})
             .sort({ [sortField]: sortOrder })
             .skip(skip)
             .limit(limit)
@@ -189,7 +186,7 @@ export const getAllProducts = async (req, res) => {
             .populate('category')
             .select('-createdAt -updatedAt');
 
-        res.json({
+        res.json({  
             products,
             total,
             page,
@@ -205,11 +202,44 @@ export const getAllProducts = async (req, res) => {
 //product deleting section
 export const deleteProductById = async (req, res) => {
     try {
+        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+
+        if (!deletedProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json({ message: 'Product deleted permanently' });
+
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).json({ message: 'Server error while deleting product' });
+    }
+};
+
+
+export const unlistProduct = async (req, res) => {
+    try {
         const product = await Product.findById(req.params.id).select('_id isList')
 
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
         product.isList = true;
+        await product.save();
+        res.status(200).json({ message: 'Product deleted successfully' });
+
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).json({ message: 'Server error while deleting product' });
+    }
+}
+
+export const listProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id).select('_id isList')
+
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+
+        product.isList = false;
         await product.save();
         res.status(200).json({ message: 'Product deleted successfully' });
 

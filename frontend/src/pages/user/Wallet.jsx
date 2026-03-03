@@ -38,6 +38,8 @@ const Wallet = () => {
     (state) => state.wallet,
   );
 
+  console.log(transactions)
+
   const handlePayments = async (amount) => {
     try {
       const result = await dispatch(createPaymentOrder(amount)).unwrap();
@@ -107,7 +109,7 @@ const Wallet = () => {
       toast.warning("Please enter a valid amount");
       return;
     }
-    const paymentId = await handlePayments({ totalPrice: amount }); 
+    const paymentId = await handlePayments(amount); 
     if (paymentId) {
       await dispatch(
         addToWallet({ userId: user._id, amount: amount, paymentId: paymentId }),

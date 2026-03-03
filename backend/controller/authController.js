@@ -232,7 +232,7 @@ export const googleAuth = async (req, res) => {
       sameSite: 'Strict',
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
-
+    user.googleId=true
     res.status(200).json({ accessToken, user });
   } catch (error) {
     console.error('Google login failed:', error);

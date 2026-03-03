@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -10,10 +11,12 @@ import {
 import SalesDistribution from "../../components/admin/SalesDistribution";
 import SalesTrend from "../../components/admin/SalesTrend ";
 import BestSellerChart from "../../components/common/BestSellerChart";
+import BestSellerChartSkeleton from "../../components/common/skeletion/BestSellerChartSkeleton";
+
 
 const Dashboard = () => {
-  const [reportPeriod, setReportPeriod] = useState("Custom Date Range");
-  const [startDate, setStartDate] = useState("");
+  const [reportPeriod, setReportPeriod] = useState("Daily");
+  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
   const [endDate, setEndDate] = useState("");
   const [totalSales, setTotalSales] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -22,6 +25,7 @@ const Dashboard = () => {
   const [avgOrderValue, setAvgOrderValue] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState("");
+  const [loadingBestSellers, setLoadingBestSellers] = useState(true); 
 
   const dispatch = useDispatch();
   // const { salesReport } = useSelector((state) => state.dashboard);
@@ -33,16 +37,39 @@ const Dashboard = () => {
     setEndDate("");
   };
 
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    dispatch(
+      fetchSalesReport({
+        type: "Daily",
+        startDate: today,
+        endDate: "",
+      })
+    ).then((res) => {
+      if (res.payload) {
+        setOrders(res.payload.orders);
+        setTotalSales(res.payload.totalSales);
+        setTotalOrders(res.payload.totalOrders);
+        setTotalDiscounts(res.payload.totalDiscount);
+        setAvgOrderValue(res.payload.avgOrderValue);
+      }
+    });
+  }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getBestSellers())
-  }, [])
+    setLoadingBestSellers(true); 
+    dispatch(getBestSellers()).then((res) => {
+      console.log(res, 'res of dispatch');
+      setLoadingBestSellers(false); 
+    });
+    console.log('did itt');
+  }, [dispatch]);
 
-  const { topProducts, topCategories, topBrands } = useSelector(state => state.dashboard)
+  const { topProducts, topCategories, topBrands } = useSelector(state => state.dashboard);
 
-  console.log(topProducts, topCategories, topBrands, '-------')
+  console.log(topProducts, '-------');
+
   const applyFilters = async () => {
-    console.log(startDate);
     const today = new Date().toISOString().split("T")[0];
 
     if ((startDate && startDate > today) || (endDate && endDate > today)) {
@@ -76,8 +103,7 @@ const Dashboard = () => {
     const res = await dispatch(
       fetchSalesReport({ type: reportPeriod, startDate, endDate }),
     );
-    console.log(res, '---')
-    setOrders(res.payload.orders)
+    setOrders(res.payload.orders);
     setTotalSales(res.payload.totalSales);
     setTotalOrders(res.payload.totalOrders);
     setTotalDiscounts(res.payload.totalDiscount);
@@ -92,7 +118,7 @@ const Dashboard = () => {
     setTotalOrders(0);
     setTotalDiscounts(0);
     setAvgOrderValue(0);
-    setOrders([])
+    setOrders([]);
   };
 
   const handleGenerateReport = () => {
@@ -129,6 +155,46 @@ const Dashboard = () => {
   const handleCancel = () => {
     setShowModal(false);
     setSelectedFormat("");
+  };
+
+  // Helper function to check if data is empty
+  const isEmptyData = (data) => {
+    return !data || data.length === 0;
+  };
+
+  // Render chart with loading and empty states
+  const renderBestSellerChart = (title, data, color) => {
+    if (loadingBestSellers) {
+      return <BestSellerChartSkeleton />;
+    }
+    
+    if (isEmptyData(data)) {
+      return (
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
+          <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+            <svg
+              className="w-16 h-16 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            <p className="text-center">No data available for {title.toLowerCase()}</p>
+            <p className="text-sm text-center mt-2">Try adjusting your filters or check back later</p>
+          </div>
+        </div>
+      );
+    }
+
+    return <BestSellerChart title={title} data={data} color={color} />;
   };
 
   return (
@@ -290,7 +356,6 @@ const Dashboard = () => {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
-
               </div>
             )}
 
@@ -380,6 +445,7 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
+          
           <div className="space-y-6 mt-4">
             {/* Top Section: 2 Columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -387,15 +453,13 @@ const Dashboard = () => {
               <SalesTrend orders={orders} />
             </div>
 
-            {/* Bottom Section: 3 Charts */}
+            {/* Bottom Section: 3 Charts with Loading/Empty States */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <BestSellerChart title="Top Products" data={topProducts} color="#4285F4" />
-              <BestSellerChart title="Top Categories" data={topCategories} color="#FFBB28" />
-              <BestSellerChart title="Top Brands" data={topBrands} color="#00C49F" />
+              {renderBestSellerChart("Top Products", topProducts, "#4285F4")}
+              {renderBestSellerChart("Top Categories", topCategories, "#FFBB28")}
+              {renderBestSellerChart("Top Brands", topBrands, "#00C49F")}
             </div>
           </div>
-
-
         </div>
       </div>
     </div>

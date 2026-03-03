@@ -53,29 +53,63 @@ const Collection = () => {
   }, [category, brand, sortType, alphabeticOrder, searchTerm, currentPage]);
 
   // Fetch filtered products
+  // const fetchFilteredProducts = (pageNumber = 1) => {
+  //   setCurrentPage(pageNumber);
+  //   dispatch(
+  //     fetchProducts({
+  //       page: pageNumber,
+  //       limit: 4,
+  //       search: searchTerm,
+  //       categories: category,
+  //       brands: brand,
+  //       sort: sortType === "low-high" || sortType === "high-low" ? "price" : "",
+  //       order:
+  //         sortType === "low-high"
+  //           ? "asc"
+  //           : sortType === "high-low"
+  //             ? "desc"
+  //             : alphabeticOrder === "a-z"
+  //               ? "asc"
+  //               : alphabeticOrder === "z-a"
+  //                 ? "desc"
+  //                 : "",
+  //     }),
+  //   );
+  // };
+
+
   const fetchFilteredProducts = (pageNumber = 1) => {
-    setCurrentPage(pageNumber);
-    dispatch(
-      fetchProducts({
-        page: pageNumber,
-        limit: 4,
-        search: searchTerm,
-        categories: category,
-        brands: brand,
-        sort: sortType === "low-high" || sortType === "high-low" ? "price" : "",
-        order:
-          sortType === "low-high"
-            ? "asc"
-            : sortType === "high-low"
-              ? "desc"
-              : alphabeticOrder === "a-z"
-                ? "asc"
-                : alphabeticOrder === "z-a"
-                  ? "desc"
-                  : "",
-      }),
-    );
-  };
+  setCurrentPage(pageNumber);
+
+  let sortField = "";
+  let order = "";
+
+  if (sortType === "low-high") {
+    sortField = "price";
+    order = "asc";
+  } else if (sortType === "high-low") {
+    sortField = "price";
+    order = "desc";
+  } else if (alphabeticOrder === "a-z") {
+    sortField = "name";
+    order = "asc";
+  } else if (alphabeticOrder === "z-a") {
+    sortField = "name";
+    order = "desc";
+  }
+
+  dispatch(
+    fetchProducts({
+      page: pageNumber,
+      limit: 4,
+      search: searchTerm,
+      categories: category,
+      brands: brand,
+      sort: sortField,
+      order: order,
+    })
+  );
+};
 
   // Handle search
   const handleSearch = (e) => {

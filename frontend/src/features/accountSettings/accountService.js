@@ -22,6 +22,7 @@ const changeMobile = async (userId, data) => {
       withCredentials: true,
     },
   );
+  console.log(res,'eresss---')
   return res.data;
 };
 

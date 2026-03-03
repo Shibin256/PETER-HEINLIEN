@@ -6,7 +6,6 @@ import {
 
 
 const prepareSalesTrend = (orders) => {
-    console.log(orders,'====')
     const grouped = {}
 
     orders.forEach((order) => {

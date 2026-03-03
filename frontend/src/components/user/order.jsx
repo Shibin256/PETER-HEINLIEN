@@ -310,7 +310,7 @@ const Order = ({ order, onCancelSuccess }) => {
 
               {/* Action Buttons */}
               <div className="mt-4 flex flex-wrap gap-2">
-                {(!item.returnReason && OrderStatus !== 'Cancelled') && (
+                {(!item.returnReason && OrderStatus !== 'Cancelled' && OrderStatus !== "Failed" ) && (
                   <button
                     disabled={item.cancelReason}
                     onClick={() => (

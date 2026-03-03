@@ -112,6 +112,30 @@ export const deleteProduct = createAsyncThunk(
   },
 );
 
+export const unlistProduct = createAsyncThunk(
+  "product/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await productService.unlistProduct(id);
+      return { id, ...res };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const listProdcut = createAsyncThunk(
+  "product/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await productService.listProduct(id);
+      return { id, ...res };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
 // handle update product
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
