@@ -45,9 +45,15 @@ const Coupons = () => {
     ) {
       return toast.error("all filed required");
     }
-    if (discountType == 'fixed' && maxDiscount == "") {
-      return toast.error("all filed required");
+    // if (discountType == 'fixed' && maxDiscount == "") {
+    //   return toast.error("all filed required");
+    // }
+
+
+    if (discountType === "percentage" && maxDiscount === "") {
+      return toast.error("Maximum discount is required for percentage coupons");
     }
+
 
     if (!couponCode.trim()) {
       return toast.error("Coupon code is required");
@@ -65,24 +71,25 @@ const Coupons = () => {
       return toast.error("Percentage discount must be between 1 and 100");
     }
 
+    if (discountType === "fixed" && (Number(discountAmount) >= Number(minPurchase))) {
+      return toast.error("Discount amount should be less than minimum purchase amount");
+    }
+
     if (!minPurchase || isNaN(minPurchase) || Number(minPurchase) <= 0) {
       return toast.error("Minimum purchase amount must be a positive number");
     }
 
 
-    if (discountType !== "percentage") {
+    if (discountType === "percentage") {
       if (!maxDiscount || isNaN(maxDiscount) || Number(maxDiscount) <= 0) {
         return toast.error("Maximum discount must be a positive number");
       }
 
-      if (Number(maxDiscount) > Number(discountAmount)) {
-        return toast.error("Maximum discount must be lesser than the discount amount");
-      }
-
       if (Number(maxDiscount) > Number(minPurchase)) {
-        return toast.error("Maximum discount must be lesser than the minimum purchase amount");
+        return toast.error("Maximum discount cannot exceed minimum purchase amount");
       }
     }
+
 
     if (!usageLimit || isNaN(usageLimit) || Number(usageLimit) <= 0) {
       return toast.error("Usage limit must be a positive number");
@@ -303,7 +310,7 @@ const Coupons = () => {
               </div>
 
               {/* Maximum Discount (only for flat) */}
-              {discountType === "fixed" && (
+              {discountType === "percentage" &&  (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Maximum Discount (₹)
@@ -630,7 +637,7 @@ const Coupons = () => {
                 </div>
 
                 {/* Minimum Purchase */}
-                {editingCoupon.discountType === "fixed" && (
+                {editingCoupon.discountType === "percentage" && (
                   < div >
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Maximum Discount (₹)

@@ -15,7 +15,7 @@ const AddAddress = () => {
     pin: "",
     phone: "",
     altPhone: "",
-    addressType: "home", // home or work
+    addressType: "home", 
     defaultAddress: false,
   });
 

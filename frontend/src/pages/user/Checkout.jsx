@@ -4,24 +4,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getAllAddress } from "../../features/accountSettings/accountSlice";
 import EditAddressModal from "../../components/common/EditAddress";
 import CheckoutCard from "../../components/user/CheckoutCard";
-import { applyCoupon, removeCoupon } from "../../features/coupons/couponsSlice";
+import { applyCoupon, removeCoupon, fetchUserCoupons } from "../../features/coupons/couponsSlice";
 import { fetchCart } from "../../features/cart/cartSlice";
 import { toast } from "react-toastify";
+import { RiCouponLine } from "react-icons/ri";
 
 const Checkout = () => {
   const [step, setStep] = useState(2);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [showCouponDropdown, setShowCouponDropdown] = useState(false);
   const location = useLocation();
-  // const total = location.state?.totalPrice || 0;
-  // const cartItems = location.state?.cartItems || [];
   const from = location.state?.from || false;
-
   const shippingCost = location.state?.shippingCost || 0;
 
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState("");
 
   const navigate = useNavigate();
@@ -29,6 +28,16 @@ const Checkout = () => {
   const user = JSON.parse(localStorage.getItem("user")) || { name: "Guest" };
   const { currency } = useSelector((state) => state.global);
   const { addresses } = useSelector((state) => state.account);
+  const { userCoupons = [] } = useSelector((state) => state.coupons);
+  console.log(userCoupons,'-----')
+
+  // Fetch user coupons on component mount
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(fetchUserCoupons());
+    }
+  }, [dispatch, user?._id]);
+
   useEffect(() => {
     if (!location.state || !cartItems || cartItems.length === 0) {
       navigate("/cart", { replace: true });
@@ -37,25 +46,44 @@ const Checkout = () => {
 
   useEffect(() => {
     dispatch(fetchCart(user._id));
-  }, [])
+  }, [dispatch, user._id]);
 
+  // let { cartItems = [] } = useSelector((state) => state.cart);
+  // const subtotal = cartItems.reduce(
+  //   (sum, item) => sum + item.price * item.quantity,
+  //   0,
+  // );
 
   let { cartItems = [] } = useSelector((state) => state.cart);
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+
+if (from) {
+  cartItems = location.state?.cartItems || [];
+}
+
+const subtotal = cartItems.reduce(
+  (sum, item) => sum + item.price * item.quantity,
+  0
+);
 
   const [total, setTotal] = useState(subtotal + shippingCost);
-  if (from) {
-    cartItems = location.state?.cartItems || [];
-  }
+  // if (from) {
+  //   cartItems = location.state?.cartItems || [];
+  // }
+
   useEffect(() => {
     if (from) {
       setTotal(location.state?.totalPrice || 0);
     }
   }, [from, location.state?.totalPrice]);
 
+  // Filter available coupons based on cart subtotal
+  const availableCoupons = userCoupons?.filter(coupon => {
+    const isActive = new Date(coupon.expiresAt) > new Date();
+    const notUsed = !coupon.usersUsed?.includes(user?._id);
+    const withinLimit = coupon.usersUsed?.length < coupon.usageLimit;
+    const meetsMinOrder = coupon.minOrderAmount <= subtotal;
+    return isActive && notUsed && withinLimit && meetsMinOrder;
+  }) || [];
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -82,6 +110,95 @@ const Checkout = () => {
     }
   }, [addresses]);
 
+  // const calculateDiscount = (coupon, amount) => {
+  //   if (!coupon) return 0;
+
+  //   let discountAmount = 0;
+  //   if (coupon.discountType === "percentage") {
+  //     discountAmount = (amount * coupon.discountValue) / 100;
+  //     // Apply max discount limit if exists
+  //     if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
+  //       discountAmount = coupon.maxDiscountAmount;
+  //     }
+  //   } else if (coupon.discountType === "fixed") {
+  //     discountAmount = coupon.discountValue;
+  //   }
+
+  //   // Ensure discount doesn't exceed total
+  //   return Math.min(discountAmount, amount);
+  // };
+
+  const calculateDiscount = (coupon, amount) => {
+    if (!coupon) return 0;
+
+    let discountAmount = 0;
+
+    if (coupon.discountType === "percentage") {
+      discountAmount = (amount * coupon.discountValue) / 100;
+
+      // apply max discount limit
+      if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
+        discountAmount = coupon.maxDiscount;
+      }
+
+    } else if (coupon.discountType === "fixed") {
+      discountAmount = coupon.discountValue;
+    }
+
+    // ensure discount never exceeds order amount
+    return Math.min(discountAmount, amount);
+  };
+
+  const handleApplyCoupon = async (coupon) => {
+    setCouponError("");
+
+    try {
+      const discountAmount = calculateDiscount(coupon, total);
+
+      // Check if coupon is applicable
+      if (total < coupon.minOrderAmount) {
+        toast.error(`Minimum order amount for this coupon is ${currency}${coupon.minOrderAmount}`);
+        return;
+      }
+
+      const data = await dispatch(
+        applyCoupon({
+          userId: user._id,
+          couponCode: coupon.code,
+          subtotal: total
+        })
+      ).unwrap();
+
+      if (data.error) {
+        return setCouponError(data.error);
+      }
+
+      setDiscount(discountAmount);
+      setAppliedCoupon(coupon);
+      setCouponCode(coupon.code);
+      setShowCouponDropdown(false);
+      toast.success(`Coupon ${coupon.code} applied successfully!`);
+    } catch (err) {
+      setCouponError(err.message || "Failed to apply coupon");
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    if (appliedCoupon) {
+      const res = await dispatch(removeCoupon({
+        userId: user._id,
+        couponCode: appliedCoupon.code
+      }));
+
+      if (res.type === "user/cart/removeCoupon/fulfilled") {
+        setCouponCode("");
+        setDiscount(0);
+        setAppliedCoupon(null);
+        toast.info("Coupon removed");
+      }
+    }
+  };
+
   const handleEdit = (addr) => {
     setSelectedAddress(addr);
     setEditModalOpen(true);
@@ -93,57 +210,7 @@ const Checkout = () => {
     }
   };
 
-  const handleApplyCoupon = async () => {
-    setCouponError("");
-    if (!couponCode) {
-      return setCouponError("Please enter a coupon code");
-    }
-    try {
-      const data = await dispatch(
-        applyCoupon({ userId: user._id, couponCode }),
-      ).unwrap();
-
-
-      if (data.error) {
-        return setCouponError(data.error);
-      }
-
-      let discountAmount = 0;
-
-      if (data.coupon.discountType === "percentage") {
-        discountAmount = (total * data.coupon.discountValue) / 100;
-      } else if (data.coupon.discountType === "fixed") {
-        discountAmount = data.coupon.discountValue;
-      }
-      if(total<discountAmount){
-        toast.error('The coupon not applicable');
-        return
-      }
-      if (discountAmount > total) {
-        discountAmount = total;
-      }
-      if ((total - discountAmount) < data.coupon.minOrderAmount) {
-        discountAmount = data.coupon.maxDiscount
-      }
-      console.log("Discount amount:", discountAmount);
-      setDiscount(discountAmount);
-      setCouponApplied(true);
-      setCouponError("");
-    } catch (err) {
-      setCouponError(err.message || "Failed to apply coupon");
-    }
-  };
-
-  const handleRemoveCoupon = async () => {
-    const res = await dispatch(removeCoupon({ userId: user._id, couponCode }));
-    console.log("Coupon removed", res);
-    if (res.type == "user/cart/removeCoupon/fulfilled") {
-      setCouponCode("");
-      setDiscount(0);
-      setCouponApplied(false);
-      setCouponError("");
-    }
-  };
+  const finalTotal = Math.max(0, total - discount);
 
   return (
     <div className="max-w-6xl mx-auto my-10 p-6">
@@ -354,6 +421,7 @@ const Checkout = () => {
                           cartItems: cartItems,
                           totalPrice: total,
                           discount: discount,
+                          appliedCoupon: appliedCoupon,
                           shippingCost: shippingCost,
                           userId: user._id,
                           deliveryDate: formattedDeliveryDate,
@@ -376,51 +444,127 @@ const Checkout = () => {
               <h4 className="text-lg font-semibold text-gray-800 mb-4">
                 PRICE DETAILS
               </h4>
-              {/* Coupon Apply Section */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Apply Coupon
-                </label>
-                {couponApplied ? (
-                  <div className="flex items-center justify-between bg-green-100 border border-green-300 text-green-800 text-sm p-2 rounded">
-                    <span>
-                      Coupon <strong>{couponCode}</strong> applied
+
+              {/* Coupon Section with Dropdown */}
+              <div className="mb-4 border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setShowCouponDropdown(!showCouponDropdown)}
+                  className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center">
+                    <RiCouponLine className="text-purple-600 mr-2" />
+                    <span className="font-medium">
+                      {appliedCoupon ? "Applied Coupon" : "Apply Coupon"}
                     </span>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 transform transition-transform ${showCouponDropdown ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showCouponDropdown && (
+                  <div className="p-3 border-t max-h-60 overflow-y-auto">
+                    {availableCoupons.length > 0 ? (
+                      availableCoupons.map((coupon) => (
+                        <div
+                          key={coupon._id}
+                          className={`p-2 mb-2 border rounded-lg cursor-pointer hover:bg-purple-50 transition-colors ${appliedCoupon?._id === coupon._id ? "border-purple-500 bg-purple-50" : ""
+                            }`}
+                          onClick={() => handleApplyCoupon(coupon)}
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-mono font-bold text-sm">
+                              {coupon.code}
+                            </span>
+                            <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                              {coupon.discountType === "percentage"
+                                ? `${coupon.discountValue}% OFF (Max ${currency}${coupon.maxDiscount})`
+                                : `${currency}${coupon.discountValue} OFF`}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Min. order: {currency}{coupon.minOrderAmount}
+                          </p>
+                          {coupon.maxDiscountAmount && (
+                            <p className="text-xs text-gray-500">
+                              Max discount: {currency}{coupon.maxDiscountAmount}
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center py-2">
+                        No coupons available for your cart
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {appliedCoupon && (
+                  <div className="p-3 bg-purple-50 border-t flex justify-between items-center">
+                    <div>
+                      <span className="text-sm font-medium text-purple-700">
+                        {appliedCoupon.code}
+                      </span>
+                      <p className="text-xs text-purple-600">
+                        -{currency}{discount.toFixed(2)} discount
+                      </p>
+                    </div>
                     <button
                       onClick={handleRemoveCoupon}
-                      className="text-red-600 font-medium hover:underline text-sm ml-2"
+                      className="text-xs text-red-600 hover:text-red-800"
                     >
                       Remove
                     </button>
                   </div>
-                ) : (
+                )}
+              </div>
+
+              {/* Manual Coupon Entry */}
+              {!appliedCoupon && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Or enter coupon code manually
+                  </label>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                       className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
                       placeholder="Enter coupon code"
                     />
                     <button
-                      onClick={handleApplyCoupon}
+                      onClick={() => {
+                        const coupon = userCoupons.find(c => c.code === couponCode);
+                        if (coupon) {
+                          handleApplyCoupon(coupon);
+                        } else {
+                          setCouponError("Invalid coupon code");
+                        }
+                      }}
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium shadow"
                     >
                       Apply
                     </button>
                   </div>
-                )}
-                {couponError && (
-                  <p className="text-red-600 text-xs mt-1">{couponError}</p>
-                )}
-              </div>
+                  {couponError && (
+                    <p className="text-red-600 text-xs mt-1">{couponError}</p>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-3">
                 <div className="flex justify-between text-sm text-gray-700">
                   <span>SubTotal</span>
                   <span>
                     {currency}
-                    {total - shippingCost}
+                    {(total - shippingCost).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-700">
@@ -432,20 +576,26 @@ const Checkout = () => {
                   )}
                 </div>
               </div>
-              <hr className="my-4 border-gray-200" />
-              <div className="flex justify-between text-sm text-gray-700">
-                <span>Discount</span>
-                <span className="text-green-700">
-                  - {currency}
-                  {discount}
-                </span>
-              </div>
 
-              <div className="flex justify-between text-lg font-bold text-gray-800 mt-1">
+              {discount > 0 && (
+                <>
+                  <hr className="my-4 border-gray-200" />
+                  <div className="flex justify-between text-sm text-gray-700">
+                    <span>Discount</span>
+                    <span className="text-green-700">
+                      - {currency}
+                      {discount.toFixed(2)}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              <hr className="my-4 border-gray-200" />
+              <div className="flex justify-between text-lg font-bold text-gray-800">
                 <span>Total Payable</span>
-                <span>
+                <span className="text-green-600">
                   {currency}
-                  {Math.max(0, total - discount)}
+                  {finalTotal.toFixed(2)}
                 </span>
               </div>
             </div>

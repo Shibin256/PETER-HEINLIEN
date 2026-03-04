@@ -23,6 +23,8 @@ const Cart = () => {
 
   const { cartItems = [] } = useSelector((state) => state.cart);
   const [localCart, setLocalCart] = useState([]);
+  const [cartUpdating, setCartUpdating] = useState(false);
+
 
   useEffect(() => {
     setLocalCart(cartItems);
@@ -39,41 +41,64 @@ const Cart = () => {
   }, [subtotal, shipping]);
   const { currency } = useSelector((state) => state.global);
 
-  const handleQuantityChange = (productId, delta) => {
-    const item = localCart.find((item) => item.productId._id === productId);
-    const newQuantity = Math.max(1, item.quantity + delta);
 
-    if (delta > 0 && newQuantity > item.productId.totalQuantity) {
-      console.warn(
-        `Only ${item.productId.totalQuantity} items available in stock.`,
-      );
-      return;
-    }
+  // const handleQuantityChange = (productId, delta) => {
+  //   const item = localCart.find((item) => item.productId._id === productId);
+  //   const newQuantity = Math.max(1, item.quantity + delta);
 
-    if (item.quantity === 4 && delta > 0) {
-      console.warn("Max quantity reached");
-      return;
-    }
+  //   if (delta > 0 && newQuantity > item.productId.totalQuantity) {
+  //     console.warn(
+  //       `Only ${item.productId.totalQuantity} items available in stock.`,
+  //     );
+  //     return;
+  //   }
 
-    setLocalCart((prev) =>
-      prev.map((item) =>
-        item.productId._id === productId
-          ? { ...item, quantity: newQuantity }
-          : item,
-      ),
-    );
+  //   if (item.quantity === 4 && delta > 0) {
+  //     console.warn("Max quantity reached");
+  //     return;
+  //   }
 
-    dispatch(
-      updateCart({
-        userId: user._id,
-        productId,
-        quantity: newQuantity,
-      }),
-    )
-      .unwrap()
-      .then(() => dispatch(fetchCart(user._id)))
-      .catch((err) => console.error("Cart update failed:", err));
-  };
+  //   setLocalCart((prev) =>
+  //     prev.map((item) =>
+  //       item.productId._id === productId
+  //         ? { ...item, quantity: newQuantity }
+  //         : item,
+  //     ),
+  //   );
+
+  //   dispatch(
+  //     updateCart({
+  //       userId: user._id,
+  //       productId,
+  //       quantity: newQuantity,
+  //     }),
+  //   )
+  //     .unwrap()
+  //     .then(() => dispatch(fetchCart(user._id)))
+  //     .catch((err) => console.error("Cart update failed:", err));
+  // };
+
+
+const handleQuantityChange = (productId, delta) => {
+  const item = localCart.find((item) => item.productId._id === productId);
+  const newQuantity = Math.max(1, item.quantity + delta);
+
+  if (delta > 0 && newQuantity > item.productId.totalQuantity) return;
+  if (item.quantity === 4 && delta > 0) return;
+
+  setCartUpdating(true);
+
+  dispatch(
+    updateCart({
+      userId: user._id,
+      productId,
+      quantity: newQuantity,
+    })
+  )
+    .unwrap()
+    .then(() => dispatch(fetchCart(user._id)))
+    .finally(() => setCartUpdating(false));
+};
 
   const handleRemoveItem = async (id, quantity) => {
     await dispatch(
@@ -192,23 +217,35 @@ const Cart = () => {
                             </svg>
                           </button>
                           <div className="flex-shrink-0 h-20 w-20 bg-gray-100 rounded-md overflow-hidden">
-                            <img
-                              src={
-                                item?.productId?.images?.[0] ||
-                                "/default-image.jpg"
-                              }
-                              alt={item?.productId?.name || "Product Image"}
-                              className="h-full w-full object-cover"
-                            />
+                            {cartUpdating ? (
+                              <div className="w-full h-full bg-gray-300 animate-pulse"></div>
+                            ) : (
+                              <img
+                                src={item?.productId?.images?.[0] || "/default-image.jpg"}
+                                alt={item?.productId?.name || "Product Image"}
+                                className="h-full w-full object-cover"
+                              />
+                            )}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-6 text-sm text-gray-900">
-                        {item?.productId?.name}
+                        {cartUpdating ? (
+                          <div className="h-4 w-32 bg-gray-300 rounded animate-pulse"></div>
+                        ) : (
+                          item?.productId?.name
+                        )}
+
                       </td>
                       <td className="px-6 py-6 text-sm text-gray-900">
-                        {currency}
-                        {item.price.toFixed(2)}
+                        {cartUpdating ? (
+                          <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                        ) : (
+                          <>
+                            {currency}{item.price.toFixed(2)}
+                          </>
+                        )}
+
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center">
@@ -240,12 +277,11 @@ const Cart = () => {
                             onClick={() =>
                               handleQuantityChange(item.productId._id, 1)
                             }
-                            className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${
-                              item.quantity >= 4 ||
+                            className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${item.quantity >= 4 ||
                               item.quantity >= item.productId.totalQuantity
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                              }`}
                             disabled={
                               item.quantity >= 4 ||
                               item.quantity >= item.productId.totalQuantity
@@ -269,8 +305,13 @@ const Cart = () => {
                         </div>
                       </td>
                       <td className="px-6 py-6 text-sm font-medium text-gray-900">
-                        {currency}
-                        {(item.price * item.quantity).toFixed(2)}
+                        {cartUpdating ? (
+                          <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                        ) : (
+                          <>
+                            {currency}{(item.price * item.quantity).toFixed(2)}
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -291,9 +332,16 @@ const Cart = () => {
               <div className="flex justify-between border-b pb-3">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-medium">
-                  {currency}
-                  {subtotal.toFixed(2)}
+                  {cartUpdating ? (
+                    <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
+                  ) : (
+                    <>
+                      {currency}{subtotal.toFixed(2)}
+                    </>
+                  )}
                 </span>
+
+
               </div>
 
               <div className="flex justify-between border-b pb-3">
@@ -307,10 +355,18 @@ const Cart = () => {
 
               <div className="flex justify-between pt-3">
                 <span className="text-lg font-medium">Total</span>
+
                 <span className="text-lg font-bold text-teal-600">
-                  {currency}
-                  {total.toFixed(2)}
+                  {cartUpdating ? (
+                    <div className="h-5 w-24 bg-gray-300 rounded animate-pulse"></div>
+                  ) : (
+                    <>
+                      {currency}{total.toFixed(2)}
+                    </>
+                  )}
                 </span>
+
+
               </div>
             </div>
 

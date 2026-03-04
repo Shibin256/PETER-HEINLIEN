@@ -23,6 +23,7 @@ import { addToCart } from "../../features/cart/cartSlice";
 import Title from "../../components/common/Title";
 import ProductCard from "../../components/common/ProductCard";
 import ProductDetailsSkeleton from "../../components/common/sketion/ProductDetailsSkeleton";
+import NotFound from "../notFound/NotFound";
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -40,9 +41,15 @@ const ProductDetails = () => {
     (state) => state.products,
   );
 
+  console.log(singleProduct,'single pro')
   useEffect(() => {
     if (id) {
-      dispatch(getProducById(id));
+      dispatch(getProducById(id)).then((res)=>{
+        if(res.type=='product/getProductById/rejected'){
+          console.log('hi')
+          return navigate('NotFound')
+        }
+      })
       if (user) {
         dispatch(relatedProducts({ id: id, userId: user._id }));
       } else {
@@ -71,28 +78,21 @@ const ProductDetails = () => {
 
   const product = singleProduct;
   let shippingCost = 0;
-  const totalQuantity = product.totalQuantity;
+  const totalQuantity = product?.totalQuantity || 0;
   if (product && product.price < 500) {
     shippingCost = 50;
   }
 
-  // if (!product || product._id !== id) {
-  //   return (
-  //     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-  //       <div className="text-5xl animate-bounce mb-4">🛍️</div>
-  //       <p className="text-gray-600 text-lg font-medium">
-  //         Loading your product...
-  //       </p>
-  //     </div>
-  //   );
-  // }
+  // Check if product is out of stock
+  const isOutOfStock = totalQuantity === 0;
+  // Check if max quantity reached (limited to 4 or available stock)
+  const maxSelectableQuantity = Math.min(4, totalQuantity);
+  const isMaxQuantityReached = quantity >= maxSelectableQuantity;
 
   if (!product || product._id !== id) {
-  return (
-    <ProductDetailsSkeleton/>
-  );
-}
-  
+    return <ProductDetailsSkeleton />;
+  }
+
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
   };
@@ -134,18 +134,29 @@ const ProductDetails = () => {
       toast.warning("Please login to use Cart");
       return;
     }
+
+    if (isOutOfStock) {
+      toast.warning("Product is out of stock");
+      return;
+    }
+
     try {
       const res = await dispatch(
-        addToCart({ userId: user._id, productId: singleProduct._id }),
+        addToCart({ 
+          userId: user._id, 
+          productId: singleProduct._id,
+          quantity: quantity 
+        }),
       );
-      console.log(res.payload);
+      
       if (res.payload === "max quantity added") {
-        toast.warning("max quantity added");
+        toast.warning("Maximum quantity reached");
       } else if (res.payload === "Product is out of stock") {
         toast.warning("Product is out of stock");
       } else {
-        toast.success("Added to cart");
-        navigate("/cart");
+        toast.success(`${quantity} item(s) added to cart`);
+        // Optionally reset quantity to 1 after adding to cart
+        // setQuantity(1);
       }
     } catch (err) {
       console.error("cart error:", err);
@@ -153,30 +164,58 @@ const ProductDetails = () => {
     }
   };
 
-
   const handleBuyNow = async () => {
-    console.log(singleProduct)
-    const forwardprice = singleProduct.offerPrice || singleProduct.price
-    console.log(forwardprice)
-    const data = {
+    if (!user) {
+      toast.warning("Please login to buy");
+      return;
+    }
+
+    if (isOutOfStock) {
+      toast.warning("Product is out of stock");
+      return;
+    }
+
+    console.log(singleProduct);
+    const forwardprice = singleProduct.offerPrice || singleProduct.price;
+    console.log(forwardprice);
+    
+    // Clear previous local cart and add current item
+    const newCartItem = {
       price: forwardprice,
       productId: singleProduct,
       productSubTotal: forwardprice * quantity,
-      quantity: quantity
-    }
-    localCart.push(data)
-    const shipping = data.productSubTotal > 1000 ? 0 : 50;
+      quantity: quantity,
+    };
+    
+    const updatedCart = [newCartItem];
+    setLocalCart(updatedCart);
+    
+    const shipping = newCartItem.productSubTotal > 1000 ? 0 : 50;
     navigate("/checkout", {
       state: {
-        cartItems: localCart,
-        totalPrice: data.productSubTotal + shipping,
+        cartItems: updatedCart,
+        totalPrice: newCartItem.productSubTotal + shipping,
         shippingCost: shipping,
         userId: user._id,
-        from: true
-      }
-    })
+        from: true,
+      },
+    });
+  };
 
-  }
+  const handleQuantityChange = (increment) => {
+    if (increment) {
+      // Increment quantity
+      if (quantity < maxSelectableQuantity) {
+        setQuantity((prev) => prev + 1);
+      }
+    } else {
+      // Decrement quantity
+      if (quantity > 1) {
+        setQuantity((prev) => prev - 1);
+      }
+    }
+  };
+
   return (
     <div className="px-6 md:px-16 lg:px-24 py-12">
       <div className="flex flex-col lg:flex-row gap-12">
@@ -187,7 +226,9 @@ const ProductDetails = () => {
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${currentImageIndex === index ? "border-blue-500" : "border-gray-200"}`}
+                className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${
+                  currentImageIndex === index ? "border-blue-500" : "border-gray-200"
+                }`}
               >
                 <img
                   src={img}
@@ -256,7 +297,7 @@ const ProductDetails = () => {
                       (
                       {Math.round(
                         ((product.price - product.offerPrice) / product.price) *
-                        100,
+                          100,
                       )}
                       % OFF)
                     </span>
@@ -272,55 +313,92 @@ const ProductDetails = () => {
             <p className="text-gray-700 mb-6">{product.description}</p>
           </div>
 
-          {/* Quantity Selector */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Quantity</h3>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-4 border border-gray-300 rounded-lg px-4 py-2 w-fit">
-                <button
-                  onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  className="text-xl text-gray-600 hover:text-gray-900"
-                  disabled={quantity <= 1}
-                >
-                  -
-                </button>
+          {/* Stock Status */}
+          <div className="mb-4">
+            {isOutOfStock ? (
+              <span className="inline-block bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded-full">
+                Out of Stock
+              </span>
+            ) : totalQuantity <= 5 ? (
+              <span className="inline-block bg-orange-100 text-orange-800 text-sm font-medium px-3 py-1 rounded-full">
+                Only {totalQuantity} left in stock
+              </span>
+            ) : (
+              <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                In Stock
+              </span>
+            )}
+          </div>
 
-                <span className="w-8 text-center">{quantity}</span>
+          {/* Quantity Selector - Only show if in stock */}
+          {!isOutOfStock && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3">Quantity</h3>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 border border-gray-300 rounded-lg px-4 py-2 w-fit">
+                  <button
+                    onClick={() => handleQuantityChange(false)}
+                    className={`text-xl text-gray-600 hover:text-gray-900 ${
+                      quantity <= 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={quantity <= 1}
+                  >
+                    -
+                  </button>
 
-                <button
-                  onClick={() =>
-                    setQuantity((prev) =>
-                      Math.min(Math.min(4, totalQuantity), prev + 1),
-                    )
-                  }
-                  className="text-xl text-gray-600 hover:text-gray-900"
-                  disabled={quantity >= Math.min(4, totalQuantity)}
-                >
-                  +
-                </button>
+                  <span className="w-8 text-center">{quantity}</span>
+
+                  {/* Only show + button if not at max quantity */}
+                  {!isMaxQuantityReached && (
+                    <button
+                      onClick={() => handleQuantityChange(true)}
+                      className="text-xl text-gray-600 hover:text-gray-900"
+                    >
+                      +
+                    </button>
+                  )}
+                </div>
+                {isMaxQuantityReached && (
+                  <span className="text-sm text-orange-600">
+                    Max quantity reached
+                  </span>
+                )}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <button
               onClick={handleAddCart}
-              className="flex-1 bg-teal-700 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md"
+              disabled={isOutOfStock}
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors shadow-md ${
+                isOutOfStock
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-teal-700 hover:bg-teal-700 text-white"
+              }`}
             >
-              ADD TO CART
+              {isOutOfStock ? "OUT OF STOCK" : "ADD TO CART"}
             </button>
             <button
               onClick={handleBuyNow}
-              className="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
-              BUY NOW
+              disabled={isOutOfStock}
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors shadow-md ${
+                isOutOfStock
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gray-900 hover:bg-gray-800 text-white"
+              }`}
+            >
+              {isOutOfStock ? "OUT OF STOCK" : "BUY NOW"}
             </button>
           </div>
 
           {/* Wishlist */}
           <button
             onClick={handlewishClick}
-            className={`flex items-center gap-2 mb-8 ${isWishlisted ? "text-red-500" : "text-gray-600"} transition-colors`}
+            className={`flex items-center gap-2 mb-8 ${
+              isWishlisted ? "text-red-500" : "text-gray-600"
+            } transition-colors`}
           >
             <FaHeart className={isWishlisted ? "fill-current" : ""} />
             <span>
@@ -358,26 +436,24 @@ const ProductDetails = () => {
                       {review.user?.name || "Anonymous"}
                     </p>
                     <div className="flex text-yellow-500 mb-2">
-                      {[...Array(5)].map((_, i) => (
+                      {[...Array(5)].map((_, i) =>
                         i < review.rating ? (
                           <FaStar key={i} />
                         ) : (
                           <FaRegStar key={i} />
-                        )
-                      ))}
+                        ),
+                      )}
                     </div>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {new Date(review.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
+                    {new Date(review.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
                     })}
                   </span>
                 </div>
-                <p className="text-gray-700">
-                  "{review.comment}"
-                </p>
+                <p className="text-gray-700">"{review.comment}"</p>
               </div>
             ))}
           </div>
@@ -390,20 +466,20 @@ const ProductDetails = () => {
         {/* Summary stats */}
         <div className="mt-8 flex items-center gap-4">
           <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(5)].map((_, i) =>
               i < Math.floor(product.averageRating) ? (
                 <FaStar key={i} className="text-yellow-500" />
               ) : (
                 <FaRegStar key={i} className="text-yellow-500" />
-              )
-            ))}
+              ),
+            )}
           </div>
           <p className="text-gray-700">
             {product.averageRating.toFixed(1)} out of 5
           </p>
           <span className="text-gray-500">•</span>
           <p className="text-gray-700">
-            {product.numReviews} review{product.numReviews !== 1 ? 's' : ''}
+            {product.numReviews} review{product.numReviews !== 1 ? "s" : ""}
           </p>
         </div>
       </div>

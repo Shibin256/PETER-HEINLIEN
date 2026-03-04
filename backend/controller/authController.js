@@ -76,7 +76,7 @@ export const register = async (req, res) => {
       ReferralCode
     } = req.body;
 
-    console.log(req.body,'-----')
+    console.log(req.body, '-----')
 
     const userExist = await User.findOne({ email }).select('-password -createdAt -updatedAt -googleId');
     if (userExist) {
@@ -88,26 +88,26 @@ export const register = async (req, res) => {
       return res.status(400).json({ errors: ["The mobile number already exists"] });
     }
 
-    const ReferralUser = await User.findOne({ referralCode: ReferralCode }).select('-password -createdAt -updatedAt -googleId')
+    // const ReferralUser = await User.findOne({ referralCode: ReferralCode }).select('-password -createdAt -updatedAt -googleId')
 
-    if (ReferralUser) {
-      let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
-      const transactions = {
-        userId: ReferralUser._id,
-        amount: 50,
-        paymentId: `REF-${Date.now()}-${uuidv4().slice(0, 8)}`,
-        status: 'success',
-        type: 'credit',
-        description: ' Referral Amount'
-      }
-      if (wallet) {
-        wallet.balance += 50;
-        wallet.transactions.push(transactions)
-      } else {
-        wallet = new Wallet({ userId: ReferralUser._id, balance: 50, transactions: [transactions] });
-      }
-      await wallet.save();
-    }
+    // if (ReferralUser) {
+    //   let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
+    //   const transactions = {
+    //     userId: ReferralUser._id,
+    //     amount: 50,
+    //     paymentId: `REF-${Date.now()}-${uuidv4().slice(0, 8)}`,
+    //     status: 'success',
+    //     type: 'credit',
+    //     description: ' Referral Amount'
+    //   }
+    //   if (wallet) {
+    //     wallet.balance += 50;
+    //     wallet.transactions.push(transactions)
+    //   } else {
+    //     wallet = new Wallet({ userId: ReferralUser._id, balance: 50, transactions: [transactions] });
+    //   }
+    //   await wallet.save();
+    // }
 
     //generate and sending otp
     const otp = genarateOtp()
@@ -146,7 +146,7 @@ export const register = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   try {
     const { formData, otp } = req.body;
-    const{email}=formData
+    const { email } = formData
 
     const record = await PendingUser.findOne({
       email,
@@ -159,7 +159,7 @@ export const verifyOTP = async (req, res) => {
       return res.status(400).json({ message: "OTP expired" });
     }
 
-    if(record.otp!==otp){
+    if (record.otp !== otp) {
       return res.status(400).json({ message: "The OTP is not matching" });
     }
 
@@ -172,6 +172,27 @@ export const verifyOTP = async (req, res) => {
       phone: record.phone,
       gender: record.gender,
     });
+
+    const ReferralUser = await User.findOne({ referralCode: record.referralCode }).select('-password -createdAt -updatedAt -googleId')
+
+    if (ReferralUser) {
+      let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
+      const transactions = {
+        userId: ReferralUser._id,
+        amount: 50,
+        paymentId: `REF-${Date.now()}-${uuidv4().slice(0, 8)}`,
+        status: 'success',
+        type: 'credit',
+        description: ' Referral Amount'
+      }
+      if (wallet) {
+        wallet.balance += 50;
+        wallet.transactions.push(transactions)
+      } else {
+        wallet = new Wallet({ userId: ReferralUser._id, balance: 50, transactions: [transactions] });
+      }
+      await wallet.save();
+    }
 
     await Otp.deleteOne({ email });
 
@@ -232,7 +253,7 @@ export const googleAuth = async (req, res) => {
       sameSite: 'Strict',
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
-    user.googleId=true
+    user.googleId = true
     res.status(200).json({ accessToken, user });
   } catch (error) {
     console.error('Google login failed:', error);

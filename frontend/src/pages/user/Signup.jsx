@@ -246,7 +246,6 @@ const Signup = () => {
               width="w-full"
               Textcolor="text-gray-700"
               borderColor="border-gray-300"
-              required={false}
             />
 
             <AuthInput

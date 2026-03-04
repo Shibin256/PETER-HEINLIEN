@@ -13,7 +13,7 @@ import { getWallet } from "../../features/wallet/walletSlice";
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 const PaymentPage = () => {
-    const [selectedPayment, setSelectedPayment] = useState("");
+    const [selectedPayment, setSelectedPayment] = useState("razorpay");
     const [showCODMessage, setShowCODMessage] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [orderStatus, setOrderStatus] = useState(null); // 'success' or 'error'
@@ -317,6 +317,7 @@ const PaymentPage = () => {
                     >
                         <label className="flex items-center cursor-pointer">
                             <input
+                                disabled={walletAmount < totalPrice + shippingCost ? true : false}
                                 type="radio"
                                 name="payment"
                                 className="h-5 w-5 text-green-600 focus:ring-green-500"
@@ -326,7 +327,7 @@ const PaymentPage = () => {
                             <div className="ml-3">
                                 <span className="block font-medium text-gray-800">Wallet</span>
                                 <span className="block text-sm text-gray-500">
-                                    Your balance (Rs.{walletAmount})
+                                    Your balance (Rs.{walletAmount.toFixed(2)})
                                 </span>
                             </div>
                         </label>

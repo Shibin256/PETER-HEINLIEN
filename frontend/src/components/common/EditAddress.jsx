@@ -2,11 +2,52 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { updateAddress } from "../../features/accountSettings/accountSlice";
+import { validateAddress } from "./AddressValidation";
 
 const EditAddressModal = ({ address, onClose, onSuccess }) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState({ ...address });
-  console.log(form);
+  console.log(form,'form');
+
+  
+  const indianStates = [
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Lakshadweep",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Andaman and Nicobar Islands",
+    "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Jammu and Kashmir",
+    "Ladakh",
+    "Puducherry",
+  ];
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -14,6 +55,16 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = validateAddress({
+      ...form,
+    });
+
+    if (errors.length > 0) {
+      toast.error(errors.join("\n"));
+      return;
+    }
+
     try {
       console.log(form);
       await dispatch(
@@ -34,6 +85,7 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             name="name"
+            required={true}
             value={form.name}
             onChange={handleChange}
             placeholder="Name"
@@ -41,6 +93,7 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
           />
           <input
             name="house"
+            required={true}
             value={form.house}
             onChange={handleChange}
             placeholder="House"
@@ -48,6 +101,7 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
           />
           <input
             name="locality"
+            required={true}
             value={form.locality}
             onChange={handleChange}
             placeholder="Locality"
@@ -55,33 +109,60 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
           />
           <input
             name="city"
+            required={true}
             value={form.city}
             onChange={handleChange}
             placeholder="City"
             className="w-full border p-2 rounded"
           />
+
+          <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                State <span className="text-red-500"></span>
+              </label>
+              <select
+                name="state"
+                value={form.state}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                <option value="">Select State</option>
+                {indianStates.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+            </div>
+{/* 
           <input
             name="state"
+            required={true}
             value={form.state}
             onChange={handleChange}
             placeholder="State"
             className="w-full border p-2 rounded"
-          />
+          /> */}
           <input
             name="pincode"
+            required={true}
             value={form.pincode}
             onChange={handleChange}
             placeholder="Pincode"
             className="w-full border p-2 rounded"
           />
           <input
+            type="tel"
             name="phone"
             value={form.phone}
+            required={true}
             onChange={handleChange}
             placeholder="Phone"
             className="w-full border p-2 rounded"
           />
           <input
+            type="tel"
             name="alternativePhone"
             value={form.alternativePhone}
             onChange={handleChange}

@@ -32,6 +32,7 @@ import OrderFailed from "../pages/user/orderFailed";
 import ErrorBoundary from "../components/common/ErrorBoundary";
 import Coupons from "../pages/user/Coupons";
 import AddAdressChockout from "../pages/user/AddAdressChockout";
+import NotFound from "../pages/notFound/NotFound";
 
 const UserRoutes = () => {
   return (
@@ -201,6 +202,9 @@ const UserRoutes = () => {
               }
             />
           </Route>
+
+          <Route path="*" element={<NotFound />} />
+
         </Routes>
       </ErrorBoundary>
     </div>

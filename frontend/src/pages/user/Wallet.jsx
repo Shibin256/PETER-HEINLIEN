@@ -207,7 +207,7 @@ const Wallet = () => {
                 <button
                   className="text-white bg-gradient-to-r from-[#003543] to-[#00758a] px-4 py-2 rounded-lg font-medium hover:opacity-90 transition duration-300 shadow-md"
                   onClick={() => {
-                    navigator.clipboard.writeText("REF5B0B4976");
+                    navigator.clipboard.writeText(user.referralCode);
                     toast.success("Referral code copied!");
                   }}
                 >

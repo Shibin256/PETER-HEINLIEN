@@ -93,7 +93,7 @@ const Coupons = () => {
                                         <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded mb-2">
                                             {coupon.discountType === 'percentage'
                                                 ? `${coupon.discountValue}% OFF`
-                                                : `₹${coupon.discountValue} OFF`}
+                                                : `Upto- ₹${coupon.discountValue} OFF`}
                                         </span>
                                         {coupon.minOrderAmount > 0 && (
                                             <p className="text-xs text-gray-500 mt-1">
