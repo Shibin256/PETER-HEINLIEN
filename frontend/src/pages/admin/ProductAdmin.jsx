@@ -4,6 +4,7 @@ import {
   addProductOffer,
   deleteProduct,
   fetchProducts,
+  fetchProductsAdmin,
   getBrandAndCollection,
   listProdcut,
   removeProductOffer,
@@ -42,7 +43,7 @@ const ProductAdmin = () => {
 
   // Fetching products from server
   useEffect(() => {
-    dispatch(fetchProducts({ page: 1, limit: 10 }));
+    dispatch(fetchProductsAdmin({ page: 1, limit: 10 }));
   }, [dispatch]);
 
   const {
@@ -87,7 +88,7 @@ const ProductAdmin = () => {
   // Handle search
   const handleSearch = (e) => {
     e.preventDefault();
-    dispatch(fetchProducts({ page: 1, limit: 10, search: searchTerm }));
+    dispatch(fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm }));
   };
 
   // List/Unlist handlers
@@ -112,7 +113,7 @@ const ProductAdmin = () => {
         toast.success(
           `Product ${listAction === "list" ? "listed" : "unlisted"} successfully!`,
         );
-        dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
+        dispatch(fetchProductsAdmin({ page, limit: 10, search: searchTerm }));
       } else {
         toast.error(res.payload?.message || `Failed to ${listAction} product.`);
       }
@@ -153,7 +154,7 @@ const ProductAdmin = () => {
       }
       setSelectedProductForOffer(null);
       setOfferPercentage("");
-      dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
+      dispatch(fetchProductsAdmin({ page, limit: 10, search: searchTerm }));
     } catch (error) {
       toast.error(error?.message || "Failed to add offer.");
     }
@@ -175,7 +176,7 @@ const ProductAdmin = () => {
       toast.success("✅ Offer removed successfully!");
       setShowRemoveConfirm(false);
       setProductToRemoveOffer(null);
-      dispatch(fetchProducts({ page, limit: 10, search: searchTerm }));
+      dispatch(fetchProductsAdmin({ page, limit: 10, search: searchTerm }));
     } catch (error) {
       toast.error(error?.message || "Failed to remove offer.");
     }
@@ -254,7 +255,7 @@ const ProductAdmin = () => {
         }
       }
       dispatch(
-        fetchProducts({ page: 1, limit: 10, search: searchTerm }),
+        fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm }),
       ).unwrap();
       navigate("/admin/products");
     } catch (error) {
@@ -283,7 +284,7 @@ const ProductAdmin = () => {
         dispatch(deleteProduct(id)).then((res) => {
           if (res.type.endsWith("/fulfilled")) {
             toast.success("✅ Product deleted successfully!");
-            dispatch(fetchProducts({ page: 1, limit: 10, search: searchTerm }));
+            dispatch(fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm }));
           } else {
             toast.error(res.payload?.message || "Failed to delete product.");
           }
@@ -367,7 +368,7 @@ const ProductAdmin = () => {
               type="button"
               onClick={() => {
                 setSearchTerm("");
-                dispatch(fetchProducts({ page: 1, limit: 10 }));
+                dispatch(fetchProductsAdmin({ page: 1, limit: 10 }));
               }}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             >
@@ -513,7 +514,7 @@ const ProductAdmin = () => {
             disabled={page <= 1}
             onClick={() =>
               dispatch(
-                fetchProducts({
+                fetchProductsAdmin({
                   page: page - 1,
                   limit: 10,
                   search: searchTerm,
@@ -537,7 +538,7 @@ const ProductAdmin = () => {
             disabled={page >= totalPages}
             onClick={() =>
               dispatch(
-                fetchProducts({
+                fetchProductsAdmin({
                   page: page + 1,
                   limit: 10,
                   search: searchTerm,

@@ -4,6 +4,13 @@ import axiosInstance from "../../api/axiosInstance";
 //fetching products
 const getProducts = async (params) => {
   const response = await axiosInstance.get(
+    `/api/v1/products/user?${params.toString()}`,
+  );
+  return response.data;
+};
+
+const getProductsAdmin = async (params) => {
+  const response = await adminAxiosInstance.get(
     `/api/v1/products?${params.toString()}`,
   );
   return response.data;
@@ -122,6 +129,7 @@ const productService = {
   fetchCollectionWithoutUser,
   topRatedCollections,
   getProducts,
+  getProductsAdmin,
   addProducts,
   deleteProduct,
   updateProduct,

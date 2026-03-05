@@ -14,9 +14,9 @@ const SalesDistribution = ({ totalSales, totalDiscount }) => {
   const netSales = totalSales - totalDiscount;
 
   const data = [
-    { name: "Gross Sales", value: totalSales },
-    { name: "Discounts", value: totalDiscount },
-    { name: "Net Sales", value: netSales },
+     { name: "Gross Sales", value: Number(totalSales.toFixed(2)) },
+    { name: "Discounts", value: Number(totalDiscount.toFixed(2)) },
+    { name: "Net Sales", value: Number(netSales.toFixed(2)) },
   ];
 
   return (

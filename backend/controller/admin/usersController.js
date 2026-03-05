@@ -10,9 +10,10 @@ export const getAllUsers = async (req, res) => {
 
         const query = { isAdmin: { $ne: true } };
 
-        let [users, total] = await Promise.all([
+        let [users, total,blockedUsers] = await Promise.all([
             User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).select('-password -updatedAt -googleId'),
-            User.countDocuments(query)
+            User.countDocuments(),
+            User.countDocuments({isBlocked:true})
         ]);
 
         if (search) {
@@ -26,7 +27,8 @@ export const getAllUsers = async (req, res) => {
             users,
             currentPage: page,
             totalPages: Math.ceil(total / limit),
-            totalUsers: total
+            totalUsers: total,
+            blockedUsers
         });
     } catch (error) {
         console.error('Error fetching users:', error.message);

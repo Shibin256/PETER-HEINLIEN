@@ -49,6 +49,7 @@ const userSlice = createSlice({
     totalPages: 0,
     currentPage: 1,
     totalUsers: 0,
+    blockedUsers:0,
     loading: false,
     error: null,
   },
@@ -62,13 +63,14 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        const { users, currentPage, totalPages, totalUsers } = action.payload;
+        const { users, currentPage, totalPages, totalUsers,blockedUsers } = action.payload;
 
         state.loading = false;
         state.users = users;
         state.currentPage = currentPage;
         state.totalPages = totalPages;
         state.totalUsers = totalUsers;
+        state.blockedUsers=blockedUsers;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;

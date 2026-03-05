@@ -33,6 +33,7 @@ import ErrorBoundary from "../components/common/ErrorBoundary";
 import Coupons from "../pages/user/Coupons";
 import AddAdressChockout from "../pages/user/AddAdressChockout";
 import NotFound from "../pages/notFound/NotFound";
+import RetryPayment from "../pages/user/RetryPayment";
 
 const UserRoutes = () => {
   return (
@@ -112,6 +113,14 @@ const UserRoutes = () => {
               element={
                 <ProtectedRoute>
                   <PaymentPage />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="retry-payment"
+              element={
+                <ProtectedRoute>
+                  <RetryPayment />
                 </ProtectedRoute>
               }
             />

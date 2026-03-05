@@ -13,7 +13,7 @@ import { useRef } from "react";
 const UserList = () => {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
-  const { users, loading, error, currentPage, totalPages } = useSelector(
+  const { users, loading, error, currentPage, totalPages,totalUsers,blockedUsers } = useSelector(
     (state) => state.users,
   );
   const [page, setPage] = useState(1);
@@ -31,8 +31,6 @@ const UserList = () => {
       dispatch(fetchUsers({ page, limit, search: searchTerm }))
         .unwrap()
         .then(() => {
-          console.log("hii");
-          console.log(inputRef);
           inputRef.current?.focus();
         });
     }, 500);
@@ -73,9 +71,6 @@ const UserList = () => {
       }
     });
   };
-
-  const totalUsers = users?.length || 0;
-  const blockedUsers = users?.filter((user) => user.isBlocked)?.length || 0;
 
   if (loading) return <p className="text-center py-4">Loading users...</p>;
   if (error) {

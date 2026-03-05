@@ -9,11 +9,13 @@ import {
 } from "../../features/orders/ordersSlice";
 import { Dialog } from "@headlessui/react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Order = ({ order, onCancelSuccess }) => {
   const {
     Items = [],
     DeliveryCharge,
+    UserID,
     DeliveryDate,
     OrderStatus,
     Order_Address,
@@ -22,6 +24,8 @@ const Order = ({ order, onCancelSuccess }) => {
     TotalAmount,
     orderId,
   } = order;
+
+  const navigate = useNavigate();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const dispatch = useDispatch();
@@ -270,8 +274,32 @@ const Order = ({ order, onCancelSuccess }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Quick Actions - Always visible */}
+
           <div onClick={(e) => e.stopPropagation()}>
+            {OrderStatus === "Failed" &&
+              (
+                <button
+                  onClick={() => {
+                    navigate("/retry-payment", {
+                      state: {
+                        orderId: orderId,
+                        address: Order_Address,
+                        cartItems: Items,
+                        totalPrice: TotalAmount,
+                        discount: 0,
+                        appliedCoupon: null,
+                        shippingCost: DeliveryCharge,
+                        userId: UserID,
+                        deliveryDate: DeliveryDate,
+                      }});
+
+                  }}
+                  className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-medium transition-colors border border-green-100 mr-2"
+                >
+                  Retry Payment
+                </button>
+              )}
+
             {OrderStatus !== "Cancelled" &&
               OrderStatus !== "Delivered" &&
               OrderStatus !== "Failed" && (
@@ -752,19 +780,19 @@ const Order = ({ order, onCancelSuccess }) => {
 
             {(returnReason === "Other reason" ||
               returnReason === "Item not as described") && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional details
-                </label>
-                <textarea
-                  rows="3"
-                  value={additionalDetails}
-                  onChange={(e) => setAdditionalDetails(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Please provide more information..."
-                />
-              </div>
-            )}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Additional details
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={additionalDetails}
+                    onChange={(e) => setAdditionalDetails(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Please provide more information..."
+                  />
+                </div>
+              )}
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
               <div className="flex">

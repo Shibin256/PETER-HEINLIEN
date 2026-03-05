@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import {createProduct, deleteProductById, getAllProducts, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, getTopRatedProduct, listProduct, unlistProduct, updateProduct } from "../controller/admin/productController.js";
+import {createProduct, deleteProductById, getAllProducts, getAllProductsAdmin, getBrandAndCategory, getBrandsAndCollection, getCollection, getProductById, getRelatedProducts, getTopRatedProduct, listProduct, unlistProduct, updateProduct } from "../controller/admin/productController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { authorizeRole } from "../middleware/authenticateAdmin.js";
 import { validateProduct } from "../validators/productValidator.js";
@@ -25,7 +25,8 @@ router.get('/products/top-rated', getTopRatedProduct);
 router.get('/products/top-rated/:userId', getTopRatedProduct);
 
 router.post('/products',authorizeRole(roles),upload.array("images",4),verifyAccessToken,validateProduct,validate,createProduct)
-router.get('/products',getAllProducts)
+router.get('/products',authorizeRole(roles),verifyAccessToken,getAllProductsAdmin)
+router.get('/products/user',verifyAccessToken,getAllProducts)
 router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
 
 router.post('/product/unlist/:id',authorizeRole(roles),verifyAccessToken,unlistProduct)

@@ -52,12 +52,6 @@ const Checkout = () => {
     dispatch(fetchCart(user._id));
   }, [dispatch, user._id]);
 
-  // let { cartItems = [] } = useSelector((state) => state.cart);
-  // const subtotal = cartItems.reduce(
-  //   (sum, item) => sum + item.price * item.quantity,
-  //   0,
-  // );
-
   let { cartItems = [] } = useSelector((state) => state.cart);
 
   if (from) {
@@ -70,9 +64,7 @@ const Checkout = () => {
   );
 
   const [total, setTotal] = useState(subtotal + shippingCost);
-  // if (from) {
-  //   cartItems = location.state?.cartItems || [];
-  // }
+
 
   useEffect(() => {
     if (from) {
@@ -115,23 +107,6 @@ const Checkout = () => {
     }
   }, [addresses]);
 
-  // const calculateDiscount = (coupon, amount) => {
-  //   if (!coupon) return 0;
-
-  //   let discountAmount = 0;
-  //   if (coupon.discountType === "percentage") {
-  //     discountAmount = (amount * coupon.discountValue) / 100;
-  //     // Apply max discount limit if exists
-  //     if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
-  //       discountAmount = coupon.maxDiscountAmount;
-  //     }
-  //   } else if (coupon.discountType === "fixed") {
-  //     discountAmount = coupon.discountValue;
-  //   }
-
-  //   // Ensure discount doesn't exceed total
-  //   return Math.min(discountAmount, amount);
-  // };
 
   const calculateDiscount = (coupon, amount) => {
     if (!coupon) return 0;

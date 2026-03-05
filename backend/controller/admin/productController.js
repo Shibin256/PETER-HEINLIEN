@@ -111,7 +111,7 @@ export const getCollection = async (req, res) => {
 
     // Only runs when no userId
     console.log(latestCollection)
-    return res.json(latestCollection );  // ← RETURN + EXIT
+    return res.json(latestCollection );  
 
   } catch (error) {
     console.error('Error fetching products:', error.message);
@@ -156,9 +156,49 @@ export const getTopRatedProduct = async (req, res) => {
 }
 
 
+export const getAllProducts = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    const categories = req.query.categories?.split(',') || [];
+    const brands = req.query.brands?.split(',') || [];
+    const sortField = req.query.sort || 'createdAt';
+    const sortOrder = req.query.order === 'asc' ? 1 : -1;
+
+    const filter = { isList: { $ne: true }};
+
+    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (categories.length) filter['category'] = { $in: categories };
+    if (brands.length) filter['brand'] = { $in: brands };
+
+    try {
+        const total = await Product.countDocuments(filter);
+
+        const products = await Product.find({...filter,})
+            .sort({ [sortField]: sortOrder })
+            .skip(skip)
+            .limit(limit)
+            .populate('brand')
+            .populate('category')
+            .select('-createdAt -updatedAt');
+
+        res.json({  
+            products,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+        });
+    } catch (error) {
+        console.error('Error fetching products:', error.message);
+        res.status(500).json({ message: 'Server error fetching products' });
+    }
+};
+
 
 //fetching all products 
-export const getAllProducts = async (req, res) => {
+export const getAllProductsAdmin = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;

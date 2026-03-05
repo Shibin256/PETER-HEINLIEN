@@ -28,23 +28,6 @@ export default function OrderFailed() {
         </div>
 
         <div className="space-y-4">
-          {/* <button
-            onClick={() =>
-              navigate("/checkout", {
-                state: {
-                  cartItems: cartItems,
-                  totalPrice: totalPrice,
-                  shippingCost: shippingCost,
-                  userId: userId,
-                  from:true
-                },
-              })
-            }
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl shadow-md transition-all duration-300 transform hover:-translate-y-1"
-          >
-            <CreditCardIcon className="w-5 h-5" />
-            <span>Try Checkout Again</span>
-          </button> */}
 
           <button
             onClick={() => navigate("/my-orders")}

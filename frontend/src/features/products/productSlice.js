@@ -100,6 +100,40 @@ export const fetchProducts = createAsyncThunk(
   },
 );
 
+export const fetchProductsAdmin = createAsyncThunk(
+  "products/fetchProductsAdmin",
+  async (
+    {
+      page = 1,
+      limit = 8,
+      search = "",
+      categories = [],
+      brands = [],
+      sort = "",
+      order = "",
+    },
+    thunkAPI,
+  ) => {
+    try {
+      // console.log(categories,brands,sort,'------------',order)
+      const params = new URLSearchParams({ page, limit });
+
+      if (search) params.append("search", search);
+      if (categories.length) params.append("categories", categories.join(","));
+      if (brands.length) params.append("brands", brands.join(","));
+      if (sort) params.append("sort", sort);
+      if (order) params.append("order", order);
+
+      const response = await productService.getProductsAdmin(params);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message,
+      );
+    }
+  },
+);
+
 //handle delete
 export const deleteProduct = createAsyncThunk(
   "product/delete",
@@ -283,6 +317,22 @@ const productSlice = createSlice({
         state.hasMore = page < totalPages;
         state.loading = false;
       })
+
+      //fetch adminPorduct
+      .addCase(fetchProductsAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(fetchProductsAdmin.fulfilled, (state, action) => {
+        const { products, page, totalPages } = action.payload;
+        state.products = products;
+        state.page = page;
+        state.totalPages = totalPages; // Add this line
+        state.hasMore = page < totalPages;
+        state.loading = false;
+      })
+
 
       // updateProduct
       .addCase(updateProduct.pending, (state) => {
