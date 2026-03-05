@@ -11,8 +11,6 @@ import {
   editBrand,
   editCategory,
   removeCategoryOffer,
-  //   addCategoryOffer,
-  //   removeCategoryOffer
 } from "../../features/admin/inventory/inventorySlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -210,7 +208,6 @@ const Inventory = () => {
         toast.warning("File size should be less than 2MB");
         return;
       }
-      console.log(file);
 
       setBrandLogo(file);
 
@@ -269,7 +266,6 @@ const Inventory = () => {
       formData.append("logo", brandLogo);
 
       const res = await dispatch(addBrand(formData));
-      console.log(res);
       if (res.type.endsWith("fulfilled")) {
         toast.success("Brand added successfully");
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
@@ -349,7 +345,6 @@ const Inventory = () => {
       const res = await dispatch(
         editBrand({ id: editingBrandId, data: formData }),
       );
-      console.log(res, "---");
 
       if (res.type.endsWith("fulfilled")) {
         toast.success("Brand updated successfully");

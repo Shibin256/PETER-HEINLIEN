@@ -8,7 +8,6 @@ export const addProduct = createAsyncThunk(
       const res = await productService.addProducts(formData);
       return res.data;
     } catch (error) {
-      console.log(error, "erroorrrr");
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   },
@@ -81,7 +80,6 @@ export const fetchProducts = createAsyncThunk(
     thunkAPI,
   ) => {
     try {
-      // console.log(categories,brands,sort,'------------',order)
       const params = new URLSearchParams({ page, limit });
 
       if (search) params.append("search", search);
@@ -115,7 +113,6 @@ export const fetchProductsAdmin = createAsyncThunk(
     thunkAPI,
   ) => {
     try {
-      // console.log(categories,brands,sort,'------------',order)
       const params = new URLSearchParams({ page, limit });
 
       if (search) params.append("search", search);
@@ -239,7 +236,6 @@ export const addProductOffer = createAsyncThunk(
   "product/addProductOffer",
   async ({ productId, percentage }, { rejectWithValue }) => {
     try {
-      console.log("Adding product offer:", { productId, percentage });
       const res = await productService.addProductOffer({
         productId,
         percentage,

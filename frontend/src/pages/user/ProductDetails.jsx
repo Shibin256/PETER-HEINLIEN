@@ -40,12 +40,10 @@ const ProductDetails = () => {
     (state) => state.products,
   );
 
-  console.log(singleProduct, "single pro");
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id)).then((res) => {
         if (res.type == "product/getProductById/rejected") {
-          console.log("hi");
           return navigate("NotFound");
         }
       });
@@ -174,9 +172,7 @@ const ProductDetails = () => {
       return;
     }
 
-    console.log(singleProduct);
     const forwardprice = singleProduct.offerPrice || singleProduct.price;
-    console.log(forwardprice);
 
     // Clear previous local cart and add current item
     const newCartItem = {

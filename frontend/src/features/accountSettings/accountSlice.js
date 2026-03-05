@@ -59,7 +59,6 @@ export const addAddress = createAsyncThunk(
   async ({ userId, data }, thunkAPI) => {
     try {
       const res = await accountService.addAddress(userId, data);
-      console.log(res, "------");
       return res;
     } catch (error) {
       console.error(error);
@@ -116,10 +115,8 @@ export const setDefault = createAsyncThunk(
 export const updateAddress = createAsyncThunk(
   "user/account/updateAdress",
   async ({ addressId, data }, thunkAPI) => {
-    console.log(addressId);
     try {
       const res = await accountService.updateAdress(addressId, data);
-      console.log(res, "sliceee");
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -186,7 +183,6 @@ const accountSlice = createSlice({
       .addCase(imageUpload.fulfilled, (state, action) => {
         state.loading = false;
         state.user.push(action.payload);
-        // console.log(action.payload,'aciton paylosd----------------')
       })
       .addCase(imageUpload.rejected, (state, action) => {
         state.loading = false;
@@ -198,8 +194,6 @@ const accountSlice = createSlice({
       .addCase(addAddress.fulfilled, (state, action) => {
         state.loading = false;
         state.addresses.push(action.payload);
-        // state.user.push(action.payload)
-        // console.log(action.payload,'aciton paylosd----------------')
       })
       .addCase(addAddress.rejected, (state, action) => {
         state.loading = false;
@@ -226,7 +220,6 @@ const accountSlice = createSlice({
         state.loading = false;
         state.user.push(action.payload);
         state.addresses = action.payload.user.addresses;
-        console.log(state.addresses, "adresss");
       })
       .addCase(removeAddress.rejected, (state, action) => {
         state.loading = false;

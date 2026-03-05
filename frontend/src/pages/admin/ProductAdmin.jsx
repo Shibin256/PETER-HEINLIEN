@@ -57,8 +57,6 @@ const ProductAdmin = () => {
     totalProducts,
   } = useSelector((state) => state.products);
 
-  console.log(products, "products,=====");
-
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -144,7 +142,6 @@ const ProductAdmin = () => {
           percentage: offerPercentage,
         }),
       );
-      console.log(res, "-----");
       if (res.type.endsWith("fulfilled")) {
         toast.success(
           `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
@@ -168,7 +165,6 @@ const ProductAdmin = () => {
   const confirmRemoveOffer = async () => {
     try {
       const res = await dispatch(removeProductOffer(productToRemoveOffer));
-      console.log("Offer removed:", res);
       if (res.type.endsWith("/rejected")) {
         toast.error(res.payload?.message || "Failed to remove offer.");
         return;
@@ -183,7 +179,6 @@ const ProductAdmin = () => {
   };
 
   const handleEdit = (product) => {
-    console.log(product.category._id, "handle edit");
     setSelectedProduct(product);
     setEditForm({
       name: product.name || "",
@@ -703,7 +698,6 @@ const ProductAdmin = () => {
                   options={categoryOptions}
                   name="category"
                 />
-                {console.log(categoryOptions, "-----")}
                 <SelectInput
                   label="Brand"
                   value={editForm.brand}

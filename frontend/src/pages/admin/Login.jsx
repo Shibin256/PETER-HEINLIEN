@@ -27,7 +27,6 @@ const AdminLogin = () => {
         `${baseUrl}/api/auth/admin-login`,
         { email, password },
       );
-      console.log(response.data, "admin login res");
 
       // settong access token to the local storage
       const token = response.data.accessToken;

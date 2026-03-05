@@ -11,7 +11,6 @@ const changeName = async (userId, data) => {
       withCredentials: true,
     },
   );
-  // console.log(res.data)
   return res.data;
 };
 
@@ -26,7 +25,6 @@ const changeMobile = async (userId, data) => {
       withCredentials: true,
     },
   );
-  console.log(res, "eresss---");
   return res.data;
 };
 
@@ -57,7 +55,6 @@ const addAddress = async (userId, data) => {
     `/api/v1/users/account/${userId}/address`,
     data,
   );
-  console.log(res, "-----000");
   return res.data;
 };
 
@@ -87,7 +84,6 @@ const updateAdress = async (addresId, data) => {
     `/api/v1/users/account/${addresId}`,
     data,
   );
-  console.log(res.data, "service");
   return res.data;
 };
 

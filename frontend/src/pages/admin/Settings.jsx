@@ -14,17 +14,6 @@ const Settings = () => {
 
   const handleSaveChanges = () => {
     setIsSaving(true);
-    console.log({
-      storeName,
-      password,
-      storeEmail,
-      storeMobile,
-      currency,
-      language,
-      paymentMethod,
-      maintenanceMode,
-    });
-
     // Simulate API call
     setTimeout(() => {
       setIsSaving(false);

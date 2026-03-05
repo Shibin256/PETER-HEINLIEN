@@ -27,7 +27,6 @@ const deleteBanner = async ({ bannerId }) => {
 };
 
 const setActiveBanner = async ({ bannerId }) => {
-  console.log(bannerId, "in ser");
   const response = await adminAxiosInstance.put(
     `/api/v1/admin/banner/${bannerId}`,
   );

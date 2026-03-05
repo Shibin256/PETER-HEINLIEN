@@ -231,7 +231,6 @@ export const removeCategoryOffer = async (req, res) => {
                 product.offerPrice = 0;
             }
             await product.save();
-            console.log(product, '=====');
         }
 
 

@@ -76,7 +76,6 @@ const PaymentPage = () => {
   const handlePayment = async ({ totalPrice, orderId }) => {
     try {
       const amount = totalPrice;
-      console.log(amount, "amount in handle pay");
       const result = await dispatch(createPaymentOrder(amount)).unwrap();
       const { order } = result;
 
@@ -155,7 +154,6 @@ const PaymentPage = () => {
           }),
         ).unwrap();
         setOrderId(res.order.orderId);
-        console.log(res, "order placed successfully");
 
         navigate("/", { replace: true });
 
@@ -187,7 +185,6 @@ const PaymentPage = () => {
         ).unwrap();
 
         setOrderId(pendingOrder.order.orderId);
-        console.log(pendingOrder, "in thepending");
 
         let totalAmount = totalPrice + (shippingCost || 0);
 
@@ -195,7 +192,6 @@ const PaymentPage = () => {
           totalPrice: totalAmount,
           orderId: pendingOrder.order.orderId,
         });
-        console.log(paymentSuccess, "--payment success");
 
         if (paymentSuccess) {
           dispatch(resetCart());
@@ -228,7 +224,6 @@ const PaymentPage = () => {
             }),
           ).unwrap();
           setOrderId(res.order.orderId);
-          console.log(res, "order placed successfully");
           const date = new Date(res.order.DeliveryDate);
           date.toLocaleDateString("en-GB", {
             day: "2-digit",

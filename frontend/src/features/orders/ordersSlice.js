@@ -5,7 +5,6 @@ export const placeOrder = createAsyncThunk(
   "user/placeOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      console.log(orderData, "order data in slice");
       const res = await orderService.placeOrder(orderData);
       return res;
     } catch (error) {
@@ -155,7 +154,6 @@ export const createPaymentOrder = createAsyncThunk(
   "order/createPaymentOrder",
   async (totalPrice, thunkAPI) => {
     try {
-      console.log(totalPrice);
       return await orderService.createRazorpayOrder(totalPrice);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
@@ -166,7 +164,6 @@ export const createPaymentOrder = createAsyncThunk(
 export const verifyPayment = createAsyncThunk(
   "order/verifyPayment",
   async (paymentDetails, thunkAPI) => {
-    console.log(paymentDetails, "-------");
     try {
       return await orderService.verifyRazorpayPayment(paymentDetails);
     } catch (err) {
@@ -178,7 +175,6 @@ export const verifyPayment = createAsyncThunk(
 export const verifyPaymentForWallet = createAsyncThunk(
   "order/verifyPayment",
   async (paymentDetails, thunkAPI) => {
-    console.log(paymentDetails, "-------");
     try {
       return await orderService.verifyPaymentForWallet(paymentDetails);
     } catch (err) {
@@ -206,7 +202,6 @@ export const addReview = createAsyncThunk(
 export const updateOrderStatus = createAsyncThunk(
   "user/updateOrderStatus",
   async (orderId, { rejectWithValue }) => {
-    console.log(orderId, "in slicee");
     try {
       const res = await orderService.updateOrderStatus(orderId);
       return res;
@@ -299,7 +294,6 @@ const orderSlice = createSlice({
         state.loading = true;
       })
       .addCase(returnOrderItem.fulfilled, (state, action) => {
-        console.log(action.payload.order, "in slice");
         state.loading = false;
         state.success = true;
         state.orders = action.payload.order;

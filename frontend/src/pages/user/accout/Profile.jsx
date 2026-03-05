@@ -11,7 +11,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  console.log(user, "user---");
   const [showModal, setShowModal] = useState(false);
   const [nameImg, setNameImg] = useState([]);
   const [profileData, setProfileData] = useState({
@@ -32,21 +31,9 @@ const Profile = () => {
     });
     const splitName = user.username.split(" ");
     setNameImg(splitName);
-    // setProfilePic(user.profileImage)
   }, []);
 
   const [profilePic, setProfilePic] = useState(null);
-
-  // const handleImageUpload = (event) => {
-  //     const file = event.target.files[0];
-  //     if (file) {
-  //         const reader = new FileReader();
-  //         reader.onloadend = () => {
-  //             setProfilePic(reader.result);
-  //         };
-  //         reader.readAsDataURL(file);
-  //     }
-  // };
 
   const handleImageSave = (imageData) => {
     setProfilePic(imageData);

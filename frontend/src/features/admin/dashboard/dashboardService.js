@@ -6,7 +6,6 @@ const getStats = async () => {
 };
 
 const getSalesReport = async ({ type, startDate, endDate }) => {
-  console.log(type, startDate);
   const res = await adminAxiosInstance.get("/api/v1/admin/sales/report", {
     params: { type, startDate, endDate },
   });
@@ -14,7 +13,6 @@ const getSalesReport = async ({ type, startDate, endDate }) => {
 };
 
 const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
-  console.log(type, startDate);
   const res = await adminAxiosInstance.get("/api/v1/admin/sales/report/pdf", {
     params: { type, startDate, endDate },
     responseType: "blob",

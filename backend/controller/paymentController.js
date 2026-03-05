@@ -12,7 +12,6 @@ const razorpay = new Razorpay({
 export const createRazorpayOrder = async (req, res) => {
     try {
         const { amount } = req.body
-        console.log(amount,'--')
         const options = {
             amount: amount * 100,
             currency: 'INR',
@@ -30,17 +29,13 @@ export const createRazorpayOrder = async (req, res) => {
 }
 
 export const verifyRazorpayPayment = async (req, res) => {
-    // console.log(req.body, '=------=====')
-    console.log('verify')
     const {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
     } = req.body.paymentDetails;
-    console.log(req.body.paymentDetails, 'payment deatialsss')
     const orderId = req.body.orderId
 
-    console.log(razorpay_payment_id, '--------', orderId)
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -93,7 +88,6 @@ export const verifyRazorpayPaymentForWallet = async (req, res) => {
         razorpay_signature,
     } = req.body;
 
-    console.log(razorpay_payment_id,'--------')
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 

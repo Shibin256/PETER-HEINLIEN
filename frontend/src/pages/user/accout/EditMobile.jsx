@@ -14,7 +14,6 @@ const EditMobile = () => {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.auth);
-  console.log(user);
   const handleBack = () => {
     navigate(-1);
   };

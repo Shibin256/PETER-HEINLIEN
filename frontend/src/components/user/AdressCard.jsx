@@ -32,7 +32,6 @@ const AddressCard = ({
         <p>India</p>
         <p>Phone number: {phone}</p>
         <p>alternativePhone:{altPhone}</p>
-        {/* <p className="text-gray-500">Add delivery instructions</p> */}
       </div>
       <div className="mt-4 flex space-x-2">
         <button onClick={onEdit} className="text-blue-600 hover:underline px-2">

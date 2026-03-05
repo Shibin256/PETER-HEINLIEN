@@ -110,17 +110,14 @@ const downloadInvoice = async (itemOrderId) => {
 };
 
 const createRazorpayOrder = async (amount) => {
-  console.log(amount);
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/order",
     { amount: amount },
   );
-  console.log(res.data);
   return res.data;
 };
 
 const verifyRazorpayPayment = async (paymentDetails) => {
-  console.log(paymentDetails, "in the ordrerserviece");
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/verify",
     paymentDetails,
@@ -141,7 +138,6 @@ const submitReview = async ({ itemId, rating, review }) => {
     rating: rating,
     review: review,
   };
-  console.log(data, itemId, "-----");
   const response = await axiosInstance.post(
     `/api/v1/users/orders/${itemId}/review`,
     data,
@@ -150,7 +146,6 @@ const submitReview = async ({ itemId, rating, review }) => {
 };
 
 const updateOrderStatus = async (orderID) => {
-  console.log(orderID, "in serviece");
   const response = await adminAxiosInstance.delete(
     `/api/v1/admin/orders/${itemOrderId}`,
     data,

@@ -40,7 +40,6 @@ export const fetchSalesReport = createAsyncThunk(
         startDate,
         endDate,
       });
-      // console.log(res);
       return res; // Should return detailed sales data
     } catch (error) {
       return rejectWithValue(
@@ -59,7 +58,6 @@ export const downloadSalesReportExcel = createAsyncThunk(
         startDate,
         endDate,
       });
-      // console.log(res);
       return res;
     } catch (error) {
       return rejectWithValue(
@@ -78,7 +76,6 @@ export const downloadSalesReportPdf = createAsyncThunk(
         startDate,
         endDate,
       });
-      // console.log(res);
       return res;
     } catch (error) {
       return rejectWithValue(

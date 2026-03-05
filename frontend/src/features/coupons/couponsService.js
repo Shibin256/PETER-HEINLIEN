@@ -37,7 +37,6 @@ const deleteCoupon = async (couponId) => {
 };
 
 const updateCoupon = async (data) => {
-  console.log(data);
   const response = await adminAxiosInstance.put(
     `/api/v1/admin/coupons/${data.couponId}`,
     {
@@ -58,12 +57,10 @@ const applyCoupon = async ({ userId, couponCode }) => {
     userId,
     couponCode,
   });
-  console.log(response.data, "in service apply coupon");
   return response.data;
 };
 
 const removeCoupon = async (userId, couponId) => {
-  console.log(couponId, userId, "in service");
   const response = await axiosInstance.delete(
     `/api/v1/users/coupons/${couponId}`,
     {

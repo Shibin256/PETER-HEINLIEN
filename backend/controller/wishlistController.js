@@ -45,7 +45,6 @@ export const getUserWishlist = async (req, res) => {
     const { userId } = req.params;
 
     const wishlist = await Wishlist.findOne({ userId }).populate('productIds');
-    console.log(wishlist.productIds)
 
     res.status(200).json(wishlist?.productIds || []);
   } catch (err) {

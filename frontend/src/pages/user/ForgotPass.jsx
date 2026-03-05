@@ -27,7 +27,6 @@ const ForgotPass = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log("the response goint to send");
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/forgotpass`,
         { email: formData.email },

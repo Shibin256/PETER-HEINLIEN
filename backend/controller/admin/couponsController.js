@@ -99,7 +99,6 @@ export const updateCoupon = async (req, res) => {
         expirationDate
     } = req.body;
 
-    console.log(req.body)
     try {
         const updatedCoupon = await Coupons.findByIdAndUpdate(couponId, {
             code,
@@ -126,7 +125,6 @@ export const applyCoupon = async (req, res) => {
     try {
         const coupon = await Coupons.findOne({ code: couponCode }).select('-createdAt -updatedAt');
 
-        console.log(coupon, 'coupon');
         if (!coupon) {
             return res.status(404).json({ message: 'Coupon not found' });
         }
@@ -139,7 +137,6 @@ export const applyCoupon = async (req, res) => {
         if ((coupon.usersUsed || []).some(user => user.toString() === userId)) {
             return res.status(400).json({ message: 'You have already used this coupon' });
         }
-        console.log('Coupon is valid, applying discount');
 
         coupon.usageLimit -= 1;
         coupon.usersUsed.push(userId);

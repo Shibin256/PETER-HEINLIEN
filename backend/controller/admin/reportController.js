@@ -19,7 +19,6 @@ export const getSalesReport = async (req, res) => {
             };
         } else {
             const baseDate = startDate ? new Date(startDate) : now;
-            console.log(type, "hii")
             if (type === "Daily") {
                 const start = new Date(baseDate);
                 start.setHours(0, 0, 0, 0);
@@ -86,7 +85,6 @@ const getSalesReportCall = async (type, startDate, endDate) => {
             };
         } else {
             const baseDate = startDate ? new Date(startDate) : now;
-            console.log(type, "hii")
             if (type === "Daily") {
                 const start = new Date(baseDate);
                 start.setHours(0, 0, 0, 0);
@@ -123,9 +121,7 @@ const getSalesReportCall = async (type, startDate, endDate) => {
 export const exelReport = async (req, res) => {
     try {
         const { type, startDate, endDate } = req.query;
-        console.log(type)
         const orders = await getSalesReportCall(type, startDate, endDate);
-        console.log(orders,'--------')
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet("Sales Report");
 
@@ -163,9 +159,7 @@ export const exelReport = async (req, res) => {
 export const downloadSalesReportPDF = async (req, res) => {
     try {
         const { type, startDate, endDate } = req.query;
-        console.log(type)
         const orders = await getSalesReportCall(type, startDate, endDate);
-        console.log(orders, '------')
         const doc = new PDFDocument({ margin: 50 });
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"');
@@ -210,83 +204,6 @@ export const downloadSalesReportPDF = async (req, res) => {
         res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Error generating PDF report" });
     }
 };
-
-
-
-// export const getBestSellers = async (req, res) => {
-//     const orders = await Order.find()
-//     const productMap = {}
-//     const categoryMap = {};
-//     const brandMap = {};
-//     const limit=10;
-//     console.log(orders, '---best sellers')
-
-//     orders.forEach(order => {
-//         order.Items.forEach(item => {
-//             const key = item.productId;
-//             if (!productMap[key]) {
-//                 productMap[key] = {
-//                     name: item.productName,
-//                     quantity: 0,
-//                     revenue: 0
-//                 };
-//             }
-
-//             productMap[key].quantity += item.quantity;
-//             productMap[key].revenue += item.subTotal;
-
-
-//             // --- Categories ---
-//             if (item.categoryName) {  // Ensure category is present
-//                 if (!categoryMap[item.categoryId]) {
-//                     categoryMap[item.categoryId] = {
-//                         name: item.categoryName,
-//                         quantity: 0,
-//                         revenue: 0
-//                     };
-//                 }
-//                 categoryMap[item.categoryId].quantity += item.quantity;
-//                 categoryMap[item.categoryId].revenue += item.subTotal;
-//             }
-
-//             // --- Brands ---
-//             if (item.brandName) {  // Ensure brand is present
-//                 if (!brandMap[item.brandId]) {
-//                     brandMap[item.brandId] = {
-//                         name: item.brandName,
-//                         quantity: 0,
-//                         revenue: 0
-//                     };
-//                 }
-//                 brandMap[item.brandId].quantity += item.quantity;
-//                 brandMap[item.brandId].revenue += item.subTotal;
-//             }
-
-//         });
-
-
-//     });
-
-//     const topProducts = Object.values(productMap)
-//         .sort((a, b) => b.quantity - a.quantity)
-//         .slice(0, limit);
-
-//     const topCategories = Object.values(categoryMap)
-//         .sort((a, b) => b.quantity - a.quantity)
-//         .slice(0, limit);
-
-//     const topBrands = Object.values(brandMap)
-//         .sort((a, b) => b.quantity - a.quantity)
-//         .slice(0, limit);
-
-
-
-//     console.log(topProducts, '-------')
-//     console.log(topCategories, 'branddsss-------')
-//     console.log(topBrands, 'categoriii-------')
-
-// }
-
 
 
 export const getBestSellers = async (req, res) => {

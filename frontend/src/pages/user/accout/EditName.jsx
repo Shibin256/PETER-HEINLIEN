@@ -25,7 +25,6 @@ const EditName = () => {
       dispatch(changeName({ userId: profileData.id, data: formData }))
         .then((res) => {
           const updatedUser = res.payload?.data;
-          console.log(res);
           if (updatedUser) {
             dispatch(setUser({ user: updatedUser }));
             localStorage.setItem("user", JSON.stringify(updatedUser));

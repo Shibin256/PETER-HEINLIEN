@@ -30,17 +30,12 @@ router.get('/products/user',verifyAccessToken,getAllProducts)
 router.delete('/product/:id',authorizeRole(roles),verifyAccessToken,deleteProductById)
 
 router.post('/product/unlist/:id',authorizeRole(roles),verifyAccessToken,unlistProduct)
-
 router.post('/product/:id',authorizeRole(roles),verifyAccessToken,listProduct)
-
 router.put('/product/:id',authorizeRole(roles), upload.array("newImages",4),verifyAccessToken,validateProduct,validate, updateProduct)
-
 router.get('/products/getBrandsAndCollection',getBrandsAndCollection)
 router.get('/brand/category',getBrandAndCategory)
 
 router.get('/product/:id',getProductById)
 router.get('/products/:productId/related', getRelatedProducts)
 router.get('/products/:productId/:userId/related',getRelatedProducts)
-// router.post('/offers',authorizeRole(roles),verifyAccessToken,addProductOffer);
-// router.delete('/offers/:productId', authorizeRole(roles), verifyAccessToken,removeProductOffer);
 export default router

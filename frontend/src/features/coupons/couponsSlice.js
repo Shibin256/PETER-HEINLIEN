@@ -8,7 +8,6 @@ export const createCoupons = createAsyncThunk(
       const res = await couponsService.createCoupons(data);
       return res;
     } catch (error) {
-      console.log(error, "-----");
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   },
@@ -78,10 +77,8 @@ export const applyCoupon = createAsyncThunk(
   "user/cart/applyCoupon",
   async ({ userId, couponCode }, thunkAPI) => {
     try {
-      console.log(userId, couponCode, "in coupons slice");
       return await couponsService.applyCoupon({ userId, couponCode });
     } catch (error) {
-      console.log(error, "--------");
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || error.message,
       );
@@ -93,8 +90,6 @@ export const removeCoupon = createAsyncThunk(
   "user/cart/removeCoupon",
   async ({ userId, couponCode }, thunkAPI) => {
     try {
-      console.log(userId, couponCode, "in coupons slice");
-      // Assuming there's a service method to remove the coupon
       return await couponsService.removeCoupon(userId, couponCode);
     } catch (error) {
       return thunkAPI.rejectWithValue(

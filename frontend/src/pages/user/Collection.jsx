@@ -51,32 +51,7 @@ const Collection = () => {
 
     setSearchParams(params);
   }, [category, brand, sortType, alphabeticOrder, searchTerm, currentPage]);
-
-  // Fetch filtered products
-  // const fetchFilteredProducts = (pageNumber = 1) => {
-  //   setCurrentPage(pageNumber);
-  //   dispatch(
-  //     fetchProducts({
-  //       page: pageNumber,
-  //       limit: 4,
-  //       search: searchTerm,
-  //       categories: category,
-  //       brands: brand,
-  //       sort: sortType === "low-high" || sortType === "high-low" ? "price" : "",
-  //       order:
-  //         sortType === "low-high"
-  //           ? "asc"
-  //           : sortType === "high-low"
-  //             ? "desc"
-  //             : alphabeticOrder === "a-z"
-  //               ? "asc"
-  //               : alphabeticOrder === "z-a"
-  //                 ? "desc"
-  //                 : "",
-  //     }),
-  //   );
-  // };
-
+  
   const fetchFilteredProducts = (pageNumber = 1) => {
     setCurrentPage(pageNumber);
 

@@ -37,7 +37,6 @@ const Wallet = () => {
     (state) => state.wallet,
   );
 
-  console.log(transactions);
 
   const handlePayments = async (amount) => {
     try {

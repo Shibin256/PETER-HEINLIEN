@@ -7,7 +7,6 @@ import { validateAddress } from "./AddressValidation";
 const EditAddressModal = ({ address, onClose, onSuccess }) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState({ ...address });
-  console.log(form, "form");
 
   const indianStates = [
     "Andhra Pradesh",
@@ -65,7 +64,6 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
     }
 
     try {
-      console.log(form);
       await dispatch(
         updateAddress({ addressId: address._id, data: form }),
       ).unwrap();
@@ -134,15 +132,6 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
               ))}
             </select>
           </div>
-          {/* 
-          <input
-            name="state"
-            required={true}
-            value={form.state}
-            onChange={handleChange}
-            placeholder="State"
-            className="w-full border p-2 rounded"
-          /> */}
           <input
             name="pincode"
             required={true}

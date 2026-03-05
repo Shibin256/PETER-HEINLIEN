@@ -16,7 +16,6 @@ const Address = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { addresses } = useSelector((state) => state.account);
-  console.log(addresses);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);

@@ -59,17 +59,14 @@ const Dashboard = () => {
   useEffect(() => {
     setLoadingBestSellers(true);
     dispatch(getBestSellers()).then((res) => {
-      console.log(res, "res of dispatch");
       setLoadingBestSellers(false);
     });
-    console.log("did itt");
   }, [dispatch]);
 
   const { topProducts, topCategories, topBrands } = useSelector(
     (state) => state.dashboard,
   );
 
-  console.log(topProducts, "-------");
 
   const applyFilters = async () => {
     const today = new Date().toISOString().split("T")[0];

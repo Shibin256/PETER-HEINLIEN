@@ -255,9 +255,9 @@ export const googleAuth = async (req, res) => {
 
     //generatind access and refresh token
     const accessToken = generateAccessToken(user)
-    console.log(accessToken)
+    // console.log(accessToken)
     const refreshToken = generateRefreshToken(user)
-    console.log(refreshToken)
+    // console.log(refreshToken)
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: process.env.COOKIE_HTTP_ONLY,
@@ -308,9 +308,9 @@ export const login = async (req, res) => {
 
     //creation of access and refresh Token when user log in
     const accessToken = generateAccessToken(user)
-    console.log(accessToken, ':accesssToken')
+    // console.log(accessToken, ':accesssToken')
     const refreshToken = generateRefreshToken(user)
-    console.log(refreshToken, ':reresh token')
+    // console.log(refreshToken, ':reresh token')
 
 
     //storing refreshToken into cookies
@@ -346,7 +346,6 @@ export const login = async (req, res) => {
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body
-    console.log("Admin login attempt for email:", email);
 
     const user = await User.findOne({ email }).select('-createdAt -updatedAt')
 
@@ -373,11 +372,10 @@ export const adminLogin = async (req, res) => {
     await user.save();
 
     //creation of access and refresh Token when user log in
-    console.log(user, 'user in access')
     const accessToken = generateAccessToken(user)
-    console.log(accessToken)
+    // console.log(accessToken)
     const refreshToken = generateRefreshToken(user)
-    console.log(refreshToken)
+    // console.log(refreshToken)
 
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {

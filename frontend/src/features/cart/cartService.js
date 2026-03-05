@@ -33,7 +33,6 @@ const toggleIsLocked = async ({ userID, lock }) => {
 };
 
 const wishlistToCart = async (data) => {
-  console.log(data, "in slice");
   const response = await axiosInstance.post(
     "/api/v1/users/cart/from-wishlist",
     data,

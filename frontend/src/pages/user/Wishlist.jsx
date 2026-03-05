@@ -51,7 +51,6 @@ const Wishlist = () => {
       const res = await dispatch(
         wishlistToCart({ userId: user._id, productIds: productIds }),
       );
-      console.log(res);
       if (res.type == "user/cart/wishlistToCart/fulfilled") {
         dispatch(getWishlist(user._id));
         toast.success("All products are added to cart");
@@ -227,29 +226,6 @@ const Wishlist = () => {
 
         {wishlist?.length > 0 && (
           <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            {/* <div className="flex items-center space-x-4 w-full sm:w-auto">
-              <select
-                value={selectedAction}
-                onChange={handleActionChange}
-                className="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
-              >
-                <option value="">Choose action</option>
-                <option value="addToCart">Add to cart</option>
-                <option value="removeFromWishlist">Remove selected</option>
-              </select>
-              <button
-                onClick={handleApplyAction}
-                disabled={!selectedAction || isProcessing}
-                className={`px-4 py-2 rounded-md text-sm font-medium text-white ${
-                  !selectedAction || isProcessing
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                } transition-colors duration-200`}
-              >
-                {isProcessing ? "Processing..." : "Apply Action"}
-              </button>
-            </div> */}
-
             <button
               onClick={handleAddAllToCart}
               disabled={wishlist?.length === 0 || isProcessing}

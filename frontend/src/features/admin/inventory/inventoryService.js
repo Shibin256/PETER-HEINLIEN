@@ -39,7 +39,6 @@ const editBrand = async (id, data) => {
 };
 
 const addCategoryOffer = async ({ categoryId, percentage }) => {
-  console.log(categoryId, percentage);
   const res = await adminAxiosInstance.post("/api/v1/admin/offer", {
     categoryId,
     percentage,

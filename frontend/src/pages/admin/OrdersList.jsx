@@ -86,9 +86,7 @@ const OrdersList = () => {
   const handleVerifyCancel = async (itemOrderId) => {
     try {
       await dispatch(verifyCancel(itemOrderId)).then((res) => {
-        console.log(res, "resssss");
         if (res.type === "user/verifyCancel/fulfilled") {
-          console.log("orders");
           dispatch(fetchAllOrders({ page: 1, limit: 10 }));
         }
       });

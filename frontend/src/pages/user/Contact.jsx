@@ -38,7 +38,6 @@ const Contact = () => {
         body: formData,
       });
 
-      console.log(response);
       setLoading(false);
       if (response.ok) {
         setStatus({ success: true, message: "✅ Message sent successfully!" });

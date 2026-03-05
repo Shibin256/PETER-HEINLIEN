@@ -27,7 +27,6 @@ export const addItemToCart = async (req, res) => {
 
     if (existingItem) {
       if (existingItem.quantity >= 4) return res.status(400).json({ message: 'max quantity added' });
-      console.log(quantity)
       if (existingItem.quantity >= product.totalQuantity) {
         return res.status(400).json({ message: `Product is out of stock` });
       }
@@ -51,7 +50,6 @@ export const addItemToCart = async (req, res) => {
     if (wishlist) {
       wishlist.productIds = wishlist.productIds.filter(id => id.toString() !== productId);
       await wishlist.save();
-      console.log('Product removed from wishlist')
     }
 
 
@@ -68,32 +66,7 @@ export const addItemToCart = async (req, res) => {
   }
 };
 
-// Get cart
-// export const getCart = async (req, res) => {
-//   try {
-//     const { userId } = req.params;
-//     const cart = await Cart.findOne({ userId }).populate('products.productId').select('-createdAt -updatedAt');
-//     console.log(cart, '---------')
-//     if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
-
-//     // let newSubTotal = 0;
-
-//     // cart.products = cart.products.map((item) => {
-//     //   const product = item.productId
-//     //   if (!product) return item
-
-//     //   const finalPrice = product.offerPrice ?? product.price;
-
-
-//     // })
-
-//     // const product = await Product.findOne({ _id: cart.products.productId })
-//     res.status(200).json(cart);
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// };
 export const getCart = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -134,11 +107,9 @@ export const getCart = async (req, res) => {
 
 export const toggleIsLocked = async (req, res) => {
   try {
-    // console.log('hiiiii')
     const { userId, lock } = req.params;
 
     const cart = await Cart.findOne({ userId: userId }).select('-createdAt -updatedAt');
-    // console.log(cart)
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
@@ -149,7 +120,6 @@ export const toggleIsLocked = async (req, res) => {
       cart.isLocked = false;
     }
 
-    console.log(cart,'=====+++++')
     await cart.save();
     res.status(200).json({
       message: lock ? "Cart locked for payment" : "Cart unlocked",
@@ -172,7 +142,6 @@ export const updateCartItem = async (req, res) => {
 
     const product = await Product.findById(productId).select('-createdAt -updatedAt');
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    console.log('product0==', product)
     if (quantity > product.totalQuantity) {
       return res.status(400).json({ message: `Cannot add more. Only ${product.totalQuantity} item(s) in stock.` });
     }
@@ -264,7 +233,6 @@ export const addFromWishlistToCart = async (req, res) => {
 
 
     for (const product of products) {
-      console.log(product)
       if (product.totalQuantity <= 0) {
         return res.status(400).json({ message: `${product.name} is out of stock` });
       }

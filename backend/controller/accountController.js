@@ -53,7 +53,6 @@ export const changeOrAddMobile = async (req, res) => {
     try {
         const { id } = req.params;
         const newNumber = req.body.phone;
-        console.log(newNumber,'new number')
 
         if (!newNumber) {
             return res.status(400).json({ message: 'Mobile number is required' });
@@ -67,7 +66,6 @@ export const changeOrAddMobile = async (req, res) => {
 
         const phoneExist = await User.findOne({ phone: newNumber }).select('-password -createdAt -updatedAt -googleId');
         if (phoneExist && phoneExist.phone != null) {
-            // console.log('existss')
             return res.status(400).json({ data:user,message: "The mobile number is already exists" });
         }
 
@@ -136,7 +134,6 @@ export const editImage = async (req, res) => {
     try {
         const { id } = req.params
         const img = req.file
-        console.log(req.file)
         const user = await User.findById(id).select('-password -createdAt -updatedAt -googleId')
 
         const result = await cloudinary.uploader.upload(img.path)
@@ -153,12 +150,9 @@ export const editImage = async (req, res) => {
 export const addAddress = async (req, res) => {
     try {
         const { id } = req.params
-        console.log(id)
 
         const { name, house, locality, city, state, pin, phone, altPhone, addressType, defaultAddress } = req.body
 
-        console.log(addressType)
-        // console.log(name,'---',locality,phone,city,state,pin)
         const newAddress = new Address({
             _id: new mongoose.Types.ObjectId(),
             name,
@@ -182,7 +176,6 @@ export const addAddress = async (req, res) => {
 
         user.addresses.push(newAddress._id);
         await user.save();
-        console.log(user, '-----')
         res.status(201).json({ message: "address created", user: user, address: newAddress })
     } catch (error) {
         console.error('Error updating address:', error.message);
@@ -210,7 +203,6 @@ export const removeAddress = async (req, res) => {
     try {
         const { userId, addressId } = req.params
         const user = await User.findById(userId).select('-password -createdAt -updatedAt -googleId')
-        console.log(user, 'user----')
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -264,7 +256,6 @@ export const SetDefaultAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
     const { addressId } = req.params
-    console.log(addressId)
     const { name, house, locality, city, state, pincode, phone, alternativePhone, addressType, defaultAddress } = req.body
     const updatedData = {
         name,

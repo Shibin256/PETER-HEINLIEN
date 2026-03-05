@@ -18,13 +18,8 @@ const ProfileImageModal = ({ isOpen, onClose, initialImage, user }) => {
   };
 
   const handleSave = async () => {
-    // if (selectedImage) {
-    //     onSave(selectedImage);
-    // }
-    // onClose();
 
     const formData = new FormData();
-    // console.log('selected img',selectedImage)
     formData.append("file", selectedFile);
     try {
       const res = await dispatch(

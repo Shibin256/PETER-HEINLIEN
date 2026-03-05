@@ -36,7 +36,6 @@ export const createBanner = async (req, res) => {
         delete bannerResponse.createdAt;
         delete bannerResponse.updatedAt;
 
-        console.log(bannerResponse, '----')
         res.status(201).json({ message: "Banner created", banner: bannerResponse })
 
     } catch (error) {
@@ -51,7 +50,6 @@ export const createBanner = async (req, res) => {
 export const fetchBanners = async (req, res) => {
     try {
         const banners = await Banners.find().sort({ createdAt: -1 });
-        console.log(banners, '====')
         res.status(201).json({ message: 'banner fetched', banners });
     } catch (error) {
         console.error('Error fetch banners:', error.message);
@@ -64,7 +62,6 @@ export const fetchBanners = async (req, res) => {
 export const deleteBanner = async (req, res) => {
     try {
         const bannerId = req.params.bannerId
-        console.log(req.params.bannerId)
         await Banners.findByIdAndDelete({ _id: bannerId })
         const banners = await Banners.find().sort({ createdAt: -1 })
 
@@ -78,7 +75,6 @@ export const deleteBanner = async (req, res) => {
 export const setActiveBanner = async (req, res) => {
     try {
         const bannerId = req.params.bannerId
-        console.log(bannerId)
         await Banners.updateMany({}, { $set: { isActive: false } });
 
         await Banners.findByIdAndUpdate({ _id: bannerId }, { isActive: true })

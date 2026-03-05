@@ -60,7 +60,6 @@ const OTPFormFrogotpass = () => {
   const handleResend = async () => {
     setLoading(true);
     try {
-      console.log();
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/forgotpass`,
         formData,
@@ -120,7 +119,6 @@ const OTPFormFrogotpass = () => {
         { formData, otp },
       );
       const { user } = response.data;
-      console.log("User registered:", user);
       toast.success(response.data.message);
       localStorage.removeItem("otpExpiry");
       navigate("/change-password", {

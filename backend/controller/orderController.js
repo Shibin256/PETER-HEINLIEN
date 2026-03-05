@@ -50,7 +50,6 @@ export const placeOrder = async (req, res) => {
             
           
             if (clientItem.price !== currentPrice) {
-                console.log('joooo')
                 return res.status(400).json({
                     message: `Price mismatch for ${product.name}. Please refresh your cart.`
                 });
@@ -110,7 +109,6 @@ export const placeOrder = async (req, res) => {
             orderId: mainOrderId
         }
         for (const item of orderData.Items) {
-            console.log(item, '--------')
             const product = await Product.findOne({ _id: item.productId })
             if (item.quantity > product.totalQuantity) {
                 return res.status(404).json({ message: 'The product is on out of stock know' });
@@ -301,7 +299,6 @@ export const singleCancelVerify = async (req, res) => {
 
         if (orderitem.PaymentMethod != 'cod') {
             let wallet = await Wallet.findOne({ userId: orderitem.UserID });
-            console.log(total)
             const transactions = {
                 userId: orderitem.UserID,
                 amount: total,
@@ -332,7 +329,6 @@ export const verifyCancel = async (req, res) => {
     const { orderId } = req.params
     try {
         const order = await Order.findOne({ "orderId": orderId });
-        console.log(order)
         if (!order) {
             return res.status(404).json({ message: 'Order item not found' });
         }

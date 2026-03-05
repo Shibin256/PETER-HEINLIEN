@@ -24,11 +24,6 @@ const bannerSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  // buttonLink: {
-  //   type: String,
-  //   required: true,
-  //   trim: true
-  // },
   isActive:{
     type:Boolean,
     default:false

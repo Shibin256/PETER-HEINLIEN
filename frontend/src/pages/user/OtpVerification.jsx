@@ -118,7 +118,6 @@ const OTPForm = () => {
         { formData, otp },
       );
       const { user } = response.data;
-      console.log("User registered:", user);
       toast.success(response.data.message);
       localStorage.removeItem("otpExpiry");
       navigate("/login");

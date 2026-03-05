@@ -40,42 +40,6 @@ const Cart = () => {
   }, [subtotal, shipping]);
   const { currency } = useSelector((state) => state.global);
 
-  // const handleQuantityChange = (productId, delta) => {
-  //   const item = localCart.find((item) => item.productId._id === productId);
-  //   const newQuantity = Math.max(1, item.quantity + delta);
-
-  //   if (delta > 0 && newQuantity > item.productId.totalQuantity) {
-  //     console.warn(
-  //       `Only ${item.productId.totalQuantity} items available in stock.`,
-  //     );
-  //     return;
-  //   }
-
-  //   if (item.quantity === 4 && delta > 0) {
-  //     console.warn("Max quantity reached");
-  //     return;
-  //   }
-
-  //   setLocalCart((prev) =>
-  //     prev.map((item) =>
-  //       item.productId._id === productId
-  //         ? { ...item, quantity: newQuantity }
-  //         : item,
-  //     ),
-  //   );
-
-  //   dispatch(
-  //     updateCart({
-  //       userId: user._id,
-  //       productId,
-  //       quantity: newQuantity,
-  //     }),
-  //   )
-  //     .unwrap()
-  //     .then(() => dispatch(fetchCart(user._id)))
-  //     .catch((err) => console.error("Cart update failed:", err));
-  // };
-
   const handleQuantityChange = (productId, delta) => {
     const item = localCart.find((item) => item.productId._id === productId);
     const newQuantity = Math.max(1, item.quantity + delta);

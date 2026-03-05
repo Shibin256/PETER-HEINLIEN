@@ -45,9 +45,7 @@ function AddItem() {
     ];
     const files = Array.from(e.target.files);
     const total = images.length + files.length;
-    console.log(files);
     for (let file of files) {
-      console.log(file);
       if (!validImageTypes.includes(file.type)) {
         toast.error("The file need to be a image format");
         return;
@@ -193,7 +191,6 @@ function AddItem() {
     setIsSubmitting(true);
     try {
       const res = await dispatch(addProduct(formData));
-      console.log(res, "---");
       if (res.type.endsWith("fulfilled")) {
         toast.success("✅ Product added successfully!");
         navigate("/admin/products");

@@ -16,7 +16,6 @@ const Coupons = () => {
   useEffect(() => {
     dispatch(fetchUserCoupons());
   }, []);
-  console.log(userCoupons);
   useEffect(() => {
     if (userCoupons && user) {
       const availableCoupons = userCoupons.filter((coupon) => {
@@ -26,7 +25,6 @@ const Coupons = () => {
         return isActive && notUsed && withinLimit;
       });
       setFilteredCoupons(availableCoupons);
-      console.log(filteredCoupons, "filtered coupons");
     }
   }, [userCoupons, user]);
 
@@ -124,15 +122,7 @@ const Coupons = () => {
                     <span>Expires {formatDate(coupon.expiresAt)}</span>
                   </div>
                 </div>
-
-                {/* <div className="mt-3 pt-3 border-t border-dashed border-gray-200 text-xs">
-                                    <div className="flex justify-between text-gray-500">
-                                        <span>Uses remaining:</span>
-                                        <span className="font-medium">
-                                            {coupon.usageLimit - coupon.usersUsed.length}/{coupon.usageLimit}
-                                        </span>
-                                    </div>
-                                </div> */}
+                
               </div>
             ))}
         </div>

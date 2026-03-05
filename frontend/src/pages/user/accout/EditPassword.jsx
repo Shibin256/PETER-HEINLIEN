@@ -75,7 +75,6 @@ const EditPassword = () => {
       const res = await dispatch(
         changePassword({ userId: profileData.id, data: formData }),
       );
-      console.log(res, "in change password res");
 
       const message = res.payload;
       const updatedUser = res.payload?.data;

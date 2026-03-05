@@ -33,7 +33,6 @@ const Checkout = () => {
   const { currency } = useSelector((state) => state.global);
   const { addresses } = useSelector((state) => state.account);
   const { userCoupons = [] } = useSelector((state) => state.coupons);
-  console.log(userCoupons, "-----");
 
   // Fetch user coupons on component mount
   useEffect(() => {

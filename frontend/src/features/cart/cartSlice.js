@@ -24,7 +24,6 @@ export const fetchCart = createAsyncThunk(
 export const toggleIsLocked = createAsyncThunk(
   "user/cart/toggleIsLocked",
   async (userId, lock) => {
-    console.log(lock);
     return await cartService.toggleIsLocked(userId, lock);
   },
 );

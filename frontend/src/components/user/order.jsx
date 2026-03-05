@@ -123,7 +123,6 @@ const Order = ({ order, onCancelSuccess }) => {
   };
 
   const submitReview = async (itemId) => {
-    console.log(itemId);
     await dispatch(
       addReview({
         itemId: itemId,
@@ -201,13 +200,7 @@ const Order = ({ order, onCancelSuccess }) => {
 
   const confirmReturn = async () => {
     if (selectedItemToReturn && returnReason) {
-      console.log(
-        selectedItemToCancel,
-        returnReason,
-        additionalDetails,
-        "in confirm return function",
-      );
-      console.log(selectedItemToCancel);
+  
       await dispatch(
         returnOrderItem({
           itemOrderId: selectedItemToReturn,

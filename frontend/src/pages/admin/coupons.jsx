@@ -125,7 +125,6 @@ const Coupons = () => {
     };
 
     const res = await dispatch(createCoupons(data));
-    console.log(res, "---");
 
     if (res.type === "admin/createCoupons/fulfilled") {
       toast.success(res?.payload?.message);
@@ -179,7 +178,6 @@ const Coupons = () => {
 
   const handleUpdateCoupon = async (e) => {
     e.preventDefault();
-    console.log(editingCoupon);
     if (!editingCoupon || !originalCoupon) return;
 
     const hasChanges =

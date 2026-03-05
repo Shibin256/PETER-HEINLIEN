@@ -22,7 +22,6 @@ const AddAddress = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  // console.log(user,'user is here')
 
   const indianStates = [
     "Andhra Pradesh",
@@ -384,24 +383,6 @@ const AddAddress = () => {
               />
             </div>
           </div>
-
-          {/* Default Address Checkbox
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="defaultAddress"
-              name="defaultAddress"
-              checked={addressData.defaultAddress}
-              onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="defaultAddress"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Set as default address
-            </label>
-          </div> */}
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4 pt-6 border-t">

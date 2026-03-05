@@ -30,7 +30,6 @@ const MyOrders = () => {
   };
 
   const { orders, page, totalPage } = useSelector((state) => state.orders);
-  console.log(orders, "in orders of myorder");
 
   return (
     <div className="px-4 md:px-10 py-6">
