@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { FiX } from "react-icons/fi";
-import Title from "../../components/common/Title";
-import ProductCard from "../../components/common/ProductCard";
+import React, { useEffect, useState } from 'react';
+import { FiX } from 'react-icons/fi';
+import Title from '../../components/common/Title';
+import ProductCard from '../../components/common/ProductCard';
 import {
   fetchProducts,
   getBrandAndCollection,
-} from "../../features/products/productSlice";
-import { useDispatch, useSelector } from "react-redux";
-import AuthInput from "../../components/common/AuthInput";
-import { useSearchParams } from "react-router-dom";
+} from '../../features/products/productSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import AuthInput from '../../components/common/AuthInput';
+import { useSearchParams } from 'react-router-dom';
 
 const Collection = () => {
   const dispatch = useDispatch();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialCategory = searchParams.getAll("category");
-  const initialBrand = searchParams.getAll("brand");
-  const initialSort = searchParams.get("sort") || "";
-  const initialAlpha = searchParams.get("alpha") || "";
-  const initialSearch = searchParams.get("search") || "";
-  const initialPage = parseInt(searchParams.get("page")) || 1;
+  const initialCategory = searchParams.getAll('category');
+  const initialBrand = searchParams.getAll('brand');
+  const initialSort = searchParams.get('sort') || '';
+  const initialAlpha = searchParams.get('alpha') || '';
+  const initialSearch = searchParams.get('search') || '';
+  const initialPage = parseInt(searchParams.get('page')) || 1;
 
   const [category, setCategory] = useState(initialCategory);
   const [brand, setBrands] = useState(initialBrand);
@@ -32,7 +32,7 @@ const Collection = () => {
   const [showFilter, setShowFilter] = useState(false);
 
   const { products, page, totalPages, brands, categories } = useSelector(
-    (state) => state.products,
+    (state) => state.products
   );
 
   // Fetch initial data
@@ -42,34 +42,34 @@ const Collection = () => {
 
   useEffect(() => {
     const params = new URLSearchParams();
-    category.forEach((cat) => params.append("category", cat));
-    brand.forEach((br) => params.append("brand", br));
-    if (sortType) params.set("sort", sortType);
-    if (alphabeticOrder) params.set("alpha", alphabeticOrder);
-    if (searchTerm) params.set("search", searchTerm);
-    params.set("page", currentPage);
+    category.forEach((cat) => params.append('category', cat));
+    brand.forEach((br) => params.append('brand', br));
+    if (sortType) params.set('sort', sortType);
+    if (alphabeticOrder) params.set('alpha', alphabeticOrder);
+    if (searchTerm) params.set('search', searchTerm);
+    params.set('page', currentPage);
 
     setSearchParams(params);
   }, [category, brand, sortType, alphabeticOrder, searchTerm, currentPage]);
-  
+
   const fetchFilteredProducts = (pageNumber = 1) => {
     setCurrentPage(pageNumber);
 
-    let sortField = "";
-    let order = "";
+    let sortField = '';
+    let order = '';
 
-    if (sortType === "low-high") {
-      sortField = "price";
-      order = "asc";
-    } else if (sortType === "high-low") {
-      sortField = "price";
-      order = "desc";
-    } else if (alphabeticOrder === "a-z") {
-      sortField = "name";
-      order = "asc";
-    } else if (alphabeticOrder === "z-a") {
-      sortField = "name";
-      order = "desc";
+    if (sortType === 'low-high') {
+      sortField = 'price';
+      order = 'asc';
+    } else if (sortType === 'high-low') {
+      sortField = 'price';
+      order = 'desc';
+    } else if (alphabeticOrder === 'a-z') {
+      sortField = 'name';
+      order = 'asc';
+    } else if (alphabeticOrder === 'z-a') {
+      sortField = 'name';
+      order = 'desc';
     }
 
     dispatch(
@@ -81,7 +81,7 @@ const Collection = () => {
         brands: brand,
         sort: sortField,
         order: order,
-      }),
+      })
     );
   };
 
@@ -102,7 +102,7 @@ const Collection = () => {
     setCategory((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
-        : [...prev, value],
+        : [...prev, value]
     );
   };
 
@@ -111,7 +111,7 @@ const Collection = () => {
     setBrands((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
-        : [...prev, value],
+        : [...prev, value]
     );
   };
 
@@ -126,7 +126,7 @@ const Collection = () => {
           >
             <span>FILTERS</span>
             <svg
-              className={`w-4 h-4 transition-transform duration-300 ${showFilter ? "rotate-90" : ""} lg:hidden`}
+              className={`w-4 h-4 transition-transform duration-300 ${showFilter ? 'rotate-90' : ''} lg:hidden`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -142,7 +142,7 @@ const Collection = () => {
 
           {/* Filter Panel */}
           <div
-            className={`${showFilter ? "block" : "hidden"} lg:block space-y-6 transition-all duration-300`}
+            className={`${showFilter ? 'block' : 'hidden'} lg:block space-y-6 transition-all duration-300`}
           >
             {/* Clear All Button */}
             {(category.length > 0 || brand.length > 0) && (
@@ -150,8 +150,8 @@ const Collection = () => {
                 onClick={() => {
                   setCategory([]);
                   setBrands([]);
-                  setSortType("");
-                  setAlphabeticOrder("");
+                  setSortType('');
+                  setAlphabeticOrder('');
                 }}
                 className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
@@ -175,7 +175,7 @@ const Collection = () => {
               <div className="space-y-2">
                 {categories.map((cat) => (
                   <label
-                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${category.includes(cat._id) ? "bg-blue-50" : "hover:bg-gray-50"}`}
+                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${category.includes(cat._id) ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                     key={cat._id}
                   >
                     <div className="relative">
@@ -187,7 +187,7 @@ const Collection = () => {
                         className="sr-only"
                       />
                       <div
-                        className={`w-5 h-5 rounded flex items-center justify-center ${category.includes(cat._id) ? "bg-blue-500 border-blue-500" : "border-2 border-gray-300"}`}
+                        className={`w-5 h-5 rounded flex items-center justify-center ${category.includes(cat._id) ? 'bg-blue-500 border-blue-500' : 'border-2 border-gray-300'}`}
                       >
                         {category.includes(cat._id) && (
                           <svg
@@ -229,7 +229,7 @@ const Collection = () => {
               <div className="space-y-2">
                 {brands.map((br) => (
                   <label
-                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${brand.includes(br._id) ? "bg-blue-50" : "hover:bg-gray-50"}`}
+                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${brand.includes(br._id) ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                     key={br._id}
                   >
                     <div className="relative">
@@ -241,7 +241,7 @@ const Collection = () => {
                         className="sr-only"
                       />
                       <div
-                        className={`w-5 h-5 rounded flex items-center justify-center ${brand.includes(br._id) ? "bg-blue-500 border-blue-500" : "border-2 border-gray-300"}`}
+                        className={`w-5 h-5 rounded flex items-center justify-center ${brand.includes(br._id) ? 'bg-blue-500 border-blue-500' : 'border-2 border-gray-300'}`}
                       >
                         {brand.includes(br._id) && (
                           <svg
@@ -308,7 +308,7 @@ const Collection = () => {
         {/* Right Product Grid */}
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <Title text1={"ALL"} text2={"COLLECTIONS"} />
+            <Title text1={'ALL'} text2={'COLLECTIONS'} />
             {/* Search Bar */}
             <div className="mb-4">
               <form onSubmit={handleSearch} className="flex gap-2 items-center">
@@ -331,7 +331,7 @@ const Collection = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setSearchTerm("");
+                    setSearchTerm('');
                     dispatch(fetchProducts({ page: 1, limit: 4 }));
                   }}
                   className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
@@ -358,7 +358,7 @@ const Collection = () => {
                 <button
                   disabled={currentPage <= 1}
                   onClick={() => fetchFilteredProducts(currentPage - 1)}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-1 transition-all ${currentPage <= 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-1 transition-all ${currentPage <= 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                 >
                   <svg
                     className="w-4 h-4"
@@ -383,7 +383,7 @@ const Collection = () => {
                 <button
                   disabled={currentPage >= totalPages}
                   onClick={() => fetchFilteredProducts(currentPage + 1)}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-1 transition-all ${currentPage >= totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-1 transition-all ${currentPage >= totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                 >
                   Next
                   <svg
@@ -414,8 +414,8 @@ const Collection = () => {
                 onClick={() => {
                   setCategory([]);
                   setBrands([]);
-                  setSortType("");
-                  setAlphabeticOrder("");
+                  setSortType('');
+                  setAlphabeticOrder('');
                 }}
                 className="mt-4 px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-500 transition-colors"
               >

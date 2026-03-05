@@ -1,18 +1,17 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const reviewSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
   // name: { type: String, required: true },
   rating: { type: Number, required: true, min: 1, max: 5 },
   comment: { type: String, required: true },
-  isList:{type:Boolean,required:false},
-  createdAt: { type: Date, default: Date.now }
+  isList: { type: Boolean, required: false },
+  createdAt: { type: Date, default: Date.now },
 });
-
 
 const productSchema = new mongoose.Schema(
   {
@@ -35,12 +34,12 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      ref: 'Category',
       required: true,
     },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Brand",
+      ref: 'Brand',
       required: true,
     },
     price: {
@@ -53,8 +52,8 @@ const productSchema = new mongoose.Schema(
     },
     stockStatus: {
       type: String,
-      enum: ["In Stock", "Out of Stock", "Preorder"],
-      default: "In Stock",
+      enum: ['In Stock', 'Out of Stock', 'Preorder'],
+      default: 'In Stock',
     },
     images: [
       {
@@ -90,25 +89,24 @@ const productSchema = new mongoose.Schema(
     },
     reviews: [reviewSchema],
     numReviews: { type: Number, default: 0 },
-    averageRating: { type: Number, default: 0 }
+    averageRating: { type: Number, default: 0 },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-productSchema.pre("save", function (next) {
+productSchema.pre('save', function (next) {
   if (this.totalQuantity === 0) {
-    this.stockStatus = "Out of Stock";
-    this.availability = false
+    this.stockStatus = 'Out of Stock';
+    this.availability = false;
   } else {
-    this.stockStatus = "In Stock";
-    this.availability = true
+    this.stockStatus = 'In Stock';
+    this.availability = true;
   }
   next();
 });
 
-
 // Export the model
-const Product = mongoose.model("Product", productSchema);
+const Product = mongoose.model('Product', productSchema);
 export default Product;

@@ -1,7 +1,7 @@
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance from '../../api/axiosInstance';
 
 const addToCart = async (data) => {
-  const response = await axiosInstance.post("/api/v1/users/cart", data);
+  const response = await axiosInstance.post('/api/v1/users/cart', data);
   return response.data;
 };
 
@@ -15,27 +15,27 @@ const removeFromCart = async (userId, productId, itemQuantity) => {
     `/api/v1/users/cart/${userId}/${productId}`,
     {
       data: itemQuantity,
-    },
+    }
   );
   return res.data;
 };
 
 const updateCart = async (data) => {
-  const response = await axiosInstance.put("/api/v1/users/cart", data);
+  const response = await axiosInstance.put('/api/v1/users/cart', data);
   return response.data;
 };
 
 const toggleIsLocked = async ({ userID, lock }) => {
   const response = await axiosInstance.post(
-    `/api/v1/users/cart/cart-lock/${lock}/${userID}`,
+    `/api/v1/users/cart/cart-lock/${lock}/${userID}`
   );
   return response.data;
 };
 
 const wishlistToCart = async (data) => {
   const response = await axiosInstance.post(
-    "/api/v1/users/cart/from-wishlist",
-    data,
+    '/api/v1/users/cart/from-wishlist',
+    data
   );
   return response.data;
 };

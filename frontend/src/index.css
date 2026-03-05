@@ -5,13 +5,13 @@
 @tailwind utilities;
 
 .prata-regular {
-  font-family: "Prata", serif;
+  font-family: 'Prata', serif;
   font-weight: 400;
   font-style: normal;
 }
 
-*{
-    font-family: Outfit;
+* {
+  font-family: Outfit;
 }
 
 @keyframes slideDown {

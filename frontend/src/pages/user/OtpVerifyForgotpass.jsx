@@ -1,26 +1,26 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-import { useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
-import axiosInstance from "../../api/axiosInstance";
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import axiosInstance from '../../api/axiosInstance';
 
 const OTPFormFrogotpass = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [sendcount, setSendCount] = useState(
-    localStorage.getItem("ResendCount"),
+    localStorage.getItem('ResendCount')
   );
   const formData = location.state?.formData;
   const [timeLeft, setTimeLeft] = useState(600);
   const [isExpired, setIsExpired] = useState(false);
-  const [userOTP, setUserOTP] = useState(Array(6).fill(""));
+  const [userOTP, setUserOTP] = useState(Array(6).fill(''));
   const inputRefs = useRef([]);
 
   //prevent restart timer from reload
   useEffect(() => {
-    const storedExpiry = localStorage.getItem("otpExpiry");
+    const storedExpiry = localStorage.getItem('otpExpiry');
     const now = Date.now();
 
     if (storedExpiry) {
@@ -31,12 +31,12 @@ const OTPFormFrogotpass = () => {
         setIsExpired(false);
       } else {
         setIsExpired(true);
-        localStorage.removeItem("otpExpiry");
+        localStorage.removeItem('otpExpiry');
       }
     } else if (formData) {
       // First-time visit or new OTP session
       const newExpiry = now + 180000; // 10 minutes
-      localStorage.setItem("otpExpiry", newExpiry.toString());
+      localStorage.setItem('otpExpiry', newExpiry.toString());
       setTimeLeft(180);
       setIsExpired(false);
     } else {
@@ -62,17 +62,17 @@ const OTPFormFrogotpass = () => {
     try {
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/forgotpass`,
-        formData,
+        formData
       );
       if (response) {
         const expiry = Date.now() + 600000; // 10 minutes from now
-        localStorage.setItem("otpExpiry", expiry.toString());
+        localStorage.setItem('otpExpiry', expiry.toString());
         setTimeLeft(180);
         setIsExpired(false);
-        toast.success("OTP send to the email adress");
-        console.log("resended otp");
+        toast.success('OTP send to the email adress');
+        console.log('resended otp');
         setSendCount(true);
-        localStorage.setItem("ResendCount", true);
+        localStorage.setItem('ResendCount', true);
       }
     } catch (error) {
       console.log(error);
@@ -85,13 +85,13 @@ const OTPFormFrogotpass = () => {
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   //handling input data
 
   const handleChange = (e, index) => {
-    const val = e.target.value.replace(/\D/, "");
+    const val = e.target.value.replace(/\D/, '');
     const newOTP = [...userOTP];
     newOTP[index] = val;
     setUserOTP(newOTP);
@@ -103,7 +103,7 @@ const OTPFormFrogotpass = () => {
 
   //back space manage
   const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !userOTP[index] && index > 0) {
+    if (e.key === 'Backspace' && !userOTP[index] && index > 0) {
       // Move to previous input on backspace if current is empty
       inputRefs.current[index - 1].focus();
     }
@@ -112,23 +112,23 @@ const OTPFormFrogotpass = () => {
   //otp verification submit
   const handleSubmit = async () => {
     try {
-      const otp = userOTP.join("");
-      console.log("Submitted OTP:", otp);
+      const otp = userOTP.join('');
+      console.log('Submitted OTP:', otp);
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/verifyOTPForgotpass`,
-        { formData, otp },
+        { formData, otp }
       );
       const { user } = response.data;
       toast.success(response.data.message);
-      localStorage.removeItem("otpExpiry");
-      navigate("/change-password", {
+      localStorage.removeItem('otpExpiry');
+      navigate('/change-password', {
         state: {
           email: formData.email,
         },
       });
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      toast.error(error.response?.data?.message || 'error hapened');
     }
   };
 
@@ -175,7 +175,7 @@ const OTPFormFrogotpass = () => {
                 onClick={handleResend}
                 className="cursor-pointer text-blue-500"
               >
-                {loading ? "Sending" : "Resend OTP"}
+                {loading ? 'Sending' : 'Resend OTP'}
               </a>
             )}
           </div>

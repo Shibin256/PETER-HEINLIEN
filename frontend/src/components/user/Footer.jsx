@@ -14,7 +14,7 @@ const Footer = () => {
               offer.
             </p>
             <div className="flex space-x-4">
-              {["twitter", "facebook", "instagram", "linkedin"].map(
+              {['twitter', 'facebook', 'instagram', 'linkedin'].map(
                 (social) => (
                   <a
                     key={social}
@@ -25,7 +25,7 @@ const Footer = () => {
                     {/* Replace with actual icons */}
                     <div className="w-5 h-5 bg-gray-300 rounded-full"></div>
                   </a>
-                ),
+                )
               )}
             </div>
           </div>
@@ -53,7 +53,7 @@ const Footer = () => {
                   >
                     Collection
                   </a>
-                </li>{" "}
+                </li>{' '}
                 {/* <li>
                   <a
                     href="/about"
@@ -78,7 +78,7 @@ const Footer = () => {
                   >
                     Payment Options
                   </a> */}
-                </li>{" "}
+                </li>{' '}
                 <li>
                   <a
                     href="/my-orders"

@@ -1,5 +1,5 @@
 // components/charts/BestSellerChart.jsx
-import React from "react";
+import React from 'react';
 import {
   BarChart,
   Bar,
@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   Legend,
   Cell,
-} from "recharts";
+} from 'recharts';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -21,7 +21,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           Quantity: <span className="font-semibold">{payload[0].value}</span>
         </p>
         <p className="text-sm text-gray-600">
-          Revenue:{" "}
+          Revenue:{' '}
           <span className="font-semibold">
             ₹{payload[0].payload.revenue?.toFixed(2) || 0}
           </span>
@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 const BestSellerChart = ({
   title,
   data,
-  colors = ["#4285F4", "#34A853", "#FBBC05", "#EA4335"],
+  colors = ['#4285F4', '#34A853', '#FBBC05', '#EA4335'],
 }) => {
   return (
     <div className="p-6 bg-white rounded-lg shadow-xl">
@@ -65,11 +65,11 @@ const BestSellerChart = ({
               orientation="left"
               stroke="#4285F4"
               label={{
-                value: "Quantity",
+                value: 'Quantity',
                 angle: -90,
-                position: "insideLeft",
+                position: 'insideLeft',
                 fontSize: 14,
-                fill: "#4285F4",
+                fill: '#4285F4',
               }}
             />
             <YAxis
@@ -77,17 +77,17 @@ const BestSellerChart = ({
               orientation="right"
               stroke="#34A853"
               label={{
-                value: "Revenue (₹)",
+                value: 'Revenue (₹)',
                 angle: 90,
-                position: "insideRight",
+                position: 'insideRight',
                 fontSize: 14,
-                fill: "#34A853",
+                fill: '#34A853',
               }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{
-                paddingTop: "30px",
+                paddingTop: '30px',
               }}
             />
             <Bar yAxisId="left" dataKey="quantity" name="Quantity Sold">

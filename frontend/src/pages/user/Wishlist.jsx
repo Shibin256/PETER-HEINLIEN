@@ -1,24 +1,24 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getWishlist,
   removeFromWishlist,
-} from "../../features/wishlist/wishlistSlice";
-import { toast } from "react-toastify";
-import Title from "../../components/common/Title";
-import { wishlistToCart } from "../../features/cart/cartSlice";
+} from '../../features/wishlist/wishlistSlice';
+import { toast } from 'react-toastify';
+import Title from '../../components/common/Title';
+import { wishlistToCart } from '../../features/cart/cartSlice';
 
 const Wishlist = () => {
   const dispatch = useDispatch();
 
   const user = useMemo(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser) : null;
   }, []);
 
   const { wishlist } = useSelector((state) => state.wishlist);
 
-  const [selectedAction, setSelectedAction] = useState("");
+  const [selectedAction, setSelectedAction] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState(null);
 
@@ -32,9 +32,9 @@ const Wishlist = () => {
     try {
       setIsDeletingId(id);
       await dispatch(
-        removeFromWishlist({ userId: user._id, productId: id }),
+        removeFromWishlist({ userId: user._id, productId: id })
       ).unwrap();
-      toast.success("Removed from wishlist");
+      toast.success('Removed from wishlist');
       dispatch(getWishlist(user._id));
     } finally {
       setIsDeletingId(null);
@@ -49,11 +49,11 @@ const Wishlist = () => {
         productIds.push(item._id);
       }
       const res = await dispatch(
-        wishlistToCart({ userId: user._id, productIds: productIds }),
+        wishlistToCart({ userId: user._id, productIds: productIds })
       );
-      if (res.type == "user/cart/wishlistToCart/fulfilled") {
+      if (res.type == 'user/cart/wishlistToCart/fulfilled') {
         dispatch(getWishlist(user._id));
-        toast.success("All products are added to cart");
+        toast.success('All products are added to cart');
       } else {
         toast.error(res.payload);
       }
@@ -69,7 +69,7 @@ const Wishlist = () => {
       <div className="flex justify-between items-center mb-8">
         <Title text1="Your" text2="wishlist" />
         <span className="text-gray-600">
-          {wishlist?.length || 0} {wishlist?.length === 1 ? "item" : "items"}
+          {wishlist?.length || 0} {wishlist?.length === 1 ? 'item' : 'items'}
         </span>
       </div>
 
@@ -128,14 +128,14 @@ const Wishlist = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        item.stockStatus == "In Stock"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                        item.stockStatus == 'In Stock'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {item.stockStatus == "In Stock"
-                        ? "In Stock"
-                        : "Out of Stock"}
+                      {item.stockStatus == 'In Stock'
+                        ? 'In Stock'
+                        : 'Out of Stock'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -144,8 +144,8 @@ const Wishlist = () => {
                       disabled={isDeletingId === item._id}
                       className={`inline-flex items-center justify-center p-1 rounded-md ${
                         isDeletingId === item._id
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-red-600 hover:text-red-900 hover:bg-red-50"
+                          ? 'text-gray-400 cursor-not-allowed'
+                          : 'text-red-600 hover:text-red-900 hover:bg-red-50'
                       } transition-colors duration-200`}
                       aria-label="Remove item"
                     >
@@ -231,11 +231,11 @@ const Wishlist = () => {
               disabled={wishlist?.length === 0 || isProcessing}
               className={`px-6 py-2 rounded-md text-sm font-medium text-white ${
                 wishlist?.length === 0 || isProcessing
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
               } transition-colors duration-200`}
             >
-              {isProcessing ? "Processing..." : "Add All to Cart"}
+              {isProcessing ? 'Processing...' : 'Add All to Cart'}
             </button>
           </div>
         )}

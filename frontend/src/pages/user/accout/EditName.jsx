@@ -1,10 +1,10 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import AccountEditCard from "../../../components/user/AccountEditCard";
-import { useDispatch } from "react-redux";
-import { changeName } from "../../../features/accountSettings/accountSlice";
-import { setUser } from "../../../features/auth/authSlice";
-import { toast } from "react-toastify";
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import AccountEditCard from '../../../components/user/AccountEditCard';
+import { useDispatch } from 'react-redux';
+import { changeName } from '../../../features/accountSettings/accountSlice';
+import { setUser } from '../../../features/auth/authSlice';
+import { toast } from 'react-toastify';
 
 const EditName = () => {
   const navigate = useNavigate();
@@ -19,24 +19,24 @@ const EditName = () => {
   const handleSave = (newName) => {
     const formData = new FormData();
     if (!newName.trim()) {
-      toast.error("proper name needed");
+      toast.error('proper name needed');
     } else {
-      formData.append("name", newName);
+      formData.append('name', newName);
       dispatch(changeName({ userId: profileData.id, data: formData }))
         .then((res) => {
           const updatedUser = res.payload?.data;
           if (updatedUser) {
             dispatch(setUser({ user: updatedUser }));
-            localStorage.setItem("user", JSON.stringify(updatedUser));
+            localStorage.setItem('user', JSON.stringify(updatedUser));
             toast.success(res.payload?.message);
-            navigate("/my-profile");
+            navigate('/my-profile');
           } else {
             toast.error(res.payload);
           }
         })
         .catch((err) => {
           toast.error(err);
-          console.error("Name update failed:", err);
+          console.error('Name update failed:', err);
         });
     }
   };

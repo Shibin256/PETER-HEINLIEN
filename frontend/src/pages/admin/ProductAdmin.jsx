@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   addProductOffer,
   deleteProduct,
@@ -12,13 +12,13 @@ import {
   updateProduct,
   // listProduct,
   // unlistProduct,
-} from "../../features/products/productSlice";
-import { toast } from "react-toastify";
-import AuthInput from "../../components/common/AuthInput";
-import SelectInput from "../../components/common/SelectInput";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import { FaStar } from "react-icons/fa";
+} from '../../features/products/productSlice';
+import { toast } from 'react-toastify';
+import AuthInput from '../../components/common/AuthInput';
+import SelectInput from '../../components/common/SelectInput';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { FaStar } from 'react-icons/fa';
 
 const ProductAdmin = () => {
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const ProductAdmin = () => {
 
   // State for offer management
   const [selectedProductForOffer, setSelectedProductForOffer] = useState(null);
-  const [offerPercentage, setOfferPercentage] = useState("");
+  const [offerPercentage, setOfferPercentage] = useState('');
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const [productToRemoveOffer, setProductToRemoveOffer] = useState(null);
 
@@ -59,15 +59,15 @@ const ProductAdmin = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [editForm, setEditForm] = useState({
-    name: "",
-    description: "",
-    quantity: "",
-    price: "",
-    category: "",
-    brand: "",
-    tags: "",
+    name: '',
+    description: '',
+    quantity: '',
+    price: '',
+    category: '',
+    brand: '',
+    tags: '',
     images: [],
     newImages: [],
   });
@@ -101,15 +101,15 @@ const ProductAdmin = () => {
 
     try {
       let res;
-      if (listAction === "list") {
+      if (listAction === 'list') {
         res = await dispatch(listProdcut(productToList._id));
       } else {
         res = await dispatch(unlistProduct(productToList._id));
       }
 
-      if (res.type.endsWith("fulfilled")) {
+      if (res.type.endsWith('fulfilled')) {
         toast.success(
-          `Product ${listAction === "list" ? "listed" : "unlisted"} successfully!`,
+          `Product ${listAction === 'list' ? 'listed' : 'unlisted'} successfully!`
         );
         dispatch(fetchProductsAdmin({ page, limit: 10, search: searchTerm }));
       } else {
@@ -131,7 +131,7 @@ const ProductAdmin = () => {
   const handleAddOffer = async () => {
     if (!selectedProductForOffer || !offerPercentage) return;
     if (offerPercentage <= 0 || offerPercentage > 100) {
-      toast.error("Offer percentage must be between 1 and 100.");
+      toast.error('Offer percentage must be between 1 and 100.');
       return;
     }
 
@@ -140,20 +140,20 @@ const ProductAdmin = () => {
         addProductOffer({
           productId: selectedProductForOffer._id,
           percentage: offerPercentage,
-        }),
+        })
       );
-      if (res.type.endsWith("fulfilled")) {
+      if (res.type.endsWith('fulfilled')) {
         toast.success(
-          `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`,
+          `Offer of ${offerPercentage}% added to ${selectedProductForOffer.name}`
         );
       } else {
         toast.error(res.payload?.message);
       }
       setSelectedProductForOffer(null);
-      setOfferPercentage("");
+      setOfferPercentage('');
       dispatch(fetchProductsAdmin({ page, limit: 10, search: searchTerm }));
     } catch (error) {
-      toast.error(error?.message || "Failed to add offer.");
+      toast.error(error?.message || 'Failed to add offer.');
     }
   };
 
@@ -165,29 +165,29 @@ const ProductAdmin = () => {
   const confirmRemoveOffer = async () => {
     try {
       const res = await dispatch(removeProductOffer(productToRemoveOffer));
-      if (res.type.endsWith("/rejected")) {
-        toast.error(res.payload?.message || "Failed to remove offer.");
+      if (res.type.endsWith('/rejected')) {
+        toast.error(res.payload?.message || 'Failed to remove offer.');
         return;
       }
-      toast.success("✅ Offer removed successfully!");
+      toast.success('✅ Offer removed successfully!');
       setShowRemoveConfirm(false);
       setProductToRemoveOffer(null);
       dispatch(fetchProductsAdmin({ page, limit: 10, search: searchTerm }));
     } catch (error) {
-      toast.error(error?.message || "Failed to remove offer.");
+      toast.error(error?.message || 'Failed to remove offer.');
     }
   };
 
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setEditForm({
-      name: product.name || "",
-      description: product.description || "",
+      name: product.name || '',
+      description: product.description || '',
       quantity: product.totalQuantity || 0,
-      price: product.price || "",
-      category: product.category._id || "",
-      brand: product.brand._id || "",
-      tags: product.tags || "",
+      price: product.price || '',
+      category: product.category._id || '',
+      brand: product.brand._id || '',
+      tags: product.tags || '',
       images: product.images,
       newImages: [],
     });
@@ -201,87 +201,89 @@ const ProductAdmin = () => {
       editForm;
 
     if (!name || !description || !price || !tags) {
-      toast.error("Please fill all fields.");
+      toast.error('Please fill all fields.');
       return;
     }
 
     if (isNaN(price) || price <= 0) {
-      toast.error("Price must be a valid number.");
+      toast.error('Price must be a valid number.');
       return;
     }
 
     if (isNaN(quantity) || quantity < 0) {
-      toast.error("Quantity must be a valid number.");
+      toast.error('Quantity must be a valid number.');
       return;
     }
 
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("quantity", quantity);
-    formData.append("price", price);
-    formData.append("category", category);
-    formData.append("brand", brand);
-    formData.append("tags", tags);
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('quantity', quantity);
+    formData.append('price', price);
+    formData.append('category', category);
+    formData.append('brand', brand);
+    formData.append('tags', tags);
 
     editForm.newImages.forEach((file) => {
-      formData.append("newImages", file);
+      formData.append('newImages', file);
     });
 
     editForm.images.forEach((url) => {
-      if (typeof url === "string") {
-        formData.append("existingImages", url);
+      if (typeof url === 'string') {
+        formData.append('existingImages', url);
       }
     });
 
     try {
       const res = await dispatch(
-        updateProduct({ id: selectedProduct._id, data: formData }),
+        updateProduct({ id: selectedProduct._id, data: formData })
       );
-      if (res.type.endsWith("fulfilled")) {
-        toast.success("✅ Product updated successfully!");
+      if (res.type.endsWith('fulfilled')) {
+        toast.success('✅ Product updated successfully!');
         setShowEditModal(false);
         setSelectedProduct(null);
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         } else {
-          toast.error(res.payload?.message || "Failed to update product");
+          toast.error(res.payload?.message || 'Failed to update product');
         }
       }
       dispatch(
-        fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm }),
+        fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm })
       ).unwrap();
-      navigate("/admin/products");
+      navigate('/admin/products');
     } catch (error) {
-      toast.error(error?.message || "Failed to update product.");
+      toast.error(error?.message || 'Failed to update product.');
     }
   };
 
   // Handle product delete
   const handleDelete = (id) => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "This will permanently delete the product.",
-      icon: "warning",
+      title: 'Are you sure?',
+      text: 'This will permanently delete the product.',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
       buttonsStyling: false,
       customClass: {
         confirmButton:
-          "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
         cancelButton:
-          "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
       },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(deleteProduct(id)).then((res) => {
-          if (res.type.endsWith("/fulfilled")) {
-            toast.success("✅ Product deleted successfully!");
-            dispatch(fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm }));
+          if (res.type.endsWith('/fulfilled')) {
+            toast.success('✅ Product deleted successfully!');
+            dispatch(
+              fetchProductsAdmin({ page: 1, limit: 10, search: searchTerm })
+            );
           } else {
-            toast.error(res.payload?.message || "Failed to delete product.");
+            toast.error(res.payload?.message || 'Failed to delete product.');
           }
         });
       }
@@ -307,9 +309,9 @@ const ProductAdmin = () => {
   if (loading) return <p className="text-center py-4">Loading products...</p>;
   if (error) {
     const errorMessage =
-      typeof error === "string"
+      typeof error === 'string'
         ? error
-        : error?.message || "An unknown error occurred.";
+        : error?.message || 'An unknown error occurred.';
     return <p className="text-red-500 text-center">{errorMessage}</p>;
   }
 
@@ -362,7 +364,7 @@ const ProductAdmin = () => {
             <button
               type="button"
               onClick={() => {
-                setSearchTerm("");
+                setSearchTerm('');
                 dispatch(fetchProductsAdmin({ page: 1, limit: 10 }));
               }}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
@@ -416,26 +418,26 @@ const ProductAdmin = () => {
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       product.availability
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {product.availability ? "In Stock" : "Out of Stock"}
+                    {product.availability ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </td>
                 <td className="px-4 py-2">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       !product.isList
-                        ? "bg-green-100 text-green-800"
-                        : "bg-orange-100 text-orange-800"
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-orange-100 text-orange-800'
                     }`}
                   >
-                    {!product.isList ? "Listed" : "Unlisted"}
+                    {!product.isList ? 'Listed' : 'Unlisted'}
                   </span>
                 </td>
                 <td className="px-4 py-2">
-                  {product.category?.categoryName || "N/A"}
+                  {product.category?.categoryName || 'N/A'}
                 </td>
                 <td className="px-4 py-2">
                   {product.offerPrice ? (
@@ -478,14 +480,14 @@ const ProductAdmin = () => {
                   </button>
                   {!product.isList ? (
                     <button
-                      onClick={() => handleListToggle(product, "unlist")}
+                      onClick={() => handleListToggle(product, 'unlist')}
                       className="text-orange-600 hover:text-orange-800 mr-3"
                     >
                       Unlist
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleListToggle(product, "list")}
+                      onClick={() => handleListToggle(product, 'list')}
                       className="text-green-600 hover:text-green-800 mr-3"
                     >
                       List
@@ -513,13 +515,13 @@ const ProductAdmin = () => {
                   page: page - 1,
                   limit: 10,
                   search: searchTerm,
-                }),
+                })
               )
             }
             className={`px-4 py-2 rounded ${
               page <= 1
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-500 text-white"
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-500 text-white'
             }`}
           >
             Previous
@@ -537,13 +539,13 @@ const ProductAdmin = () => {
                   page: page + 1,
                   limit: 10,
                   search: searchTerm,
-                }),
+                })
               )
             }
             className={`px-4 py-2 rounded ${
               page >= totalPages
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-500 text-white"
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-500 text-white'
             }`}
           >
             Next
@@ -598,7 +600,7 @@ const ProductAdmin = () => {
                     <div key={`existing-${index}`} className="relative">
                       <img
                         src={
-                          typeof image === "string"
+                          typeof image === 'string'
                             ? image
                             : URL.createObjectURL(image)
                         }
@@ -792,7 +794,7 @@ const ProductAdmin = () => {
               <button
                 onClick={() => {
                   setSelectedProductForOffer(null);
-                  setOfferPercentage("");
+                  setOfferPercentage('');
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
@@ -839,7 +841,7 @@ const ProductAdmin = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h3 className="text-lg font-bold mb-4">
-              Confirm {listAction === "list" ? "List" : "Unlist"} Product
+              Confirm {listAction === 'list' ? 'List' : 'Unlist'} Product
             </h3>
             <p className="mb-4">
               Are you sure you want to {listAction} "{productToList.name}"?
@@ -858,12 +860,12 @@ const ProductAdmin = () => {
               <button
                 onClick={confirmListToggle}
                 className={`px-4 py-2 text-white rounded ${
-                  listAction === "list"
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-orange-600 hover:bg-orange-700"
+                  listAction === 'list'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-orange-600 hover:bg-orange-700'
                 }`}
               >
-                {listAction === "list" ? "List Product" : "Unlist Product"}
+                {listAction === 'list' ? 'List Product' : 'Unlist Product'}
               </button>
             </div>
           </div>

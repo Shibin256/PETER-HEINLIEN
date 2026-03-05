@@ -1,16 +1,16 @@
-import { useEffect } from "react";
-import Title from "../common/Title";
-import ProductCard from "../common/ProductCard";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from 'react';
+import Title from '../common/Title';
+import ProductCard from '../common/ProductCard';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   topRatedCollections,
   topRatedCollectionsWithOutUser,
-} from "../../features/products/productSlice";
+} from '../../features/products/productSlice';
 
 const TopRated = () => {
   const dispatch = useDispatch();
   // const { user } = useSelector((state) => state.auth);
-  const storedUser = localStorage.getItem("user");
+  const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   const { topRated } = useSelector((state) => state.products);

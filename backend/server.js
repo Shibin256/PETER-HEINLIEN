@@ -31,29 +31,30 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Logging (optional)
-app.use(morgan("combined", { stream: { write: (msg) => logger.info(msg.trim()) } }));
-
-
+app.use(
+  morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }),
+);
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://346d5cdda7cf.ngrok-free.app",
-  "https://peter-heinlien-pfoi-qr57fzs8j-shibin-shajan-kps-projects.vercel.app",
-  "https://peterheinlien.shop",
-  "https://www.peterheinlien.shop"
+  'http://localhost:5173',
+  'https://346d5cdda7cf.ngrok-free.app',
+  'https://peter-heinlien-pfoi-qr57fzs8j-shibin-shajan-kps-projects.vercel.app',
+  'https://peterheinlien.shop',
+  'https://www.peterheinlien.shop',
 ];
 
-
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
 
 // API Routes (must be before React frontend route)
 app.use('/api/auth', authRoutes);
@@ -61,16 +62,14 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1', productRoutes);
 
-
 // Serve React frontend (correct path)
-const frontendPath = path.join(__dirname, "../frontend/dist");
+const frontendPath = path.join(__dirname, '../frontend/dist');
 
 app.use(express.static(frontendPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
-
 
 // Start server
 const PORT = process.env.PORT || 2028;

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { FaCopy } from "react-icons/fa";
-import { FiClock } from "react-icons/fi";
-import { RiCouponLine } from "react-icons/ri";
-import { fetchUserCoupons } from "../../features/coupons/couponsSlice";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { FaCopy } from 'react-icons/fa';
+import { FiClock } from 'react-icons/fi';
+import { RiCouponLine } from 'react-icons/ri';
+import { fetchUserCoupons } from '../../features/coupons/couponsSlice';
 
 const Coupons = () => {
   const { userCoupons, loading } = useSelector((state) => state.coupons);
   const { user } = useSelector((state) => state.auth);
   const [filteredCoupons, setFilteredCoupons] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -35,15 +35,15 @@ const Coupons = () => {
         <p className="font-medium">Coupon copied!</p>
         <p className="text-sm">Paste it at checkout</p>
       </div>,
-      { icon: <RiCouponLine className="text-purple-500" /> },
+      { icon: <RiCouponLine className="text-purple-500" /> }
     );
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
@@ -72,7 +72,7 @@ const Coupons = () => {
           <p className="text-gray-500 mt-1">
             {userCoupons?.length > 0
               ? "You've either used all coupons or none are currently active."
-              : "There are no coupons available at the moment."}
+              : 'There are no coupons available at the moment.'}
           </p>
         </div>
       ) : (
@@ -83,7 +83,7 @@ const Coupons = () => {
                 coupon.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 coupon.discountType
                   .toLowerCase()
-                  .includes(searchTerm.toLowerCase()),
+                  .includes(searchTerm.toLowerCase())
             )
             .map((coupon) => (
               <div
@@ -93,7 +93,7 @@ const Coupons = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded mb-2">
-                      {coupon.discountType === "percentage"
+                      {coupon.discountType === 'percentage'
                         ? `${coupon.discountValue}% OFF`
                         : `Upto- ₹${coupon.discountValue} OFF`}
                     </span>
@@ -122,7 +122,6 @@ const Coupons = () => {
                     <span>Expires {formatDate(coupon.expiresAt)}</span>
                   </div>
                 </div>
-                
               </div>
             ))}
         </div>

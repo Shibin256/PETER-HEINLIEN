@@ -36,14 +36,14 @@ const AddressCard = ({
       <div className="mt-4 flex space-x-2">
         <button onClick={onEdit} className="text-blue-600 hover:underline px-2">
           Edit
-        </button>{" "}
+        </button>{' '}
         |
         <button
           onClick={onRemove}
           className="text-red-600 hover:underline px-2"
         >
           Remove
-        </button>{" "}
+        </button>{' '}
         |
         {!defaultAddress && (
           <button

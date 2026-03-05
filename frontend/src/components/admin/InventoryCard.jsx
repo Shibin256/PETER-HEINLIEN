@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const InventoryCard = ({
   title,
@@ -13,7 +13,7 @@ const InventoryCard = ({
 }) => {
   return (
     <div
-      className={`bg-white p-6 rounded-xl shadow-sm border ${hasOffer ? "border-green-200" : "border-gray-100"}`}
+      className={`bg-white p-6 rounded-xl shadow-sm border ${hasOffer ? 'border-green-200' : 'border-gray-100'}`}
     >
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-lg font-semibold text-gray-800">
@@ -64,7 +64,7 @@ const InventoryCard = ({
           {offerClick && (
             <button
               onClick={hasOffer ? removeOfferClick : offerClick}
-              className={`${hasOffer ? "text-yellow-600 hover:text-yellow-800" : "text-gray-600 hover:text-gray-800"}`}
+              className={`${hasOffer ? 'text-yellow-600 hover:text-yellow-800' : 'text-gray-600 hover:text-gray-800'}`}
             >
               <svg
                 className="w-5 h-5"

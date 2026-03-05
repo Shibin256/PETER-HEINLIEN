@@ -1,64 +1,64 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const Offers = () => {
   // Sample data
   const sampleProducts = [
-    { _id: "1", name: "T-Shirt" },
-    { _id: "2", name: "Jeans" },
-    { _id: "3", name: "Sneakers" },
-    { _id: "4", name: "Hat" },
+    { _id: '1', name: 'T-Shirt' },
+    { _id: '2', name: 'Jeans' },
+    { _id: '3', name: 'Sneakers' },
+    { _id: '4', name: 'Hat' },
   ];
 
   const sampleCategories = [
-    { _id: "1", categoryName: "Clothing" },
-    { _id: "2", categoryName: "Footwear" },
-    { _id: "3", categoryName: "Accessories" },
+    { _id: '1', categoryName: 'Clothing' },
+    { _id: '2', categoryName: 'Footwear' },
+    { _id: '3', categoryName: 'Accessories' },
   ];
 
   const sampleOffers = [
     {
-      _id: "1",
-      title: "Summer Sale",
-      description: "Discount on summer collection",
-      discountType: "percentage",
-      discountValue: "20",
-      offerType: "product",
+      _id: '1',
+      title: 'Summer Sale',
+      description: 'Discount on summer collection',
+      discountType: 'percentage',
+      discountValue: '20',
+      offerType: 'product',
       products: [
-        { _id: "1", name: "T-Shirt" },
-        { _id: "2", name: "Jeans" },
+        { _id: '1', name: 'T-Shirt' },
+        { _id: '2', name: 'Jeans' },
       ],
       category: null,
-      startDate: "2023-06-01T00:00:00Z",
-      endDate: "2023-06-30T00:00:00Z",
+      startDate: '2023-06-01T00:00:00Z',
+      endDate: '2023-06-30T00:00:00Z',
       isActive: true,
     },
     {
-      _id: "2",
-      title: "Winter Clearance",
-      description: "Clearance sale on winter items",
-      discountType: "fixed",
-      discountValue: "500",
-      offerType: "category",
+      _id: '2',
+      title: 'Winter Clearance',
+      description: 'Clearance sale on winter items',
+      discountType: 'fixed',
+      discountValue: '500',
+      offerType: 'category',
       products: [],
-      category: { _id: "1", categoryName: "Clothing" },
-      startDate: "2023-12-01T00:00:00Z",
-      endDate: "2023-12-31T00:00:00Z",
+      category: { _id: '1', categoryName: 'Clothing' },
+      startDate: '2023-12-01T00:00:00Z',
+      endDate: '2023-12-31T00:00:00Z',
       isActive: false,
     },
   ];
 
   // Form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [discountType, setDiscountType] = useState("percentage");
-  const [discountValue, setDiscountValue] = useState("");
-  const [offerType, setOfferType] = useState("product");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [discountType, setDiscountType] = useState('percentage');
+  const [discountValue, setDiscountValue] = useState('');
+  const [offerType, setOfferType] = useState('product');
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [isActive, setIsActive] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -68,7 +68,7 @@ const Offers = () => {
     setSelectedProducts((prev) =>
       prev.includes(productId)
         ? prev.filter((id) => id !== productId)
-        : [...prev, productId],
+        : [...prev, productId]
     );
   };
 
@@ -122,21 +122,21 @@ const Offers = () => {
             {/* Discount Value */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {discountType === "fixed"
-                  ? "Discount Amount (₹)*"
-                  : "Discount Percentage (%)*"}
+                {discountType === 'fixed'
+                  ? 'Discount Amount (₹)*'
+                  : 'Discount Percentage (%)*'}
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  {discountType === "fixed" ? "₹" : "%"}
+                  {discountType === 'fixed' ? '₹' : '%'}
                 </span>
                 <input
                   type="number"
                   value={discountValue}
                   onChange={(e) => setDiscountValue(e.target.value)}
-                  step={discountType === "fixed" ? "0.01" : "1"}
+                  step={discountType === 'fixed' ? '0.01' : '1'}
                   min="0"
-                  max={discountType === "percentage" ? "100" : ""}
+                  max={discountType === 'percentage' ? '100' : ''}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -200,7 +200,7 @@ const Offers = () => {
 
           {/* Product/Category Selection */}
           <div className="mt-4">
-            {offerType === "product" ? (
+            {offerType === 'product' ? (
               <>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Select Products*
@@ -228,7 +228,7 @@ const Offers = () => {
                   Select Category*
                 </label>
                 <select
-                  value={selectedCategory || ""}
+                  value={selectedCategory || ''}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
@@ -356,23 +356,23 @@ const Offers = () => {
                     {offer.offerType}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {offer.discountType === "fixed"
+                    {offer.discountType === 'fixed'
                       ? `₹${offer.discountValue}`
                       : `${offer.discountValue}%`}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {offer.offerType === "product"
+                    {offer.offerType === 'product'
                       ? `${offer.products.length} product(s)`
-                      : offer.category?.categoryName || "N/A"}
+                      : offer.category?.categoryName || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(offer.startDate)} - {formatDate(offer.endDate)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${offer.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                      className={`px-2 py-1 rounded-full text-xs ${offer.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
                     >
-                      {offer.isActive ? "Active" : "Inactive"}
+                      {offer.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -386,7 +386,7 @@ const Offers = () => {
                       Edit
                     </button>
                     <button
-                      onClick={() => console.log("Delete offer", offer._id)}
+                      onClick={() => console.log('Delete offer', offer._id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       Delete
@@ -493,13 +493,13 @@ const Offers = () => {
                 {/* Discount Value */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {editingOffer.discountType === "fixed"
-                      ? "Discount Amount (₹)*"
-                      : "Discount Percentage (%)*"}
+                    {editingOffer.discountType === 'fixed'
+                      ? 'Discount Amount (₹)*'
+                      : 'Discount Percentage (%)*'}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      {editingOffer.discountType === "fixed" ? "₹" : "%"}
+                      {editingOffer.discountType === 'fixed' ? '₹' : '%'}
                     </span>
                     <input
                       type="number"
@@ -511,11 +511,11 @@ const Offers = () => {
                         })
                       }
                       step={
-                        editingOffer.discountType === "fixed" ? "0.01" : "1"
+                        editingOffer.discountType === 'fixed' ? '0.01' : '1'
                       }
                       min="0"
                       max={
-                        editingOffer.discountType === "percentage" ? "100" : ""
+                        editingOffer.discountType === 'percentage' ? '100' : ''
                       }
                       className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -549,7 +549,7 @@ const Offers = () => {
                   </label>
                   <input
                     type="date"
-                    value={editingOffer.startDate.split("T")[0]}
+                    value={editingOffer.startDate.split('T')[0]}
                     onChange={(e) =>
                       setEditingOffer({
                         ...editingOffer,
@@ -567,7 +567,7 @@ const Offers = () => {
                   </label>
                   <input
                     type="date"
-                    value={editingOffer.endDate.split("T")[0]}
+                    value={editingOffer.endDate.split('T')[0]}
                     onChange={(e) =>
                       setEditingOffer({
                         ...editingOffer,
@@ -599,7 +599,7 @@ const Offers = () => {
 
               {/* Product/Category Selection */}
               <div className="mt-4">
-                {editingOffer.offerType === "product" ? (
+                {editingOffer.offerType === 'product' ? (
                   <>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Select Products*
@@ -611,14 +611,14 @@ const Offers = () => {
                             type="checkbox"
                             id={`edit-product-${product._id}`}
                             checked={editingOffer.products.some(
-                              (p) => p._id === product._id,
+                              (p) => p._id === product._id
                             )}
                             onChange={() => {
                               const newProducts = editingOffer.products.some(
-                                (p) => p._id === product._id,
+                                (p) => p._id === product._id
                               )
                                 ? editingOffer.products.filter(
-                                    (p) => p._id !== product._id,
+                                    (p) => p._id !== product._id
                                   )
                                 : [...editingOffer.products, product];
                               setEditingOffer({
@@ -641,10 +641,10 @@ const Offers = () => {
                       Select Category*
                     </label>
                     <select
-                      value={editingOffer.category?._id || ""}
+                      value={editingOffer.category?._id || ''}
                       onChange={(e) => {
                         const selectedCat = sampleCategories.find(
-                          (cat) => cat._id === e.target.value,
+                          (cat) => cat._id === e.target.value
                         );
                         setEditingOffer({
                           ...editingOffer,
@@ -697,7 +697,7 @@ const Offers = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    console.log("Updated offer:", editingOffer);
+                    console.log('Updated offer:', editingOffer);
                     setIsEditModalOpen(false);
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"

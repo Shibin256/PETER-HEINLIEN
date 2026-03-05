@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   createPaymentOrder,
   placeOrder,
   updateOrderStatus,
   verifyPayment,
-} from "../../features/orders/ordersSlice";
-import { toast } from "react-toastify";
-import { resetCart, toggleIsLocked } from "../../features/cart/cartSlice";
-import { getWallet } from "../../features/wallet/walletSlice";
+} from '../../features/orders/ordersSlice';
+import { toast } from 'react-toastify';
+import { resetCart, toggleIsLocked } from '../../features/cart/cartSlice';
+import { getWallet } from '../../features/wallet/walletSlice';
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 const PaymentPage = () => {
-  const [selectedPayment, setSelectedPayment] = useState("razorpay");
+  const [selectedPayment, setSelectedPayment] = useState('razorpay');
   const [showCODMessage, setShowCODMessage] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [orderStatus, setOrderStatus] = useState(null); // 'success' or 'error'
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderId, setOrderId] = useState("");
-  const [date, setDate] = useState("");
+  const [orderId, setOrderId] = useState('');
+  const [date, setDate] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const PaymentPage = () => {
 
   const handlePaymentChange = (method) => {
     setSelectedPayment(method);
-    if (method === "cod") {
+    if (method === 'cod') {
       setShowCODMessage(true);
     } else {
       setShowCODMessage(false);
@@ -60,8 +60,8 @@ const PaymentPage = () => {
   const { walletAmount } = useSelector((state) => state.wallet);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
     document.body.appendChild(script);
   }, []);
@@ -69,7 +69,7 @@ const PaymentPage = () => {
   useEffect(() => {
     // If user landed here directly without state, redirect them to cart
     if (!location.state || !address || !cartItems) {
-      navigate("/cart", { replace: true });
+      navigate('/cart', { replace: true });
     }
   }, []);
 
@@ -84,35 +84,35 @@ const PaymentPage = () => {
           key: razorpayKey,
           amount: order.amount,
           currency: order.currency,
-          name: "Peter Heinlien Watches",
-          description: "Watch Order",
+          name: 'Peter Heinlien Watches',
+          description: 'Watch Order',
           order_id: order.id,
           handler: async (response) => {
             try {
               const verifyRes = await dispatch(
-                verifyPayment({ paymentDetails: response, orderId: orderId }),
+                verifyPayment({ paymentDetails: response, orderId: orderId })
               ).unwrap();
               if (verifyRes.success) {
                 resolve(true);
               } else {
-                reject("Payment verification failed");
+                reject('Payment verification failed');
               }
             } catch (err) {
               console.log(err);
-              reject("Payment verification error");
+              reject('Payment verification error');
             }
           },
           prefill: {
-            name: "Customer Name",
-            email: "customer@example.com",
-            contact: "9999999999",
+            name: 'Customer Name',
+            email: 'customer@example.com',
+            contact: '9999999999',
           },
           theme: {
-            color: "#3399cc",
+            color: '#3399cc',
           },
           modal: {
             ondismiss: () => {
-              reject("Payment was cancelled by user");
+              reject('Payment was cancelled by user');
             },
           },
           retry: {
@@ -122,16 +122,16 @@ const PaymentPage = () => {
 
         const rzp = new window.Razorpay(options);
 
-        rzp.on("payment.failed", function (response) {
+        rzp.on('payment.failed', function (response) {
           const errorMessage =
-            response.error?.description || "Payment failed due to an error.";
+            response.error?.description || 'Payment failed due to an error.';
           reject(errorMessage);
         });
 
         rzp.open();
       });
     } catch (err) {
-      console.error("Razorpay init failed:", err);
+      console.error('Razorpay init failed:', err);
       return false;
     }
   };
@@ -139,7 +139,7 @@ const PaymentPage = () => {
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     try {
-      if (selectedPayment == "cod") {
+      if (selectedPayment == 'cod') {
         const res = await dispatch(
           placeOrder({
             orderdata: {
@@ -151,19 +151,19 @@ const PaymentPage = () => {
               deliveryDate,
             },
             paymentMethod: selectedPayment,
-          }),
+          })
         ).unwrap();
         setOrderId(res.order.orderId);
 
-        navigate("/", { replace: true });
+        navigate('/', { replace: true });
 
         setTimeout(() => {
-          navigate("/order-success", { state: { order: res.order } });
+          navigate('/order-success', { state: { order: res.order } });
         }, 0);
-      } else if (selectedPayment === "razorpay") {
+      } else if (selectedPayment === 'razorpay') {
         if (isLocked) {
-          toast.error("The cart is already locked and payment is pending.");
-          navigate("/");
+          toast.error('The cart is already locked and payment is pending.');
+          navigate('/');
           return;
         }
 
@@ -178,10 +178,10 @@ const PaymentPage = () => {
               shippingCost,
               userId,
               deliveryDate,
-              status: "pending",
+              status: 'pending',
             },
             paymentMethod: selectedPayment,
-          }),
+          })
         ).unwrap();
 
         setOrderId(pendingOrder.order.orderId);
@@ -195,17 +195,17 @@ const PaymentPage = () => {
 
         if (paymentSuccess) {
           dispatch(resetCart());
-          navigate("/order-success", { state: { order: pendingOrder.order } });
+          navigate('/order-success', { state: { order: pendingOrder.order } });
         } else {
-          toast.error("Payment failed");
+          toast.error('Payment failed');
           await dispatch(
             updateOrderStatus({
               orderId: pendingOrder.order.orderId,
-            }),
+            })
           );
           await dispatch(toggleIsLocked({ userID: userId, lock: false }));
         }
-      } else if (selectedPayment === "walletPay") {
+      } else if (selectedPayment === 'walletPay') {
         let totalAmount = totalPrice + (shippingCost || 0);
         if (totalAmount > walletAmount) {
           setShowModal(true);
@@ -221,28 +221,28 @@ const PaymentPage = () => {
                 deliveryDate,
               },
               paymentMethod: selectedPayment,
-            }),
+            })
           ).unwrap();
           setOrderId(res.order.orderId);
           const date = new Date(res.order.DeliveryDate);
-          date.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
+          date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
           });
-          navigate("/", { replace: true });
+          navigate('/', { replace: true });
 
           setTimeout(() => {
-            navigate("/order-success", { state: { order: res.order } });
+            navigate('/order-success', { state: { order: res.order } });
           }, 0);
         }
       } else {
-        navigate("/cart");
+        navigate('/cart');
       }
     } catch (error) {
-      setOrderStatus("error");
+      setOrderStatus('error');
       console.log(error);
-      navigate("/order-failed", {
+      navigate('/order-failed', {
         state: {
           cartItems,
           totalPrice,
@@ -258,8 +258,8 @@ const PaymentPage = () => {
 
   const handleModalClose = () => {
     setShowModal(false);
-    if (orderStatus === "success") {
-      navigate("/my-orders");
+    if (orderStatus === 'success') {
+      navigate('/my-orders');
     }
   };
 
@@ -274,15 +274,15 @@ const PaymentPage = () => {
         <div className="space-y-1">
           {/* UPI Option */}
           <div
-            className={`p-4 transition-all ${selectedPayment === "upi" ? "bg-green-50 border-l-4 border-green-500" : "hover:bg-gray-50"}`}
+            className={`p-4 transition-all ${selectedPayment === 'upi' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}
           >
             <label className="flex items-center cursor-pointer">
               <input
                 type="radio"
                 name="payment"
                 className="h-5 w-5 text-green-600 focus:ring-green-500"
-                checked={selectedPayment === "razorpay"}
-                onChange={() => handlePaymentChange("razorpay")}
+                checked={selectedPayment === 'razorpay'}
+                onChange={() => handlePaymentChange('razorpay')}
               />
               <div className="ml-3">
                 <span className="block font-medium text-gray-800">
@@ -300,7 +300,7 @@ const PaymentPage = () => {
 
           {/* Net Banking Option */}
           <div
-            className={`p-4 transition-all ${selectedPayment === "walletPay" ? "bg-green-50 border-l-4 border-green-500" : "hover:bg-gray-50"}`}
+            className={`p-4 transition-all ${selectedPayment === 'walletPay' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}
           >
             <label className="flex items-center cursor-pointer">
               <input
@@ -310,8 +310,8 @@ const PaymentPage = () => {
                 type="radio"
                 name="payment"
                 className="h-5 w-5 text-green-600 focus:ring-green-500"
-                checked={selectedPayment === "walletPay"}
-                onChange={() => handlePaymentChange("walletPay")}
+                checked={selectedPayment === 'walletPay'}
+                onChange={() => handlePaymentChange('walletPay')}
               />
               <div className="ml-3">
                 <span className="block font-medium text-gray-800">Wallet</span>
@@ -324,7 +324,7 @@ const PaymentPage = () => {
 
           {/* Cash on Delivery Option */}
           <div
-            className={`p-4 transition-all ${selectedPayment === "cod" ? "bg-green-50 border-l-4 border-green-500" : "hover:bg-gray-50"}`}
+            className={`p-4 transition-all ${selectedPayment === 'cod' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}
           >
             <label className="flex items-center cursor-pointer">
               <input
@@ -332,8 +332,8 @@ const PaymentPage = () => {
                 type="radio"
                 name="payment"
                 className="h-5 w-5 text-green-600 focus:ring-green-500"
-                checked={selectedPayment === "cod"}
-                onChange={() => handlePaymentChange("cod")}
+                checked={selectedPayment === 'cod'}
+                onChange={() => handlePaymentChange('cod')}
               />
               <div className="ml-3">
                 <span className="block font-medium text-gray-800">
@@ -386,14 +386,14 @@ const PaymentPage = () => {
         </button>
         <button
           onClick={handlePlaceOrder}
-          className={`px-6 py-2 rounded-md text-white transition-colors ${selectedPayment ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"}`}
+          className={`px-6 py-2 rounded-md text-white transition-colors ${selectedPayment ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'}`}
           disabled={!selectedPayment || isProcessing}
         >
           {isProcessing
-            ? "PROCESSING..."
-            : selectedPayment === "cod"
-              ? "CONFIRM ORDER"
-              : "PROCEED TO PAYMENT"}
+            ? 'PROCESSING...'
+            : selectedPayment === 'cod'
+              ? 'CONFIRM ORDER'
+              : 'PROCEED TO PAYMENT'}
         </button>
       </div>
 
@@ -402,7 +402,7 @@ const PaymentPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="text-center">
-              {orderStatus === "success" ? (
+              {orderStatus === 'success' ? (
                 <>
                   <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
                     <svg
@@ -459,10 +459,10 @@ const PaymentPage = () => {
               <div className="mt-5">
                 <button
                   type="button"
-                  className={`inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white ${orderStatus === "success" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"} focus:outline-none sm:text-sm`}
+                  className={`inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white ${orderStatus === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} focus:outline-none sm:text-sm`}
                   onClick={handleModalClose}
                 >
-                  {orderStatus === "success" ? "View Orders" : "Try Again"}
+                  {orderStatus === 'success' ? 'View Orders' : 'Try Again'}
                 </button>
               </div>
             </div>

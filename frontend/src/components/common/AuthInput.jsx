@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef } from 'react';
 
 const AuthInput = forwardRef(
   (
@@ -17,7 +17,7 @@ const AuthInput = forwardRef(
       rows,
       icon,
     },
-    ref,
+    ref
   ) => (
     <div>
       <label className={`block text-sm font-medium ${Textcolor} mb-1`}>
@@ -30,15 +30,15 @@ const AuthInput = forwardRef(
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          ref={ref} 
+          ref={ref}
           className={`${width} p-3 border ${borderColor} rounded-md focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-transparent ${bgcolor}`}
           rows={rows}
           required={required}
           autoComplete={
-            type === "email"
-              ? "username"
-              : type === "password"
-                ? "current-password"
+            type === 'email'
+              ? 'username'
+              : type === 'password'
+                ? 'current-password'
                 : undefined
           }
         />
@@ -49,7 +49,7 @@ const AuthInput = forwardRef(
         )}
       </div>
     </div>
-  ),
+  )
 );
 
 export default AuthInput;

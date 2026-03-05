@@ -1,26 +1,26 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   FaHeart,
   FaRegHeart,
   FaShoppingCart,
   FaStar,
   FaStarHalfAlt,
-} from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+} from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
   addToWishlist,
   removeFromWishlist,
-} from "../../features/wishlist/wishlistSlice";
-import { addToCart } from "../../features/cart/cartSlice";
-import { useEffect } from "react";
+} from '../../features/wishlist/wishlistSlice';
+import { addToCart } from '../../features/cart/cartSlice';
+import { useEffect } from 'react';
 
 const ProductCard = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(product.isWishlisted);
   const dispatch = useDispatch();
 
-  const storedUser = localStorage.getItem("user");
+  const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   // Function to render star ratings
@@ -48,47 +48,47 @@ const ProductCard = ({ product }) => {
   const toggleFavorite = async (e) => {
     e.preventDefault();
     if (!user) {
-      toast.warning("Please login to use wishlist");
+      toast.warning('Please login to use wishlist');
       return;
     }
 
     try {
       if (!isFavorite) {
         dispatch(addToWishlist({ userId: user._id, productId: product._id }));
-        toast.success("Added to wishlist");
+        toast.success('Added to wishlist');
       } else {
         dispatch(
-          removeFromWishlist({ userId: user._id, productId: product._id }),
+          removeFromWishlist({ userId: user._id, productId: product._id })
         );
-        toast.info("Removed from wishlist");
+        toast.info('Removed from wishlist');
       }
       setIsFavorite(!isFavorite);
     } catch (err) {
-      console.error("Wishlist error:", err);
-      toast.error("Something went wrong");
+      console.error('Wishlist error:', err);
+      toast.error('Something went wrong');
     }
   };
 
   const handleAddCart = async (e) => {
     e.preventDefault();
     if (!user) {
-      toast.warning("Please login to use Cart");
+      toast.warning('Please login to use Cart');
       return;
     }
     try {
       const res = await dispatch(
-        addToCart({ userId: user._id, productId: product._id }),
+        addToCart({ userId: user._id, productId: product._id })
       );
-      if (res.payload == "max quantity added") {
-        toast.warning("max quantity added");
-      } else if (res.payload == "Product is out of stock") {
-        toast.warning("Only this much products are left");
+      if (res.payload == 'max quantity added') {
+        toast.warning('max quantity added');
+      } else if (res.payload == 'Product is out of stock') {
+        toast.warning('Only this much products are left');
       } else {
-        toast.success("Added to cart");
+        toast.success('Added to cart');
       }
     } catch (err) {
-      console.error("cart error:", err);
-      toast.error("Something went wrong");
+      console.error('cart error:', err);
+      toast.error('Something went wrong');
     }
   };
 
@@ -99,9 +99,9 @@ const ProductCard = ({ product }) => {
         <div className="absolute top-2 left-2 right-2 flex justify-between items-center z-10">
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-medium shadow-sm 
-            ${product.availability ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+            ${product.availability ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
           >
-            {product.availability ? "In Stock" : "Out of Stock"}
+            {product.availability ? 'In Stock' : 'Out of Stock'}
           </span>
 
           <div className="flex gap-1 z-20">

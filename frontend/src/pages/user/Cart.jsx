@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import Title from "../../components/common/Title";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import React, { useState } from 'react';
+import Title from '../../components/common/Title';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import {
   fetchCart,
   removeFromCart,
   updateCart,
-} from "../../features/cart/cartSlice";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+} from '../../features/cart/cartSlice';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Cart = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem('user'));
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ const Cart = () => {
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0,
+    0
   );
   const shipping = subtotal > 1000 ? 0 : 50;
   const [total, setTotal] = useState(subtotal + shipping);
@@ -54,7 +54,7 @@ const Cart = () => {
         userId: user._id,
         productId,
         quantity: newQuantity,
-      }),
+      })
     )
       .unwrap()
       .then(() => dispatch(fetchCart(user._id)))
@@ -67,13 +67,13 @@ const Cart = () => {
         userId: user._id,
         productId: id,
         itemQuantity: { quantity: quantity },
-      }),
+      })
     );
     dispatch(fetchCart(user._id));
   };
 
   const handleProceedToCheckout = async () => {
-    navigate("/checkout", {
+    navigate('/checkout', {
       state: {
         cartItems: localCart,
         totalPrice: total,
@@ -86,7 +86,7 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8 text-center">
-        <Title text1={"Your"} text2={"Shopping Cart"} />
+        <Title text1={'Your'} text2={'Shopping Cart'} />
         <div className="bg-white rounded-lg shadow-md p-12 mt-8">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +121,7 @@ const Cart = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-2 py-4">
-      <Title text1={"Your"} text2={"Shopping Cart"} />
+      <Title text1={'Your'} text2={'Shopping Cart'} />
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Cart Items - Wider Table */}
         <div className="lg:w-2/3">
@@ -159,7 +159,7 @@ const Cart = () => {
                             onClick={() =>
                               handleRemoveItem(
                                 item.productId._id,
-                                item.quantity,
+                                item.quantity
                               )
                             }
                             className="text-gray-400 hover:text-red-500 transition-colors mr-4"
@@ -184,9 +184,9 @@ const Cart = () => {
                               <img
                                 src={
                                   item?.productId?.images?.[0] ||
-                                  "/default-image.jpg"
+                                  '/default-image.jpg'
                                 }
-                                alt={item?.productId?.name || "Product Image"}
+                                alt={item?.productId?.name || 'Product Image'}
                                 className="h-full w-full object-cover"
                               />
                             )}
@@ -243,8 +243,8 @@ const Cart = () => {
                             className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${
                               item.quantity >= 4 ||
                               item.quantity >= item.productId.totalQuantity
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
+                                ? 'opacity-50 cursor-not-allowed'
+                                : ''
                             }`}
                             disabled={
                               item.quantity >= 4 ||
@@ -312,7 +312,7 @@ const Cart = () => {
                 <span className="text-gray-600">Shipping</span>
                 <span className="font-medium">
                   {shipping === 0
-                    ? "Free"
+                    ? 'Free'
                     : `${currency}${shipping.toFixed(2)}`}
                 </span>
               </div>

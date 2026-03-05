@@ -1,6 +1,6 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { FiAlertTriangle, FiRefreshCw } from "react-icons/fi";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -19,7 +19,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("Error caught:", error, errorInfo);
+    console.error('Error caught:', error, errorInfo);
     // You could also log to an error tracking service here
   }
 

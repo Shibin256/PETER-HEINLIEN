@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   LineChart,
   Line,
@@ -7,18 +7,18 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
 const prepareSalesTrend = (orders) => {
   const grouped = {};
 
   orders.forEach((order) => {
     const date = new Date(
-      order.DeliveryDate || order.createdAt,
-    ).toLocaleDateString("en-GB", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+      order.DeliveryDate || order.createdAt
+    ).toLocaleDateString('en-GB', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
 
     grouped[date] = (grouped[date] || 0) + Number(order.TotalAmount);

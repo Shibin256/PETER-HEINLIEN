@@ -1,106 +1,106 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import couponsService from "./couponsService";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import couponsService from './couponsService';
 
 export const createCoupons = createAsyncThunk(
-  "admin/createCoupons",
+  'admin/createCoupons',
   async (data, { rejectWithValue }) => {
     try {
       const res = await couponsService.createCoupons(data);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchCoupons = createAsyncThunk(
-  "admin/fetchCoupons",
-  async ({ search = "", page = 1, limit = 8 }, { rejectWithValue }) => {
+  'admin/fetchCoupons',
+  async ({ search = '', page = 1, limit = 8 }, { rejectWithValue }) => {
     try {
       const res = await couponsService.fetchAllCoupons(search, page, limit);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchUserCoupons = createAsyncThunk(
-  "admin/fetchUserCoupons",
+  'admin/fetchUserCoupons',
   async (_, { rejectWithValue }) => {
     try {
       const res = await couponsService.fetchUserCoupons();
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchAdsCoupons = createAsyncThunk(
-  "admin/fetchAdsCoupons",
+  'admin/fetchAdsCoupons',
   async (_, { rejectWithValue }) => {
     try {
       const res = await couponsService.fetchAdsCoupons();
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const deleteCoupon = createAsyncThunk(
-  "admin/deleteCoupon",
+  'admin/deleteCoupon',
   async (couponId, { rejectWithValue }) => {
     try {
       const res = await couponsService.deleteCoupon(couponId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const updateCoupon = createAsyncThunk(
-  "admin/updateCoupon",
+  'admin/updateCoupon',
   async (data, { rejectWithValue }) => {
     try {
       const res = await couponsService.updateCoupon(data);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const applyCoupon = createAsyncThunk(
-  "user/cart/applyCoupon",
+  'user/cart/applyCoupon',
   async ({ userId, couponCode }, thunkAPI) => {
     try {
       return await couponsService.applyCoupon({ userId, couponCode });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const removeCoupon = createAsyncThunk(
-  "user/cart/removeCoupon",
+  'user/cart/removeCoupon',
   async ({ userId, couponCode }, thunkAPI) => {
     try {
       return await couponsService.removeCoupon(userId, couponCode);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 const couponsSlice = createSlice({
-  name: "coupons",
+  name: 'coupons',
   initialState: {
     coupons: [],
     userCoupons: [],

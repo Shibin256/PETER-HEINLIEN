@@ -1,139 +1,139 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import productService from "./productService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import productService from './productService';
 //handle add items
 export const addProduct = createAsyncThunk(
-  "products/addProduct",
+  'products/addProduct',
   async (formData, { rejectWithValue }) => {
     try {
       const res = await productService.addProducts(formData);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 //handle fetchinng product
 export const fetchCollection = createAsyncThunk(
-  "products/fetchAll",
-  async ({ userId = "" }, { rejectWithValue }) => {
+  'products/fetchAll',
+  async ({ userId = '' }, { rejectWithValue }) => {
     try {
       const latestCollection = await productService.getLatestCollection(userId);
       return latestCollection;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchCollectionWithoutUser = createAsyncThunk(
-  "products/fetchCollectionWithoutUser",
+  'products/fetchCollectionWithoutUser',
   async (_, { rejectWithValue }) => {
     try {
       const latestCollection =
         await productService.fetchCollectionWithoutUser();
       return latestCollection;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const topRatedCollections = createAsyncThunk(
-  "products/topRatedCollections",
-  async ({ userId = "" }, { rejectWithValue }) => {
+  'products/topRatedCollections',
+  async ({ userId = '' }, { rejectWithValue }) => {
     try {
       const topRatedCollections =
         await productService.topRatedCollections(userId);
       return topRatedCollections;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const topRatedCollectionsWithOutUser = createAsyncThunk(
-  "products/topRatedCollectionsWithOutUser",
+  'products/topRatedCollectionsWithOutUser',
   async (_, { rejectWithValue }) => {
     try {
       const topRatedCollections =
         await productService.topRatedCollectionsWithOutUser();
       return topRatedCollections;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchProducts = createAsyncThunk(
-  "products/fetchProducts",
+  'products/fetchProducts',
   async (
     {
       page = 1,
       limit = 8,
-      search = "",
+      search = '',
       categories = [],
       brands = [],
-      sort = "",
-      order = "",
+      sort = '',
+      order = '',
     },
-    thunkAPI,
+    thunkAPI
   ) => {
     try {
       const params = new URLSearchParams({ page, limit });
 
-      if (search) params.append("search", search);
-      if (categories.length) params.append("categories", categories.join(","));
-      if (brands.length) params.append("brands", brands.join(","));
-      if (sort) params.append("sort", sort);
-      if (order) params.append("order", order);
+      if (search) params.append('search', search);
+      if (categories.length) params.append('categories', categories.join(','));
+      if (brands.length) params.append('brands', brands.join(','));
+      if (sort) params.append('sort', sort);
+      if (order) params.append('order', order);
 
       const response = await productService.getProducts(params);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const fetchProductsAdmin = createAsyncThunk(
-  "products/fetchProductsAdmin",
+  'products/fetchProductsAdmin',
   async (
     {
       page = 1,
       limit = 8,
-      search = "",
+      search = '',
       categories = [],
       brands = [],
-      sort = "",
-      order = "",
+      sort = '',
+      order = '',
     },
-    thunkAPI,
+    thunkAPI
   ) => {
     try {
       const params = new URLSearchParams({ page, limit });
 
-      if (search) params.append("search", search);
-      if (categories.length) params.append("categories", categories.join(","));
-      if (brands.length) params.append("brands", brands.join(","));
-      if (sort) params.append("sort", sort);
-      if (order) params.append("order", order);
+      if (search) params.append('search', search);
+      if (categories.length) params.append('categories', categories.join(','));
+      if (brands.length) params.append('brands', brands.join(','));
+      if (sort) params.append('sort', sort);
+      if (order) params.append('order', order);
 
       const response = await productService.getProductsAdmin(params);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 //handle delete
 export const deleteProduct = createAsyncThunk(
-  "product/delete",
+  'product/delete',
   async (id, { rejectWithValue }) => {
     try {
       const res = await productService.deleteProduct(id);
@@ -141,11 +141,11 @@ export const deleteProduct = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  },
+  }
 );
 
 export const unlistProduct = createAsyncThunk(
-  "product/delete",
+  'product/delete',
   async (id, { rejectWithValue }) => {
     try {
       const res = await productService.unlistProduct(id);
@@ -153,11 +153,11 @@ export const unlistProduct = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  },
+  }
 );
 
 export const listProdcut = createAsyncThunk(
-  "product/delete",
+  'product/delete',
   async (id, { rejectWithValue }) => {
     try {
       const res = await productService.listProduct(id);
@@ -165,12 +165,12 @@ export const listProdcut = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  },
+  }
 );
 
 // handle update product
 export const updateProduct = createAsyncThunk(
-  "product/updateProduct",
+  'product/updateProduct',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const res = await productService.updateProduct(id, data);
@@ -178,62 +178,62 @@ export const updateProduct = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
-  },
+  }
 );
 
 //fetching brand and collection
 export const getBrandAndCollection = createAsyncThunk(
-  "product/getBrandAndCollection",
+  'product/getBrandAndCollection',
   async (_, { rejectWithValue }) => {
     try {
       const res = await productService.getBrandAndCollection();
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 //fetching brand and collection
 export const getBrandAndCategory = createAsyncThunk(
-  "product/getBrandAndCategory",
+  'product/getBrandAndCategory',
   async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
       const res = await productService.getBrandAndCategory(page, limit);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 //fetching single product
 export const getProducById = createAsyncThunk(
-  "product/getProductById",
+  'product/getProductById',
   async (id, { rejectWithValue }) => {
     try {
       const res = await productService.getProducById(id);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const relatedProducts = createAsyncThunk(
-  "product/relatedProduct",
-  async ({ id, userId = "" }, { rejectWithValue }) => {
+  'product/relatedProduct',
+  async ({ id, userId = '' }, { rejectWithValue }) => {
     try {
       const res = await productService.getRelatedProducts(id, userId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const addProductOffer = createAsyncThunk(
-  "product/addProductOffer",
+  'product/addProductOffer',
   async ({ productId, percentage }, { rejectWithValue }) => {
     try {
       const res = await productService.addProductOffer({
@@ -242,25 +242,25 @@ export const addProductOffer = createAsyncThunk(
       });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const removeProductOffer = createAsyncThunk(
-  "product/removeProductOffer",
+  'product/removeProductOffer',
   async (productId, { rejectWithValue }) => {
     try {
       const res = await productService.removeProductOffer(productId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 const productSlice = createSlice({
-  name: "products",
+  name: 'products',
   initialState: {
     products: [],
     productsRelated: [],
@@ -328,7 +328,6 @@ const productSlice = createSlice({
         state.hasMore = page < totalPages;
         state.loading = false;
       })
-
 
       // updateProduct
       .addCase(updateProduct.pending, (state) => {

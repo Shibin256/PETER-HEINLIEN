@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import AuthLayout from "../../components/common/AuhLayout";
-import AuthInput from "../../components/common/AuthInput";
-import MainThemeButton from "../../components/common/MainThemeButton";
-import { toast } from "react-toastify";
+import React, { useState } from 'react';
+import AuthLayout from '../../components/common/AuhLayout';
+import AuthInput from '../../components/common/AuthInput';
+import MainThemeButton from '../../components/common/MainThemeButton';
+import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-import axiosInstance from "../../api/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../api/axiosInstance';
+import { useNavigate } from 'react-router-dom';
 
 const ForgotPass = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
+    email: '',
   });
 
   // handling input changes
@@ -29,22 +29,22 @@ const ForgotPass = () => {
     try {
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/forgotpass`,
-        { email: formData.email },
+        { email: formData.email }
       );
       if (response) {
         toast.success(response.data.message);
         //naviagting to otp verification page with data
-        navigate("/verify-otp-forgotpass", {
+        navigate('/verify-otp-forgotpass', {
           state: {
             formData,
           },
         });
       } else {
-        toast.error("Otp sends failed. Please check your inputs.");
+        toast.error('Otp sends failed. Please check your inputs.');
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      toast.error(error.response?.data?.message || 'error hapened');
     } finally {
       setLoading(false);
     }

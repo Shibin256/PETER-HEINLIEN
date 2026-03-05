@@ -1,17 +1,17 @@
-import adminAxiosInstance from "../../api/adminAxiosInstance";
-import axiosInstance from "../../api/axiosInstance";
+import adminAxiosInstance from '../../api/adminAxiosInstance';
+import axiosInstance from '../../api/axiosInstance';
 
 //fetching products
 const getProducts = async (params) => {
   const response = await axiosInstance.get(
-    `/api/v1/products/user?${params.toString()}`,
+    `/api/v1/products/user?${params.toString()}`
   );
   return response.data;
 };
 
 const getProductsAdmin = async (params) => {
   const response = await adminAxiosInstance.get(
-    `/api/v1/products?${params.toString()}`,
+    `/api/v1/products?${params.toString()}`
   );
   return response.data;
 };
@@ -24,14 +24,14 @@ const getLatestCollection = async (userId) => {
 
 const topRatedCollections = async (userId) => {
   const response = await axiosInstance.get(
-    `/api/v1/products/top-rated/${userId}`,
+    `/api/v1/products/top-rated/${userId}`
   );
   return response.data;
 };
 
 //adding products
 const addProducts = async (formData) => {
-  const response = await adminAxiosInstance.post("/api/v1/products", formData);
+  const response = await adminAxiosInstance.post('/api/v1/products', formData);
   return response.data;
 };
 
@@ -48,7 +48,7 @@ const listProduct = async (id) => {
 
 const unlistProduct = async (id) => {
   const response = await adminAxiosInstance.post(
-    `/api/v1/product/unlist/${id}`,
+    `/api/v1/product/unlist/${id}`
   );
   return response.data;
 };
@@ -57,7 +57,7 @@ const unlistProduct = async (id) => {
 const updateProduct = async (id, data) => {
   const res = await adminAxiosInstance.put(`/api/v1/product/${id}`, data, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
     withCredentials: true,
   });
@@ -67,7 +67,7 @@ const updateProduct = async (id, data) => {
 // fetching brand and category
 const getBrandAndCollection = async () => {
   const res = await axiosInstance.get(
-    "/api/v1/products/getBrandsAndCollection",
+    '/api/v1/products/getBrandsAndCollection'
   );
   return res.data;
 };
@@ -81,7 +81,7 @@ const getProducById = async (id) => {
 const getRelatedProducts = async (id, userId) => {
   if (userId) {
     const res = await axiosInstance.get(
-      `/api/v1/products/${id}/${userId}/related`,
+      `/api/v1/products/${id}/${userId}/related`
     );
     return res.data;
   } else {
@@ -91,7 +91,7 @@ const getRelatedProducts = async (id, userId) => {
 };
 
 const addProductOffer = async ({ productId, percentage }) => {
-  const res = await adminAxiosInstance.post("/api/v1/admin/offers", {
+  const res = await adminAxiosInstance.post('/api/v1/admin/offers', {
     productId,
     percentage,
   });
@@ -100,7 +100,7 @@ const addProductOffer = async ({ productId, percentage }) => {
 
 const removeProductOffer = async (productId) => {
   const res = await adminAxiosInstance.delete(
-    `/api/v1/admin/offers/${productId}`,
+    `/api/v1/admin/offers/${productId}`
   );
   return res.data;
 };
@@ -108,7 +108,7 @@ const removeProductOffer = async (productId) => {
 // fetching brand and category
 const getBrandAndCategory = async (page, limit) => {
   const params = new URLSearchParams({ page, limit });
-  const res = await axiosInstance.get("/api/v1/brand/category", {
+  const res = await axiosInstance.get('/api/v1/brand/category', {
     params: params,
   });
   return res.data;

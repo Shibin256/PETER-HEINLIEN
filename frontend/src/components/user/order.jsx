@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   addReview,
   cancelOrderItem,
   cancelSingleOrderItem,
   downloadInvoice,
   returnOrderItem,
-} from "../../features/orders/ordersSlice";
-import { Dialog } from "@headlessui/react";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+} from '../../features/orders/ordersSlice';
+import { Dialog } from '@headlessui/react';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Order = ({ order, onCancelSuccess }) => {
   const {
@@ -32,56 +32,56 @@ const Order = ({ order, onCancelSuccess }) => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSingleCancelModalOpen, setIsSingleCancelModalOpen] = useState(false);
   const [selectedItemToCancel, setSelectedItemToCancel] = useState(null);
-  const [cancellationReason, setCancellationReason] = useState("");
+  const [cancellationReason, setCancellationReason] = useState('');
 
   // Return modal states
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [selectedItemToReturn, setSelectedItemToReturn] = useState(null);
-  const [returnReason, setReturnReason] = useState("");
-  const [additionalDetails, setAdditionalDetails] = useState("");
+  const [returnReason, setReturnReason] = useState('');
+  const [additionalDetails, setAdditionalDetails] = useState('');
 
   // Status styling
   const statusStyles = {
-    Pending: "bg-yellow-100 text-yellow-800",
-    Processing: "bg-blue-100 text-blue-800",
-    Shipped: "bg-purple-100 text-purple-800",
-    Delivered: "bg-green-100 text-green-800",
-    Cancelled: "bg-red-100 text-red-800",
-    Returned: "bg-orange-100 text-orange-800",
-    Failed: "bg-red-100 text-red-800",
+    Pending: 'bg-yellow-100 text-yellow-800',
+    Processing: 'bg-blue-100 text-blue-800',
+    Shipped: 'bg-purple-100 text-purple-800',
+    Delivered: 'bg-green-100 text-green-800',
+    Cancelled: 'bg-red-100 text-red-800',
+    Returned: 'bg-orange-100 text-orange-800',
+    Failed: 'bg-red-100 text-red-800',
   };
 
   // Payment status styling
   const paymentStatusStyles = {
-    Pending: "bg-yellow-100 text-yellow-800",
-    Paid: "bg-green-100 text-green-800",
-    Failed: "bg-red-100 text-red-800",
-    Refunded: "bg-blue-100 text-blue-800",
+    Pending: 'bg-yellow-100 text-yellow-800',
+    Paid: 'bg-green-100 text-green-800',
+    Failed: 'bg-red-100 text-red-800',
+    Refunded: 'bg-blue-100 text-blue-800',
   };
 
   // Cancellation reasons
   const cancellationReasons = [
-    "Changed my mind",
-    "Found a better price elsewhere",
-    "Item no longer needed",
-    "Shipping takes too long",
-    "Ordered by mistake",
-    "Product specifications changed",
-    "Other reason",
+    'Changed my mind',
+    'Found a better price elsewhere',
+    'Item no longer needed',
+    'Shipping takes too long',
+    'Ordered by mistake',
+    'Product specifications changed',
+    'Other reason',
   ];
 
   // Return reasons specific to watches
   const watchReturnReasons = [
-    "Product damaged or defective",
-    "Received wrong item",
-    "Item not as described",
-    "Size/fit issues",
-    "Quality not as expected",
-    "Battery issues",
-    "Strap/band problems",
-    "Watch not working properly",
-    "Changed my mind",
-    "Other reason",
+    'Product damaged or defective',
+    'Received wrong item',
+    'Item not as described',
+    'Size/fit issues',
+    'Quality not as expected',
+    'Battery issues',
+    'Strap/band problems',
+    'Watch not working properly',
+    'Changed my mind',
+    'Other reason',
   ];
 
   // State for ratings and reviews
@@ -89,21 +89,21 @@ const Order = ({ order, onCancelSuccess }) => {
     Items.reduce((acc, item) => {
       acc[item.itemOrderId] = 0;
       return acc;
-    }, {}),
+    }, {})
   );
 
   const [reviews, setReviews] = useState(
     Items.reduce((acc, item) => {
-      acc[item.itemOrderId] = "";
+      acc[item.itemOrderId] = '';
       return acc;
-    }, {}),
+    }, {})
   );
 
   const [showReviewForm, setShowReviewForm] = useState(
     Items.reduce((acc, item) => {
       acc[item.itemOrderId] = false;
       return acc;
-    }, {}),
+    }, {})
   );
 
   // Get first item for summary preview
@@ -128,7 +128,7 @@ const Order = ({ order, onCancelSuccess }) => {
         itemId: itemId,
         rating: ratings[itemId],
         review: reviews[itemId],
-      }),
+      })
     );
     setRatings((prev) => {
       const updated = { ...prev };
@@ -144,19 +144,19 @@ const Order = ({ order, onCancelSuccess }) => {
 
     toggleReviewForm(itemId);
 
-    toast.success("Review submitted!");
+    toast.success('Review submitted!');
   };
 
   const closeCancelModal = () => {
     setIsCancelModalOpen(false);
     setSelectedItemToCancel(null);
-    setCancellationReason("");
+    setCancellationReason('');
   };
 
   const closeSingleCancelModal = () => {
     setIsSingleCancelModalOpen(false);
     setSelectedItemToCancel(null);
-    setCancellationReason("");
+    setCancellationReason('');
   };
 
   const confirmCancel = async () => {
@@ -165,7 +165,7 @@ const Order = ({ order, onCancelSuccess }) => {
         cancelOrderItem({
           itemOrderId: selectedItemToCancel,
           reason: cancellationReason,
-        }),
+        })
       );
       onCancelSuccess();
       closeCancelModal();
@@ -178,7 +178,7 @@ const Order = ({ order, onCancelSuccess }) => {
         cancelSingleOrderItem({
           itemOrderId: selectedItemToCancel,
           reason: cancellationReason,
-        }),
+        })
       );
       onCancelSuccess();
       closeSingleCancelModal();
@@ -194,19 +194,18 @@ const Order = ({ order, onCancelSuccess }) => {
   const closeReturnModal = () => {
     setIsReturnModalOpen(false);
     setSelectedItemToReturn(null);
-    setReturnReason("");
-    setAdditionalDetails("");
+    setReturnReason('');
+    setAdditionalDetails('');
   };
 
   const confirmReturn = async () => {
     if (selectedItemToReturn && returnReason) {
-  
       await dispatch(
         returnOrderItem({
           itemOrderId: selectedItemToReturn,
           reason: returnReason,
           deatials: additionalDetails,
-        }),
+        })
       );
       onCancelSuccess();
       closeReturnModal();
@@ -215,7 +214,7 @@ const Order = ({ order, onCancelSuccess }) => {
 
   const handleInvoice = async (orderId) => {
     await dispatch(downloadInvoice({ itemOrderId: orderId }));
-    console.log("success");
+    console.log('success');
   };
 
   const toggleExpand = () => {
@@ -235,15 +234,15 @@ const Order = ({ order, onCancelSuccess }) => {
               Order #{orderId}
             </h2>
             <span
-              className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyles[OrderStatus] || "bg-gray-100 text-gray-800"}`}
+              className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyles[OrderStatus] || 'bg-gray-100 text-gray-800'}`}
             >
               {OrderStatus}
             </span>
             <span className="text-sm text-gray-600">
-              {new Date(DeliveryDate).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
+              {new Date(DeliveryDate).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
               })}
             </span>
           </div>
@@ -251,7 +250,7 @@ const Order = ({ order, onCancelSuccess }) => {
           {/* Compact Summary */}
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
             <span className="font-medium">
-              {itemCount} item{itemCount !== 1 ? "s" : ""}
+              {itemCount} item{itemCount !== 1 ? 's' : ''}
             </span>
             <span>•</span>
             <span className="font-bold text-gray-900">₹{TotalAmount}</span>
@@ -267,35 +266,33 @@ const Order = ({ order, onCancelSuccess }) => {
         </div>
 
         <div className="flex items-center gap-3">
-
           <div onClick={(e) => e.stopPropagation()}>
-            {OrderStatus === "Failed" &&
-              (
-                <button
-                  onClick={() => {
-                    navigate("/retry-payment", {
-                      state: {
-                        orderId: orderId,
-                        address: Order_Address,
-                        cartItems: Items,
-                        totalPrice: TotalAmount,
-                        discount: 0,
-                        appliedCoupon: null,
-                        shippingCost: DeliveryCharge,
-                        userId: UserID,
-                        deliveryDate: DeliveryDate,
-                      }});
+            {OrderStatus === 'Failed' && (
+              <button
+                onClick={() => {
+                  navigate('/retry-payment', {
+                    state: {
+                      orderId: orderId,
+                      address: Order_Address,
+                      cartItems: Items,
+                      totalPrice: TotalAmount,
+                      discount: 0,
+                      appliedCoupon: null,
+                      shippingCost: DeliveryCharge,
+                      userId: UserID,
+                      deliveryDate: DeliveryDate,
+                    },
+                  });
+                }}
+                className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-medium transition-colors border border-green-100 mr-2"
+              >
+                Retry Payment
+              </button>
+            )}
 
-                  }}
-                  className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-medium transition-colors border border-green-100 mr-2"
-                >
-                  Retry Payment
-                </button>
-              )}
-
-            {OrderStatus !== "Cancelled" &&
-              OrderStatus !== "Delivered" &&
-              OrderStatus !== "Failed" && (
+            {OrderStatus !== 'Cancelled' &&
+              OrderStatus !== 'Delivered' &&
+              OrderStatus !== 'Failed' && (
                 <button
                   onClick={() => (
                     setSelectedItemToCancel(orderId),
@@ -307,7 +304,7 @@ const Order = ({ order, onCancelSuccess }) => {
                 </button>
               )}
 
-            {OrderStatus !== "Cancelled" && OrderStatus !== "Failed" && (
+            {OrderStatus !== 'Cancelled' && OrderStatus !== 'Failed' && (
               <button
                 onClick={() => handleInvoice(orderId)}
                 className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-medium transition-colors border border-blue-100"
@@ -319,7 +316,7 @@ const Order = ({ order, onCancelSuccess }) => {
 
           {/* Expand/Collapse Icon */}
           <svg
-            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -372,7 +369,7 @@ const Order = ({ order, onCancelSuccess }) => {
                       {item.subTotal}
                     </div>
                     <div>
-                      <span className="font-medium">Status:</span>{" "}
+                      <span className="font-medium">Status:</span>{' '}
                       {item.status || OrderStatus}
                     </div>
                   </div>
@@ -380,9 +377,9 @@ const Order = ({ order, onCancelSuccess }) => {
                   {/* Action Buttons */}
                   <div className="mt-4 flex flex-wrap gap-2">
                     {!item.returnReason &&
-                      OrderStatus !== "Cancelled" &&
-                      OrderStatus !== "Failed" &&
-                      OrderStatus !== "Delivered" && (
+                      OrderStatus !== 'Cancelled' &&
+                      OrderStatus !== 'Failed' &&
+                      OrderStatus !== 'Delivered' && (
                         <button
                           disabled={item.cancelReason}
                           onClick={() => (
@@ -392,35 +389,35 @@ const Order = ({ order, onCancelSuccess }) => {
                           className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
                         >
                           {!item.cancelReason
-                            ? "Cancel Order"
-                            : "Product canceled"}
+                            ? 'Cancel Order'
+                            : 'Product canceled'}
                         </button>
                       )}
 
-                    {OrderStatus === "Delivered" && !item.cancelReason && (
+                    {OrderStatus === 'Delivered' && !item.cancelReason && (
                       <button
                         disabled={item.returnReason}
                         onClick={() => openReturnModal(item.itemOrderId)}
-                        className={`px-3 py-1.5  ${!item.returnReason ? "bg-gray-50 hover:bg-gray-100 text-gray-700" : "bg-red-50 hover:bg-red-100 text-red-700"} rounded-lg text-sm font-medium transition-colors border border-gray-200`}
+                        className={`px-3 py-1.5  ${!item.returnReason ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 'bg-red-50 hover:bg-red-100 text-red-700'} rounded-lg text-sm font-medium transition-colors border border-gray-200`}
                       >
-                        {!item.returnReason ? "Return" : "Product Returned"}
+                        {!item.returnReason ? 'Return' : 'Product Returned'}
                       </button>
                     )}
 
-                    {OrderStatus === "Delivered" && !item.rated && (
+                    {OrderStatus === 'Delivered' && !item.rated && (
                       <button
                         onClick={() => toggleReviewForm(item.itemOrderId)}
                         className="px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-lg text-sm font-medium transition-colors border border-yellow-100"
                       >
                         {showReviewForm[item.itemOrderId]
-                          ? "Hide Review"
-                          : "Rate Product"}
+                          ? 'Hide Review'
+                          : 'Rate Product'}
                       </button>
                     )}
                   </div>
 
                   {/* Review Section */}
-                  {OrderStatus === "Delivered" && (
+                  {OrderStatus === 'Delivered' && (
                     <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                       {item.rated ? (
                         <div>
@@ -431,7 +428,7 @@ const Order = ({ order, onCancelSuccess }) => {
                             {[1, 2, 3, 4, 5].map((star) => (
                               <svg
                                 key={star}
-                                className={`w-5 h-5 ${star <= item.rating ? "text-yellow-400" : "text-gray-300"}`}
+                                className={`w-5 h-5 ${star <= item.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                               >
@@ -439,7 +436,7 @@ const Order = ({ order, onCancelSuccess }) => {
                               </svg>
                             ))}
                             <span className="ml-2 text-sm text-gray-600">
-                              {item.rating} star{item.rating !== 1 ? "s" : ""}
+                              {item.rating} star{item.rating !== 1 ? 's' : ''}
                             </span>
                           </div>
                           {item.comment && (
@@ -465,7 +462,7 @@ const Order = ({ order, onCancelSuccess }) => {
                                 className="focus:outline-none"
                               >
                                 <svg
-                                  className={`w-6 h-6 ${star <= ratings[item.itemOrderId] ? "text-yellow-400" : "text-gray-300"}`}
+                                  className={`w-6 h-6 ${star <= ratings[item.itemOrderId] ? 'text-yellow-400' : 'text-gray-300'}`}
                                   fill="currentColor"
                                   viewBox="0 0 20 20"
                                 >
@@ -475,8 +472,8 @@ const Order = ({ order, onCancelSuccess }) => {
                             ))}
                             <span className="ml-2 text-sm text-gray-600">
                               {ratings[item.itemOrderId] > 0
-                                ? `${ratings[item.itemOrderId]} star${ratings[item.itemOrderId] !== 1 ? "s" : ""}`
-                                : "Not rated"}
+                                ? `${ratings[item.itemOrderId]} star${ratings[item.itemOrderId] !== 1 ? 's' : ''}`
+                                : 'Not rated'}
                             </span>
                           </div>
 
@@ -489,7 +486,7 @@ const Order = ({ order, onCancelSuccess }) => {
                               onChange={(e) =>
                                 handleReviewChange(
                                   item.itemOrderId,
-                                  e.target.value,
+                                  e.target.value
                                 )
                               }
                             />
@@ -499,7 +496,7 @@ const Order = ({ order, onCancelSuccess }) => {
                             <button
                               onClick={() => submitReview(item.itemOrderId)}
                               disabled={ratings[item.itemOrderId] === 0}
-                              className={`px-3 py-1 text-sm rounded-md font-medium text-white ${ratings[item.itemOrderId] === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                              className={`px-3 py-1 text-sm rounded-md font-medium text-white ${ratings[item.itemOrderId] === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
                               Submit
                             </button>
@@ -549,7 +546,7 @@ const Order = ({ order, onCancelSuccess }) => {
                   <p className="text-sm text-gray-600 mt-2">
                     {Order_Address.house},{Order_Address.locality}
                     <br />
-                    {Order_Address.city}, {Order_Address.state} -{" "}
+                    {Order_Address.city}, {Order_Address.state} -{' '}
                     {Order_Address.pincode}
                   </p>
                 </div>
@@ -586,7 +583,7 @@ const Order = ({ order, onCancelSuccess }) => {
                       Payment Status:
                     </span>
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${paymentStatusStyles[PaymentStatus] || "bg-gray-100 text-gray-800"}`}
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${paymentStatusStyles[PaymentStatus] || 'bg-gray-100 text-gray-800'}`}
                     >
                       {PaymentStatus}
                     </span>
@@ -624,7 +621,7 @@ const Order = ({ order, onCancelSuccess }) => {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="w-full max-w-md rounded-xl bg-white p-6">
             <Dialog.Title className="text-lg font-bold text-gray-900 mb-4">
-              {selectedItemToCancel ? "Cancel Item" : "Cancel Order"}
+              {selectedItemToCancel ? 'Cancel Item' : 'Cancel Order'}
             </Dialog.Title>
 
             <div className="mb-4">
@@ -645,7 +642,7 @@ const Order = ({ order, onCancelSuccess }) => {
               </select>
             </div>
 
-            {cancellationReason === "Other reason" && (
+            {cancellationReason === 'Other reason' && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Please specify
@@ -668,7 +665,7 @@ const Order = ({ order, onCancelSuccess }) => {
               <button
                 onClick={confirmCancel}
                 disabled={!cancellationReason}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
               >
                 Confirm Cancellation
               </button>
@@ -687,7 +684,7 @@ const Order = ({ order, onCancelSuccess }) => {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="w-full max-w-md rounded-xl bg-white p-6">
             <Dialog.Title className="text-lg font-bold text-gray-900 mb-4">
-              {selectedItemToCancel ? "Cancel Item" : "Cancel Order"}
+              {selectedItemToCancel ? 'Cancel Item' : 'Cancel Order'}
             </Dialog.Title>
 
             <div className="mb-4">
@@ -708,7 +705,7 @@ const Order = ({ order, onCancelSuccess }) => {
               </select>
             </div>
 
-            {cancellationReason === "Other reason" && (
+            {cancellationReason === 'Other reason' && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Please specify
@@ -731,7 +728,7 @@ const Order = ({ order, onCancelSuccess }) => {
               <button
                 onClick={confirmSingleCancel}
                 disabled={!cancellationReason}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!cancellationReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
               >
                 Confirm Cancellation
               </button>
@@ -771,21 +768,21 @@ const Order = ({ order, onCancelSuccess }) => {
               </select>
             </div>
 
-            {(returnReason === "Other reason" ||
-              returnReason === "Item not as described") && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional details
-                  </label>
-                  <textarea
-                    rows="3"
-                    value={additionalDetails}
-                    onChange={(e) => setAdditionalDetails(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Please provide more information..."
-                  />
-                </div>
-              )}
+            {(returnReason === 'Other reason' ||
+              returnReason === 'Item not as described') && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional details
+                </label>
+                <textarea
+                  rows="3"
+                  value={additionalDetails}
+                  onChange={(e) => setAdditionalDetails(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Please provide more information..."
+                />
+              </div>
+            )}
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
               <div className="flex">
@@ -823,7 +820,7 @@ const Order = ({ order, onCancelSuccess }) => {
               <button
                 onClick={confirmReturn}
                 disabled={!returnReason}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!returnReason ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${!returnReason ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
               >
                 Submit Return Request
               </button>

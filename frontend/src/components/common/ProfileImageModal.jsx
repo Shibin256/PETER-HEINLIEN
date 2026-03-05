@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-import { imageUpload } from "../../features/accountSettings/accountSlice";
-import { setUser } from "../../features/auth/authSlice";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { imageUpload } from '../../features/accountSettings/accountSlice';
+import { setUser } from '../../features/auth/authSlice';
 
 const ProfileImageModal = ({ isOpen, onClose, initialImage, user }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -18,20 +18,19 @@ const ProfileImageModal = ({ isOpen, onClose, initialImage, user }) => {
   };
 
   const handleSave = async () => {
-
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append('file', selectedFile);
     try {
       const res = await dispatch(
-        imageUpload({ userId: user.id, data: formData }),
+        imageUpload({ userId: user.id, data: formData })
       ).unwrap();
       if (res) {
-        toast.success("image added successfully");
+        toast.success('image added successfully');
         dispatch(setUser({ user: res }));
         onClose();
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to add product.");
+      toast.error(error?.message || 'Failed to add product.');
     }
   };
 

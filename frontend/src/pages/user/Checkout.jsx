@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getAllAddress } from "../../features/accountSettings/accountSlice";
-import EditAddressModal from "../../components/common/EditAddress";
-import CheckoutCard from "../../components/user/CheckoutCard";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getAllAddress } from '../../features/accountSettings/accountSlice';
+import EditAddressModal from '../../components/common/EditAddress';
+import CheckoutCard from '../../components/user/CheckoutCard';
 import {
   applyCoupon,
   removeCoupon,
   fetchUserCoupons,
-} from "../../features/coupons/couponsSlice";
-import { fetchCart } from "../../features/cart/cartSlice";
-import { toast } from "react-toastify";
-import { RiCouponLine } from "react-icons/ri";
+} from '../../features/coupons/couponsSlice';
+import { fetchCart } from '../../features/cart/cartSlice';
+import { toast } from 'react-toastify';
+import { RiCouponLine } from 'react-icons/ri';
 
 const Checkout = () => {
   const [step, setStep] = useState(2);
@@ -22,14 +22,14 @@ const Checkout = () => {
   const from = location.state?.from || false;
   const shippingCost = location.state?.shippingCost || 0;
 
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [couponError, setCouponError] = useState("");
+  const [couponError, setCouponError] = useState('');
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = JSON.parse(localStorage.getItem("user")) || { name: "Guest" };
+  const user = JSON.parse(localStorage.getItem('user')) || { name: 'Guest' };
   const { currency } = useSelector((state) => state.global);
   const { addresses } = useSelector((state) => state.account);
   const { userCoupons = [] } = useSelector((state) => state.coupons);
@@ -43,7 +43,7 @@ const Checkout = () => {
 
   useEffect(() => {
     if (!location.state || !cartItems || cartItems.length === 0) {
-      navigate("/cart", { replace: true });
+      navigate('/cart', { replace: true });
     }
   }, []);
 
@@ -59,11 +59,10 @@ const Checkout = () => {
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0,
+    0
   );
 
   const [total, setTotal] = useState(subtotal + shippingCost);
-
 
   useEffect(() => {
     if (from) {
@@ -83,10 +82,10 @@ const Checkout = () => {
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
-  const formattedDeliveryDate = deliveryDate.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+  const formattedDeliveryDate = deliveryDate.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   });
 
   useEffect(() => {
@@ -96,7 +95,7 @@ const Checkout = () => {
   useEffect(() => {
     if (addresses && addresses.length > 0) {
       const defaultAddr = addresses.find(
-        (addr) => addr.defaultAddress === true,
+        (addr) => addr.defaultAddress === true
       );
       if (defaultAddr) {
         setSelectedAddress(defaultAddr);
@@ -106,20 +105,19 @@ const Checkout = () => {
     }
   }, [addresses]);
 
-
   const calculateDiscount = (coupon, amount) => {
     if (!coupon) return 0;
 
     let discountAmount = 0;
 
-    if (coupon.discountType === "percentage") {
+    if (coupon.discountType === 'percentage') {
       discountAmount = (amount * coupon.discountValue) / 100;
 
       // apply max discount limit
       if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
         discountAmount = coupon.maxDiscount;
       }
-    } else if (coupon.discountType === "fixed") {
+    } else if (coupon.discountType === 'fixed') {
       discountAmount = coupon.discountValue;
     }
 
@@ -128,7 +126,7 @@ const Checkout = () => {
   };
 
   const handleApplyCoupon = async (coupon) => {
-    setCouponError("");
+    setCouponError('');
 
     try {
       const discountAmount = calculateDiscount(coupon, total);
@@ -136,7 +134,7 @@ const Checkout = () => {
       // Check if coupon is applicable
       if (total < coupon.minOrderAmount) {
         toast.error(
-          `Minimum order amount for this coupon is ${currency}${coupon.minOrderAmount}`,
+          `Minimum order amount for this coupon is ${currency}${coupon.minOrderAmount}`
         );
         return;
       }
@@ -146,7 +144,7 @@ const Checkout = () => {
           userId: user._id,
           couponCode: coupon.code,
           subtotal: total,
-        }),
+        })
       ).unwrap();
 
       if (data.error) {
@@ -159,7 +157,7 @@ const Checkout = () => {
       setShowCouponDropdown(false);
       toast.success(`Coupon ${coupon.code} applied successfully!`);
     } catch (err) {
-      setCouponError(err.message || "Failed to apply coupon");
+      setCouponError(err.message || 'Failed to apply coupon');
     }
   };
 
@@ -169,14 +167,14 @@ const Checkout = () => {
         removeCoupon({
           userId: user._id,
           couponCode: appliedCoupon.code,
-        }),
+        })
       );
 
-      if (res.type === "user/cart/removeCoupon/fulfilled") {
-        setCouponCode("");
+      if (res.type === 'user/cart/removeCoupon/fulfilled') {
+        setCouponCode('');
         setDiscount(0);
         setAppliedCoupon(null);
-        toast.info("Coupon removed");
+        toast.info('Coupon removed');
       }
     }
   };
@@ -201,7 +199,7 @@ const Checkout = () => {
         <button
           className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-all shadow-sm"
           onClick={() => {
-            navigate("/cart");
+            navigate('/cart');
           }}
         >
           Back
@@ -223,7 +221,7 @@ const Checkout = () => {
               </div>
             </div>
             <p className="ml-11 mt-2 text-sm text-gray-700">
-              Customer{" "}
+              Customer{' '}
               <span className="font-medium">name: {user.username}</span>
             </p>
           </div>
@@ -256,8 +254,8 @@ const Checkout = () => {
                         key={addr._id || index}
                         className={`border-2 ${
                           selectedAddress?._id === addr._id
-                            ? "border-green-500 bg-green-50"
-                            : "border-gray-200"
+                            ? 'border-green-500 bg-green-50'
+                            : 'border-gray-200'
                         } p-4 rounded-md flex items-start justify-between transition-colors duration-200`}
                       >
                         <div className="flex-grow">
@@ -280,7 +278,7 @@ const Checkout = () => {
                                   </span>
                                 )}
                                 <span
-                                  className={` ${addr.addressType === "home" ? "bg-blue-100 text-blue-800" : " bg-yellow-100 text-yellow-800"} text-xs px-2 py-0.5 rounded-full`}
+                                  className={` ${addr.addressType === 'home' ? 'bg-blue-100 text-blue-800' : ' bg-yellow-100 text-yellow-800'} text-xs px-2 py-0.5 rounded-full`}
                                 >
                                   {addr.addressType}
                                 </span>
@@ -289,7 +287,7 @@ const Checkout = () => {
                                 </span>
                               </div>
                               <p className="text-sm text-gray-700 mt-2">
-                                {addr.house},{addr.locality}, {addr.city},{" "}
+                                {addr.house},{addr.locality}, {addr.city},{' '}
                                 {addr.state} - {addr.pincode}
                               </p>
                             </div>
@@ -324,7 +322,7 @@ const Checkout = () => {
                   <button
                     className="text-blue-600 hover:text-blue-800 text-sm flex items-center font-medium"
                     onClick={() => {
-                      navigate("/add-address-checkout");
+                      navigate('/add-address-checkout');
                     }}
                   >
                     <span className="text-xl mr-1">+</span> Add a new address
@@ -345,7 +343,7 @@ const Checkout = () => {
                     </p>
                     <p className="text-sm text-gray-600 mt-1">
                       {selectedAddress.house}, {selectedAddress.locality},
-                      {selectedAddress.city}, {selectedAddress.state} -{" "}
+                      {selectedAddress.city}, {selectedAddress.state} -{' '}
                       {selectedAddress.pincode}
                     </p>
                   </div>
@@ -396,7 +394,7 @@ const Checkout = () => {
                   <button
                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-medium shadow-md"
                     onClick={() => {
-                      navigate("/payment-page", {
+                      navigate('/payment-page', {
                         state: {
                           address: selectedAddress,
                           cartItems: cartItems,
@@ -435,11 +433,11 @@ const Checkout = () => {
                   <div className="flex items-center">
                     <RiCouponLine className="text-purple-600 mr-2" />
                     <span className="font-medium">
-                      {appliedCoupon ? "Applied Coupon" : "Apply Coupon"}
+                      {appliedCoupon ? 'Applied Coupon' : 'Apply Coupon'}
                     </span>
                   </div>
                   <svg
-                    className={`w-5 h-5 transform transition-transform ${showCouponDropdown ? "rotate-180" : ""}`}
+                    className={`w-5 h-5 transform transition-transform ${showCouponDropdown ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -461,8 +459,8 @@ const Checkout = () => {
                           key={coupon._id}
                           className={`p-2 mb-2 border rounded-lg cursor-pointer hover:bg-purple-50 transition-colors ${
                             appliedCoupon?._id === coupon._id
-                              ? "border-purple-500 bg-purple-50"
-                              : ""
+                              ? 'border-purple-500 bg-purple-50'
+                              : ''
                           }`}
                           onClick={() => handleApplyCoupon(coupon)}
                         >
@@ -471,7 +469,7 @@ const Checkout = () => {
                               {coupon.code}
                             </span>
                             <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-                              {coupon.discountType === "percentage"
+                              {coupon.discountType === 'percentage'
                                 ? `${coupon.discountValue}% OFF (Max ${currency}${coupon.maxDiscount})`
                                 : `${currency}${coupon.discountValue} OFF`}
                             </span>
@@ -536,12 +534,12 @@ const Checkout = () => {
                     <button
                       onClick={() => {
                         const coupon = userCoupons.find(
-                          (c) => c.code === couponCode,
+                          (c) => c.code === couponCode
                         );
                         if (coupon) {
                           handleApplyCoupon(coupon);
                         } else {
-                          setCouponError("Invalid coupon code");
+                          setCouponError('Invalid coupon code');
                         }
                       }}
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium shadow"

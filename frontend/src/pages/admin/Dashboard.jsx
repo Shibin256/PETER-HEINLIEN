@@ -1,50 +1,50 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
   downloadSalesReportExcel,
   downloadSalesReportPdf,
   fetchSalesReport,
   getBestSellers,
-} from "../../features/admin/dashboard/dashboardSlice";
-import SalesDistribution from "../../components/admin/SalesDistribution";
-import SalesTrend from "../../components/admin/SalesTrend ";
-import BestSellerChart from "../../components/common/BestSellerChart";
-import BestSellerChartSkeleton from "../../components/common/sketion/BestSellerChartSkeleton";
+} from '../../features/admin/dashboard/dashboardSlice';
+import SalesDistribution from '../../components/admin/SalesDistribution';
+import SalesTrend from '../../components/admin/SalesTrend ';
+import BestSellerChart from '../../components/common/BestSellerChart';
+import BestSellerChartSkeleton from '../../components/common/sketion/BestSellerChartSkeleton';
 
 const Dashboard = () => {
-  const [reportPeriod, setReportPeriod] = useState("Daily");
+  const [reportPeriod, setReportPeriod] = useState('Daily');
   const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toISOString().split('T')[0]
   );
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState('');
   const [totalSales, setTotalSales] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [orders, setOrders] = useState([]);
   const [totalDiscounts, setTotalDiscounts] = useState(0);
   const [avgOrderValue, setAvgOrderValue] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState("");
+  const [selectedFormat, setSelectedFormat] = useState('');
   const [loadingBestSellers, setLoadingBestSellers] = useState(true);
 
   const dispatch = useDispatch();
   // const { salesReport } = useSelector((state) => state.dashboard);
 
   const handleReportPeriodChange = (e) => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
     setReportPeriod(e.target.value);
     setStartDate(today);
-    setEndDate("");
+    setEndDate('');
   };
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
     dispatch(
       fetchSalesReport({
-        type: "Daily",
+        type: 'Daily',
         startDate: today,
-        endDate: "",
-      }),
+        endDate: '',
+      })
     ).then((res) => {
       if (res.payload) {
         setOrders(res.payload.orders);
@@ -64,43 +64,42 @@ const Dashboard = () => {
   }, [dispatch]);
 
   const { topProducts, topCategories, topBrands } = useSelector(
-    (state) => state.dashboard,
+    (state) => state.dashboard
   );
 
-
   const applyFilters = async () => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
 
     if ((startDate && startDate > today) || (endDate && endDate > today)) {
-      toast.warning("You cannot select upcoming dates.");
+      toast.warning('You cannot select upcoming dates.');
       return;
     }
 
-    if (reportPeriod != "Custom Date Range" && startDate == "") {
-      toast.warning("please select a date");
+    if (reportPeriod != 'Custom Date Range' && startDate == '') {
+      toast.warning('please select a date');
       return;
     }
 
     if (
-      reportPeriod == "Custom Date Range" &&
-      (startDate == "" || endDate == "")
+      reportPeriod == 'Custom Date Range' &&
+      (startDate == '' || endDate == '')
     ) {
-      toast.warning("Please select a date");
+      toast.warning('Please select a date');
       return;
     }
 
     if (
-      reportPeriod === "Custom Date Range" &&
+      reportPeriod === 'Custom Date Range' &&
       startDate &&
       endDate &&
       endDate < startDate
     ) {
-      toast.warning("End date cannot be earlier than start date.");
+      toast.warning('End date cannot be earlier than start date.');
       return;
     }
 
     const res = await dispatch(
-      fetchSalesReport({ type: reportPeriod, startDate, endDate }),
+      fetchSalesReport({ type: reportPeriod, startDate, endDate })
     );
     setOrders(res.payload.orders);
     setTotalSales(res.payload.totalSales);
@@ -110,9 +109,9 @@ const Dashboard = () => {
   };
 
   const resetFilters = () => {
-    setReportPeriod("Custom Date Range");
-    setStartDate("");
-    setEndDate("");
+    setReportPeriod('Custom Date Range');
+    setStartDate('');
+    setEndDate('');
     setTotalSales(0);
     setTotalOrders(0);
     setTotalDiscounts(0);
@@ -125,35 +124,35 @@ const Dashboard = () => {
   };
 
   const handleDownload = async () => {
-    if (reportPeriod != "Custom Date Range" && startDate == "") {
-      toast.warning("please select a date");
+    if (reportPeriod != 'Custom Date Range' && startDate == '') {
+      toast.warning('please select a date');
       return;
     }
 
     if (
-      reportPeriod == "Custom Date Range" &&
-      (startDate == "" || endDate == "")
+      reportPeriod == 'Custom Date Range' &&
+      (startDate == '' || endDate == '')
     ) {
-      toast.warning("Please select a date");
+      toast.warning('Please select a date');
       return;
     }
 
-    if (selectedFormat == "Excel") {
+    if (selectedFormat == 'Excel') {
       await dispatch(
-        downloadSalesReportExcel({ type: reportPeriod, startDate, endDate }),
+        downloadSalesReportExcel({ type: reportPeriod, startDate, endDate })
       );
     } else {
       await dispatch(
-        downloadSalesReportPdf({ type: reportPeriod, startDate, endDate }),
+        downloadSalesReportPdf({ type: reportPeriod, startDate, endDate })
       );
     }
     setShowModal(false);
-    setSelectedFormat("");
+    setSelectedFormat('');
   };
 
   const handleCancel = () => {
     setShowModal(false);
-    setSelectedFormat("");
+    setSelectedFormat('');
   };
 
   // Helper function to check if data is empty
@@ -215,14 +214,14 @@ const Dashboard = () => {
 
             <div className="space-y-3 mb-6">
               <div
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === "PDF" ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:bg-gray-50"}`}
-                onClick={() => setSelectedFormat("PDF")}
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === 'PDF' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:bg-gray-50'}`}
+                onClick={() => setSelectedFormat('PDF')}
               >
                 <div className="flex items-center">
                   <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === "PDF" ? "border-indigo-500 bg-indigo-500" : "border-gray-400"}`}
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === 'PDF' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-400'}`}
                   >
-                    {selectedFormat === "PDF" && (
+                    {selectedFormat === 'PDF' && (
                       <svg
                         className="w-3 h-3 text-white"
                         fill="none"
@@ -248,14 +247,14 @@ const Dashboard = () => {
               </div>
 
               <div
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === "Excel" ? "border-indigo-500 bg-indigo-50" : "border-gray-300 hover:bg-gray-50"}`}
-                onClick={() => setSelectedFormat("Excel")}
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedFormat === 'Excel' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:bg-gray-50'}`}
+                onClick={() => setSelectedFormat('Excel')}
               >
                 <div className="flex items-center">
                   <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === "Excel" ? "border-indigo-500 bg-indigo-500" : "border-gray-400"}`}
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedFormat === 'Excel' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-400'}`}
                   >
-                    {selectedFormat === "Excel" && (
+                    {selectedFormat === 'Excel' && (
                       <svg
                         className="w-3 h-3 text-white"
                         fill="none"
@@ -291,7 +290,7 @@ const Dashboard = () => {
               <button
                 onClick={handleDownload}
                 disabled={!selectedFormat}
-                className={`px-4 py-2 rounded-lg text-white transition-colors ${selectedFormat ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-300 cursor-not-allowed"}`}
+                className={`px-4 py-2 rounded-lg text-white transition-colors ${selectedFormat ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'}`}
               >
                 Download
               </button>
@@ -343,7 +342,7 @@ const Dashboard = () => {
               </select>
             </div>
 
-            {reportPeriod !== "Custom Date Range" && (
+            {reportPeriod !== 'Custom Date Range' && (
               <div className="flex-1">
                 <label
                   htmlFor="date"
@@ -354,7 +353,7 @@ const Dashboard = () => {
                 <input
                   id="date"
                   type="date"
-                  max={new Date().toISOString().split("T")[0]}
+                  max={new Date().toISOString().split('T')[0]}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -362,7 +361,7 @@ const Dashboard = () => {
               </div>
             )}
 
-            {reportPeriod === "Custom Date Range" && (
+            {reportPeriod === 'Custom Date Range' && (
               <>
                 <div className="flex-1">
                   <label
@@ -374,7 +373,7 @@ const Dashboard = () => {
                   <input
                     id="start-date"
                     type="date"
-                    max={new Date().toISOString().split("T")[0]} // Prevent future dates
+                    max={new Date().toISOString().split('T')[0]} // Prevent future dates
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
@@ -390,7 +389,7 @@ const Dashboard = () => {
                   <input
                     id="end-date"
                     type="date"
-                    max={new Date().toISOString().split("T")[0]} // Prevent future dates
+                    max={new Date().toISOString().split('T')[0]} // Prevent future dates
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
@@ -461,13 +460,13 @@ const Dashboard = () => {
 
             {/* Bottom Section: 3 Charts with Loading/Empty States */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {renderBestSellerChart("Top Products", topProducts, "#4285F4")}
+              {renderBestSellerChart('Top Products', topProducts, '#4285F4')}
               {renderBestSellerChart(
-                "Top Categories",
+                'Top Categories',
                 topCategories,
-                "#FFBB28",
+                '#FFBB28'
               )}
-              {renderBestSellerChart("Top Brands", topBrands, "#00C49F")}
+              {renderBestSellerChart('Top Brands', topBrands, '#00C49F')}
             </div>
           </div>
         </div>

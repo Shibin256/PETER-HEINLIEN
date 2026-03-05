@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { logout } from "../../../features/auth/authSlice";
-import Swal from "sweetalert2";
-import { deleteUser } from "../../../features/users/userSlice";
-import { toast } from "react-toastify";
-import ProfileImageModal from "../../../components/common/ProfileImageModal";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../../../features/auth/authSlice';
+import Swal from 'sweetalert2';
+import { deleteUser } from '../../../features/users/userSlice';
+import { toast } from 'react-toastify';
+import ProfileImageModal from '../../../components/common/ProfileImageModal';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -14,11 +14,11 @@ const Profile = () => {
   const [showModal, setShowModal] = useState(false);
   const [nameImg, setNameImg] = useState([]);
   const [profileData, setProfileData] = useState({
-    id: "",
-    name: "",
-    email: "",
-    mobile: "",
-    password: "********",
+    id: '',
+    name: '',
+    email: '',
+    mobile: '',
+    password: '********',
   });
 
   useEffect(() => {
@@ -27,9 +27,9 @@ const Profile = () => {
       name: user.username,
       email: user.email,
       mobile: user.phone,
-      password: "********",
+      password: '********',
     });
-    const splitName = user.username.split(" ");
+    const splitName = user.username.split(' ');
     setNameImg(splitName);
   }, []);
 
@@ -50,10 +50,10 @@ const Profile = () => {
   //handle logut
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    navigate("/login");
-    toast.success("Logged out successfully");
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+    toast.success('Logged out successfully');
   };
 
   return (
@@ -116,7 +116,7 @@ const Profile = () => {
                 <p className="font-medium text-[#003543]">{profileData.name}</p>
               </div>
               <button
-                onClick={() => navigateToEdit("name")}
+                onClick={() => navigateToEdit('name')}
                 className="text-[#003543] hover:text-[#004d5f] transition-colors duration-300"
               >
                 <svg
@@ -165,7 +165,7 @@ const Profile = () => {
                 </p>
               </div>
               <button
-                onClick={() => navigateToEdit("mobile")}
+                onClick={() => navigateToEdit('mobile')}
                 className="text-[#003543] hover:text-[#004d5f] transition-colors duration-300"
               >
                 <svg
@@ -186,7 +186,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {user.googleId == "true" ? (
+          {user.googleId == 'true' ? (
             <></>
           ) : (
             <div className="bg-gray-50 px-4 py-3 rounded-lg">
@@ -199,7 +199,7 @@ const Profile = () => {
                 </div>
 
                 <button
-                  onClick={() => navigateToEdit("password")}
+                  onClick={() => navigateToEdit('password')}
                   className="text-[#003543] hover:text-[#004d5f] transition-colors duration-300"
                 >
                   <svg

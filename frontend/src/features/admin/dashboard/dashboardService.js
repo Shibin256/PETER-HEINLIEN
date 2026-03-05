@@ -1,28 +1,28 @@
-import adminAxiosInstance from "../../../api/adminAxiosInstance";
+import adminAxiosInstance from '../../../api/adminAxiosInstance';
 
 const getStats = async () => {
-  const res = await adminAxiosInstance.get("/api/admin/dashboard/stats");
+  const res = await adminAxiosInstance.get('/api/admin/dashboard/stats');
   return res.data;
 };
 
 const getSalesReport = async ({ type, startDate, endDate }) => {
-  const res = await adminAxiosInstance.get("/api/v1/admin/sales/report", {
+  const res = await adminAxiosInstance.get('/api/v1/admin/sales/report', {
     params: { type, startDate, endDate },
   });
   return res.data;
 };
 
 const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
-  const res = await adminAxiosInstance.get("/api/v1/admin/sales/report/pdf", {
+  const res = await adminAxiosInstance.get('/api/v1/admin/sales/report/pdf', {
     params: { type, startDate, endDate },
-    responseType: "blob",
+    responseType: 'blob',
   });
 
-  const blob = new Blob([res.data], { type: "application/pdf" });
+  const blob = new Blob([res.data], { type: 'application/pdf' });
   const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.setAttribute("download", `SalesReport-${startDate}.pdf`);
+  link.setAttribute('download', `SalesReport-${startDate}.pdf`);
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -30,22 +30,22 @@ const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
   return res.data;
 };
 const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
-  const res = await adminAxiosInstance.get("/api/v1/admin/sales/report/excel", {
+  const res = await adminAxiosInstance.get('/api/v1/admin/sales/report/excel', {
     params: { type, startDate, endDate },
-    responseType: "blob",
+    responseType: 'blob',
   });
 
   const blob = new Blob([res.data], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
 
   const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
 
   // Set filename dynamically
-  const fileName = `SalesReport-${startDate || new Date().toISOString().split("T")[0]}.xlsx`;
-  link.setAttribute("download", fileName);
+  const fileName = `SalesReport-${startDate || new Date().toISOString().split('T')[0]}.xlsx`;
+  link.setAttribute('download', fileName);
 
   document.body.appendChild(link);
   link.click();
@@ -54,7 +54,7 @@ const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
 };
 
 const getBestSellers = async () => {
-  const res = await adminAxiosInstance.get("/api/v1/admin/bestsellers");
+  const res = await adminAxiosInstance.get('/api/v1/admin/bestsellers');
   return res.data;
 };
 

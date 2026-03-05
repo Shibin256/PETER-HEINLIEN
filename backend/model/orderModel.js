@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
-const addressSchema = new mongoose.Schema({
+const addressSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
     addressType: { type: String, required: true },
     alternativePhone: { type: Number, required: false },
@@ -11,9 +12,12 @@ const addressSchema = new mongoose.Schema({
     locality: { type: String, required: true },
     house: { type: String, required: true },
     pincode: { type: String, required: true },
-}, { _id: false });
+  },
+  { _id: false },
+);
 
-const itemSchema = new mongoose.Schema([{
+const itemSchema = new mongoose.Schema([
+  {
     itemOrderId: { type: String, required: true },
     productId: { type: String, required: true },
     productImage: [{ type: String, required: true }],
@@ -25,14 +29,21 @@ const itemSchema = new mongoose.Schema([{
     returnVerified: { type: Boolean, default: false },
     cancelReason: { type: String, default: '' },
     cancelVerified: { type: Boolean, default: false },
-    rated:{type:Boolean,default:false},
-    rating:{type:String,default:''},
-    comment:{type:String,default:''},
-}, { _id: false }]);
+    rated: { type: Boolean, default: false },
+    rating: { type: String, default: '' },
+    comment: { type: String, default: '' },
+  },
+  { _id: false },
+]);
 
-const orderSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema(
+  {
     orderId: { type: String, required: true, unique: true },
-    UserID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    UserID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     Order_Address: { type: addressSchema, required: true },
     Items: { type: [itemSchema], required: true },
     TotalAmount: { type: Number, required: true },
@@ -46,9 +57,11 @@ const orderSchema = new mongoose.Schema({
     PaymentStatus: { type: String, default: 'Unpaid' },
     cancelReason: { type: String, default: '' },
     cancelVerified: { type: Boolean, default: false },
-}, {
+  },
+  {
     timestamps: true, // Automatically handles createdAt and updatedAt
-});
+  },
+);
 
 const Order = mongoose.model('Order', orderSchema);
 

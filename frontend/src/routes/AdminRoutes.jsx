@@ -1,31 +1,31 @@
-import React, { useEffect } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import AdminLayout from "../Layout/AdminLayout";
-import AdminLogin from "../pages/admin/Login";
-import Dashboard from "../pages/admin/Dashboard";
-import AddItem from "../pages/admin/AddItem";
-import Customer from "../pages/admin/Customer";
-import ProductAdmin from "../pages/admin/ProductAdmin";
-import ProtectedAdminRoute from "./ProtectedAdminRoute";
-import UserList from "../pages/admin/UserList";
-import Inventory from "../pages/admin/Inventory";
-import Banners from "../pages/admin/Banners";
-import OrdersList from "../pages/admin/OrdersList";
-import Coupons from "../pages/admin/coupons";
-import Offers from "../pages/admin/Offer";
-import ErrorBoundary from "../components/common/ErrorBoundary";
+import React, { useEffect } from 'react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import AdminLayout from '../Layout/AdminLayout';
+import AdminLogin from '../pages/admin/Login';
+import Dashboard from '../pages/admin/Dashboard';
+import AddItem from '../pages/admin/AddItem';
+import Customer from '../pages/admin/Customer';
+import ProductAdmin from '../pages/admin/ProductAdmin';
+import ProtectedAdminRoute from './ProtectedAdminRoute';
+import UserList from '../pages/admin/UserList';
+import Inventory from '../pages/admin/Inventory';
+import Banners from '../pages/admin/Banners';
+import OrdersList from '../pages/admin/OrdersList';
+import Coupons from '../pages/admin/coupons';
+import Offers from '../pages/admin/Offer';
+import ErrorBoundary from '../components/common/ErrorBoundary';
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem("adminAccessToken");
-    const isLoginPage = location.pathname === "/admin/login";
+    const token = localStorage.getItem('adminAccessToken');
+    const isLoginPage = location.pathname === '/admin/login';
 
     if (token && isLoginPage) {
       // If already logged in and trying to access login, redirect to dashboard
-      navigate("/admin/");
+      navigate('/admin/');
     }
   }, [location, navigate]);
 

@@ -1,68 +1,68 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import cartService from "./cartService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import cartService from './cartService';
 
 export const addToCart = createAsyncThunk(
-  "user/cart/add",
+  'user/cart/add',
   async ({ userId, productId, quantity = 1 }, thunkAPI) => {
     try {
       return await cartService.addToCart({ userId, productId, quantity });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const fetchCart = createAsyncThunk(
-  "user/cart/fetchCart",
+  'user/cart/fetchCart',
   async (userId) => {
     return await cartService.fetchCart(userId);
-  },
+  }
 );
 
 export const toggleIsLocked = createAsyncThunk(
-  "user/cart/toggleIsLocked",
+  'user/cart/toggleIsLocked',
   async (userId, lock) => {
     return await cartService.toggleIsLocked(userId, lock);
-  },
+  }
 );
 
 export const removeFromCart = createAsyncThunk(
-  "user/cart/removeFromCart",
+  'user/cart/removeFromCart',
   async ({ userId, productId, itemQuantity }) => {
     return await cartService.removeFromCart(userId, productId, itemQuantity);
-  },
+  }
 );
 
 export const updateCart = createAsyncThunk(
-  "user/cart/update",
+  'user/cart/update',
   async ({ userId, productId, quantity = 1 }, thunkAPI) => {
     try {
       return await cartService.updateCart({ userId, productId, quantity });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const wishlistToCart = createAsyncThunk(
-  "user/cart/wishlistToCart",
+  'user/cart/wishlistToCart',
   async ({ userId, productIds, quantity = 1 }, thunkAPI) => {
     try {
       return await cartService.wishlistToCart({ userId, productIds, quantity });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 const cartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState: {
     cartItems: [],
     isLocked: false,

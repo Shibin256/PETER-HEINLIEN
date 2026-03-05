@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import AuthInput from "../../components/common/AuthInput";
+import React, { useState } from 'react';
+import AuthInput from '../../components/common/AuthInput';
 
 const Settings = () => {
-  const [storeName, setStoreName] = useState("");
-  const [password, setPassword] = useState("");
-  const [storeEmail, setStoreEmail] = useState("");
-  const [storeMobile, setStoreMobile] = useState("");
-  const [currency, setCurrency] = useState("USD");
-  const [language, setLanguage] = useState("English");
-  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [storeName, setStoreName] = useState('');
+  const [password, setPassword] = useState('');
+  const [storeEmail, setStoreEmail] = useState('');
+  const [storeMobile, setStoreMobile] = useState('');
+  const [currency, setCurrency] = useState('USD');
+  const [language, setLanguage] = useState('English');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -28,10 +28,10 @@ const Settings = () => {
         </h2>
         <div className="flex items-center space-x-2">
           <span
-            className={`h-3 w-3 rounded-full ${maintenanceMode ? "bg-red-500" : "bg-green-500"}`}
+            className={`h-3 w-3 rounded-full ${maintenanceMode ? 'bg-red-500' : 'bg-green-500'}`}
           ></span>
           <span className="text-sm text-gray-600">
-            {maintenanceMode ? "Maintenance Mode" : "Live Mode"}
+            {maintenanceMode ? 'Maintenance Mode' : 'Live Mode'}
           </span>
         </div>
       </div>
@@ -150,13 +150,13 @@ const Settings = () => {
                     type="checkbox"
                     name="paymentMethod"
                     value="COD"
-                    checked={paymentMethod.includes("COD")}
+                    checked={paymentMethod.includes('COD')}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setPaymentMethod([...paymentMethod, "COD"]);
+                        setPaymentMethod([...paymentMethod, 'COD']);
                       } else {
                         setPaymentMethod(
-                          paymentMethod.filter((method) => method !== "COD"),
+                          paymentMethod.filter((method) => method !== 'COD')
                         );
                       }
                     }}
@@ -169,13 +169,13 @@ const Settings = () => {
                     type="checkbox"
                     name="paymentMethod"
                     value="UPI"
-                    checked={paymentMethod.includes("UPI")}
+                    checked={paymentMethod.includes('UPI')}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setPaymentMethod([...paymentMethod, "UPI"]);
+                        setPaymentMethod([...paymentMethod, 'UPI']);
                       } else {
                         setPaymentMethod(
-                          paymentMethod.filter((method) => method !== "UPI"),
+                          paymentMethod.filter((method) => method !== 'UPI')
                         );
                       }
                     }}
@@ -188,15 +188,15 @@ const Settings = () => {
                     type="checkbox"
                     name="paymentMethod"
                     value="NETBANKING"
-                    checked={paymentMethod.includes("NETBANKING")}
+                    checked={paymentMethod.includes('NETBANKING')}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setPaymentMethod([...paymentMethod, "NETBANKING"]);
+                        setPaymentMethod([...paymentMethod, 'NETBANKING']);
                       } else {
                         setPaymentMethod(
                           paymentMethod.filter(
-                            (method) => method !== "NETBANKING",
-                          ),
+                            (method) => method !== 'NETBANKING'
+                          )
                         );
                       }
                     }}
@@ -218,8 +218,8 @@ const Settings = () => {
                 <h4 className="font-medium text-gray-800">Maintenance Mode</h4>
                 <p className="text-sm text-gray-600">
                   {maintenanceMode
-                    ? "Your store is currently in maintenance mode and not visible to customers"
-                    : "Your store is currently live and visible to customers"}
+                    ? 'Your store is currently in maintenance mode and not visible to customers'
+                    : 'Your store is currently live and visible to customers'}
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -239,7 +239,7 @@ const Settings = () => {
             <button
               onClick={handleSaveChanges}
               disabled={isSaving}
-              className={`w-full md:w-auto px-6 py-3 rounded-lg font-medium text-white transition-all ${isSaving ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg"}`}
+              className={`w-full md:w-auto px-6 py-3 rounded-lg font-medium text-white transition-all ${isSaving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'}`}
             >
               {isSaving ? (
                 <span className="flex items-center justify-center">
@@ -266,7 +266,7 @@ const Settings = () => {
                   Saving...
                 </span>
               ) : (
-                "Save Changes"
+                'Save Changes'
               )}
             </button>
           </div>

@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import Title from "../common/Title";
-import womensCollection from "../../assets/womensCollection.jpg";
-import mensCollection from "../../assets/mensCollection.jpg";
-import couplesCollection from "../../assets/couplesCollection.jpg";
-import { useDispatch, useSelector } from "react-redux";
-import { getBrandAndCollection } from "../../features/products/productSlice";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import Title from '../common/Title';
+import womensCollection from '../../assets/womensCollection.jpg';
+import mensCollection from '../../assets/mensCollection.jpg';
+import couplesCollection from '../../assets/couplesCollection.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBrandAndCollection } from '../../features/products/productSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CategoryProducts = () => {
   const dispatch = useDispatch();
@@ -19,16 +19,16 @@ const CategoryProducts = () => {
 
   const getCategoryImage = (categoryName) => {
     const lowerCaseName = categoryName.toLowerCase();
-    if (lowerCaseName.includes("women") || lowerCaseName.includes("ladies")) {
+    if (lowerCaseName.includes('women') || lowerCaseName.includes('ladies')) {
       return womensCollection;
     } else if (
-      lowerCaseName.includes("men") ||
-      lowerCaseName.includes("gentlemen")
+      lowerCaseName.includes('men') ||
+      lowerCaseName.includes('gentlemen')
     ) {
       return mensCollection;
     } else if (
-      lowerCaseName.includes("couple") ||
-      lowerCaseName.includes("pair")
+      lowerCaseName.includes('couple') ||
+      lowerCaseName.includes('pair')
     ) {
       return couplesCollection;
     }
@@ -36,7 +36,7 @@ const CategoryProducts = () => {
   };
 
   const handleClick = (categoryId, categoryName) => {
-    navigate("/category-collection", { state: { categoryId, categoryName } });
+    navigate('/category-collection', { state: { categoryId, categoryName } });
   };
 
   return (

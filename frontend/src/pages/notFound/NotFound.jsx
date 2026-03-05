@@ -1,5 +1,5 @@
-import { FiAlertTriangle } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { FiAlertTriangle } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 const NotFound = () => {
   return (

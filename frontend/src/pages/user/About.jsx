@@ -1,6 +1,6 @@
-import React from "react";
-import image from "../../assets/pexels-javon-swaby-197616-2783873.jpg";
-import { ShieldCheck, ShoppingCart, Headset } from "lucide-react"; // using lucide icons
+import React from 'react';
+import image from '../../assets/pexels-javon-swaby-197616-2783873.jpg';
+import { ShieldCheck, ShoppingCart, Headset } from 'lucide-react'; // using lucide icons
 
 const About = () => {
   return (

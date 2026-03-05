@@ -1,26 +1,26 @@
-import User from "../model/userModel.js";
+import User from '../model/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 //module for otp verification
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
-import Otp from '../model/otpModel.js'
-const saltround = parseInt(process.env.SALT_ROUNDS || "10", 10);
+import Otp from '../model/otpModel.js';
+const saltround = parseInt(process.env.SALT_ROUNDS || '10', 10);
 
 //google authontication
 import { OAuth2Client } from 'google-auth-library';
-import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
-import Wallet from "../model/walletModal.js";
-import PendingUser from "../model/pendingUserModal.js";
-import { MESSAGES } from "../utils/messages.js";
+import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
+import Wallet from '../model/walletModal.js';
+import PendingUser from '../model/pendingUserModal.js';
+import { MESSAGES } from '../utils/messages.js';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //generate otp with random 6 digit number
 function genarateOtp() {
-  return Math.floor(100000 + Math.random() * 900000).toString()
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-//sending the email to the mail address 
+//sending the email to the mail address
 async function sendVerificationEmail(email, otp) {
   try {
     const transporter = nodemailer.createTransport({
@@ -29,10 +29,9 @@ async function sendVerificationEmail(email, otp) {
       requireTLS: true,
       auth: {
         user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD
-      }
-
-    })
+        pass: process.env.NODEMAILER_PASSWORD,
+      },
+    });
 
     const info = await transporter.sendMail({
       from: process.env.NODEMAILER_EMAIL,
@@ -54,17 +53,16 @@ async function sendVerificationEmail(email, otp) {
             <p>If you did not request this, please ignore this email.</p>
             <p>Regards,<br>The Peter Heinlien Team</p>
           </div>
-  `
+  `,
     });
-    return info.accepted.length > 0
+    return info.accepted.length > 0;
   } catch (error) {
-    console.log(error)
-    return false
+    console.log(error);
+    return false;
   }
 }
 
-
-// user registration 
+// user registration
 export const register = async (req, res) => {
   try {
     const {
@@ -74,57 +72,59 @@ export const register = async (req, res) => {
       confirmPassword,
       phone,
       gender,
-      ReferralCode
+      ReferralCode,
     } = req.body;
 
-
-    const userExist = await User.findOne({ email }).select('-password -createdAt -updatedAt -googleId');
+    const userExist = await User.findOne({ email }).select(
+      '-password -createdAt -updatedAt -googleId',
+    );
     if (userExist) {
       return res.status(400).json({ errors: [MESSAGES.USER_ALREADY_EXISTS] });
     }
 
-    const phoneExist = await User.findOne({ phone }).select('-password -createdAt -updatedAt -googleId');
+    const phoneExist = await User.findOne({ phone }).select(
+      '-password -createdAt -updatedAt -googleId',
+    );
     if (phoneExist && phoneExist.phone != null) {
       return res.status(400).json({ errors: [MESSAGES.PHONE_ALREADY_EXISTS] });
     }
 
     const errors = [];
-    
+
     if (!name || name.trim().length < 3) {
-      errors.push("Name must be at least 3 characters");
+      errors.push('Name must be at least 3 characters');
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      errors.push("Invalid email format");
+      errors.push('Invalid email format');
     }
 
     if (!password || password.length < 6) {
-      errors.push("Password must be at least 6 characters");
+      errors.push('Password must be at least 6 characters');
     }
 
     if (password !== confirmPassword) {
-      errors.push("Passwords do not match");
+      errors.push('Passwords do not match');
     }
 
-     const phoneRegex = /^[6-9]\d{9}$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
     if (!phone || !phoneRegex.test(phone)) {
-      errors.push("Invalid phone number");
+      errors.push('Invalid phone number');
     }
 
-     if (!gender || !["male", "female", "other"].includes(gender)) {
-      errors.push("Invalid gender value");
+    if (!gender || !['male', 'female', 'other'].includes(gender)) {
+      errors.push('Invalid gender value');
     }
 
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     }
 
-
     //generate and sending otp
-    const otp = genarateOtp()
+    const otp = genarateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    console.log('otp is:----', otp)
+    console.log('otp is:----', otp);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -138,41 +138,41 @@ export const register = async (req, res) => {
       gender,
       referralCode: ReferralCode,
       otp,
-      expiresAt
+      expiresAt,
     });
-    const emailSend = await sendVerificationEmail(email, otp)
+    const emailSend = await sendVerificationEmail(email, otp);
     if (!emailSend) {
       return res.status(400).json({ errors: [MESSAGES.OTP_EMAIL_ERROR] });
     }
 
-    return res.status(200).json(
-      { message: MESSAGES.OTP_SENT, email })
+    return res.status(200).json({ message: MESSAGES.OTP_SENT, email });
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error('Registration error:', error);
     res.status(400).json({ errors: [MESSAGES.SERVER_ERROR] });
   }
 };
-
 
 //verify otp after register with form data
 export const verifyOTP = async (req, res) => {
   try {
     const { formData, otp } = req.body;
-    const { email } = formData
+    const { email } = formData;
 
     const record = await PendingUser.findOne({
       email,
     });
     if (!record) {
-      return res.status(400).json({ message: "The User not found something fraud happend" });
+      return res
+        .status(400)
+        .json({ message: 'The User not found something fraud happend' });
     }
 
     if (record.expiresAt < Date.now()) {
-      return res.status(400).json({ message: "OTP expired" });
+      return res.status(400).json({ message: 'OTP expired' });
     }
 
     if (record.otp !== otp) {
-      return res.status(400).json({ message: "The OTP is not matching" });
+      return res.status(400).json({ message: 'The OTP is not matching' });
     }
 
     // Create new user from stored server data
@@ -185,23 +185,31 @@ export const verifyOTP = async (req, res) => {
       gender: record.gender,
     });
 
-    const ReferralUser = await User.findOne({ referralCode: record.referralCode }).select('-password -createdAt -updatedAt -googleId')
+    const ReferralUser = await User.findOne({
+      referralCode: record.referralCode,
+    }).select('-password -createdAt -updatedAt -googleId');
 
     if (ReferralUser) {
-      let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
+      let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select(
+        '-createdAt -updatedAt',
+      );
       const transactions = {
         userId: ReferralUser._id,
         amount: 50,
         paymentId: `REF-${Date.now()}-${uuidv4().slice(0, 8)}`,
         status: 'success',
         type: 'credit',
-        description: ' Referral Amount'
-      }
+        description: ' Referral Amount',
+      };
       if (wallet) {
         wallet.balance += 50;
-        wallet.transactions.push(transactions)
+        wallet.transactions.push(transactions);
       } else {
-        wallet = new Wallet({ userId: ReferralUser._id, balance: 50, transactions: [transactions] });
+        wallet = new Wallet({
+          userId: ReferralUser._id,
+          balance: 50,
+          transactions: [transactions],
+        });
       }
       await wallet.save();
     }
@@ -209,7 +217,7 @@ export const verifyOTP = async (req, res) => {
     await Otp.deleteOne({ email });
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: 'User registered successfully',
       user: {
         _id: user._id,
         name: user.username,
@@ -217,24 +225,22 @@ export const verifyOTP = async (req, res) => {
         isAdmin: user.isAdmin,
       },
     });
-
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error registering user" });
+    res.status(500).json({ message: 'Error registering user' });
   }
 };
 
-
 //google auth for user
 export const googleAuth = async (req, res) => {
-  const { idToken } = req.body
+  const { idToken } = req.body;
   try {
     const ticket = await client.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
-    })
+    });
 
-    const payload = ticket.getPayload()
+    const payload = ticket.getPayload();
     const { sub, email, name, picture } = payload;
 
     let user = await User.findOne({ googleId: sub });
@@ -246,7 +252,7 @@ export const googleAuth = async (req, res) => {
         email: email,
         avatar: picture,
         gender: 'other',
-        isAuthenticated: true
+        isAuthenticated: true,
       });
     } else {
       user.isAuthenticated = true;
@@ -254,76 +260,81 @@ export const googleAuth = async (req, res) => {
     }
 
     //generatind access and refresh token
-    const accessToken = generateAccessToken(user)
+    const accessToken = generateAccessToken(user);
     // console.log(accessToken)
-    const refreshToken = generateRefreshToken(user)
+    const refreshToken = generateRefreshToken(user);
     // console.log(refreshToken)
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: process.env.COOKIE_HTTP_ONLY,
       secure: process.env.COOKIE_SECURE,
       sameSite: process.env.COOKIE_SAME_SITE,
-      maxAge: process.env.COOKIE_MAX_AGE
-    })
+      maxAge: process.env.COOKIE_MAX_AGE,
+    });
 
-    user.googleId = true
+    user.googleId = true;
     res.status(200).json({ accessToken, user });
   } catch (error) {
     console.error('Google login failed:', error);
     res.status(401).json({ error: 'Invalid Google token' });
   }
-}
-
+};
 
 // user login section
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select('-createdAt -updatedAt')
-
+    const user = await User.findOne({ email }).select('-createdAt -updatedAt');
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
     if (user.googleId) {
-      return res.status(401).json({ message: 'user not exist, try google login' })
+      return res
+        .status(401)
+        .json({ message: 'user not exist, try google login' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     if (user.isAdmin) {
-      return res.status(401).json({ message: 'The user is admin, cant join thorugh this' })
+      return res
+        .status(401)
+        .json({ message: 'The user is admin, cant join thorugh this' });
     }
 
     if (user.isBlocked) {
-      return res.status(401).json({ message: 'The user is blocked form using the site, cant join' })
+      return res
+        .status(401)
+        .json({
+          message: 'The user is blocked form using the site, cant join',
+        });
     }
 
     user.isAuthenticated = true;
     await user.save();
 
     //creation of access and refresh Token when user log in
-    const accessToken = generateAccessToken(user)
+    const accessToken = generateAccessToken(user);
     // console.log(accessToken, ':accesssToken')
-    const refreshToken = generateRefreshToken(user)
+    const refreshToken = generateRefreshToken(user);
     // console.log(refreshToken, ':reresh token')
-
 
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
       httpOnly: process.env.COOKIE_HTTP_ONLY,
       secure: process.env.COOKIE_SECURE,
       sameSite: process.env.COOKIE_SAME_SITE,
-      maxAge: process.env.COOKIE_MAX_AGE
-    })
+      maxAge: process.env.COOKIE_MAX_AGE,
+    });
 
     // Send response with user data
     res.json({
-      message: "Login successful",
+      message: 'Login successful',
       accessToken,
       user: {
         _id: user._id,
@@ -333,48 +344,50 @@ export const login = async (req, res) => {
         phone: user.phone,
         gender: user.gender,
         profileImage: user.profileImage,
-        referralCode: user.referralCode
+        referralCode: user.referralCode,
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Error logging in" });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Error logging in' });
   }
-}
+};
 
 //admin login section
 export const adminLogin = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select('-createdAt -updatedAt')
+    const user = await User.findOne({ email }).select('-createdAt -updatedAt');
 
     if (!user) {
       console.log('Admin login failed: User not found');
-      return res.status(401).json({ message: 'admin not found in this email' })
+      return res.status(401).json({ message: 'admin not found in this email' });
     }
 
     if (!user.isAdmin) {
-      console.log('The user is not an admin')
-      return res.status(401).json({ message: 'user is not an admin' })
+      console.log('The user is not an admin');
+      return res.status(401).json({ message: 'user is not an admin' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      console.log('Admin login is failed, the password not match')
-      return res.status(401).json({ message: 'admin login is failed, password not matches' })
+      console.log('Admin login is failed, the password not match');
+      return res
+        .status(401)
+        .json({ message: 'admin login is failed, password not matches' });
     }
 
-    console.log('admin login is successfull')
+    console.log('admin login is successfull');
 
     user.isAuthenticated = true;
     await user.save();
 
     //creation of access and refresh Token when user log in
-    const accessToken = generateAccessToken(user)
+    const accessToken = generateAccessToken(user);
     // console.log(accessToken)
-    const refreshToken = generateRefreshToken(user)
+    const refreshToken = generateRefreshToken(user);
     // console.log(refreshToken)
 
     //storing refreshToken into cookies
@@ -382,8 +395,8 @@ export const adminLogin = async (req, res) => {
       httpOnly: process.env.COOKIE_HTTP_ONLY,
       secure: process.env.COOKIE_SECURE,
       sameSite: process.env.COOKIE_SAME_SITE,
-      maxAge: process.env.COOKIE_MAX_AGE
-    })
+      maxAge: process.env.COOKIE_MAX_AGE,
+    });
 
     //store cookkie in db tooo
     res.json({
@@ -392,15 +405,14 @@ export const adminLogin = async (req, res) => {
       user: {
         _id: user._id,
         email: user.email,
-        isAdmin: true
-      }
+        isAdmin: true,
+      },
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Error logging in" });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Error logging in' });
   }
-}
-
+};
 
 //refresh accessToken from cokies without asking the user to log again
 export const refreshAccessToken = (req, res) => {
@@ -415,7 +427,6 @@ export const refreshAccessToken = (req, res) => {
   });
 };
 
-
 //forgot password manage
 export const forgotPass = async (req, res) => {
   try {
@@ -423,7 +434,7 @@ export const forgotPass = async (req, res) => {
 
     const userExist = await User.findOne({ email });
     if (!userExist) {
-      return res.status(400).json({ message: "User does not exist" });
+      return res.status(400).json({ message: 'User does not exist' });
     }
 
     const otp = genarateOtp();
@@ -436,72 +447,70 @@ export const forgotPass = async (req, res) => {
 
     const emailSend = await sendVerificationEmail(email, otp);
     if (!emailSend) {
-      return res.status(400).json({ message: "OTP not sent. Email error." });
+      return res.status(400).json({ message: 'OTP not sent. Email error.' });
     }
 
-    return res.status(200).json({ message: 'The OTP has been sent to the email', email });
-
+    return res
+      .status(200)
+      .json({ message: 'The OTP has been sent to the email', email });
   } catch (error) {
-    console.error("Reset password error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 //verification of forgot password with email
 export const verifyOTPForgotpass = async (req, res) => {
   try {
-
     const { formData, otp } = req.body;
-    const email = formData.email
+    const email = formData.email;
     const record = await Otp.findOne({ email, otp });
     if (record) {
       res.status(201).json({
-        message: "OTP verified successfully",
+        message: 'OTP verified successfully',
       });
     } else {
-      console.log('The otp is not matching')
-      res.status(400).json({ message: "The otp is not matching" })
+      console.log('The otp is not matching');
+      res.status(400).json({ message: 'The otp is not matching' });
     }
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: "Error logging in" });
+    console.log(error);
+    res.status(500).json({ message: 'Error logging in' });
   }
-}
+};
 
 // creating new password
 export const changePassword = async (req, res) => {
   try {
-    const { newPassword, email } = req.body
-    const user = await User.findOne({ email }).select('-createdAt -updatedAt')
+    const { newPassword, email } = req.body;
+    const user = await User.findOne({ email }).select('-createdAt -updatedAt');
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (user.isBlocked) return res.status(404).json({ message: 'User cant access anything' });
+    if (user.isBlocked)
+      return res.status(404).json({ message: 'User cant access anything' });
 
     const hashedPassword = await bcrypt.hash(newPassword, saltround);
 
-    user.password = hashedPassword
-    await user.save()
-    res.status(200).json({ message: 'User Password changed successfully' })
-
+    user.password = hashedPassword;
+    await user.save();
+    res.status(200).json({ message: 'User Password changed successfully' });
   } catch (error) {
     console.error('Error while changing User password:', error.message);
     res.status(500).json({ message: 'Server error changing password' });
-
   }
-
-}
+};
 
 // fetch current user who logged in
 export const fetchCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password -createdAt -updatedAt -googleId');
+    const user = await User.findById(req.params.id).select(
+      '-password -createdAt -updatedAt -googleId',
+    );
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json(user);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: MESSAGES.SERVER_ERROR });
-
   }
-
-}
+};

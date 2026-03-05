@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 export const authorizeRole = (roles) => {
   return (req, res, next) => {
@@ -18,4 +18,3 @@ export const authorizeRole = (roles) => {
     }
   };
 };
-

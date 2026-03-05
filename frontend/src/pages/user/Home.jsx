@@ -1,10 +1,10 @@
-import React from "react";
-import HeroSection from "../../components/user/HeroSection";
+import React from 'react';
+import HeroSection from '../../components/user/HeroSection';
 
-import LatestCollection from "../../components/user/LatestCollection";
-import CategoryProducts from "../../components/user/CategoryProducts";
-import AdBanner from "../../components/user/AdBanner";
-import TopRated from "../../components/user/TopRated";
+import LatestCollection from '../../components/user/LatestCollection';
+import CategoryProducts from '../../components/user/CategoryProducts';
+import AdBanner from '../../components/user/AdBanner';
+import TopRated from '../../components/user/TopRated';
 
 const Home = () => {
   return (

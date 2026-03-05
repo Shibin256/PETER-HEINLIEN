@@ -1,32 +1,32 @@
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-import { Link, useNavigate } from "react-router-dom";
-import usePasswordVal from "../../usePasswordVal";
+import { Link, useNavigate } from 'react-router-dom';
+import usePasswordVal from '../../usePasswordVal';
 //google button getting
-import axiosInstance from "../../api/axiosInstance";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../../features/auth/authSlice";
-import { useEffect } from "react";
-import AuthInput from "../../components/common/AuthInput";
-import AuthDivider from "../../components/common/AuthDivder";
-import GoogleAuthButton from "../../components/common/GoogleAuthButton";
-import MainThemeButton from "../../components/common/MainThemeButton";
-import RadioGroup from "../../components/common/RadioGroup";
+import axiosInstance from '../../api/axiosInstance';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../../features/auth/authSlice';
+import { useEffect } from 'react';
+import AuthInput from '../../components/common/AuthInput';
+import AuthDivider from '../../components/common/AuthDivder';
+import GoogleAuthButton from '../../components/common/GoogleAuthButton';
+import MainThemeButton from '../../components/common/MainThemeButton';
+import RadioGroup from '../../components/common/RadioGroup';
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    gender: "male",
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    gender: 'male',
     file: null,
-    ReferralCode: "",
+    ReferralCode: '',
   });
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -34,10 +34,10 @@ const Signup = () => {
 
   useEffect(() => {
     //removing saved values in the Otp verify page.
-    localStorage.removeItem("otpExpiry");
-    localStorage.removeItem("ResendCount");
+    localStorage.removeItem('otpExpiry');
+    localStorage.removeItem('ResendCount');
     if (isAuthenticated) {
-      navigate("/", { replace: true });
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -49,20 +49,20 @@ const Signup = () => {
       [name]: files ? files[0] : value,
     }));
 
-    if (name === "password") {
+    if (name === 'password') {
       const validationMsg = usePasswordVal(value);
       setError(validationMsg);
       setIsPasswordValid(!validationMsg);
       if (validationMsg) {
-        setFormData((prev) => ({ ...prev, confirmPassword: "" }));
+        setFormData((prev) => ({ ...prev, confirmPassword: '' }));
       }
     }
 
-    if (name === "confirmPassword" && isPasswordValid) {
+    if (name === 'confirmPassword' && isPasswordValid) {
       if (formData.password !== value) {
-        setError("Passwords do not match");
+        setError('Passwords do not match');
       } else {
-        setError("");
+        setError('');
       }
     }
   };
@@ -77,24 +77,24 @@ const Signup = () => {
         !formData.password ||
         !formData.confirmPassword
       ) {
-        toast.error("All fields are required for signup");
+        toast.error('All fields are required for signup');
         setLoading(false);
         return;
       }
 
       if (!formData.name.trim()) {
-        toast.error("proper name needed");
+        toast.error('proper name needed');
       }
       //phone number validation
       if (formData.phone) {
         if (!/^\d{10}$/.test(formData.phone)) {
-          toast.error("The phone number must be 10");
+          toast.error('The phone number must be 10');
           setLoading(false);
           return;
         }
 
-        if (formData.phone === "0000000000") {
-          toast.error("The phone number not be all zeros");
+        if (formData.phone === '0000000000') {
+          toast.error('The phone number not be all zeros');
           setLoading(false);
           return;
         }
@@ -106,7 +106,7 @@ const Signup = () => {
 
         if (!validatePhoneNumber(formData.phone)) {
           toast.error(
-            "Please enter a valid 10-digit phone number starting with 6-9.",
+            'Please enter a valid 10-digit phone number starting with 6-9.'
           );
           return;
         }
@@ -121,31 +121,31 @@ const Signup = () => {
       }
 
       if (formData.password !== formData.confirmPassword) {
-        setError("Passwords do not match");
+        setError('Passwords do not match');
         setLoading(false);
         return;
       }
 
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/register`,
-        formData,
+        formData
       );
       if (response) {
         //navigate to verify otp with formdata
         toast.success(response.data.message);
-        navigate("/verify-otp", {
+        navigate('/verify-otp', {
           state: {
             formData,
           },
         });
       } else {
-        toast.error("Registration failed. Please check your inputs.");
+        toast.error('Registration failed. Please check your inputs.');
       }
     } catch (error) {
       if (error.response && error.response.data.errors) {
         error.response.data.errors.forEach((msg) => toast.error(msg));
       } else {
-        toast.error("Something went wrong");
+        toast.error('Something went wrong');
       }
     } finally {
       setLoading(false);
@@ -163,10 +163,10 @@ const Signup = () => {
     const token = res.data.accessToken;
     const user = JSON.stringify(res.data.user);
     dispatch(setUser(token, user));
-    localStorage.setItem("accessToken", token);
-    localStorage.setItem("user", user);
-    toast.success("user register using google is successfull");
-    navigate("/");
+    localStorage.setItem('accessToken', token);
+    localStorage.setItem('user', user);
+    toast.success('user register using google is successfull');
+    navigate('/');
   };
 
   return (
@@ -266,8 +266,8 @@ const Signup = () => {
               value={formData.gender}
               onChange={handleChange}
               options={[
-                { label: "Male", value: "male" },
-                { label: "Female", value: "female" },
+                { label: 'Male', value: 'male' },
+                { label: 'Female', value: 'female' },
               ]}
             />
 
@@ -284,7 +284,7 @@ const Signup = () => {
 
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>
-                Already have an account?{" "}
+                Already have an account?{' '}
                 <Link to="/login" className="text-blue-500">
                   Log in
                 </Link>

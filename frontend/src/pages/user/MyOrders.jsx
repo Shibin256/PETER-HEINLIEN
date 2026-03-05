@@ -1,23 +1,23 @@
 // pages/user/MyOrders.jsx
-import React, { useEffect, useState } from "react";
-import Title from "../../components/common/Title";
-import Order from "../../components/user/order";
-import { useDispatch, useSelector } from "react-redux";
-import { getOrders } from "../../features/orders/ordersSlice";
-import AuthInput from "../../components/common/AuthInput";
+import React, { useEffect, useState } from 'react';
+import Title from '../../components/common/Title';
+import Order from '../../components/user/order';
+import { useDispatch, useSelector } from 'react-redux';
+import { getOrders } from '../../features/orders/ordersSlice';
+import AuthInput from '../../components/common/AuthInput';
 
 const MyOrders = () => {
   const dispatch = useDispatch();
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [searchTerm, setSearchTerm] = useState("");
+  const user = JSON.parse(localStorage.getItem('user'));
+  const [searchTerm, setSearchTerm] = useState('');
   useEffect(() => {
-    dispatch(getOrders({ userId: user._id, search: "", page: 1, limit: 4 }));
+    dispatch(getOrders({ userId: user._id, search: '', page: 1, limit: 4 }));
   }, []);
 
   const refetchOrders = () => {
     if (user?._id) {
       dispatch(
-        getOrders({ userId: user._id, search: searchTerm, page: 1, limit: 4 }),
+        getOrders({ userId: user._id, search: searchTerm, page: 1, limit: 4 })
       );
     }
   };
@@ -25,7 +25,7 @@ const MyOrders = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     dispatch(
-      getOrders({ userId: user._id, search: searchTerm, page: 1, limit: 4 }),
+      getOrders({ userId: user._id, search: searchTerm, page: 1, limit: 4 })
     );
   };
 
@@ -33,7 +33,7 @@ const MyOrders = () => {
 
   return (
     <div className="px-4 md:px-10 py-6">
-      <Title text1={"Orders"} text2={"List"} />
+      <Title text1={'Orders'} text2={'List'} />
       {/* Search Bar */}
       <div className="mb-6">
         <form onSubmit={handleSearch} className="flex gap-2">
@@ -57,8 +57,8 @@ const MyOrders = () => {
             <button
               type="button"
               onClick={() => {
-                setSearchTerm("");
-                dispatch(getOrders({ userId: user._id, search: "" }));
+                setSearchTerm('');
+                dispatch(getOrders({ userId: user._id, search: '' }));
               }}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             >
@@ -82,10 +82,10 @@ const MyOrders = () => {
                 page: page - 1,
                 limit: 4,
                 search: searchTerm,
-              }),
+              })
             )
           }
-          className={`px-4 py-2 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+          className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
         >
           Previous
         </button>
@@ -103,10 +103,10 @@ const MyOrders = () => {
                 page: page + 1,
                 limit: 4,
                 search: searchTerm,
-              }),
+              })
             )
           }
-          className={`px-4 py-2 rounded ${page >= totalPage ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+          className={`px-4 py-2 rounded ${page >= totalPage ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
         >
           Next
         </button>
