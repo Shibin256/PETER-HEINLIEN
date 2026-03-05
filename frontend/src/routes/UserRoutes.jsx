@@ -63,7 +63,10 @@ const UserRoutes = () => {
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="verify-otp" element={<OTPForm />} />
             <Route path="change-password" element={<ChangePass />} />
-            <Route path="verify-otp-forgotpass" element={<OTPFormFrogotpass />} />
+            <Route
+              path="verify-otp-forgotpass"
+              element={<OTPFormFrogotpass />}
+            />
             <Route path="reset-password" element={<ForgotPass />} />
             <Route path="contact" element={<Contact />} />
             <Route path="coupons" element={<Coupons />} />
@@ -204,7 +207,6 @@ const UserRoutes = () => {
           </Route>
 
           <Route path="*" element={<NotFound />} />
-
         </Routes>
       </ErrorBoundary>
     </div>

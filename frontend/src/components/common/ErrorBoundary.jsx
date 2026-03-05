@@ -1,20 +1,20 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FiAlertTriangle, FiHome, FiRefreshCw } from "react-icons/fi";
+import { FiAlertTriangle, FiRefreshCw } from "react-icons/fi";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       hasError: false,
-      error: null 
+      error: null,
     };
   }
 
   static getDerivedStateFromError(error) {
-    return { 
+    return {
       hasError: true,
-      error 
+      error,
     };
   }
 
@@ -33,16 +33,17 @@ class ErrorBoundary extends React.Component {
                 <FiAlertTriangle className="text-red-500 text-4xl" />
               </div>
             </div>
-            
+
             <h1 className="text-5xl font-bold text-gray-800 mb-2">404</h1>
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">
               Oops! Something went wrong
             </h2>
-            
+
             <p className="text-gray-600 mb-6">
-              {this.state.error?.toString() || "We couldn't load this page properly."}
+              {this.state.error?.toString() ||
+                "We couldn't load this page properly."}
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
@@ -69,13 +70,8 @@ class ErrorBoundary extends React.Component {
 // Optional: Create a wrapper component to use hooks if needed
 export const ErrorBoundaryWithNavigation = (props) => {
   const navigate = useNavigate();
-  
-  return (
-    <ErrorBoundary 
-      {...props} 
-      navigate={navigate} 
-    />
-  );
+
+  return <ErrorBoundary {...props} navigate={navigate} />;
 };
 
 export default ErrorBoundary;

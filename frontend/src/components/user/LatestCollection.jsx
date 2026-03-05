@@ -2,7 +2,10 @@ import React, { useEffect } from "react";
 import Title from "../common/Title";
 import ProductCard from "../common/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCollection, fetchCollectionWithoutUser } from "../../features/products/productSlice";
+import {
+  fetchCollection,
+  fetchCollectionWithoutUser,
+} from "../../features/products/productSlice";
 
 const LatestCollection = () => {
   const dispatch = useDispatch();
@@ -10,12 +13,10 @@ const LatestCollection = () => {
   const user = storedUser ? JSON.parse(storedUser) : null;
   const { latestCollection } = useSelector((state) => state.products);
 
-
   useEffect(() => {
     if (user) {
       dispatch(fetchCollection({ userId: user._id }));
-    }
-     else {
+    } else {
       dispatch(fetchCollectionWithoutUser());
     }
   }, []);

@@ -8,7 +8,7 @@ export const createCoupons = createAsyncThunk(
       const res = await couponsService.createCoupons(data);
       return res;
     } catch (error) {
-      console.log(error,'-----')
+      console.log(error, "-----");
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   },
@@ -81,7 +81,7 @@ export const applyCoupon = createAsyncThunk(
       console.log(userId, couponCode, "in coupons slice");
       return await couponsService.applyCoupon({ userId, couponCode });
     } catch (error) {
-      console.log(error,'--------')
+      console.log(error, "--------");
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || error.message,
       );
@@ -108,8 +108,8 @@ const couponsSlice = createSlice({
   name: "coupons",
   initialState: {
     coupons: [],
-    userCoupons:[],
-    adsCoupon:null,
+    userCoupons: [],
+    adsCoupon: null,
     coupon: null,
     page: 1,
     totalPages: 1,
@@ -154,7 +154,7 @@ const couponsSlice = createSlice({
         state.error = action.payload;
       })
 
-       .addCase(fetchAdsCoupons.pending, (state) => {
+      .addCase(fetchAdsCoupons.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchAdsCoupons.fulfilled, (state, action) => {
@@ -167,8 +167,7 @@ const couponsSlice = createSlice({
         state.error = action.payload;
       })
 
-      
-       .addCase(fetchUserCoupons.pending, (state) => {
+      .addCase(fetchUserCoupons.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchUserCoupons.fulfilled, (state, action) => {

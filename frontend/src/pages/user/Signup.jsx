@@ -41,7 +41,6 @@ const Signup = () => {
     }
   }, [isAuthenticated, navigate]);
 
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -67,7 +66,6 @@ const Signup = () => {
       }
     }
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,7 +105,9 @@ const Signup = () => {
         };
 
         if (!validatePhoneNumber(formData.phone)) {
-          toast.error("Please enter a valid 10-digit phone number starting with 6-9.");
+          toast.error(
+            "Please enter a valid 10-digit phone number starting with 6-9.",
+          );
           return;
         }
       }
@@ -143,7 +143,7 @@ const Signup = () => {
       }
     } catch (error) {
       if (error.response && error.response.data.errors) {
-        error.response.data.errors.forEach(msg => toast.error(msg));
+        error.response.data.errors.forEach((msg) => toast.error(msg));
       } else {
         toast.error("Something went wrong");
       }
@@ -235,7 +235,6 @@ const Signup = () => {
               disabled={!isPasswordValid}
             />
 
-
             <AuthInput
               label="Phone Number"
               type="tel"
@@ -286,17 +285,19 @@ const Signup = () => {
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>
                 Already have an account?{" "}
-              <Link to="/login" className="text-blue-500">
-                Log in
-              </Link>
+                <Link to="/login" className="text-blue-500">
+                  Log in
+                </Link>
               </span>
               <span>
-                <Link to="/" className="text-yellow-500 font-semibold hover:underline">
+                <Link
+                  to="/"
+                  className="text-yellow-500 font-semibold hover:underline"
+                >
                   Go to Home
                 </Link>
               </span>
             </div>
-
           </form>
         </div>
       </main>

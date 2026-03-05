@@ -134,7 +134,10 @@ const Login = () => {
               </Link>
             </span>
             <span>
-              <Link to="/" className="text-yellow-500 font-semibold hover:underline">
+              <Link
+                to="/"
+                className="text-yellow-500 font-semibold hover:underline"
+              >
                 Go to Home
               </Link>
             </span>

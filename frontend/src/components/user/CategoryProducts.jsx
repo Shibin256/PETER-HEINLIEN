@@ -21,9 +21,15 @@ const CategoryProducts = () => {
     const lowerCaseName = categoryName.toLowerCase();
     if (lowerCaseName.includes("women") || lowerCaseName.includes("ladies")) {
       return womensCollection;
-    } else if (lowerCaseName.includes("men") || lowerCaseName.includes("gentlemen")) {
+    } else if (
+      lowerCaseName.includes("men") ||
+      lowerCaseName.includes("gentlemen")
+    ) {
       return mensCollection;
-    } else if (lowerCaseName.includes("couple") || lowerCaseName.includes("pair")) {
+    } else if (
+      lowerCaseName.includes("couple") ||
+      lowerCaseName.includes("pair")
+    ) {
       return couplesCollection;
     }
     return womensCollection;
@@ -52,11 +58,11 @@ const CategoryProducts = () => {
             className="group relative bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
           >
             {/* Clickable area for the entire card */}
-            <div 
+            <div
               className="absolute inset-0 z-20 cursor-pointer"
               onClick={() => handleClick(category._id, category.categoryName)}
             ></div>
-            
+
             {/* Category Image */}
             <div className="relative h-80 w-full overflow-hidden">
               <img
@@ -64,10 +70,10 @@ const CategoryProducts = () => {
                 alt={category.categoryName}
                 className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
               />
-              
+
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
+
               {/* Shop Now Button - Now positioned higher */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30">
                 <button
@@ -78,8 +84,19 @@ const CategoryProducts = () => {
                   className="px-8 py-3 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg flex items-center"
                 >
                   Shop Now
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 ml-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
                   </svg>
                 </button>
               </div>
@@ -91,7 +108,7 @@ const CategoryProducts = () => {
                 {category.categoryName}
               </h3>
             </div>
-            
+
             {/* Floating Tag */}
             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm z-30">
               <span className="text-xs font-medium text-gray-900 uppercase tracking-wider">

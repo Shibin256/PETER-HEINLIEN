@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import usePasswordVal from "../../../usePasswordVal";
 import MainThemeButton from "../../../components/common/MainThemeButton";
 import AuthInput from "../../../components/common/AuthInput";
 import { changePassword } from "../../../features/accountSettings/accountSlice";
 import { setUser } from "../../../features/auth/authSlice";
-
 
 const EditPassword = () => {
   const navigate = useNavigate();

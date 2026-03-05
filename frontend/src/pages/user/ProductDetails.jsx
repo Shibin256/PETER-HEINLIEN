@@ -23,7 +23,6 @@ import { addToCart } from "../../features/cart/cartSlice";
 import Title from "../../components/common/Title";
 import ProductCard from "../../components/common/ProductCard";
 import ProductDetailsSkeleton from "../../components/common/sketion/ProductDetailsSkeleton";
-import NotFound from "../notFound/NotFound";
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -41,15 +40,15 @@ const ProductDetails = () => {
     (state) => state.products,
   );
 
-  console.log(singleProduct,'single pro')
+  console.log(singleProduct, "single pro");
   useEffect(() => {
     if (id) {
-      dispatch(getProducById(id)).then((res)=>{
-        if(res.type=='product/getProductById/rejected'){
-          console.log('hi')
-          return navigate('NotFound')
+      dispatch(getProducById(id)).then((res) => {
+        if (res.type == "product/getProductById/rejected") {
+          console.log("hi");
+          return navigate("NotFound");
         }
-      })
+      });
       if (user) {
         dispatch(relatedProducts({ id: id, userId: user._id }));
       } else {
@@ -142,13 +141,13 @@ const ProductDetails = () => {
 
     try {
       const res = await dispatch(
-        addToCart({ 
-          userId: user._id, 
+        addToCart({
+          userId: user._id,
           productId: singleProduct._id,
-          quantity: quantity 
+          quantity: quantity,
         }),
       );
-      
+
       if (res.payload === "max quantity added") {
         toast.warning("Maximum quantity reached");
       } else if (res.payload === "Product is out of stock") {
@@ -178,7 +177,7 @@ const ProductDetails = () => {
     console.log(singleProduct);
     const forwardprice = singleProduct.offerPrice || singleProduct.price;
     console.log(forwardprice);
-    
+
     // Clear previous local cart and add current item
     const newCartItem = {
       price: forwardprice,
@@ -186,10 +185,10 @@ const ProductDetails = () => {
       productSubTotal: forwardprice * quantity,
       quantity: quantity,
     };
-    
+
     const updatedCart = [newCartItem];
     setLocalCart(updatedCart);
-    
+
     const shipping = newCartItem.productSubTotal > 1000 ? 0 : 50;
     navigate("/checkout", {
       state: {
@@ -227,7 +226,9 @@ const ProductDetails = () => {
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
                 className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${
-                  currentImageIndex === index ? "border-blue-500" : "border-gray-200"
+                  currentImageIndex === index
+                    ? "border-blue-500"
+                    : "border-gray-200"
                 }`}
               >
                 <img
@@ -281,7 +282,9 @@ const ProductDetails = () => {
                     ),
                   )}
               </div>
-              <span className="text-sm text-gray-500">{product.numReviews}</span>
+              <span className="text-sm text-gray-500">
+                {product.numReviews}
+              </span>
             </div>
             <div className="mb-4">
               {product.offerPrice ? (

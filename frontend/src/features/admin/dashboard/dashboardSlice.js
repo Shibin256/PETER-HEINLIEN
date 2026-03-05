@@ -21,7 +21,7 @@ export const getBestSellers = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await dashboardService.getBestSellers();
-      return res; 
+      return res;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Failed to fetch dashboard stats",
@@ -49,7 +49,6 @@ export const fetchSalesReport = createAsyncThunk(
     }
   },
 );
-
 
 export const downloadSalesReportExcel = createAsyncThunk(
   "dashboard/downloadSalesReportExcel",
@@ -100,7 +99,6 @@ const dashboardSlice = createSlice({
     topBrands: [],
     stats: null, // { totalSales, totalOrders, totalUsers, revenue }
     salesReport: null, // Array of sales data (for chart/table)
-    topProducts: [], // Array of best-selling products
     success: false,
   },
   reducers: {
@@ -127,21 +125,19 @@ const dashboardSlice = createSlice({
         state.error = action.payload;
       })
 
-
-       // Fetch Stats
+      // Fetch Stats
       .addCase(getBestSellers.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getBestSellers.fulfilled, (state, action) => {
-        const {topProducts, topCategories, topBrands}=action.payload
+        const { topProducts, topCategories, topBrands } = action.payload;
 
         state.loading = false;
         state.success = true;
         state.topProducts = topProducts;
         state.topCategories = topCategories;
         state.topBrands = topBrands;
-
       })
       .addCase(getBestSellers.rejected, (state, action) => {
         state.loading = false;
@@ -160,8 +156,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchSalesReport.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-
+      });
   },
 });
 

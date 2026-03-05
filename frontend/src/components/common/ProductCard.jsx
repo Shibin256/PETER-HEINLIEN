@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-import { FaHeart, FaRegHeart, FaShoppingCart, FaStar, FaStarHalfAlt } from "react-icons/fa";
+import {
+  FaHeart,
+  FaRegHeart,
+  FaShoppingCart,
+  FaStar,
+  FaStarHalfAlt,
+} from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   addToWishlist,
-  getWishedProduct,
   removeFromWishlist,
 } from "../../features/wishlist/wishlistSlice";
 import { addToCart } from "../../features/cart/cartSlice";
@@ -23,7 +28,6 @@ const ProductCard = ({ product }) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
-
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);

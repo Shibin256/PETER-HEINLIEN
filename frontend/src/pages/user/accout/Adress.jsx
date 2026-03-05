@@ -40,7 +40,7 @@ const Address = () => {
         dispatch(getAllAddress(user._id));
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Failed to remove address");
     }
   };
@@ -55,7 +55,7 @@ const Address = () => {
         dispatch(getAllAddress(user._id));
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Failed to set default address");
     }
   };

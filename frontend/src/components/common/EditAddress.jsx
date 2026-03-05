@@ -7,9 +7,8 @@ import { validateAddress } from "./AddressValidation";
 const EditAddressModal = ({ address, onClose, onSuccess }) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState({ ...address });
-  console.log(form,'form');
+  console.log(form, "form");
 
-  
   const indianStates = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
@@ -117,25 +116,25 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
           />
 
           <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                State <span className="text-red-500"></span>
-              </label>
-              <select
-                name="state"
-                value={form.state}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              >
-                <option value="">Select State</option>
-                {indianStates.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-{/* 
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              State <span className="text-red-500"></span>
+            </label>
+            <select
+              name="state"
+              value={form.state}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            >
+              <option value="">Select State</option>
+              {indianStates.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* 
           <input
             name="state"
             required={true}

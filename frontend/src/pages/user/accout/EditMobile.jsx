@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 const EditMobile = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const profileData = location.state?.profileData;
   const dispatch = useDispatch();
 
@@ -39,7 +39,9 @@ const EditMobile = () => {
     };
 
     if (!validatePhoneNumber(newMobile)) {
-      toast.error("Please enter a valid 10-digit phone number starting with 6-9.");
+      toast.error(
+        "Please enter a valid 10-digit phone number starting with 6-9.",
+      );
       return;
     }
 

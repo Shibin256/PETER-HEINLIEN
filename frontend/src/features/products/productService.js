@@ -16,7 +16,9 @@ const getLatestCollection = async (userId) => {
 };
 
 const topRatedCollections = async (userId) => {
-  const response = await axiosInstance.get(`/api/v1/products/top-rated/${userId}`);
+  const response = await axiosInstance.get(
+    `/api/v1/products/top-rated/${userId}`,
+  );
   return response.data;
 };
 
@@ -38,7 +40,9 @@ const listProduct = async (id) => {
 };
 
 const unlistProduct = async (id) => {
-  const response = await adminAxiosInstance.post(`/api/v1/product/unlist/${id}`);
+  const response = await adminAxiosInstance.post(
+    `/api/v1/product/unlist/${id}`,
+  );
   return response.data;
 };
 
@@ -55,7 +59,9 @@ const updateProduct = async (id, data) => {
 
 // fetching brand and category
 const getBrandAndCollection = async () => {
-  const res = await axiosInstance.get("/api/v1/products/getBrandsAndCollection");
+  const res = await axiosInstance.get(
+    "/api/v1/products/getBrandsAndCollection",
+  );
   return res.data;
 };
 
@@ -67,13 +73,14 @@ const getProducById = async (id) => {
 
 const getRelatedProducts = async (id, userId) => {
   if (userId) {
-    const res = await axiosInstance.get(`/api/v1/products/${id}/${userId}/related`);
+    const res = await axiosInstance.get(
+      `/api/v1/products/${id}/${userId}/related`,
+    );
     return res.data;
   } else {
     const res = await axiosInstance.get(`/api/v1/products/${id}/related`);
     return res.data;
   }
-
 };
 
 const addProductOffer = async ({ productId, percentage }) => {
@@ -105,7 +112,7 @@ const fetchCollectionWithoutUser = async () => {
   return response.data;
 };
 
-const topRatedCollectionsWithOutUser = async (userId) => {
+const topRatedCollectionsWithOutUser = async () => {
   const response = await axiosInstance.get(`/api/v1/products/top-rated`);
   return response.data;
 };
@@ -126,7 +133,7 @@ const productService = {
   removeProductOffer,
   getBrandAndCategory,
   listProduct,
-  unlistProduct
+  unlistProduct,
 };
 
 export default productService;

@@ -7,24 +7,18 @@ const getStats = async () => {
 
 const getSalesReport = async ({ type, startDate, endDate }) => {
   console.log(type, startDate);
-  const res = await adminAxiosInstance.get(
-    "/api/v1/admin/sales/report",
-    {
-      params: { type, startDate, endDate },
-    },
-  );
+  const res = await adminAxiosInstance.get("/api/v1/admin/sales/report", {
+    params: { type, startDate, endDate },
+  });
   return res.data;
 };
 
 const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
   console.log(type, startDate);
-  const res = await adminAxiosInstance.get(
-    "/api/v1/admin/sales/report/pdf",
-    {
-      params: { type, startDate, endDate },
-      responseType: "blob",
-    },
-  );
+  const res = await adminAxiosInstance.get("/api/v1/admin/sales/report/pdf", {
+    params: { type, startDate, endDate },
+    responseType: "blob",
+  });
 
   const blob = new Blob([res.data], { type: "application/pdf" });
   const url = window.URL.createObjectURL(blob);
@@ -38,13 +32,10 @@ const downloadSalesReportPdf = async ({ type, startDate, endDate }) => {
   return res.data;
 };
 const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
-  const res = await adminAxiosInstance.get(
-    "/api/v1/admin/sales/report/excel",
-    {
-      params: { type, startDate, endDate },
-      responseType: "blob",
-    },
-  );
+  const res = await adminAxiosInstance.get("/api/v1/admin/sales/report/excel", {
+    params: { type, startDate, endDate },
+    responseType: "blob",
+  });
 
   const blob = new Blob([res.data], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -64,8 +55,6 @@ const downloadSalesReportExcel = async ({ type, startDate, endDate }) => {
   window.URL.revokeObjectURL(url);
 };
 
-
-
 const getBestSellers = async () => {
   const res = await adminAxiosInstance.get("/api/v1/admin/bestsellers");
   return res.data;
@@ -76,7 +65,7 @@ const dashboardService = {
   getSalesReport,
   downloadSalesReportPdf,
   downloadSalesReportExcel,
-  getBestSellers
+  getBestSellers,
 };
 
 export default dashboardService;

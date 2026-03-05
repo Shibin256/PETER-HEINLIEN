@@ -2,10 +2,7 @@ import adminAxiosInstance from "../../api/adminAxiosInstance";
 import axiosInstance from "../../api/axiosInstance";
 
 const createCoupons = async (data) => {
-  const response = await adminAxiosInstance.post(
-    "/api/v1/admin/coupons",
-    data,
-  );
+  const response = await adminAxiosInstance.post("/api/v1/admin/coupons", data);
   return response.data;
 };
 
@@ -22,16 +19,14 @@ const fetchAllCoupons = async (search, page, limit) => {
   return response.data;
 };
 
-
-const fetchAdsCoupons= async () => {
+const fetchAdsCoupons = async () => {
   const response = await axiosInstance.get("/api/v1/users/coupons");
   return response.data;
 };
 
-const fetchUserCoupons= async () => {
+const fetchUserCoupons = async () => {
   const response = await axiosInstance.get("/api/v1/users/all/coupons");
   return response.data;
-
 };
 
 const deleteCoupon = async (couponId) => {
@@ -42,7 +37,7 @@ const deleteCoupon = async (couponId) => {
 };
 
 const updateCoupon = async (data) => {
-  console.log(data)
+  console.log(data);
   const response = await adminAxiosInstance.put(
     `/api/v1/admin/coupons/${data.couponId}`,
     {
@@ -50,7 +45,7 @@ const updateCoupon = async (data) => {
       discountType: data.discountType,
       discountValue: data.discountAmount,
       minOrderAmount: data.minPurchase,
-      maxDiscount:data.maxDiscount,
+      maxDiscount: data.maxDiscount,
       usageLimit: data.usageLimit,
       expirationDate: data.expirationDate,
     },
@@ -69,9 +64,12 @@ const applyCoupon = async ({ userId, couponCode }) => {
 
 const removeCoupon = async (userId, couponId) => {
   console.log(couponId, userId, "in service");
-  const response = await axiosInstance.delete(`/api/v1/users/coupons/${couponId}`, {
-    data: { userId }, // this is how you pass body in axios DELETE
-  });
+  const response = await axiosInstance.delete(
+    `/api/v1/users/coupons/${couponId}`,
+    {
+      data: { userId }, // this is how you pass body in axios DELETE
+    },
+  );
   return response.data;
 };
 
@@ -83,7 +81,7 @@ const couponsService = {
   updateCoupon,
   removeCoupon,
   fetchAdsCoupons,
-  fetchUserCoupons
+  fetchUserCoupons,
 };
 
 export default couponsService;

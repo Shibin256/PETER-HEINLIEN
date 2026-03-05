@@ -28,25 +28,6 @@ const Wishlist = () => {
     }
   }, [dispatch, user?._id]);
 
-  const handleActionChange = (e) => {
-    setSelectedAction(e.target.value);
-  };
-
-  const handleApplyAction = () => {
-    if (!selectedAction) return;
-
-    setIsProcessing(true);
-    setTimeout(() => {
-      if (selectedAction === "addToCart") {
-        console.log("Adding selected to cart");
-      } else if (selectedAction === "removeFromWishlist") {
-        // implement multi-delete logic here
-      }
-      setSelectedAction("");
-      setIsProcessing(false);
-    }, 800);
-  };
-
   const handleRemoveItem = async (id) => {
     try {
       setIsDeletingId(id);
@@ -246,7 +227,6 @@ const Wishlist = () => {
 
         {wishlist?.length > 0 && (
           <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-
             {/* <div className="flex items-center space-x-4 w-full sm:w-auto">
               <select
                 value={selectedAction}

@@ -1,12 +1,16 @@
 import axiosInstance from "../../api/axiosInstance";
 
 const changeName = async (userId, data) => {
-  const res = await axiosInstance.patch(`/api/v1/users/account/${userId}/name`, data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
+  const res = await axiosInstance.patch(
+    `/api/v1/users/account/${userId}/name`,
+    data,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: true,
     },
-    withCredentials: true,
-  });
+  );
   // console.log(res.data)
   return res.data;
 };
@@ -22,7 +26,7 @@ const changeMobile = async (userId, data) => {
       withCredentials: true,
     },
   );
-  console.log(res,'eresss---')
+  console.log(res, "eresss---");
   return res.data;
 };
 
@@ -53,7 +57,7 @@ const addAddress = async (userId, data) => {
     `/api/v1/users/account/${userId}/address`,
     data,
   );
-  console.log(res,'-----000')
+  console.log(res, "-----000");
   return res.data;
 };
 

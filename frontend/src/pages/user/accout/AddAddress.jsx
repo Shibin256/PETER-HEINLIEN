@@ -15,7 +15,7 @@ const AddAddress = () => {
     pin: "",
     phone: "",
     altPhone: "",
-    addressType: "home", 
+    addressType: "home",
     defaultAddress: false,
   });
 
@@ -93,8 +93,13 @@ const AddAddress = () => {
       }
     });
 
-    if (addressData.name && !/^[a-zA-Z\s]{2,50}$/.test(addressData.name.trim())) {
-      errors.push("Name should only contain letters and be 2–50 characters long");
+    if (
+      addressData.name &&
+      !/^[a-zA-Z\s]{2,50}$/.test(addressData.name.trim())
+    ) {
+      errors.push(
+        "Name should only contain letters and be 2–50 characters long",
+      );
     }
 
     if (
@@ -151,28 +156,26 @@ const AddAddress = () => {
 
     try {
       const res = await dispatch(
-        addAddress({ userId: user._id, data: formattedAddress })
+        addAddress({ userId: user._id, data: formattedAddress }),
       );
-      console.log(res)
+      console.log(res);
       if (res.type.endsWith("/fulfilled")) {
         toast.success("✅ Address added successfully!");
         navigate("/my-address");
-      }else {
+      } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-          toast.error(res.payload.errors[0])
-        }
-        else {
+          toast.error(res.payload.errors[0]);
+        } else {
           toast.error(res?.error?.message || "Failed to add address.");
         }
       }
     } catch (error) {
       if (error.response?.data?.errors) {
-        error.response.data.errors.forEach(err => toast.error(err.msg));
+        error.response.data.errors.forEach((err) => toast.error(err.msg));
       } else {
         toast.error(error.response?.data?.message || "Something went wrong");
       }
     }
-
 
     // Reset form
     setAddressData({
@@ -188,7 +191,6 @@ const AddAddress = () => {
       defaultAddress: false,
     });
   };
-
 
   const handleCancel = () => {
     // Navigate back or reset form

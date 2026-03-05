@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import InventoryCard from "../../components/admin/InventoryCard";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getBrandAndCategory,
-} from "../../features/products/productSlice";
+import { getBrandAndCategory } from "../../features/products/productSlice";
 import {
   addBrand,
   addCategory,
@@ -163,7 +161,9 @@ const Inventory = () => {
       }
 
       if (!/^[A-Za-z&\-\s]+$/.test(trimmedCategory)) {
-        toast.warning("Category name can only contain letters, spaces, '&', and '-'");
+        toast.warning(
+          "Category name can only contain letters, spaces, '&', and '-'",
+        );
         return;
       }
 
@@ -181,7 +181,7 @@ const Inventory = () => {
         toast.warning("Category already exists");
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-          toast.error(res.payload.errors[0])
+          toast.error(res.payload.errors[0]);
         }
       }
       setNewCategory("");
@@ -210,7 +210,7 @@ const Inventory = () => {
         toast.warning("File size should be less than 2MB");
         return;
       }
-      console.log(file)
+      console.log(file);
 
       setBrandLogo(file);
 
@@ -241,7 +241,9 @@ const Inventory = () => {
         return;
       }
       if (!/^[a-zA-Z0-9\s\-]+$/.test(newBrand)) {
-        toast.warning("Brand name can only contain letters, numbers, spaces, and hyphens");
+        toast.warning(
+          "Brand name can only contain letters, numbers, spaces, and hyphens",
+        );
         return;
       }
       if (brandDescription && brandDescription.length > 200) {
@@ -267,8 +269,8 @@ const Inventory = () => {
       formData.append("logo", brandLogo);
 
       const res = await dispatch(addBrand(formData));
-      console.log(res)
-      if (res.type.endsWith('fulfilled')) {
+      console.log(res);
+      if (res.type.endsWith("fulfilled")) {
         toast.success("Brand added successfully");
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setNewBrand("");
@@ -278,7 +280,7 @@ const Inventory = () => {
         setIsAddingBrand(false);
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-          toast.error(res.payload.errors[0])
+          toast.error(res.payload.errors[0]);
         } else {
           toast.error(res.payload?.message || "Failed to create product");
         }
@@ -289,7 +291,6 @@ const Inventory = () => {
       setIsLoading(false);
     }
   };
-
 
   // Brand edit
   const handleBrandEdit = (brand) => {
@@ -315,7 +316,9 @@ const Inventory = () => {
         return;
       }
       if (!/^[a-zA-Z0-9\s\-]+$/.test(editingBrandName)) {
-        toast.warning("Brand name can only contain letters, numbers, spaces, and hyphens");
+        toast.warning(
+          "Brand name can only contain letters, numbers, spaces, and hyphens",
+        );
         return;
       }
       if (editingBrandDescription && editingBrandDescription.length > 200) {
@@ -326,7 +329,11 @@ const Inventory = () => {
         toast.warning("Brand logo is required");
         return;
       }
-      if (!["image/jpeg", "image/png", "image/webp"].includes(editingBrandLogo.type)) {
+      if (
+        !["image/jpeg", "image/png", "image/webp"].includes(
+          editingBrandLogo.type,
+        )
+      ) {
         toast.warning("Only JPG, PNG, and WEBP formats are allowed");
         return;
       }
@@ -342,15 +349,15 @@ const Inventory = () => {
       const res = await dispatch(
         editBrand({ id: editingBrandId, data: formData }),
       );
-      console.log(res,'---')
+      console.log(res, "---");
 
-      if (res.type.endsWith('fulfilled')) {
+      if (res.type.endsWith("fulfilled")) {
         toast.success("Brand updated successfully");
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setIsEditingBrand(false);
-      }else{
+      } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-          toast.error(res.payload.errors[0])
+          toast.error(res.payload.errors[0]);
         } else {
           toast.error(res.payload?.message || "Failed to create product");
         }
@@ -424,7 +431,9 @@ const Inventory = () => {
       }
 
       if (!/^[A-Za-z&\-\s]+$/.test(trimmedCategory)) {
-        toast.warning("Category name can only contain letters, spaces, '&', and '-'");
+        toast.warning(
+          "Category name can only contain letters, spaces, '&', and '-'",
+        );
         return;
       }
 
@@ -438,15 +447,15 @@ const Inventory = () => {
           id: editingCategoryId,
           category: editingCategoryName,
         }),
-      )
+      );
 
-      if (res.type.endsWith('fulfilled')) {
+      if (res.type.endsWith("fulfilled")) {
         toast.success("✅ category added successfully!");
-        setIsEditingCategory(false)
-        dispatch(getBrandAndCategory({ page: page, limit: 4 }))
+        setIsEditingCategory(false);
+        dispatch(getBrandAndCategory({ page: page, limit: 4 }));
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-          toast.error(res.payload.errors[0])
+          toast.error(res.payload.errors[0]);
         } else {
           toast.error(res.payload?.message || "Failed to create product");
         }
@@ -1009,7 +1018,10 @@ const Inventory = () => {
             <p className="mb-4">Are you sure you want to remove this offer?</p>
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => (setShowRemoveConfirm(false),setSelectedCategoryForOffer(null) )}
+                onClick={() => (
+                  setShowRemoveConfirm(false),
+                  setSelectedCategoryForOffer(null)
+                )}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
                 Cancel

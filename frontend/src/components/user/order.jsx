@@ -44,7 +44,7 @@ const Order = ({ order, onCancelSuccess }) => {
     Delivered: "bg-green-100 text-green-800",
     Cancelled: "bg-red-100 text-red-800",
     Returned: "bg-orange-100 text-orange-800",
-    Failed:'bg-red-100 text-red-800'
+    Failed: "bg-red-100 text-red-800",
   };
 
   // Payment status styling
@@ -119,8 +119,14 @@ const Order = ({ order, onCancelSuccess }) => {
   };
 
   const submitReview = async (itemId) => {
-    console.log(itemId)
-    await dispatch(addReview({ itemId: itemId, rating: ratings[itemId], review: reviews[itemId] }))
+    console.log(itemId);
+    await dispatch(
+      addReview({
+        itemId: itemId,
+        rating: ratings[itemId],
+        review: reviews[itemId],
+      }),
+    );
     setRatings((prev) => {
       const updated = { ...prev };
       delete updated[itemId];
@@ -197,7 +203,7 @@ const Order = ({ order, onCancelSuccess }) => {
         additionalDetails,
         "in confirm return function",
       );
-      console.log(selectedItemToCancel)
+      console.log(selectedItemToCancel);
       await dispatch(
         returnOrderItem({
           itemOrderId: selectedItemToReturn,
@@ -222,7 +228,7 @@ const Order = ({ order, onCancelSuccess }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
       {/* Order Header - Always Visible */}
-      <div 
+      <div
         className="p-4 bg-gray-50 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
         onClick={toggleExpand}
       >
@@ -244,35 +250,41 @@ const Order = ({ order, onCancelSuccess }) => {
               })}
             </span>
           </div>
-          
+
           {/* Compact Summary */}
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-            <span className="font-medium">{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
+            <span className="font-medium">
+              {itemCount} item{itemCount !== 1 ? "s" : ""}
+            </span>
             <span>•</span>
             <span className="font-bold text-gray-900">₹{TotalAmount}</span>
             {firstItem.productName && (
               <>
                 <span>•</span>
-                <span className="truncate max-w-[200px]">{firstItem.productName}</span>
+                <span className="truncate max-w-[200px]">
+                  {firstItem.productName}
+                </span>
               </>
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {/* Quick Actions - Always visible */}
           <div onClick={(e) => e.stopPropagation()}>
-            {OrderStatus !== "Cancelled" && OrderStatus !== "Delivered" && OrderStatus !== "Failed" && (
-              <button
-                onClick={() => (
-                  setSelectedItemToCancel(orderId),
-                  setIsCancelModalOpen(true)
-                )}
-                className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium transition-colors border border-red-100 mr-2"
-              >
-                Cancel
-              </button>
-            )}
+            {OrderStatus !== "Cancelled" &&
+              OrderStatus !== "Delivered" &&
+              OrderStatus !== "Failed" && (
+                <button
+                  onClick={() => (
+                    setSelectedItemToCancel(orderId),
+                    setIsCancelModalOpen(true)
+                  )}
+                  className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium transition-colors border border-red-100 mr-2"
+                >
+                  Cancel
+                </button>
+              )}
 
             {OrderStatus !== "Cancelled" && OrderStatus !== "Failed" && (
               <button
@@ -283,15 +295,20 @@ const Order = ({ order, onCancelSuccess }) => {
               </button>
             )}
           </div>
-          
+
           {/* Expand/Collapse Icon */}
           <svg
-            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
       </div>
@@ -341,18 +358,23 @@ const Order = ({ order, onCancelSuccess }) => {
 
                   {/* Action Buttons */}
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {(!item.returnReason && OrderStatus !== 'Cancelled' && OrderStatus !== "Failed" && OrderStatus !== "Delivered") && (
-                      <button
-                        disabled={item.cancelReason}
-                        onClick={() => (
-                          setSelectedItemToCancel(item.itemOrderId),
-                          setIsSingleCancelModalOpen(true)
-                        )}
-                        className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
-                      >
-                        {!item.cancelReason ? "Cancel Order" : "Product canceled"}
-                      </button>
-                    )}
+                    {!item.returnReason &&
+                      OrderStatus !== "Cancelled" &&
+                      OrderStatus !== "Failed" &&
+                      OrderStatus !== "Delivered" && (
+                        <button
+                          disabled={item.cancelReason}
+                          onClick={() => (
+                            setSelectedItemToCancel(item.itemOrderId),
+                            setIsSingleCancelModalOpen(true)
+                          )}
+                          className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-100"
+                        >
+                          {!item.cancelReason
+                            ? "Cancel Order"
+                            : "Product canceled"}
+                        </button>
+                      )}
 
                     {OrderStatus === "Delivered" && !item.cancelReason && (
                       <button
@@ -364,7 +386,7 @@ const Order = ({ order, onCancelSuccess }) => {
                       </button>
                     )}
 
-                    {(OrderStatus === "Delivered" && !item.rated) && (
+                    {OrderStatus === "Delivered" && !item.rated && (
                       <button
                         onClick={() => toggleReviewForm(item.itemOrderId)}
                         className="px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-lg text-sm font-medium transition-colors border border-yellow-100"
@@ -416,7 +438,9 @@ const Order = ({ order, onCancelSuccess }) => {
                             {[1, 2, 3, 4, 5].map((star) => (
                               <button
                                 key={star}
-                                onClick={() => handleRatingChange(item.itemOrderId, star)}
+                                onClick={() =>
+                                  handleRatingChange(item.itemOrderId, star)
+                                }
                                 className="focus:outline-none"
                               >
                                 <svg
@@ -442,7 +466,10 @@ const Order = ({ order, onCancelSuccess }) => {
                               placeholder="Share your experience..."
                               value={reviews[item.itemOrderId]}
                               onChange={(e) =>
-                                handleReviewChange(item.itemOrderId, e.target.value)
+                                handleReviewChange(
+                                  item.itemOrderId,
+                                  e.target.value,
+                                )
                               }
                             />
                           </div>
@@ -457,7 +484,8 @@ const Order = ({ order, onCancelSuccess }) => {
                             </button>
                           </div>
                         </div>
-                      ) : (<></>
+                      ) : (
+                        <></>
                       )}
                     </div>
                   )}
@@ -527,11 +555,15 @@ const Order = ({ order, onCancelSuccess }) => {
                 </h4>
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-600">Payment Method:</span>
+                    <span className="text-sm text-gray-600">
+                      Payment Method:
+                    </span>
                     <span className="text-sm font-medium">{PaymentMethod}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-600">Payment Status:</span>
+                    <span className="text-sm text-gray-600">
+                      Payment Status:
+                    </span>
                     <span
                       className={`text-xs font-medium px-2 py-1 rounded-full ${paymentStatusStyles[PaymentStatus] || "bg-gray-100 text-gray-800"}`}
                     >
@@ -539,8 +571,12 @@ const Order = ({ order, onCancelSuccess }) => {
                     </span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-600">Delivery Charge:</span>
-                    <span className="text-sm font-medium">₹{DeliveryCharge}</span>
+                    <span className="text-sm text-gray-600">
+                      Delivery Charge:
+                    </span>
+                    <span className="text-sm font-medium">
+                      ₹{DeliveryCharge}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-md font-semibold text-gray-800">
@@ -716,19 +752,19 @@ const Order = ({ order, onCancelSuccess }) => {
 
             {(returnReason === "Other reason" ||
               returnReason === "Item not as described") && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional details
-                  </label>
-                  <textarea
-                    rows="3"
-                    value={additionalDetails}
-                    onChange={(e) => setAdditionalDetails(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Please provide more information..."
-                  />
-                </div>
-              )}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional details
+                </label>
+                <textarea
+                  rows="3"
+                  value={additionalDetails}
+                  onChange={(e) => setAdditionalDetails(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Please provide more information..."
+                />
+              </div>
+            )}
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
               <div className="flex">

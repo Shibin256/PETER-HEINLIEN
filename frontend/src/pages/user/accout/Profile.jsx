@@ -11,7 +11,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  console.log(user,'user---')
+  console.log(user, "user---");
   const [showModal, setShowModal] = useState(false);
   const [nameImg, setNameImg] = useState([]);
   const [profileData, setProfileData] = useState({
@@ -67,36 +67,6 @@ const Profile = () => {
     localStorage.removeItem("accessToken");
     navigate("/login");
     toast.success("Logged out successfully");
-  };
-
-  //handle delete
-  const handleDelete = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "you will permanently delete from the site.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete!",
-      cancelButtonText: "Cancel",
-      buttonsStyling: false,
-      customClass: {
-        confirmButton:
-          "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
-        cancelButton:
-          "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteUser(id)).then((res) => {
-          if (res.type.endsWith("/fulfilled")) {
-            toast.success("✅ User deleted successfully!");
-            navigate("/login")
-          } else {
-            toast.error(res?.error?.message || "Failed to delete user.");
-          }
-        });
-      }
-    });
   };
 
   return (
@@ -229,37 +199,40 @@ const Profile = () => {
             </div>
           </div>
 
-          {user.googleId == 'true' ?<></>:<div className="bg-gray-50 px-4 py-3 rounded-lg">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm text-gray-500">Password</p>
-                <p className="font-medium text-[#003543] tracking-widest">
-                  {profileData.password}
-                </p>
-              </div>
-              
-              <button
-                onClick={() => navigateToEdit("password")}
-                className="text-[#003543] hover:text-[#004d5f] transition-colors duration-300"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          {user.googleId == "true" ? (
+            <></>
+          ) : (
+            <div className="bg-gray-50 px-4 py-3 rounded-lg">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-500">Password</p>
+                  <p className="font-medium text-[#003543] tracking-widest">
+                    {profileData.password}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => navigateToEdit("password")}
+                  className="text-[#003543] hover:text-[#004d5f] transition-colors duration-300"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>}
-          
+          )}
         </div>
 
         {/* Action Buttons */}

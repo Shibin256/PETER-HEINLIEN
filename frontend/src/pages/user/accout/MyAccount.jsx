@@ -55,7 +55,7 @@ const MyAccount = () => {
             title="COUPONS"
             description="Get exciting offers and discounts"
             onclickFun={() => {
-              navigate('/coupons')
+              navigate("/coupons");
             }}
           />
 

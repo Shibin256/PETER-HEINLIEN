@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -13,10 +12,11 @@ import SalesTrend from "../../components/admin/SalesTrend ";
 import BestSellerChart from "../../components/common/BestSellerChart";
 import BestSellerChartSkeleton from "../../components/common/sketion/BestSellerChartSkeleton";
 
-
 const Dashboard = () => {
   const [reportPeriod, setReportPeriod] = useState("Daily");
-  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [endDate, setEndDate] = useState("");
   const [totalSales, setTotalSales] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -25,7 +25,7 @@ const Dashboard = () => {
   const [avgOrderValue, setAvgOrderValue] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState("");
-  const [loadingBestSellers, setLoadingBestSellers] = useState(true); 
+  const [loadingBestSellers, setLoadingBestSellers] = useState(true);
 
   const dispatch = useDispatch();
   // const { salesReport } = useSelector((state) => state.dashboard);
@@ -44,7 +44,7 @@ const Dashboard = () => {
         type: "Daily",
         startDate: today,
         endDate: "",
-      })
+      }),
     ).then((res) => {
       if (res.payload) {
         setOrders(res.payload.orders);
@@ -57,17 +57,19 @@ const Dashboard = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setLoadingBestSellers(true); 
+    setLoadingBestSellers(true);
     dispatch(getBestSellers()).then((res) => {
-      console.log(res, 'res of dispatch');
-      setLoadingBestSellers(false); 
+      console.log(res, "res of dispatch");
+      setLoadingBestSellers(false);
     });
-    console.log('did itt');
+    console.log("did itt");
   }, [dispatch]);
 
-  const { topProducts, topCategories, topBrands } = useSelector(state => state.dashboard);
+  const { topProducts, topCategories, topBrands } = useSelector(
+    (state) => state.dashboard,
+  );
 
-  console.log(topProducts, '-------');
+  console.log(topProducts, "-------");
 
   const applyFilters = async () => {
     const today = new Date().toISOString().split("T")[0];
@@ -167,7 +169,7 @@ const Dashboard = () => {
     if (loadingBestSellers) {
       return <BestSellerChartSkeleton />;
     }
-    
+
     if (isEmptyData(data)) {
       return (
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -187,8 +189,12 @@ const Dashboard = () => {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <p className="text-center">No data available for {title.toLowerCase()}</p>
-            <p className="text-sm text-center mt-2">Try adjusting your filters or check back later</p>
+            <p className="text-center">
+              No data available for {title.toLowerCase()}
+            </p>
+            <p className="text-sm text-center mt-2">
+              Try adjusting your filters or check back later
+            </p>
           </div>
         </div>
       );
@@ -445,18 +451,25 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          
+
           <div className="space-y-6 mt-4">
             {/* Top Section: 2 Columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SalesDistribution totalSales={totalSales} totalDiscount={totalDiscounts} />
+              <SalesDistribution
+                totalSales={totalSales}
+                totalDiscount={totalDiscounts}
+              />
               <SalesTrend orders={orders} />
             </div>
 
             {/* Bottom Section: 3 Charts with Loading/Empty States */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {renderBestSellerChart("Top Products", topProducts, "#4285F4")}
-              {renderBestSellerChart("Top Categories", topCategories, "#FFBB28")}
+              {renderBestSellerChart(
+                "Top Categories",
+                topCategories,
+                "#FFBB28",
+              )}
               {renderBestSellerChart("Top Brands", topBrands, "#00C49F")}
             </div>
           </div>

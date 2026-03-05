@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 
 const GenericTable = ({ title, columns, data, renderActions }) => {
   return (
@@ -111,7 +111,6 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
   );
 };
 
-
 GenericTable.PropTypes = {
   title: PropTypes.string.isRequired,
   columns: PropTypes.arrayOf(
@@ -120,10 +119,10 @@ GenericTable.PropTypes = {
       label: PropTypes.string.isRequired,
       sortable: PropTypes.bool,
       render: PropTypes.func,
-    })
+    }),
   ).isRequired,
-  data:PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
   renderActions: PropTypes.func,
-}
+};
 
 export default GenericTable;

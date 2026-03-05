@@ -12,6 +12,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import Wallet from "../model/walletModal.js";
 import PendingUser from "../model/pendingUserModal.js";
+import { MESSAGES } from "../utils/messages.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //generate otp with random 6 digit number
@@ -76,38 +77,49 @@ export const register = async (req, res) => {
       ReferralCode
     } = req.body;
 
-    console.log(req.body, '-----')
 
     const userExist = await User.findOne({ email }).select('-password -createdAt -updatedAt -googleId');
     if (userExist) {
-      return res.status(400).json({ errors: ["User already exists"] });
+      return res.status(400).json({ errors: [MESSAGES.USER_ALREADY_EXISTS] });
     }
 
     const phoneExist = await User.findOne({ phone }).select('-password -createdAt -updatedAt -googleId');
     if (phoneExist && phoneExist.phone != null) {
-      return res.status(400).json({ errors: ["The mobile number already exists"] });
+      return res.status(400).json({ errors: [MESSAGES.PHONE_ALREADY_EXISTS] });
     }
 
-    // const ReferralUser = await User.findOne({ referralCode: ReferralCode }).select('-password -createdAt -updatedAt -googleId')
+    const errors = [];
+    
+    if (!name || name.trim().length < 3) {
+      errors.push("Name must be at least 3 characters");
+    }
 
-    // if (ReferralUser) {
-    //   let wallet = await Wallet.findOne({ userId: ReferralUser._id }).select('-createdAt -updatedAt')
-    //   const transactions = {
-    //     userId: ReferralUser._id,
-    //     amount: 50,
-    //     paymentId: `REF-${Date.now()}-${uuidv4().slice(0, 8)}`,
-    //     status: 'success',
-    //     type: 'credit',
-    //     description: ' Referral Amount'
-    //   }
-    //   if (wallet) {
-    //     wallet.balance += 50;
-    //     wallet.transactions.push(transactions)
-    //   } else {
-    //     wallet = new Wallet({ userId: ReferralUser._id, balance: 50, transactions: [transactions] });
-    //   }
-    //   await wallet.save();
-    // }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      errors.push("Invalid email format");
+    }
+
+    if (!password || password.length < 6) {
+      errors.push("Password must be at least 6 characters");
+    }
+
+    if (password !== confirmPassword) {
+      errors.push("Passwords do not match");
+    }
+
+     const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      errors.push("Invalid phone number");
+    }
+
+     if (!gender || !["male", "female", "other"].includes(gender)) {
+      errors.push("Invalid gender value");
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+
 
     //generate and sending otp
     const otp = genarateOtp()
@@ -130,14 +142,14 @@ export const register = async (req, res) => {
     });
     const emailSend = await sendVerificationEmail(email, otp)
     if (!emailSend) {
-      return res.status(400).json({ errors: ["otp not send email error"] });
+      return res.status(400).json({ errors: [MESSAGES.OTP_EMAIL_ERROR] });
     }
 
     return res.status(200).json(
-      { message: 'The otp send to the email', email })
+      { message: MESSAGES.OTP_SENT, email })
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(400).json({ errors: ["Server error"] });
+    res.status(400).json({ errors: [MESSAGES.SERVER_ERROR] });
   }
 };
 
@@ -248,11 +260,12 @@ export const googleAuth = async (req, res) => {
     console.log(refreshToken)
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      httpOnly: process.env.COOKIE_HTTP_ONLY,
+      secure: process.env.COOKIE_SECURE,
+      sameSite: process.env.COOKIE_SAME_SITE,
+      maxAge: process.env.COOKIE_MAX_AGE
     })
+
     user.googleId = true
     res.status(200).json({ accessToken, user });
   } catch (error) {
@@ -302,10 +315,10 @@ export const login = async (req, res) => {
 
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      httpOnly: process.env.COOKIE_HTTP_ONLY,
+      secure: process.env.COOKIE_SECURE,
+      sameSite: process.env.COOKIE_SAME_SITE,
+      maxAge: process.env.COOKIE_MAX_AGE
     })
 
     // Send response with user data
@@ -368,10 +381,10 @@ export const adminLogin = async (req, res) => {
 
     //storing refreshToken into cookies
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      httpOnly: process.env.COOKIE_HTTP_ONLY,
+      secure: process.env.COOKIE_SECURE,
+      sameSite: process.env.COOKIE_SAME_SITE,
+      maxAge: process.env.COOKIE_MAX_AGE
     })
 
     //store cookkie in db tooo
@@ -489,7 +502,7 @@ export const fetchCurrentUser = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
 
   }
 

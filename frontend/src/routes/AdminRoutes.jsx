@@ -9,7 +9,6 @@ import ProductAdmin from "../pages/admin/ProductAdmin";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import UserList from "../pages/admin/UserList";
 import Inventory from "../pages/admin/Inventory";
-import Settings from "../pages/admin/Settings";
 import Banners from "../pages/admin/Banners";
 import OrdersList from "../pages/admin/OrdersList";
 import Coupons from "../pages/admin/coupons";
@@ -33,29 +32,29 @@ const AdminRoutes = () => {
   return (
     <div>
       <ErrorBoundary>
-      <Routes>
-        <Route path="login" element={<AdminLogin />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedAdminRoute>
-              <AdminLayout />
-            </ProtectedAdminRoute>
-          }
-        >
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="additems" element={<AddItem />} />
-          <Route path="customers" element={<Customer />} />
-          <Route path="orders" element={<OrdersList />} />
-          <Route path="products" element={<ProductAdmin />} />
-          <Route path="user-list" element={<UserList />} />
-          <Route path="inventory" element={<Inventory />} />
-          {/* <Route path="settings" element={<Settings />} /> */}
-          <Route path="banners" element={<Banners />} />
-          <Route path="coupons" element={<Coupons />} />
-          <Route path="offers" element={<Offers />} />
-        </Route>
-      </Routes>
+        <Routes>
+          <Route path="login" element={<AdminLogin />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedAdminRoute>
+                <AdminLayout />
+              </ProtectedAdminRoute>
+            }
+          >
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="additems" element={<AddItem />} />
+            <Route path="customers" element={<Customer />} />
+            <Route path="orders" element={<OrdersList />} />
+            <Route path="products" element={<ProductAdmin />} />
+            <Route path="user-list" element={<UserList />} />
+            <Route path="inventory" element={<Inventory />} />
+            {/* <Route path="settings" element={<Settings />} /> */}
+            <Route path="banners" element={<Banners />} />
+            <Route path="coupons" element={<Coupons />} />
+            <Route path="offers" element={<Offers />} />
+          </Route>
+        </Routes>
       </ErrorBoundary>
     </div>
   );

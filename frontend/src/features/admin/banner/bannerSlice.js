@@ -61,13 +61,11 @@ export const fetchHomeBanner = createAsyncThunk(
   },
 );
 
-
-
 const bannerSlice = createSlice({
   name: "banner",
   initialState: {
     banners: [],
-    homeBanner:{},
+    homeBanner: {},
     loading: false,
     success: false,
     error: null,
@@ -85,10 +83,10 @@ const bannerSlice = createSlice({
       .addCase(createBanner.pending, (state) => {
         state.loading = true;
       })
-      .addCase(createBanner.fulfilled, (state,action) => {
+      .addCase(createBanner.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.banners.unshift(action.payload.banner)
+        state.banners.unshift(action.payload.banner);
       })
       .addCase(createBanner.rejected, (state, action) => {
         state.loading = false;
@@ -98,23 +96,23 @@ const bannerSlice = createSlice({
       .addCase(deleteBanner.pending, (state) => {
         state.loading = true;
       })
-      .addCase(deleteBanner.fulfilled, (state,action) => {
+      .addCase(deleteBanner.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.banners=action.payload.banners
+        state.banners = action.payload.banners;
       })
       .addCase(deleteBanner.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-        .addCase(setActiveBanner.pending, (state) => {
+      .addCase(setActiveBanner.pending, (state) => {
         state.loading = true;
       })
-      .addCase(setActiveBanner.fulfilled, (state,action) => {
+      .addCase(setActiveBanner.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.banners=action.payload.banners
+        state.banners = action.payload.banners;
       })
       .addCase(setActiveBanner.rejected, (state, action) => {
         state.loading = false;
@@ -124,29 +122,28 @@ const bannerSlice = createSlice({
       .addCase(fetchBanners.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchBanners.fulfilled, (state,action) => {
+      .addCase(fetchBanners.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.banners=action.payload.banners
+        state.banners = action.payload.banners;
       })
       .addCase(fetchBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      
-       .addCase(fetchHomeBanner.pending, (state) => {
+
+      .addCase(fetchHomeBanner.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchHomeBanner.fulfilled, (state,action) => {
+      .addCase(fetchHomeBanner.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.homeBanner=action.payload.banner
+        state.homeBanner = action.payload.banner;
       })
       .addCase(fetchHomeBanner.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      ;
+      });
   },
 });
 

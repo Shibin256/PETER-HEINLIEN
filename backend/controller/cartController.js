@@ -134,10 +134,11 @@ export const getCart = async (req, res) => {
 
 export const toggleIsLocked = async (req, res) => {
   try {
+    // console.log('hiiiii')
     const { userId, lock } = req.params;
-    console.log(userId, lock, 'in controller')
 
     const cart = await Cart.findOne({ userId: userId }).select('-createdAt -updatedAt');
+    // console.log(cart)
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
@@ -148,6 +149,7 @@ export const toggleIsLocked = async (req, res) => {
       cart.isLocked = false;
     }
 
+    console.log(cart,'=====+++++')
     await cart.save();
     res.status(200).json({
       message: lock ? "Cart locked for payment" : "Cart unlocked",

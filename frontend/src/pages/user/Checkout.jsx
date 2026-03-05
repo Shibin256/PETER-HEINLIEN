@@ -4,7 +4,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getAllAddress } from "../../features/accountSettings/accountSlice";
 import EditAddressModal from "../../components/common/EditAddress";
 import CheckoutCard from "../../components/user/CheckoutCard";
-import { applyCoupon, removeCoupon, fetchUserCoupons } from "../../features/coupons/couponsSlice";
+import {
+  applyCoupon,
+  removeCoupon,
+  fetchUserCoupons,
+} from "../../features/coupons/couponsSlice";
 import { fetchCart } from "../../features/cart/cartSlice";
 import { toast } from "react-toastify";
 import { RiCouponLine } from "react-icons/ri";
@@ -29,7 +33,7 @@ const Checkout = () => {
   const { currency } = useSelector((state) => state.global);
   const { addresses } = useSelector((state) => state.account);
   const { userCoupons = [] } = useSelector((state) => state.coupons);
-  console.log(userCoupons,'-----')
+  console.log(userCoupons, "-----");
 
   // Fetch user coupons on component mount
   useEffect(() => {
@@ -56,14 +60,14 @@ const Checkout = () => {
 
   let { cartItems = [] } = useSelector((state) => state.cart);
 
-if (from) {
-  cartItems = location.state?.cartItems || [];
-}
+  if (from) {
+    cartItems = location.state?.cartItems || [];
+  }
 
-const subtotal = cartItems.reduce(
-  (sum, item) => sum + item.price * item.quantity,
-  0
-);
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   const [total, setTotal] = useState(subtotal + shippingCost);
   // if (from) {
@@ -77,13 +81,14 @@ const subtotal = cartItems.reduce(
   }, [from, location.state?.totalPrice]);
 
   // Filter available coupons based on cart subtotal
-  const availableCoupons = userCoupons?.filter(coupon => {
-    const isActive = new Date(coupon.expiresAt) > new Date();
-    const notUsed = !coupon.usersUsed?.includes(user?._id);
-    const withinLimit = coupon.usersUsed?.length < coupon.usageLimit;
-    const meetsMinOrder = coupon.minOrderAmount <= subtotal;
-    return isActive && notUsed && withinLimit && meetsMinOrder;
-  }) || [];
+  const availableCoupons =
+    userCoupons?.filter((coupon) => {
+      const isActive = new Date(coupon.expiresAt) > new Date();
+      const notUsed = !coupon.usersUsed?.includes(user?._id);
+      const withinLimit = coupon.usersUsed?.length < coupon.usageLimit;
+      const meetsMinOrder = coupon.minOrderAmount <= subtotal;
+      return isActive && notUsed && withinLimit && meetsMinOrder;
+    }) || [];
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 3);
@@ -140,7 +145,6 @@ const subtotal = cartItems.reduce(
       if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
         discountAmount = coupon.maxDiscount;
       }
-
     } else if (coupon.discountType === "fixed") {
       discountAmount = coupon.discountValue;
     }
@@ -157,7 +161,9 @@ const subtotal = cartItems.reduce(
 
       // Check if coupon is applicable
       if (total < coupon.minOrderAmount) {
-        toast.error(`Minimum order amount for this coupon is ${currency}${coupon.minOrderAmount}`);
+        toast.error(
+          `Minimum order amount for this coupon is ${currency}${coupon.minOrderAmount}`,
+        );
         return;
       }
 
@@ -165,8 +171,8 @@ const subtotal = cartItems.reduce(
         applyCoupon({
           userId: user._id,
           couponCode: coupon.code,
-          subtotal: total
-        })
+          subtotal: total,
+        }),
       ).unwrap();
 
       if (data.error) {
@@ -185,10 +191,12 @@ const subtotal = cartItems.reduce(
 
   const handleRemoveCoupon = async () => {
     if (appliedCoupon) {
-      const res = await dispatch(removeCoupon({
-        userId: user._id,
-        couponCode: appliedCoupon.code
-      }));
+      const res = await dispatch(
+        removeCoupon({
+          userId: user._id,
+          couponCode: appliedCoupon.code,
+        }),
+      );
 
       if (res.type === "user/cart/removeCoupon/fulfilled") {
         setCouponCode("");
@@ -215,13 +223,11 @@ const subtotal = cartItems.reduce(
   return (
     <div className="max-w-6xl mx-auto my-10 p-6">
       <div className="flex justify-between items-center border-b-2 border-green-500 pb-3 mb-8">
-        <h2 className="text-3xl font-bold text-green-700">
-          CHECKOUT
-        </h2>
+        <h2 className="text-3xl font-bold text-green-700">CHECKOUT</h2>
         <button
           className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-all shadow-sm"
           onClick={() => {
-            navigate('/cart');
+            navigate("/cart");
           }}
         >
           Back
@@ -274,10 +280,11 @@ const subtotal = cartItems.reduce(
                     addresses.map((addr, index) => (
                       <div
                         key={addr._id || index}
-                        className={`border-2 ${selectedAddress?._id === addr._id
-                          ? "border-green-500 bg-green-50"
-                          : "border-gray-200"
-                          } p-4 rounded-md flex items-start justify-between transition-colors duration-200`}
+                        className={`border-2 ${
+                          selectedAddress?._id === addr._id
+                            ? "border-green-500 bg-green-50"
+                            : "border-gray-200"
+                        } p-4 rounded-md flex items-start justify-between transition-colors duration-200`}
                       >
                         <div className="flex-grow">
                           <label className="flex items-center space-x-2 cursor-pointer">
@@ -343,7 +350,7 @@ const subtotal = cartItems.reduce(
                   <button
                     className="text-blue-600 hover:text-blue-800 text-sm flex items-center font-medium"
                     onClick={() => {
-                      navigate("/add-address-checkout")
+                      navigate("/add-address-checkout");
                     }}
                   >
                     <span className="text-xl mr-1">+</span> Add a new address
@@ -463,7 +470,12 @@ const subtotal = cartItems.reduce(
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
@@ -473,8 +485,11 @@ const subtotal = cartItems.reduce(
                       availableCoupons.map((coupon) => (
                         <div
                           key={coupon._id}
-                          className={`p-2 mb-2 border rounded-lg cursor-pointer hover:bg-purple-50 transition-colors ${appliedCoupon?._id === coupon._id ? "border-purple-500 bg-purple-50" : ""
-                            }`}
+                          className={`p-2 mb-2 border rounded-lg cursor-pointer hover:bg-purple-50 transition-colors ${
+                            appliedCoupon?._id === coupon._id
+                              ? "border-purple-500 bg-purple-50"
+                              : ""
+                          }`}
                           onClick={() => handleApplyCoupon(coupon)}
                         >
                           <div className="flex justify-between items-center">
@@ -488,11 +503,13 @@ const subtotal = cartItems.reduce(
                             </span>
                           </div>
                           <p className="text-xs text-gray-500 mt-1">
-                            Min. order: {currency}{coupon.minOrderAmount}
+                            Min. order: {currency}
+                            {coupon.minOrderAmount}
                           </p>
                           {coupon.maxDiscountAmount && (
                             <p className="text-xs text-gray-500">
-                              Max discount: {currency}{coupon.maxDiscountAmount}
+                              Max discount: {currency}
+                              {coupon.maxDiscountAmount}
                             </p>
                           )}
                         </div>
@@ -512,7 +529,8 @@ const subtotal = cartItems.reduce(
                         {appliedCoupon.code}
                       </span>
                       <p className="text-xs text-purple-600">
-                        -{currency}{discount.toFixed(2)} discount
+                        -{currency}
+                        {discount.toFixed(2)} discount
                       </p>
                     </div>
                     <button
@@ -535,13 +553,17 @@ const subtotal = cartItems.reduce(
                     <input
                       type="text"
                       value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        setCouponCode(e.target.value.toUpperCase())
+                      }
                       className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
                       placeholder="Enter coupon code"
                     />
                     <button
                       onClick={() => {
-                        const coupon = userCoupons.find(c => c.code === couponCode);
+                        const coupon = userCoupons.find(
+                          (c) => c.code === couponCode,
+                        );
                         if (coupon) {
                           handleApplyCoupon(coupon);
                         } else {

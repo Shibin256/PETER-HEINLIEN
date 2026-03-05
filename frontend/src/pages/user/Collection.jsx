@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FiFilter, FiChevronDown, FiChevronUp, FiX } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import Title from "../../components/common/Title";
 import ProductCard from "../../components/common/ProductCard";
 import {
@@ -77,39 +77,38 @@ const Collection = () => {
   //   );
   // };
 
-
   const fetchFilteredProducts = (pageNumber = 1) => {
-  setCurrentPage(pageNumber);
+    setCurrentPage(pageNumber);
 
-  let sortField = "";
-  let order = "";
+    let sortField = "";
+    let order = "";
 
-  if (sortType === "low-high") {
-    sortField = "price";
-    order = "asc";
-  } else if (sortType === "high-low") {
-    sortField = "price";
-    order = "desc";
-  } else if (alphabeticOrder === "a-z") {
-    sortField = "name";
-    order = "asc";
-  } else if (alphabeticOrder === "z-a") {
-    sortField = "name";
-    order = "desc";
-  }
+    if (sortType === "low-high") {
+      sortField = "price";
+      order = "asc";
+    } else if (sortType === "high-low") {
+      sortField = "price";
+      order = "desc";
+    } else if (alphabeticOrder === "a-z") {
+      sortField = "name";
+      order = "asc";
+    } else if (alphabeticOrder === "z-a") {
+      sortField = "name";
+      order = "desc";
+    }
 
-  dispatch(
-    fetchProducts({
-      page: pageNumber,
-      limit: 4,
-      search: searchTerm,
-      categories: category,
-      brands: brand,
-      sort: sortField,
-      order: order,
-    })
-  );
-};
+    dispatch(
+      fetchProducts({
+        page: pageNumber,
+        limit: 4,
+        search: searchTerm,
+        categories: category,
+        brands: brand,
+        sort: sortField,
+        order: order,
+      }),
+    );
+  };
 
   // Handle search
   const handleSearch = (e) => {

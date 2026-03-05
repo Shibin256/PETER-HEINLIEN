@@ -2,7 +2,10 @@ import { useEffect } from "react";
 import Title from "../common/Title";
 import ProductCard from "../common/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
-import { topRatedCollections, topRatedCollectionsWithOutUser } from "../../features/products/productSlice";
+import {
+  topRatedCollections,
+  topRatedCollectionsWithOutUser,
+} from "../../features/products/productSlice";
 
 const TopRated = () => {
   const dispatch = useDispatch();
@@ -11,12 +14,12 @@ const TopRated = () => {
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   const { topRated } = useSelector((state) => state.products);
-  const products = topRated
+  const products = topRated;
   useEffect(() => {
     if (user) {
-      dispatch(topRatedCollections({ userId: user._id }))
+      dispatch(topRatedCollections({ userId: user._id }));
     } else {
-      dispatch(topRatedCollectionsWithOutUser())
+      dispatch(topRatedCollectionsWithOutUser());
     }
   }, []);
 

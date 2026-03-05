@@ -1,5 +1,5 @@
 export const validateAddress = (data) => {
-    console.log(data,'dataaass')
+  console.log(data, "dataaass");
   const errors = [];
 
   const requiredFields = [
@@ -10,11 +10,11 @@ export const validateAddress = (data) => {
     "state",
     "pincode",
     "phone",
-    "alternativePhone"
+    "alternativePhone",
   ];
 
   requiredFields.forEach((field) => {
-    console.log(data[field])
+    console.log(data[field]);
     if (!String(data[field])?.trim()) {
       errors.push(`${field} is required`);
     }
@@ -46,7 +46,7 @@ export const validateAddress = (data) => {
     if (!/^[6-9]\d{9}$/.test(String(data.alternativePhone).trim())) {
       errors.push("Alternative phone number must be 10 digits");
     }
-    console.log(data.alte)
+    console.log(data.alte);
 
     if (data.alternativePhone === data.phone) {
       errors.push("Alternative phone number cannot be the same as primary");

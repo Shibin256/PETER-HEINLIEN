@@ -8,7 +8,6 @@ import {
 } from "react-icons/fa";
 import navlogo from "../../assets/navlogo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { HiArrowLeftOnRectangle } from "react-icons/hi2";
 import { logout } from "../../features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";

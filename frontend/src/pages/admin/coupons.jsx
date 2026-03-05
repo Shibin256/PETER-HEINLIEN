@@ -23,7 +23,6 @@ const Coupons = () => {
   const [expirationDate, setExpirationDate] = useState("");
   const [originalCoupon, setOriginalCoupon] = useState(null);
 
-
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
@@ -49,11 +48,9 @@ const Coupons = () => {
     //   return toast.error("all filed required");
     // }
 
-
     if (discountType === "percentage" && maxDiscount === "") {
       return toast.error("Maximum discount is required for percentage coupons");
     }
-
 
     if (!couponCode.trim()) {
       return toast.error("Coupon code is required");
@@ -63,22 +60,33 @@ const Coupons = () => {
       return toast.error("Discount type must be 'fixed' or 'percentage'");
     }
 
-    if (!discountAmount || isNaN(discountAmount) || Number(discountAmount) <= 0) {
+    if (
+      !discountAmount ||
+      isNaN(discountAmount) ||
+      Number(discountAmount) <= 0
+    ) {
       return toast.error("Discount amount must be a positive number");
     }
 
-    if (discountType === "percentage" && (Number(discountAmount) > 100 || Number(discountAmount) < 1)) {
+    if (
+      discountType === "percentage" &&
+      (Number(discountAmount) > 100 || Number(discountAmount) < 1)
+    ) {
       return toast.error("Percentage discount must be between 1 and 100");
     }
 
-    if (discountType === "fixed" && (Number(discountAmount) >= Number(minPurchase))) {
-      return toast.error("Discount amount should be less than minimum purchase amount");
+    if (
+      discountType === "fixed" &&
+      Number(discountAmount) >= Number(minPurchase)
+    ) {
+      return toast.error(
+        "Discount amount should be less than minimum purchase amount",
+      );
     }
 
     if (!minPurchase || isNaN(minPurchase) || Number(minPurchase) <= 0) {
       return toast.error("Minimum purchase amount must be a positive number");
     }
-
 
     if (discountType === "percentage") {
       if (!maxDiscount || isNaN(maxDiscount) || Number(maxDiscount) <= 0) {
@@ -86,10 +94,11 @@ const Coupons = () => {
       }
 
       if (Number(maxDiscount) > Number(minPurchase)) {
-        return toast.error("Maximum discount cannot exceed minimum purchase amount");
+        return toast.error(
+          "Maximum discount cannot exceed minimum purchase amount",
+        );
       }
     }
-
 
     if (!usageLimit || isNaN(usageLimit) || Number(usageLimit) <= 0) {
       return toast.error("Usage limit must be a positive number");
@@ -116,7 +125,7 @@ const Coupons = () => {
     };
 
     const res = await dispatch(createCoupons(data));
-    console.log(res, '---')
+    console.log(res, "---");
 
     if (res.type === "admin/createCoupons/fulfilled") {
       toast.success(res?.payload?.message);
@@ -124,12 +133,12 @@ const Coupons = () => {
       setDiscountType("fixed");
       setDiscountAmount("");
       setMinPurchase("");
-      setMaxDiscount("")
+      setMaxDiscount("");
       setUsageLimit("");
       setExpirationDate("");
     } else {
       if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-        toast.error(res.payload.errors[0])
+        toast.error(res.payload.errors[0]);
       } else {
         toast.error(res.payload?.message || "Failed to create coupon");
       }
@@ -170,7 +179,7 @@ const Coupons = () => {
 
   const handleUpdateCoupon = async (e) => {
     e.preventDefault();
-    console.log(editingCoupon)
+    console.log(editingCoupon);
     if (!editingCoupon || !originalCoupon) return;
 
     const hasChanges =
@@ -180,7 +189,8 @@ const Coupons = () => {
       editingCoupon.minOrderAmount !== originalCoupon.minOrderAmount ||
       editingCoupon.maxDiscount !== originalCoupon.maxDiscount ||
       editingCoupon.usageLimit !== originalCoupon.usageLimit ||
-      editingCoupon.expiresAt.split("T")[0] !== originalCoupon.expiresAt.split("T")[0];
+      editingCoupon.expiresAt.split("T")[0] !==
+        originalCoupon.expiresAt.split("T")[0];
 
     if (!hasChanges) {
       toast.info("No changes detected");
@@ -208,7 +218,7 @@ const Coupons = () => {
       maxDiscount: editingCoupon.maxDiscount,
       usageLimit: editingCoupon.usageLimit,
       expirationDate: editingCoupon.expiresAt,
-    }
+    };
 
     const res = await dispatch(updateCoupon(data));
     if (res.type === "admin/updateCoupon/fulfilled") {
@@ -310,7 +320,7 @@ const Coupons = () => {
               </div>
 
               {/* Maximum Discount (only for flat) */}
-              {discountType === "percentage" &&  (
+              {discountType === "percentage" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Maximum Discount (₹)
@@ -638,7 +648,7 @@ const Coupons = () => {
 
                 {/* Minimum Purchase */}
                 {editingCoupon.discountType === "percentage" && (
-                  < div >
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Maximum Discount (₹)
                     </label>
@@ -660,8 +670,8 @@ const Coupons = () => {
                         className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
-                  </div>)
-                }
+                  </div>
+                )}
 
                 {/* Minimum Purchase */}
                 <div>
@@ -743,9 +753,9 @@ const Coupons = () => {
               </div>
             </form>
           </div>
-        </div >
+        </div>
       )}
-    </div >
+    </div>
   );
 };
 

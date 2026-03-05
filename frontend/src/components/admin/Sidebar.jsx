@@ -7,9 +7,7 @@ import {
   HiUsers,
   HiArchiveBox,
   HiTicket,
-  HiCog6Tooth,
   HiRectangleGroup,
-  HiStar,
   HiBars3,
 } from "react-icons/hi2";
 import { useNavigate, useLocation } from "react-router-dom";

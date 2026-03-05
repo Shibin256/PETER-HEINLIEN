@@ -3,29 +3,28 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {fetchHomeBanner } from "../../features/admin/banner/bannerSlice";
+import { fetchHomeBanner } from "../../features/admin/banner/bannerSlice";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/collection");
   };
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchHomeBanner())
-  }, [])
+    dispatch(fetchHomeBanner());
+  }, []);
 
-  const { homeBanner } = useSelector(state => state.banner)
+  const { homeBanner } = useSelector((state) => state.banner);
 
   const fallbackBanner =
-  homeBanner?.bannerImage ||
-  "https://placehold.co/1200x600?text=Banner+Not+Available";
+    homeBanner?.bannerImage ||
+    "https://placehold.co/1200x600?text=Banner+Not+Available";
 
-const fallbackBg =
-  homeBanner?.bagroundImage ||
-  "https://placehold.co/600x800?text=Background+Not+Available";
-
+  const fallbackBg =
+    homeBanner?.bagroundImage ||
+    "https://placehold.co/600x800?text=Background+Not+Available";
 
   return (
     <section className="relative w-full bg-gray-50 overflow-hidden">

@@ -9,7 +9,7 @@ const AdBanner = () => {
 
   useEffect(() => {
     dispatch(fetchAdsCoupons());
-  }, [dispatch]); 
+  }, [dispatch]);
 
   const { adsCoupon } = useSelector((state) => state.coupons);
 

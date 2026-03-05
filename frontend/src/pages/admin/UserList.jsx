@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
-  deleteUser,
   fetchUsers,
   toggleUserBlock,
 } from "../../features/users/userSlice";
@@ -22,26 +21,27 @@ const UserList = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
+  //debouncing
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      dispatch(fetchUsers({ page, limit, search: searchTerm })).unwrap()
+      dispatch(fetchUsers({ page, limit, search: searchTerm }))
+        .unwrap()
         .then(() => {
-          console.log('hii')
-          console.log(inputRef)
+          console.log("hii");
+          console.log(inputRef);
           inputRef.current?.focus();
-        })
-    }, 500)
+        });
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm, page, limit, dispatch])
+  }, [searchTerm, page, limit, dispatch]);
 
   useEffect(() => {
-    dispatch(fetchUsers({ page, limit }))
+    dispatch(fetchUsers({ page, limit }));
   }, [page]);
 
   const handleToggleBlock = (user) => {
@@ -73,7 +73,6 @@ const UserList = () => {
       }
     });
   };
-
 
   const totalUsers = users?.length || 0;
   const blockedUsers = users?.filter((user) => user.isBlocked)?.length || 0;
@@ -168,10 +167,11 @@ const UserList = () => {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => handleToggleBlock(user)}
-                      className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${user.isBlocked
-                        ? "bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500"
-                        : "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500"
-                        }`}
+                      className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                        user.isBlocked
+                          ? "bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500"
+                          : "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500"
+                      }`}
                     >
                       {user.isBlocked ? "Unblock" : "Block"}
                     </button>

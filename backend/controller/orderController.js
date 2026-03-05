@@ -249,9 +249,7 @@ export const cancelOrderSingleItem = async (req, res) => {
         }
 
         const UserID = orderItem.UserID;
-        // console.log(orderItem.Items.length, '---')
 
-        // Find the specific item in the order
         const item = orderItem.Items.find(item => item.itemOrderId === itemOrderId);
         if (!item) {
             return res.status(404).json({ message: 'Item not found in order' });
@@ -340,7 +338,6 @@ export const verifyCancel = async (req, res) => {
         }
 
         let total = Number(order.TotalAmount) + Number(order.DeliveryCharge);
-        console.log(total, '------------')
 
         order.cancelVerified = true
         await order.save();

@@ -3,7 +3,6 @@ import Title from "../../components/common/Title";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { addAddress } from "../../features/accountSettings/accountSlice";
-import { useNavigate } from "react-router-dom";
 
 const AddAdressChockout = () => {
   const [addressData, setAddressData] = useState({
@@ -127,7 +126,7 @@ const AddAdressChockout = () => {
       console.log(error);
       toast.error(error.response?.data?.message || "error hapened");
     }
- 
+
     setAddressData({
       name: "",
       houseNo: "",

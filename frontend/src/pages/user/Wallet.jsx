@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Title from "../../components/common/Title";
 import {
   createPaymentOrder,
-  verifyPayment,
   verifyPaymentForWallet,
 } from "../../features/orders/ordersSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,14 +30,14 @@ const Wallet = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(getWallet({userId:user._id,page: 1, limit: 10 }));
+    dispatch(getWallet({ userId: user._id, page: 1, limit: 10 }));
   }, []);
 
-  const { walletAmount,page,totalPages, loading, transactions } = useSelector(
+  const { walletAmount, page, totalPages, loading, transactions } = useSelector(
     (state) => state.wallet,
   );
 
-  console.log(transactions)
+  console.log(transactions);
 
   const handlePayments = async (amount) => {
     try {
@@ -64,7 +63,7 @@ const Wallet = () => {
                 reject("Payment verification failed");
               }
             } catch (err) {
-              console.log(err)
+              console.log(err);
               reject("Payment verification error");
             }
           },
@@ -109,7 +108,7 @@ const Wallet = () => {
       toast.warning("Please enter a valid amount");
       return;
     }
-    const paymentId = await handlePayments(amount); 
+    const paymentId = await handlePayments(amount);
     if (paymentId) {
       await dispatch(
         addToWallet({ userId: user._id, amount: amount, paymentId: paymentId }),
@@ -330,10 +329,11 @@ const Wallet = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
-                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${transaction.status === "success"
-                          ? "bg-[#e6f7ee] text-[#006644]"
-                          : "bg-[#ffebee] text-[#d32f2f]"
-                          }`}
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          transaction.status === "success"
+                            ? "bg-[#e6f7ee] text-[#006644]"
+                            : "bg-[#ffebee] text-[#d32f2f]"
+                        }`}
                       >
                         {transaction.status}
                       </span>
@@ -341,43 +341,43 @@ const Wallet = () => {
                   </tr>
                 ))}
                 {/* Pagination Buttons */}
-                        <div className="flex justify-center items-center gap-4 mt-6">
-                          <button
-                            disabled={page <= 1}
-                            onClick={() =>
-                              dispatch(
-                                getWallet({
-                                  userId:user._id,
-                                  page: page - 1,
-                                  limit: 10,
-                                }),
-                              )
-                            }
-                            className={`px-4 py-2 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
-                          >
-                            Previous
-                          </button>
-                
-                          <span className="text-sm text-gray-700">
-                            Page {page} of {totalPages}
-                          </span>
-                
-                          <button
-                            disabled={page >= totalPages}
-                            onClick={() =>
-                              dispatch(
-                                getWallet({
-                                  userId:user._id,
-                                  page: page + 1,
-                                  limit: 10,
-                                }),
-                              )
-                            }
-                            className={`px-4 py-2 rounded ${page >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
-                          >
-                            Next
-                          </button>
-                        </div>
+                <div className="flex justify-center items-center gap-4 mt-6">
+                  <button
+                    disabled={page <= 1}
+                    onClick={() =>
+                      dispatch(
+                        getWallet({
+                          userId: user._id,
+                          page: page - 1,
+                          limit: 10,
+                        }),
+                      )
+                    }
+                    className={`px-4 py-2 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+                  >
+                    Previous
+                  </button>
+
+                  <span className="text-sm text-gray-700">
+                    Page {page} of {totalPages}
+                  </span>
+
+                  <button
+                    disabled={page >= totalPages}
+                    onClick={() =>
+                      dispatch(
+                        getWallet({
+                          userId: user._id,
+                          page: page + 1,
+                          limit: 10,
+                        }),
+                      )
+                    }
+                    className={`px-4 py-2 rounded ${page >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+                  >
+                    Next
+                  </button>
+                </div>
               </tbody>
             </table>
           </div>

@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 function AddItem() {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
@@ -28,9 +28,7 @@ function AddItem() {
     dispatch(getBrandAndCollection());
   }, []);
 
-  const { brands, categories } = useSelector(
-    (state) => state.products,
-  );
+  const { brands, categories } = useSelector((state) => state.products);
   const { currency } = useSelector((state) => state.global);
   // files waiting to crop
   const [pendingFiles, setPendingFiles] = useState([]);
@@ -124,20 +122,27 @@ function AddItem() {
       return;
     }
 
-     if(images.length <3){
-      toast.error("The minimum of 3 images need to proceed")
-      return
+    if (images.length < 3) {
+      toast.error("The minimum of 3 images need to proceed");
+      return;
     }
 
     const nameRegex = /^[A-Za-z0-9 ]+$/;
-    if (!trimmedName || trimmedName.length < 3 || !nameRegex.test(trimmedName)) {
+    if (
+      !trimmedName ||
+      trimmedName.length < 3 ||
+      !nameRegex.test(trimmedName)
+    ) {
       toast.error(
-        "Product name must be at least 3 characters and contain only letters, numbers, and spaces."
+        "Product name must be at least 3 characters and contain only letters, numbers, and spaces.",
       );
       return;
     }
 
-    const tagList = trimmedTags.split(",").map(tag => tag.trim()).filter(Boolean);
+    const tagList = trimmedTags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
     if (tagList.length === 0) {
       toast.error("Please enter at least one valid tag.");
       return;
@@ -155,14 +160,18 @@ function AddItem() {
       numericQuantity < 0 ||
       !Number.isInteger(numericQuantity)
     ) {
-      toast.error("Quantity must be a valid whole number greater than or equal to 0.");
+      toast.error(
+        "Quantity must be a valid whole number greater than or equal to 0.",
+      );
       return;
     }
 
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     for (const img of images) {
       if (!allowedTypes.includes(img.file.type)) {
-        toast.error(`Invalid image type: ${img.file.name}. Only JPG, PNG, and WebP are allowed.`);
+        toast.error(
+          `Invalid image type: ${img.file.name}. Only JPG, PNG, and WebP are allowed.`,
+        );
         return;
       }
       if (img.file.size > 5 * 1024 * 1024) {
@@ -184,34 +193,32 @@ function AddItem() {
     setIsSubmitting(true);
     try {
       const res = await dispatch(addProduct(formData));
-      console.log(res,'---')
-      if (res.type.endsWith('fulfilled')) {
+      console.log(res, "---");
+      if (res.type.endsWith("fulfilled")) {
         toast.success("✅ Product added successfully!");
+        navigate("/admin/products");
+        setProductName("");
+        setDescription("");
+        setCategory("");
+        setTags("");
+        setBrand("");
+        setPrice("");
+        setQuantity(0);
+        setImages([]);
+        dispatch(resetProductState());
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
-          toast.error(res.payload.errors[0])
+          toast.error(res.payload.errors[0]);
         } else {
           toast.error(res.payload?.message || "Failed to create product");
         }
       }
-
-      setProductName("");
-      setDescription("");
-      setCategory("");
-      setTags("");
-      setBrand("");
-      setPrice("");
-      setQuantity(0);
-      setImages([]);
-      dispatch(resetProductState());
-      navigate("/admin/products");
     } catch (error) {
       toast.error(error?.message || "Failed to add product.");
     } finally {
       setIsSubmitting(false);
     }
   };
-
 
   //getting category and brands from database
   const categoryOptions = categories.map((category) => ({

@@ -25,7 +25,6 @@ const Cart = () => {
   const [localCart, setLocalCart] = useState([]);
   const [cartUpdating, setCartUpdating] = useState(false);
 
-
   useEffect(() => {
     setLocalCart(cartItems);
   }, [cartItems]);
@@ -40,7 +39,6 @@ const Cart = () => {
     setTotal(subtotal + shipping);
   }, [subtotal, shipping]);
   const { currency } = useSelector((state) => state.global);
-
 
   // const handleQuantityChange = (productId, delta) => {
   //   const item = localCart.find((item) => item.productId._id === productId);
@@ -78,27 +76,26 @@ const Cart = () => {
   //     .catch((err) => console.error("Cart update failed:", err));
   // };
 
+  const handleQuantityChange = (productId, delta) => {
+    const item = localCart.find((item) => item.productId._id === productId);
+    const newQuantity = Math.max(1, item.quantity + delta);
 
-const handleQuantityChange = (productId, delta) => {
-  const item = localCart.find((item) => item.productId._id === productId);
-  const newQuantity = Math.max(1, item.quantity + delta);
+    if (delta > 0 && newQuantity > item.productId.totalQuantity) return;
+    if (item.quantity === 4 && delta > 0) return;
 
-  if (delta > 0 && newQuantity > item.productId.totalQuantity) return;
-  if (item.quantity === 4 && delta > 0) return;
+    setCartUpdating(true);
 
-  setCartUpdating(true);
-
-  dispatch(
-    updateCart({
-      userId: user._id,
-      productId,
-      quantity: newQuantity,
-    })
-  )
-    .unwrap()
-    .then(() => dispatch(fetchCart(user._id)))
-    .finally(() => setCartUpdating(false));
-};
+    dispatch(
+      updateCart({
+        userId: user._id,
+        productId,
+        quantity: newQuantity,
+      }),
+    )
+      .unwrap()
+      .then(() => dispatch(fetchCart(user._id)))
+      .finally(() => setCartUpdating(false));
+  };
 
   const handleRemoveItem = async (id, quantity) => {
     await dispatch(
@@ -221,7 +218,10 @@ const handleQuantityChange = (productId, delta) => {
                               <div className="w-full h-full bg-gray-300 animate-pulse"></div>
                             ) : (
                               <img
-                                src={item?.productId?.images?.[0] || "/default-image.jpg"}
+                                src={
+                                  item?.productId?.images?.[0] ||
+                                  "/default-image.jpg"
+                                }
                                 alt={item?.productId?.name || "Product Image"}
                                 className="h-full w-full object-cover"
                               />
@@ -235,17 +235,16 @@ const handleQuantityChange = (productId, delta) => {
                         ) : (
                           item?.productId?.name
                         )}
-
                       </td>
                       <td className="px-6 py-6 text-sm text-gray-900">
                         {cartUpdating ? (
                           <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
                         ) : (
                           <>
-                            {currency}{item.price.toFixed(2)}
+                            {currency}
+                            {item.price.toFixed(2)}
                           </>
                         )}
-
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center">
@@ -277,11 +276,12 @@ const handleQuantityChange = (productId, delta) => {
                             onClick={() =>
                               handleQuantityChange(item.productId._id, 1)
                             }
-                            className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${item.quantity >= 4 ||
+                            className={`text-gray-500 hover:text-teal-600 transition-colors p-1 ${
+                              item.quantity >= 4 ||
                               item.quantity >= item.productId.totalQuantity
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                              }`}
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
                             disabled={
                               item.quantity >= 4 ||
                               item.quantity >= item.productId.totalQuantity
@@ -309,7 +309,8 @@ const handleQuantityChange = (productId, delta) => {
                           <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
                         ) : (
                           <>
-                            {currency}{(item.price * item.quantity).toFixed(2)}
+                            {currency}
+                            {(item.price * item.quantity).toFixed(2)}
                           </>
                         )}
                       </td>
@@ -336,12 +337,11 @@ const handleQuantityChange = (productId, delta) => {
                     <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
                   ) : (
                     <>
-                      {currency}{subtotal.toFixed(2)}
+                      {currency}
+                      {subtotal.toFixed(2)}
                     </>
                   )}
                 </span>
-
-
               </div>
 
               <div className="flex justify-between border-b pb-3">
@@ -361,12 +361,11 @@ const handleQuantityChange = (productId, delta) => {
                     <div className="h-5 w-24 bg-gray-300 rounded animate-pulse"></div>
                   ) : (
                     <>
-                      {currency}{total.toFixed(2)}
+                      {currency}
+                      {total.toFixed(2)}
                     </>
                   )}
                 </span>
-
-
               </div>
             </div>
 

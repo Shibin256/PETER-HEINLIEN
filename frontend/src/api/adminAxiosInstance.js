@@ -26,7 +26,10 @@ adminAxiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       try {
         //refresh token
-        const response = await adminAxiosInstance.get("/api/auth/refresh-token", {withCredentials: true,});
+        const response = await adminAxiosInstance.get(
+          "/api/auth/refresh-token",
+          { withCredentials: true },
+        );
 
         const newAccessToken = response.data.accessToken;
         localStorage.setItem("adminAccessToken", newAccessToken);

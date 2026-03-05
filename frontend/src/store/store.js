@@ -25,6 +25,6 @@ export const store = configureStore({
     coupons: couponsReducer,
     wallet: walletReducer,
     dashboard: dashboardReducer,
-    banner:bannerReducer
+    banner: bannerReducer,
   },
 });

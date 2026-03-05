@@ -2,10 +2,7 @@ import adminAxiosInstance from "../../api/adminAxiosInstance";
 import axiosInstance from "../../api/axiosInstance";
 
 const placeOrder = async (orderData) => {
-  const response = await axiosInstance.post(
-    "/api/v1/users/orders",
-    orderData,
-  );
+  const response = await axiosInstance.post("/api/v1/users/orders", orderData);
   return response.data;
 };
 
@@ -62,12 +59,9 @@ const getALlOrders = async (search, page, limit, sort) => {
     params.append("sort", sort);
   }
 
-  const response = await adminAxiosInstance.get(
-    `/api/v1/admin/orders`,
-    {
-      params: params,
-    },
-  );
+  const response = await adminAxiosInstance.get(`/api/v1/admin/orders`, {
+    params: params,
+  });
   return response.data;
 };
 
@@ -98,9 +92,12 @@ const singleCancelVerify = async (itemId) => {
 };
 
 const downloadInvoice = async (itemOrderId) => {
-  const response = await axiosInstance.get(`/api/v1/users/invoice/${itemOrderId}`, {
-    responseType: "blob",
-  });
+  const response = await axiosInstance.get(
+    `/api/v1/users/invoice/${itemOrderId}`,
+    {
+      responseType: "blob",
+    },
+  );
   const blob = new Blob([response.data], { type: "application/pdf" });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -113,17 +110,20 @@ const downloadInvoice = async (itemOrderId) => {
 };
 
 const createRazorpayOrder = async (amount) => {
-  console.log(amount)
-  const res = await axiosInstance.post("/api/v1/users/payments/razorpay/order", { amount:amount });
-  console.log(res.data)
+  console.log(amount);
+  const res = await axiosInstance.post(
+    "/api/v1/users/payments/razorpay/order",
+    { amount: amount },
+  );
+  console.log(res.data);
   return res.data;
 };
 
 const verifyRazorpayPayment = async (paymentDetails) => {
-  console.log(paymentDetails,'in the ordrerserviece')
+  console.log(paymentDetails, "in the ordrerserviece");
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/verify",
-     paymentDetails 
+    paymentDetails,
   );
   return res.data;
 };
@@ -131,18 +131,17 @@ const verifyRazorpayPayment = async (paymentDetails) => {
 const verifyPaymentForWallet = async (paymentDetails) => {
   const res = await axiosInstance.post(
     "/api/v1/users/payments/razorpay/wallet/verify",
-     paymentDetails 
+    paymentDetails,
   );
   return res.data;
 };
-
 
 const submitReview = async ({ itemId, rating, review }) => {
   const data = {
     rating: rating,
     review: review,
   };
-  console.log(data,itemId,'-----')
+  console.log(data, itemId, "-----");
   const response = await axiosInstance.post(
     `/api/v1/users/orders/${itemId}/review`,
     data,
@@ -151,7 +150,7 @@ const submitReview = async ({ itemId, rating, review }) => {
 };
 
 const updateOrderStatus = async (orderID) => {
-  console.log(orderID,'in serviece')
+  console.log(orderID, "in serviece");
   const response = await adminAxiosInstance.delete(
     `/api/v1/admin/orders/${itemOrderId}`,
     data,
@@ -175,7 +174,7 @@ const orderService = {
   verifyRazorpayPayment,
   cancelSingleOrderItem,
   singleCancelVerify,
-  submitReview
+  submitReview,
 };
 
 export default orderService;

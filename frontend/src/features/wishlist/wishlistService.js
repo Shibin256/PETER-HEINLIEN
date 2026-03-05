@@ -18,7 +18,10 @@ const getWishedProduct = async ({ userId, productId }) => {
 };
 
 const removeFromWishlist = async (data) => {
-  const response = await axiosInstance.post("/api/v1/users/wishlist/remove", data);
+  const response = await axiosInstance.post(
+    "/api/v1/users/wishlist/remove",
+    data,
+  );
   return response.data;
 };
 
