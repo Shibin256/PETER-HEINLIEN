@@ -32,7 +32,7 @@ export const validateAddress = (data) => {
     }
   });
 
-  if (data.pin && !/^\d{6}$/.test(String(data.pin).trim())) {
+  if (data.pincode && !/^\d{6}$/.test(String(data.pincode).trim())) {
     errors.push('PIN code must be a 6-digit number');
   }
 

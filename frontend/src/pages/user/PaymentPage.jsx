@@ -362,7 +362,7 @@ const PaymentPage = () => {
         <div className="p-4">
           <div className="flex justify-between py-2">
             <span className="text-gray-600">Price (1 item)</span>
-            <span className="font-medium">{totalPrice}</span>
+            <span className="font-medium">{totalPrice.toFixed(2)}</span>
           </div>
           <div className="flex justify-between py-2 text-green-600">
             <span>Delivery Charges</span>
@@ -371,7 +371,7 @@ const PaymentPage = () => {
           <div className="border-t border-gray-200 my-2"></div>
           <div className="flex justify-between py-2 font-bold text-lg">
             <span>Total Payable</span>
-            <span>{`${currency}${totalPrice + shippingCost} `}</span>
+            <span>{`${currency}${(totalPrice + shippingCost).toFixed(2)} `}</span>
           </div>
         </div>
       </div>

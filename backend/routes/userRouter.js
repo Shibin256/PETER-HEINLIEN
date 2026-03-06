@@ -93,7 +93,7 @@ router.patch(
   verifyAccessToken,
   SetDefaultAddress,
 );
-router.put('/account/:addressId', verifyAccessToken, updateAddress);
+router.put('/account/:addressId', validateAddress, verifyAccessToken, updateAddress);
 
 //cart manage
 router.post('/cart', verifyAccessToken, addItemToCart);

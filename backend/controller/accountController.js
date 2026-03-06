@@ -55,6 +55,12 @@ export const changeOrAddMobile = async (req, res) => {
       return res.status(400).json({ message: 'Mobile number is required' });
     }
 
+    const indianMobileRegex = /^[6-9]\d{9}$/;
+
+    if (!indianMobileRegex.test(newNumber)) {
+      return res.status(400).json({ message: "Invalid Indian mobile number" });
+    }
+
     const user = await User.findById(id).select(
       '-password -createdAt -updatedAt -googleId',
     ); // Exclude password
@@ -97,10 +103,46 @@ export const editPassword = async (req, res) => {
     const { id } = req.params;
     const { currentPassword, newPassword, confirmPassword } = req.body;
 
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required" });
+    }
+
     if (newPassword !== confirmPassword) {
       return res
         .status(400)
         .json({ message: 'New password and confirm password must match' });
+    }
+
+    const errors = [];
+
+    if (newPassword.length < 8) {
+      errors.push("at least 8 characters long");
+    }
+
+    if (!/[A-Z]/.test(newPassword)) {
+      errors.push("one uppercase letter");
+    }
+
+    if (!/[a-z]/.test(newPassword)) {
+      errors.push("one lowercase letter");
+    }
+
+    if (!/[0-9]/.test(newPassword)) {
+      errors.push("one number");
+    }
+
+    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(newPassword)) {
+      errors.push("one special character (!@#$%^&*)");
+    }
+
+    if (/\s/.test(newPassword)) {
+      errors.push("no spaces");
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        message: `Password must contain ${errors.join(", ")}.`,
+      });
     }
 
     const user = await User.findById(id).select(
@@ -148,9 +190,31 @@ export const editImage = async (req, res) => {
   try {
     const { id } = req.params;
     const img = req.file;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    if (!img) {
+      return res.status(400).json({ message: "Image file is required" });
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(img.mimetype)) {
+      return res.status(400).json({
+        message: "Only JPG, PNG, and WEBP images are allowed",
+      });
+    }
+
     const user = await User.findById(id).select(
       '-password -createdAt -updatedAt -googleId',
     );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
 
     const result = await cloudinary.uploader.upload(img.path);
     const uploadedImage = result.secure_url;
@@ -316,6 +380,7 @@ export const updateAddress = async (req, res) => {
     addressType,
     defaultAddress,
   } = req.body;
+
   const updatedData = {
     name,
     house,

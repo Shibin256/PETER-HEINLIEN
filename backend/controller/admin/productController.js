@@ -415,6 +415,10 @@ export const addProductOffer = async (req, res) => {
         .json({ message: 'Product ID and percentage are required' });
     }
 
+    if (percentage >= 100) {
+      return res.status(404).json({ message: 'Percentage must be less than 100' })
+    }
+
     const product = await Product.findById(productId).select(
       '-createdAt -updatedAt',
     );

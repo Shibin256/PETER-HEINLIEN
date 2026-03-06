@@ -188,6 +188,10 @@ export const addCategoryOffer = async (req, res) => {
         .json({ message: 'category ID and percentage are required' });
     }
 
+    if (percentage >= 100) {
+      return res.status(404).json({ message: 'Percentage offer must be less than 100' })
+    }
+
     const category = await Category.findById(categoryId).select(
       '-createdAt -updatedAt',
     );

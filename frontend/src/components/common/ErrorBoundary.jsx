@@ -51,12 +51,7 @@ class ErrorBoundary extends React.Component {
               >
                 <FiRefreshCw /> Try Again
               </button>
-              {/* <button
-                onClick={() => window.location.href = "/"}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                <FiHome /> Go Home
-              </button> */}
+
             </div>
           </div>
         </div>
