@@ -414,17 +414,26 @@ export const adminLogin = async (req, res) => {
   }
 };
 
-//refresh accessToken from cokies without asking the user to log again
-export const refreshAccessToken = (req, res) => {
+export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
+
   if (!refreshToken) return res.sendStatus(401);
 
-  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-    if (err) return res.sendStatus(403);
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-    const newAccessToken = generateAccessToken({ _id: decoded.id });
+    const user = await User.findById(decoded.id);
+
+    if (!user) return res.sendStatus(404);
+
+
+    const newAccessToken = generateAccessToken(user);
+
     res.json({ accessToken: newAccessToken });
-  });
+
+  } catch (err) {
+    return res.sendStatus(403);
+  }
 };
 
 //forgot password manage

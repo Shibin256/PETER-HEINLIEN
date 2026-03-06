@@ -30,10 +30,10 @@ ConnectDB();
 app.use(express.json());
 app.use(cookieParser());
 
-// Logging (optional)
-app.use(
-  morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }),
-);
+// // Logging (optional)
+// app.use(
+//   morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }),
+// );
 
 const allowedOrigins = [
   'http://localhost:5173',

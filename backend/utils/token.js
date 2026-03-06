@@ -1,17 +1,15 @@
 //jet token creating so it can use anyware by calling
 import jwt from 'jsonwebtoken';
 
-//access token creation
 export const generateAccessToken = (user) => {
-  let userRole = 'user';
-  if (user.isAdmin) {
-    userRole = 'admin';
-  }
   const payload = {
     id: user._id,
-    role: userRole,
+    role: user.isAdmin ? "admin" : "user",
   };
-  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '60m' });
+
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: "60m",
+  });
 };
 
 //refresh token creation
