@@ -1,4 +1,4 @@
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance from '../../api/axiosInstance';
 
 const changeName = async (userId, data) => {
   const res = await axiosInstance.patch(
@@ -6,10 +6,10 @@ const changeName = async (userId, data) => {
     data,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
       withCredentials: true,
-    },
+    }
   );
   return res.data;
 };
@@ -20,10 +20,10 @@ const changeMobile = async (userId, data) => {
     data,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
       withCredentials: true,
-    },
+    }
   );
   return res.data;
 };
@@ -31,7 +31,7 @@ const changeMobile = async (userId, data) => {
 const changePassword = async (userId, data) => {
   const res = await axiosInstance.patch(
     `/api/v1/users/account/${userId}/password`,
-    data,
+    data
   );
   return res.data;
 };
@@ -42,10 +42,10 @@ const uploadImage = async (userId, data) => {
     data,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
       withCredentials: true,
-    },
+    }
   );
   return res.data;
 };
@@ -53,28 +53,28 @@ const uploadImage = async (userId, data) => {
 const addAddress = async (userId, data) => {
   const res = await axiosInstance.post(
     `/api/v1/users/account/${userId}/address`,
-    data,
+    data
   );
   return res.data;
 };
 
 const getAllAddress = async (userId) => {
   const res = await axiosInstance.get(
-    `/api/v1/users/account/${userId}/address`,
+    `/api/v1/users/account/${userId}/address`
   );
   return res.data;
 };
 
 const removeAddress = async (userId, addresId) => {
   const res = await axiosInstance.delete(
-    `/api/v1/users/account/${userId}/${addresId}`,
+    `/api/v1/users/account/${userId}/${addresId}`
   );
   return res.data;
 };
 
 const setDefault = async (userId, addresId) => {
   const res = await axiosInstance.patch(
-    `/api/v1/users/account/${userId}/${addresId}/default`,
+    `/api/v1/users/account/${userId}/${addresId}/default`
   );
   return res.data;
 };
@@ -82,7 +82,7 @@ const setDefault = async (userId, addresId) => {
 const updateAdress = async (addresId, data) => {
   const res = await axiosInstance.put(
     `/api/v1/users/account/${addresId}`,
-    data,
+    data
   );
   return res.data;
 };

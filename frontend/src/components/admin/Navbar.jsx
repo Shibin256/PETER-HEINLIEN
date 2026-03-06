@@ -1,6 +1,6 @@
 // components/Navbar.jsx
-import React from "react";
-import { HiArrowLeftOnRectangle } from "react-icons/hi2";
+import React from 'react';
+import { HiArrowLeftOnRectangle } from 'react-icons/hi2';
 
 const AdminNav = ({ onLogout }) => {
   return (

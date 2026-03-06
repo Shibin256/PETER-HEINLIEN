@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 export const authorizeRole = (roles) => {
   return (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
+
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
     try {
@@ -18,4 +19,3 @@ export const authorizeRole = (roles) => {
     }
   };
 };
-

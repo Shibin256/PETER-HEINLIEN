@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from "react";
-import Cropper from "react-easy-crop";
-import { Slider } from "@mui/material";
-import { getCroppedImg } from "../../utils/cropUtils";
+import React, { useState, useCallback } from 'react';
+import Cropper from 'react-easy-crop';
+import { Slider } from '@mui/material';
+import { getCroppedImg } from '../../utils/cropUtils';
 
 const CropModal = ({ imageSrc, onComplete, onCancel }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });

@@ -1,55 +1,55 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import userService from "./userService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import userService from './userService';
 
 //fetch users
 export const fetchUsers = createAsyncThunk(
-  "users/fetchUsers",
-  async ({ page = 1, limit = 10, search = "" }, thunkAPI) => {
+  'users/fetchUsers',
+  async ({ page = 1, limit = 10, search = '' }, thunkAPI) => {
     try {
       const res = await userService.getUsers(page, limit, search);
       return res;
     } catch (err) {
       return thunkAPI.rejectWithValue(
-        err.response?.data?.message || "Fetch failed",
+        err.response?.data?.message || 'Fetch failed'
       );
     }
-  },
+  }
 );
 
 //block and unblock handle
 export const toggleUserBlock = createAsyncThunk(
-  "users/toggleBlockUser",
+  'users/toggleBlockUser',
   async (userId, { rejectWithValue }) => {
     try {
       const user = await userService.toggleUserBlock(userId);
       return user;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 //delete users
 export const deleteUser = createAsyncThunk(
-  "users/deleteUser",
+  'users/deleteUser',
   async (userId, { rejectWithValue }) => {
     try {
       const res = await userService.deleteUser(userId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 const userSlice = createSlice({
-  name: "users",
+  name: 'users',
   initialState: {
     users: [],
     totalPages: 0,
     currentPage: 1,
     totalUsers: 0,
-    blockedUsers:0,
+    blockedUsers: 0,
     loading: false,
     error: null,
   },
@@ -63,14 +63,15 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        const { users, currentPage, totalPages, totalUsers,blockedUsers } = action.payload;
+        const { users, currentPage, totalPages, totalUsers, blockedUsers } =
+          action.payload;
 
         state.loading = false;
         state.users = users;
         state.currentPage = currentPage;
         state.totalPages = totalPages;
         state.totalUsers = totalUsers;
-        state.blockedUsers=blockedUsers;
+        state.blockedUsers = blockedUsers;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;

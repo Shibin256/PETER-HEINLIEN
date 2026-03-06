@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const CheckoutCard = ({
   productName,
@@ -21,7 +21,7 @@ const CheckoutCard = ({
         <div className="flex-1 w-full">
           <h3 className="text-lg font-semibold text-gray-800">{productName}</h3>
           <p className="text-sm text-green-600 mt-1">
-            Delivery by <span className="font-medium">{deliveryDate}</span> |{" "}
+            Delivery by <span className="font-medium">{deliveryDate}</span> |{' '}
             <span className="font-semibold">FREE</span>
           </p>
 

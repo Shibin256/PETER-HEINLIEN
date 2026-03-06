@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const pendingUserSchema = new mongoose.Schema({
   name: String,
@@ -8,9 +8,8 @@ const pendingUserSchema = new mongoose.Schema({
   referralCode: String,
   otp: String,
   expiresAt: Date,
-  gender:String
+  gender: String,
 });
 
-
-const PendingUser= mongoose.model("PendingUser", pendingUserSchema);
-export default PendingUser
+const PendingUser = mongoose.model('PendingUser', pendingUserSchema);
+export default PendingUser;

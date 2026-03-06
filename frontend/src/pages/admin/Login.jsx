@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import AuthInput from "../../components/common/AuthInput";
-import axiosInstance from "../../api/axiosInstance";
-import { setAdmin } from "../../features/auth/authSlice";
-import { useDispatch } from "react-redux";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import AuthInput from '../../components/common/AuthInput';
+import axiosInstance from '../../api/axiosInstance';
+import { setAdmin } from '../../features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -18,30 +18,30 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError("Please fill in all fields");
+      setError('Please fill in all fields');
       return;
     }
-    setError("");
+    setError('');
     try {
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/admin-login`,
-        { email, password },
+        { email, password }
       );
 
       // settong access token to the local storage
       const token = response.data.accessToken;
       const admin = JSON.stringify(response.data.user);
       dispatch(setAdmin({ token, admin }));
-      localStorage.setItem("adminAccessToken", token);
-      localStorage.setItem("admin", admin);
+      localStorage.setItem('adminAccessToken', token);
+      localStorage.setItem('admin', admin);
 
       if (response) {
         toast.success(response.data.message);
-        navigate("/admin/dashboard");
+        navigate('/admin/dashboard');
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      toast.error(error.response?.data?.message || 'error hapened');
     }
   };
 

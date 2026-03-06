@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
-import adBackgroundImg from "../../assets/adBannerImg.jpg";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAdsCoupons } from "../../features/coupons/couponsSlice";
-import { toast } from "react-toastify";
+import React, { useEffect } from 'react';
+import adBackgroundImg from '../../assets/adBannerImg.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAdsCoupons } from '../../features/coupons/couponsSlice';
+import { toast } from 'react-toastify';
 
 const AdBanner = () => {
   const dispatch = useDispatch();
@@ -14,22 +14,22 @@ const AdBanner = () => {
   const { adsCoupon } = useSelector((state) => state.coupons);
 
   const adContent = {
-    title: "Exclusive Watch Deal!",
+    title: 'Exclusive Watch Deal!',
     description: adsCoupon
-      ? adsCoupon.discountType === "percentage"
+      ? adsCoupon.discountType === 'percentage'
         ? `Get up to ${adsCoupon.discountValue}% off on our premium collection of watches for Men, Women, and Couples. Shop now and elevate your style!`
         : `Get ₹${adsCoupon.discountValue} off on our premium collection of watches for Men, Women, and Couples. Shop now and elevate your style!`
-      : "Fetching latest deals...",
-    buttonText: adsCoupon ? `Copy code: ${adsCoupon.code}` : "Loading...",
+      : 'Fetching latest deals...',
+    buttonText: adsCoupon ? `Copy code: ${adsCoupon.code}` : 'Loading...',
     backgroundImage: adBackgroundImg,
   };
 
   const handleCopy = () => {
     if (adsCoupon?.code) {
       navigator.clipboard.writeText(adsCoupon.code);
-      toast.success("Coupon code copied to clipboard!");
+      toast.success('Coupon code copied to clipboard!');
     } else {
-      toast.error("No coupon code available");
+      toast.error('No coupon code available');
     }
   };
 
@@ -50,7 +50,7 @@ const AdBanner = () => {
           <button
             onClick={handleCopy}
             className="inline-block px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md transition-colors duration-300"
-            style={{ backgroundColor: "#003543" }}
+            style={{ backgroundColor: '#003543' }}
           >
             {adContent.buttonText}
           </button>

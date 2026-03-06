@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef } from 'react';
 import {
   FiPlus,
   FiTrash2,
@@ -6,30 +6,30 @@ import {
   FiCheckCircle,
   FiUpload,
   FiX,
-} from "react-icons/fi";
-import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
+} from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   createBanner,
   deleteBanner,
   fetchBanners,
   setActiveBanner,
-} from "../../features/admin/banner/bannerSlice";
-import { useEffect } from "react";
-import Swal from "sweetalert2";
+} from '../../features/admin/banner/bannerSlice';
+import { useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 const Banners = () => {
   // Form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [buttonText, setButtonText] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [buttonText, setButtonText] = useState('');
   const dispatch = useDispatch();
 
   // Image states
   const [bgImage, setBgImage] = useState(null);
-  const [bgImagePreview, setBgImagePreview] = useState("");
+  const [bgImagePreview, setBgImagePreview] = useState('');
   const [mainImage, setMainImage] = useState(null);
-  const [mainImagePreview, setMainImagePreview] = useState("");
+  const [mainImagePreview, setMainImagePreview] = useState('');
 
   const [loading, setLoading] = useState(false);
   const bgImageInputRef = useRef(null);
@@ -46,13 +46,13 @@ const Banners = () => {
   const handleBgImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (!file.type.match("image.*")) {
-        toast.warning("Please select an image file (JPEG, PNG)");
+      if (!file.type.match('image.*')) {
+        toast.warning('Please select an image file (JPEG, PNG)');
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        toast.warning("File size should be less than 2MB");
+        toast.warning('File size should be less than 2MB');
         return;
       }
       setBgImage(file);
@@ -67,13 +67,13 @@ const Banners = () => {
   const handleMainImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (!file.type.match("image.*")) {
-        toast.warning("Please select an image file (JPEG, PNG)");
+      if (!file.type.match('image.*')) {
+        toast.warning('Please select an image file (JPEG, PNG)');
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        toast.warning("File size should be less than 2MB");
+        toast.warning('File size should be less than 2MB');
         return;
       }
 
@@ -88,17 +88,17 @@ const Banners = () => {
 
   const removeBgImage = () => {
     setBgImage(null);
-    setBgImagePreview("");
+    setBgImagePreview('');
     if (bgImageInputRef.current) {
-      bgImageInputRef.current.value = "";
+      bgImageInputRef.current.value = '';
     }
   };
 
   const removeMainImage = () => {
     setMainImage(null);
-    setMainImagePreview("");
+    setMainImagePreview('');
     if (mainImageInputRef.current) {
-      mainImageInputRef.current.value = "";
+      mainImageInputRef.current.value = '';
     }
   };
 
@@ -106,15 +106,15 @@ const Banners = () => {
     try {
       setLoading(true);
       if (!bgImagePreview || !title || !buttonText || !description) {
-        toast.warning("All fields required");
+        toast.warning('All fields required');
         return;
       }
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("buttonText", buttonText);
-      if (bgImage) formData.append("images", bgImage);
-      if (mainImage) formData.append("images", mainImage);
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('buttonText', buttonText);
+      if (bgImage) formData.append('images', bgImage);
+      if (mainImage) formData.append('images', mainImage);
 
       await dispatch(createBanner(formData));
       resetForm();
@@ -126,45 +126,45 @@ const Banners = () => {
   };
 
   const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setButtonText("");
+    setTitle('');
+    setDescription('');
+    setButtonText('');
     setBgImage(null);
-    setBgImagePreview("");
+    setBgImagePreview('');
     setMainImage(null);
-    setMainImagePreview("");
+    setMainImagePreview('');
   };
 
   const handledeleteBanner = async (id) => {
     try {
       Swal.fire({
-        title: "Are you sure?",
-        text: "This will delete the banner forever!",
-        icon: "warning",
+        title: 'Are you sure?',
+        text: 'This will delete the banner forever!',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
         buttonsStyling: false,
         customClass: {
           confirmButton:
-            "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
+            'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
           cancelButton:
-            "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
+            'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
         },
       }).then((result) => {
         if (result.isConfirmed) {
           dispatch(deleteBanner({ bannerId: id })).then((res) => {
-            if (res.type.endsWith("/fulfilled")) {
+            if (res.type.endsWith('/fulfilled')) {
               Swal.fire(
-                "Deleted!",
+                'Deleted!',
                 `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
-                "success",
+                'success'
               );
             } else {
               Swal.fire(
-                "Error!",
-                res.payload?.message || "Failed to delete brand.",
-                "error",
+                'Error!',
+                res.payload?.message || 'Failed to delete brand.',
+                'error'
               );
             }
           });
@@ -328,10 +328,10 @@ const Banners = () => {
             <button
               onClick={handleCreate}
               disabled={!bgImagePreview || !title}
-              className={`w-full mt-4 px-6 py-3 rounded-lg font-medium text-white transition-all ${!bgImagePreview || !title ? "bg-gray-400 cursor-not-allowed" : "bg-teal-600 hover:bg-teal-700 shadow-md hover:shadow-lg"} flex items-center justify-center`}
+              className={`w-full mt-4 px-6 py-3 rounded-lg font-medium text-white transition-all ${!bgImagePreview || !title ? 'bg-gray-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700 shadow-md hover:shadow-lg'} flex items-center justify-center`}
             >
               {!loading && <FiPlus className="mr-2" />}
-              {loading ? "loading" : "Create Banner"}
+              {loading ? 'loading' : 'Create Banner'}
             </button>
           </div>
         </div>
@@ -360,7 +360,7 @@ const Banners = () => {
                 {banners.map((banner) => (
                   <div
                     key={banner._id}
-                    className={`relative border rounded-xl overflow-hidden transition-all ${banner.isActive ? "ring-2 ring-teal-500 border-teal-500" : "border-gray-200"}`}
+                    className={`relative border rounded-xl overflow-hidden transition-all ${banner.isActive ? 'ring-2 ring-teal-500 border-teal-500' : 'border-gray-200'}`}
                   >
                     {/* Banner Image */}
                     <div className="h-40 bg-gray-100 overflow-hidden relative">
@@ -415,11 +415,11 @@ const Banners = () => {
 
                           <button
                             onClick={() => activateBanner(banner._id)}
-                            className={`p-2 transition-colors ${banner.isActive ? "text-teal-500" : "text-gray-400 hover:text-gray-600"}`}
+                            className={`p-2 transition-colors ${banner.isActive ? 'text-teal-500' : 'text-gray-400 hover:text-gray-600'}`}
                             title={
                               banner.isActive
-                                ? "Active banner"
-                                : "Set as active"
+                                ? 'Active banner'
+                                : 'Set as active'
                             }
                           >
                             <FiCheckCircle />
@@ -452,7 +452,7 @@ const Banners = () => {
                   <img
                     src={
                       activeBanner.bannerImage ||
-                      "https://via.placeholder.com/1200x400?text=Banner+Image"
+                      'https://via.placeholder.com/1200x400?text=Banner+Image'
                     }
                     alt="Banner background"
                     className="w-full h-full object-cover opacity-20"
@@ -464,7 +464,7 @@ const Banners = () => {
                     {/* Text content */}
                     <div className="text-center lg:text-left">
                       <h1 className="prata-regular text-2xl md:text-3xl font-bold mb-2 text-gray-900">
-                        {activeBanner.title || "DISCOVER"}
+                        {activeBanner.title || 'DISCOVER'}
                       </h1>
                       {activeBanner.description && (
                         <h2 className="text-xl md:text-2xl mb-4 text-gray-800">
@@ -479,7 +479,7 @@ const Banners = () => {
                           <>
                             <p className="text-md md:text-lg mb-3 max-w-xl mx-auto lg:mx-0 text-gray-600">
                               {activeBanner.additionalText ||
-                                "Explore our premium collection"}
+                                'Explore our premium collection'}
                             </p>
                             <button className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300 text-md font-medium">
                               {activeBanner.buttonText}

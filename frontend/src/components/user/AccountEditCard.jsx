@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const AccountEditCard = ({
   title,
@@ -11,7 +11,7 @@ const AccountEditCard = ({
   onVerifyButtonName,
   onBackButtonName,
 }) => {
-  const [value, setvalue] = useState("");
+  const [value, setvalue] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();

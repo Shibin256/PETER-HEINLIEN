@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   createPaymentOrder,
   verifyPayment,
-} from "../../features/orders/ordersSlice";
-import { toast } from "react-toastify";
+} from '../../features/orders/ordersSlice';
+import { toast } from 'react-toastify';
 
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
@@ -31,14 +31,14 @@ const RetryPayment = () => {
   // redirect if page opened directly
   useEffect(() => {
     if (!location.state || !orderId) {
-      navigate("/cart", { replace: true });
+      navigate('/cart', { replace: true });
     }
   }, []);
 
   // load razorpay script
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
     document.body.appendChild(script);
   }, []);
@@ -47,9 +47,7 @@ const RetryPayment = () => {
     try {
       setIsProcessing(true);
 
-      const result = await dispatch(
-        createPaymentOrder(totalAmount)
-      ).unwrap();
+      const result = await dispatch(createPaymentOrder(totalAmount)).unwrap();
 
       const { order } = result;
 
@@ -57,8 +55,8 @@ const RetryPayment = () => {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency,
-        name: "Peter Heinlien Watches",
-        description: "Retry Order Payment",
+        name: 'Peter Heinlien Watches',
+        description: 'Retry Order Payment',
         order_id: order.id,
 
         handler: async function (response) {
@@ -71,41 +69,41 @@ const RetryPayment = () => {
             ).unwrap();
 
             if (verifyRes.success) {
-              toast.success("Payment Successful");
+              toast.success('Payment Successful');
 
-              navigate("/my-orders");
+              navigate('/my-orders');
             } else {
-              toast.error("Payment verification failed");
+              toast.error('Payment verification failed');
             }
           } catch (error) {
             console.error(error);
-            toast.error("Payment verification error");
+            toast.error('Payment verification error');
           }
         },
 
         modal: {
           ondismiss: () => {
-            toast.error("Payment cancelled");
+            toast.error('Payment cancelled');
           },
         },
 
         theme: {
-          color: "#3399cc",
+          color: '#3399cc',
         },
       };
 
       const rzp = new window.Razorpay(options);
 
-      rzp.on("payment.failed", function (response) {
+      rzp.on('payment.failed', function (response) {
         toast.error(
-          response.error?.description || "Payment failed. Please try again."
+          response.error?.description || 'Payment failed. Please try again.'
         );
       });
 
       rzp.open();
     } catch (error) {
       console.error(error);
-      toast.error("Unable to start payment");
+      toast.error('Unable to start payment');
     } finally {
       setIsProcessing(false);
     }
@@ -133,9 +131,7 @@ const RetryPayment = () => {
 
         <div className="flex justify-between py-2">
           <span>Delivery</span>
-          <span>
-            {shippingCost ? `₹${shippingCost}` : "FREE"}
-          </span>
+          <span>{shippingCost ? `₹${shippingCost}` : 'FREE'}</span>
         </div>
 
         <div className="border-t my-2"></div>
@@ -149,7 +145,7 @@ const RetryPayment = () => {
       {/* Buttons */}
       <div className="flex justify-between">
         <button
-          onClick={() => navigate("/my-orders")}
+          onClick={() => navigate('/my-orders')}
           className="px-6 py-2 border rounded-md hover:bg-gray-100"
         >
           Cancel
@@ -160,7 +156,7 @@ const RetryPayment = () => {
           disabled={isProcessing}
           className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
         >
-          {isProcessing ? "Processing..." : "Retry Payment"}
+          {isProcessing ? 'Processing...' : 'Retry Payment'}
         </button>
       </div>
     </div>

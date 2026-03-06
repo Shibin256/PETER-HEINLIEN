@@ -5,8 +5,8 @@ export const getCroppedImg = (imageSrc, pixelCrop) => {
     image.src = imageSrc;
     // wait untill fully loaded
     image.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
       canvas.width = pixelCrop.width;
       canvas.height = pixelCrop.height;
 
@@ -19,19 +19,19 @@ export const getCroppedImg = (imageSrc, pixelCrop) => {
         0,
         0,
         pixelCrop.width,
-        pixelCrop.height,
+        pixelCrop.height
       );
 
       //convert the canvas into file
       canvas.toBlob((blob) => {
         const file = new File([blob], `cropped_${Date.now()}.jpeg`, {
-          type: "image/jpeg",
+          type: 'image/jpeg',
         });
         resolve({
           preview: URL.createObjectURL(file),
           file,
         });
-      }, "image/jpeg");
+      }, 'image/jpeg');
     };
   });
 };

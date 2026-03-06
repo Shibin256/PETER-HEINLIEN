@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   HiHome,
   HiPlusCircle,
@@ -9,22 +9,22 @@ import {
   HiTicket,
   HiRectangleGroup,
   HiBars3,
-} from "react-icons/hi2";
-import { useNavigate, useLocation } from "react-router-dom";
+} from 'react-icons/hi2';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const menuItems = [
-  { name: "Dashboard", icon: HiHome, path: "/admin/dashboard" },
-  { name: "Add Items", icon: HiPlusCircle, path: "/admin/additems" },
-  { name: "List Items", icon: HiListBullet, path: "/admin/products" },
-  { name: "Orders", icon: HiShoppingBag, path: "/admin/orders" },
-  { name: "Customers", icon: HiUsers, path: "/admin/user-list" },
-  { name: "Inventory", icon: HiArchiveBox, path: "/admin/inventory" },
-  { name: "Coupons", icon: HiTicket, path: "/admin/coupons" },
-  { name: "Banners", icon: HiRectangleGroup, path: "/admin/banners" },
+  { name: 'Dashboard', icon: HiHome, path: '/admin/dashboard' },
+  { name: 'Add Items', icon: HiPlusCircle, path: '/admin/additems' },
+  { name: 'List Items', icon: HiListBullet, path: '/admin/products' },
+  { name: 'Orders', icon: HiShoppingBag, path: '/admin/orders' },
+  { name: 'Customers', icon: HiUsers, path: '/admin/user-list' },
+  { name: 'Inventory', icon: HiArchiveBox, path: '/admin/inventory' },
+  { name: 'Coupons', icon: HiTicket, path: '/admin/coupons' },
+  { name: 'Banners', icon: HiRectangleGroup, path: '/admin/banners' },
 ];
 
 const AdminSidebar = () => {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const [activeItem, setActiveItem] = useState('Dashboard');
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +32,7 @@ const AdminSidebar = () => {
   //change active item it when path name change
   useEffect(() => {
     const currentItem = menuItems.find((item) =>
-      location.pathname.startsWith(item.path),
+      location.pathname.startsWith(item.path)
     );
     if (currentItem) {
       setActiveItem(currentItem.name);
@@ -56,7 +56,7 @@ const AdminSidebar = () => {
 
       <div
         className={`
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
         md:static fixed
         top-0 left-0 z-40
@@ -72,8 +72,8 @@ const AdminSidebar = () => {
               onClick={() => handleItemClick(name, path)}
               className={`w-full flex items-center px-6 py-3 transition-colors duration-200 ${
                 activeItem === name
-                  ? "bg-gray-800 text-white border-l-4 border-blue-500"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                  ? 'bg-gray-800 text-white border-l-4 border-blue-500'
+                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}
             >
               <Icon className="mr-3 text-blue-400 text-lg" />

@@ -1,4 +1,4 @@
-import Wallet from "../model/walletModal.js";
+import Wallet from '../model/walletModal.js';
 
 export const addToWallet = async (req, res) => {
   const { userId, amount, paymentId } = req.params;
@@ -18,26 +18,30 @@ export const addToWallet = async (req, res) => {
       paymentId,
       status: 'success',
       type: 'credit',
-      description: 'Wallet Top-up'
-    }
+      description: 'Wallet Top-up',
+    };
 
     if (wallet) {
       wallet.balance += numericAmount;
-      wallet.transactions.push(transactions)
+      wallet.transactions.push(transactions);
     } else {
-      wallet = new Wallet({ userId, balance: numericAmount, transactions: [transactions] });
+      wallet = new Wallet({
+        userId,
+        balance: numericAmount,
+        transactions: [transactions],
+      });
     }
 
     await wallet.save();
-    wallet.transactions.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))
+    wallet.transactions.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    );
     res.status(200).json({ message: 'Wallet updated', wallet });
   } catch (error) {
     console.error('Error adding to wallet:', error);
     res.status(500).json({ message: 'Failed to update wallet' });
   }
 };
-
-
 
 export const getWallet = async (req, res) => {
   const { userId } = req.params;
@@ -48,7 +52,7 @@ export const getWallet = async (req, res) => {
   try {
     const wallet = await Wallet.findOne({ userId });
     if (!wallet) {
-      return res.status(404).json({ message: "Wallet not found" });
+      return res.status(404).json({ message: 'Wallet not found' });
     }
 
     const total = wallet.transactions.length;
@@ -70,9 +74,7 @@ export const getWallet = async (req, res) => {
       totalPage,
     });
   } catch (error) {
-    console.error("Error fetching wallet:", error);
-    return res.status(500).json({ message: "Failed to fetch wallet" });
+    console.error('Error fetching wallet:', error);
+    return res.status(500).json({ message: 'Failed to fetch wallet' });
   }
 };
-
-

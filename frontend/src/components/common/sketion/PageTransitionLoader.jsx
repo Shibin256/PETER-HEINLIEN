@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import PageSkeleton from "./PageSkeleton";
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import PageSkeleton from './PageSkeleton';
 
 const PageTransitionLoader = ({ children }) => {
   const location = useLocation();

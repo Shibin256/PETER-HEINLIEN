@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
-import InventoryCard from "../../components/admin/InventoryCard";
-import { useDispatch, useSelector } from "react-redux";
-import { getBrandAndCategory } from "../../features/products/productSlice";
+import React, { useEffect, useState, useRef } from 'react';
+import InventoryCard from '../../components/admin/InventoryCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBrandAndCategory } from '../../features/products/productSlice';
 import {
   addBrand,
   addCategory,
@@ -11,20 +11,20 @@ import {
   editBrand,
   editCategory,
   removeCategoryOffer,
-} from "../../features/admin/inventory/inventorySlice";
-import { toast } from "react-toastify";
-import Swal from "sweetalert2";
+} from '../../features/admin/inventory/inventorySlice';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const Inventory = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("category");
+  const [selectedOption, setSelectedOption] = useState('category');
   const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
+  const [newCategory, setNewCategory] = useState('');
 
   // Brand adding states
   const [isAddingBrand, setIsAddingBrand] = useState(false);
-  const [newBrand, setNewBrand] = useState("");
-  const [brandDescription, setBrandDescription] = useState("");
+  const [newBrand, setNewBrand] = useState('');
+  const [brandDescription, setBrandDescription] = useState('');
   const [brandLogo, setBrandLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -32,20 +32,20 @@ const Inventory = () => {
   // Brand editing states
   const [isEditingBrand, setIsEditingBrand] = useState(false);
   const [editingBrandId, setEditingBrandId] = useState(null);
-  const [editingBrandName, setEditingBrandName] = useState("");
-  const [editingBrandDescription, setEditingBrandDescription] = useState("");
+  const [editingBrandName, setEditingBrandName] = useState('');
+  const [editingBrandDescription, setEditingBrandDescription] = useState('');
   const [editingBrandLogo, setEditingBrandLogo] = useState(null);
   const [editingLogoPreview, setEditingLogoPreview] = useState(null);
 
   // Category editing states
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
-  const [editingCategoryName, setEditingCategoryName] = useState("");
+  const [editingCategoryName, setEditingCategoryName] = useState('');
 
   // Offer states
   const [selectedCategoryForOffer, setSelectedCategoryForOffer] =
     useState(null);
-  const [offerPercentage, setOfferPercentage] = useState("");
+  const [offerPercentage, setOfferPercentage] = useState('');
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ const Inventory = () => {
   // The total category counts
   const categoryCounts = categories.map((cat) => {
     const count = categoryBrandTotal.filter(
-      (product) => product.category === cat._id,
+      (product) => product.category === cat._id
     ).length;
 
     return {
@@ -73,7 +73,7 @@ const Inventory = () => {
   // The total brand counts
   const brandCounts = brands.map((brand) => {
     const count = categoryBrandTotal.filter(
-      (product) => product.brand === brand._id,
+      (product) => product.brand === brand._id
     ).length;
 
     return {
@@ -91,34 +91,34 @@ const Inventory = () => {
   // Delete category
   const handleCategoryDelete = (id) => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "This will delete the category and all related products!",
-      icon: "warning",
+      title: 'Are you sure?',
+      text: 'This will delete the category and all related products!',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
       buttonsStyling: false,
       customClass: {
         confirmButton:
-          "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
         cancelButton:
-          "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
       },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(deleteCategory(id)).then((res) => {
-          if (res.type.endsWith("/fulfilled")) {
+          if (res.type.endsWith('/fulfilled')) {
             Swal.fire(
-              "Deleted!",
+              'Deleted!',
               `Category and ${res.payload.deletedProductCount} related product(s) deleted successfully.`,
-              "success",
+              'success'
             );
             dispatch(getBrandAndCategory({ page: page, limit: 4 }));
           } else {
             Swal.fire(
-              "Error!",
-              res.payload?.message || "Failed to delete category.",
-              "error",
+              'Error!',
+              res.payload?.message || 'Failed to delete category.',
+              'error'
             );
           }
         });
@@ -127,8 +127,8 @@ const Inventory = () => {
   };
 
   const options = [
-    { value: "category", label: "Category" },
-    { value: "brand", label: "Brand" },
+    { value: 'category', label: 'Category' },
+    { value: 'brand', label: 'Brand' },
   ];
 
   // Adding category modal popup
@@ -143,50 +143,50 @@ const Inventory = () => {
       const trimmedCategory = newCategory.trim();
 
       if (!trimmedCategory) {
-        toast.warning("Category name is required");
-        setNewCategory("");
+        toast.warning('Category name is required');
+        setNewCategory('');
         return;
       }
 
       if (trimmedCategory.length < 3) {
-        toast.warning("Category name must be at least 3 characters long");
+        toast.warning('Category name must be at least 3 characters long');
         return;
       }
 
       if (trimmedCategory.length > 50) {
-        toast.warning("Category name must be less than 50 characters");
+        toast.warning('Category name must be less than 50 characters');
         return;
       }
 
       if (!/^[A-Za-z&\-\s]+$/.test(trimmedCategory)) {
         toast.warning(
-          "Category name can only contain letters, spaces, '&', and '-'",
+          "Category name can only contain letters, spaces, '&', and '-'"
         );
         return;
       }
 
       if (/\s{2,}/.test(trimmedCategory)) {
-        toast.warning("Category name cannot have multiple consecutive spaces");
+        toast.warning('Category name cannot have multiple consecutive spaces');
         return;
       }
 
       const res = await dispatch(addCategory(newCategory.trim()));
 
-      if (res.payload?.message === "Category created") {
-        toast.success("Category created successfully");
+      if (res.payload?.message === 'Category created') {
+        toast.success('Category created successfully');
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
-      } else if (res.payload?.message === "Category already exists") {
-        toast.warning("Category already exists");
+      } else if (res.payload?.message === 'Category already exists') {
+        toast.warning('Category already exists');
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         }
       }
-      setNewCategory("");
+      setNewCategory('');
 
       setIsAddingCategory(false);
     } catch (error) {
-      toast.error(error?.message || "Failed to update category.");
+      toast.error(error?.message || 'Failed to update category.');
     }
   };
 
@@ -199,13 +199,13 @@ const Inventory = () => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type and size
-      if (!file.type.match("image.*")) {
-        toast.warning("Please select an image file (JPEG, PNG)");
+      if (!file.type.match('image.*')) {
+        toast.warning('Please select an image file (JPEG, PNG)');
         return;
       }
       if (file.size > 2 * 1024 * 1024) {
         // 2MB
-        toast.warning("File size should be less than 2MB");
+        toast.warning('File size should be less than 2MB');
         return;
       }
 
@@ -230,47 +230,47 @@ const Inventory = () => {
 
     try {
       if (!newBrand.trim()) {
-        toast.warning("Brand name is required");
+        toast.warning('Brand name is required');
         return;
       }
       if (newBrand.length < 2 || newBrand.length > 50) {
-        toast.warning("Brand name must be between 2 and 50 characters");
+        toast.warning('Brand name must be between 2 and 50 characters');
         return;
       }
       if (!/^[a-zA-Z0-9\s\-]+$/.test(newBrand)) {
         toast.warning(
-          "Brand name can only contain letters, numbers, spaces, and hyphens",
+          'Brand name can only contain letters, numbers, spaces, and hyphens'
         );
         return;
       }
       if (brandDescription && brandDescription.length > 200) {
-        toast.warning("Description must not exceed 200 characters");
+        toast.warning('Description must not exceed 200 characters');
         return;
       }
       if (!brandLogo) {
-        toast.warning("Brand logo is required");
+        toast.warning('Brand logo is required');
         return;
       }
-      if (!["image/jpeg", "image/png", "image/webp"].includes(brandLogo.type)) {
-        toast.warning("Only JPG, PNG, and WEBP formats are allowed");
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(brandLogo.type)) {
+        toast.warning('Only JPG, PNG, and WEBP formats are allowed');
         return;
       }
       if (brandLogo.size > 2 * 1024 * 1024) {
-        toast.warning("Logo must be less than 2MB");
+        toast.warning('Logo must be less than 2MB');
         return;
       }
 
       const formData = new FormData();
-      formData.append("name", newBrand);
-      formData.append("description", brandDescription);
-      formData.append("logo", brandLogo);
+      formData.append('name', newBrand);
+      formData.append('description', brandDescription);
+      formData.append('logo', brandLogo);
 
       const res = await dispatch(addBrand(formData));
-      if (res.type.endsWith("fulfilled")) {
-        toast.success("Brand added successfully");
+      if (res.type.endsWith('fulfilled')) {
+        toast.success('Brand added successfully');
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
-        setNewBrand("");
-        setBrandDescription("");
+        setNewBrand('');
+        setBrandDescription('');
         setBrandLogo(null);
         setLogoPreview(null);
         setIsAddingBrand(false);
@@ -278,11 +278,11 @@ const Inventory = () => {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         } else {
-          toast.error(res.payload?.message || "Failed to create product");
+          toast.error(res.payload?.message || 'Failed to create product');
         }
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to add brand");
+      toast.error(error?.message || 'Failed to add brand');
     } finally {
       setIsLoading(false);
     }
@@ -292,7 +292,7 @@ const Inventory = () => {
   const handleBrandEdit = (brand) => {
     setEditingBrandId(brand._id);
     setEditingBrandName(brand.name);
-    setEditingBrandDescription(brand.description || "");
+    setEditingBrandDescription(brand.description || '');
     setEditingLogoPreview(brand.logo?.url || null);
     setEditingBrandLogo(null);
     setIsEditingBrand(true);
@@ -304,61 +304,61 @@ const Inventory = () => {
     setIsLoading(true);
     try {
       if (!editingBrandName.trim()) {
-        toast.warning("Brand name is required");
+        toast.warning('Brand name is required');
         return;
       }
       if (editingBrandName.length < 2 || editingBrandName.length > 50) {
-        toast.warning("Brand name must be between 2 and 50 characters");
+        toast.warning('Brand name must be between 2 and 50 characters');
         return;
       }
       if (!/^[a-zA-Z0-9\s\-]+$/.test(editingBrandName)) {
         toast.warning(
-          "Brand name can only contain letters, numbers, spaces, and hyphens",
+          'Brand name can only contain letters, numbers, spaces, and hyphens'
         );
         return;
       }
       if (editingBrandDescription && editingBrandDescription.length > 200) {
-        toast.warning("Description must not exceed 200 characters");
+        toast.warning('Description must not exceed 200 characters');
         return;
       }
       if (!editingBrandLogo) {
-        toast.warning("Brand logo is required");
+        toast.warning('Brand logo is required');
         return;
       }
       if (
-        !["image/jpeg", "image/png", "image/webp"].includes(
-          editingBrandLogo.type,
+        !['image/jpeg', 'image/png', 'image/webp'].includes(
+          editingBrandLogo.type
         )
       ) {
-        toast.warning("Only JPG, PNG, and WEBP formats are allowed");
+        toast.warning('Only JPG, PNG, and WEBP formats are allowed');
         return;
       }
       if (editingBrandLogo.size > 2 * 1024 * 1024) {
-        toast.warning("Logo must be less than 2MB");
+        toast.warning('Logo must be less than 2MB');
         return;
       }
       const formData = new FormData();
-      formData.append("name", editingBrandName);
-      formData.append("description", editingBrandDescription);
-      formData.append("logo", editingBrandLogo);
+      formData.append('name', editingBrandName);
+      formData.append('description', editingBrandDescription);
+      formData.append('logo', editingBrandLogo);
 
       const res = await dispatch(
-        editBrand({ id: editingBrandId, data: formData }),
+        editBrand({ id: editingBrandId, data: formData })
       );
 
-      if (res.type.endsWith("fulfilled")) {
-        toast.success("Brand updated successfully");
+      if (res.type.endsWith('fulfilled')) {
+        toast.success('Brand updated successfully');
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setIsEditingBrand(false);
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         } else {
-          toast.error(res.payload?.message || "Failed to create product");
+          toast.error(res.payload?.message || 'Failed to create product');
         }
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to update brand");
+      toast.error(error?.message || 'Failed to update brand');
     } finally {
       setIsLoading(false);
     }
@@ -367,34 +367,34 @@ const Inventory = () => {
   // Brand deletion
   const handleBrandDelete = (id) => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "This will delete the brand and all related products!",
-      icon: "warning",
+      title: 'Are you sure?',
+      text: 'This will delete the brand and all related products!',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
       buttonsStyling: false,
       customClass: {
         confirmButton:
-          "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
         cancelButton:
-          "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
       },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(deleteBrand(id)).then((res) => {
-          if (res.type.endsWith("/fulfilled")) {
+          if (res.type.endsWith('/fulfilled')) {
             Swal.fire(
-              "Deleted!",
+              'Deleted!',
               `Brand and ${res.payload.deletedBrandCount} related product(s) deleted successfully.`,
-              "success",
+              'success'
             );
             dispatch(getBrandAndCategory({ page: 1, limit: 4 }));
           } else {
             Swal.fire(
-              "Error!",
-              res.payload?.message || "Failed to delete brand.",
-              "error",
+              'Error!',
+              res.payload?.message || 'Failed to delete brand.',
+              'error'
             );
           }
         });
@@ -410,30 +410,30 @@ const Inventory = () => {
       const trimmedCategory = editingCategoryName.trim();
 
       if (!trimmedCategory) {
-        toast.warning("Category name is required");
-        setNewCategory("");
+        toast.warning('Category name is required');
+        setNewCategory('');
         return;
       }
 
       if (trimmedCategory.length < 3) {
-        toast.warning("Category name must be at least 3 characters long");
+        toast.warning('Category name must be at least 3 characters long');
         return;
       }
 
       if (trimmedCategory.length > 50) {
-        toast.warning("Category name must be less than 50 characters");
+        toast.warning('Category name must be less than 50 characters');
         return;
       }
 
       if (!/^[A-Za-z&\-\s]+$/.test(trimmedCategory)) {
         toast.warning(
-          "Category name can only contain letters, spaces, '&', and '-'",
+          "Category name can only contain letters, spaces, '&', and '-'"
         );
         return;
       }
 
       if (/\s{2,}/.test(trimmedCategory)) {
-        toast.warning("Category name cannot have multiple consecutive spaces");
+        toast.warning('Category name cannot have multiple consecutive spaces');
         return;
       }
 
@@ -441,22 +441,22 @@ const Inventory = () => {
         editCategory({
           id: editingCategoryId,
           category: editingCategoryName,
-        }),
+        })
       );
 
-      if (res.type.endsWith("fulfilled")) {
-        toast.success("✅ category added successfully!");
+      if (res.type.endsWith('fulfilled')) {
+        toast.success('✅ category added successfully!');
         setIsEditingCategory(false);
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         } else {
-          toast.error(res.payload?.message || "Failed to create product");
+          toast.error(res.payload?.message || 'Failed to create product');
         }
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to update category");
+      toast.error(error?.message || 'Failed to update category');
     } finally {
       setIsLoading(false);
     }
@@ -465,19 +465,19 @@ const Inventory = () => {
   // Offer functions
   const handleAddOfferClick = (category) => {
     setSelectedCategoryForOffer(category);
-    setOfferPercentage(category.offerPercentage || "");
+    setOfferPercentage(category.offerPercentage || '');
   };
 
   const handleAddOffer = async () => {
     try {
       if (!offerPercentage || isNaN(offerPercentage)) {
-        toast.warning("Please enter a valid percentage");
+        toast.warning('Please enter a valid percentage');
         return;
       }
 
       const percentage = parseInt(offerPercentage);
       if (percentage < 1 || percentage > 100) {
-        toast.warning("Percentage must be between 1 and 100");
+        toast.warning('Percentage must be between 1 and 100');
         return;
       }
 
@@ -486,17 +486,17 @@ const Inventory = () => {
         addCategoryOffer({
           categoryId: selectedCategoryForOffer._id,
           percentage,
-        }),
+        })
       ).unwrap();
 
       if (res) {
-        toast.success("Offer added successfully");
+        toast.success('Offer added successfully');
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setSelectedCategoryForOffer(null);
-        setOfferPercentage("");
+        setOfferPercentage('');
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to add offer");
+      toast.error(error?.message || 'Failed to add offer');
     } finally {
       setIsLoading(false);
     }
@@ -511,17 +511,17 @@ const Inventory = () => {
     try {
       setIsLoading(true);
       const res = await dispatch(
-        removeCategoryOffer(selectedCategoryForOffer._id),
+        removeCategoryOffer(selectedCategoryForOffer._id)
       ).unwrap();
 
       if (res) {
-        toast.success("Offer removed successfully");
+        toast.success('Offer removed successfully');
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
         setShowRemoveConfirm(false);
         setSelectedCategoryForOffer(null);
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to remove offer");
+      toast.error(error?.message || 'Failed to remove offer');
     } finally {
       setIsLoading(false);
     }
@@ -548,7 +548,7 @@ const Inventory = () => {
               <option
                 key={option.value}
                 value={option.value}
-                className={option.disabled ? "text-gray-400" : ""}
+                className={option.disabled ? 'text-gray-400' : ''}
               >
                 {option.label}
               </option>
@@ -568,22 +568,22 @@ const Inventory = () => {
 
         <button
           onClick={
-            selectedOption === "category" ? handleAddCategory : handleAddBrand
+            selectedOption === 'category' ? handleAddCategory : handleAddBrand
           }
           className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-md"
         >
-          {selectedOption === "category" ? "Add Category" : "Add Brand"}
+          {selectedOption === 'category' ? 'Add Category' : 'Add Brand'}
         </button>
 
         {/* Pagination Buttons */}
-        {selectedOption !== "category" && (
+        {selectedOption !== 'category' && (
           <div className="flex justify-center items-center gap-4 mt-1">
             <button
               disabled={page <= 1}
               onClick={() =>
                 dispatch(getBrandAndCategory({ page: page - 1, limit: 4 }))
               }
-              className={`px-4 py-2 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+              className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
             >
               &lt;
             </button>
@@ -597,7 +597,7 @@ const Inventory = () => {
               onClick={() =>
                 dispatch(getBrandAndCategory({ page: page + 1, limit: 4 }))
               }
-              className={`px-4 py-2 rounded ${page >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+              className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
             >
               &gt;
             </button>
@@ -681,7 +681,7 @@ const Inventory = () => {
                     type="submit"
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                   >
-                    {isLoading ? "Loading" : "Update Category"}
+                    {isLoading ? 'Loading' : 'Update Category'}
                   </button>
                 </div>
               </form>
@@ -736,7 +736,7 @@ const Inventory = () => {
                           />
                         </svg>
                         <p className="mb-1 text-sm text-gray-500">
-                          <span className="font-semibold">Click to upload</span>{" "}
+                          <span className="font-semibold">Click to upload</span>{' '}
                           or drag and drop
                         </p>
                         <p className="text-xs text-gray-500">
@@ -752,14 +752,14 @@ const Inventory = () => {
                       onChange={(e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          if (!file.type.match("image.*")) {
+                          if (!file.type.match('image.*')) {
                             toast.warning(
-                              "Please select an image file (JPEG, PNG)",
+                              'Please select an image file (JPEG, PNG)'
                             );
                             return;
                           }
                           if (file.size > 2 * 1024 * 1024) {
-                            toast.warning("File size should be less than 2MB");
+                            toast.warning('File size should be less than 2MB');
                             return;
                           }
 
@@ -819,7 +819,7 @@ const Inventory = () => {
                     type="submit"
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                   >
-                    {isLoading ? "Loading" : "Update Brand"}
+                    {isLoading ? 'Loading' : 'Update Brand'}
                   </button>
                 </div>
               </form>
@@ -879,7 +879,7 @@ const Inventory = () => {
                           />
                         </svg>
                         <p className="mb-1 text-sm text-gray-500">
-                          <span className="font-semibold">Click to upload</span>{" "}
+                          <span className="font-semibold">Click to upload</span>{' '}
                           or drag and drop
                         </p>
                         <p className="text-xs text-gray-500">
@@ -945,7 +945,7 @@ const Inventory = () => {
                     type="submit"
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                   >
-                    {isLoading ? "Loading" : "Add Brand"}
+                    {isLoading ? 'Loading' : 'Add Brand'}
                   </button>
                 </div>
               </form>
@@ -960,8 +960,8 @@ const Inventory = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h3 className="text-lg font-bold mb-4">
               {selectedCategoryForOffer.offerPercentage
-                ? "Update Offer"
-                : "Add Offer"}{" "}
+                ? 'Update Offer'
+                : 'Add Offer'}{' '}
               for {selectedCategoryForOffer.categoryName}
             </h3>
             <input
@@ -977,7 +977,7 @@ const Inventory = () => {
               <button
                 onClick={() => {
                   setSelectedCategoryForOffer(null);
-                  setOfferPercentage("");
+                  setOfferPercentage('');
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
@@ -989,8 +989,8 @@ const Inventory = () => {
                 disabled={!offerPercentage}
               >
                 {selectedCategoryForOffer.offerPercentage
-                  ? "Update Offer"
-                  : "Apply Offer"}
+                  ? 'Update Offer'
+                  : 'Apply Offer'}
               </button>
               {selectedCategoryForOffer.offerPercentage && (
                 <button
@@ -1033,7 +1033,7 @@ const Inventory = () => {
       )}
 
       {/* Shows the categories */}
-      {selectedOption === "category" && (
+      {selectedOption === 'category' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {categoryCounts.map((category) => (
             <InventoryCard
@@ -1053,7 +1053,7 @@ const Inventory = () => {
       )}
 
       {/* Shows the brands */}
-      {selectedOption === "brand" && (
+      {selectedOption === 'brand' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {brandCounts.map((brand) => (
             <InventoryCard

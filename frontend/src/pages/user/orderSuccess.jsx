@@ -1,23 +1,23 @@
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const OrderSuccessPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     // Replace current history so user can’t go back
-    window.history.replaceState(null, "", window.location.href);
+    window.history.replaceState(null, '', window.location.href);
 
     const handlePopState = () => {
-      navigate("/", { replace: true }); // Always go to home on back
+      navigate('/', { replace: true }); // Always go to home on back
     };
 
     // Listen to back/forward navigation
-    window.addEventListener("popstate", handlePopState);
+    window.addEventListener('popstate', handlePopState);
 
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener('popstate', handlePopState);
     };
   }, [navigate]);
 
@@ -36,10 +36,10 @@ const OrderSuccessPage = () => {
     PaymentStatus,
   } = order;
 
-  const formattedDate = new Date(DeliveryDate).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
+  const formattedDate = new Date(DeliveryDate).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
   });
 
   return (
@@ -85,8 +85,8 @@ const OrderSuccessPage = () => {
           <strong>Alternate Phone:</strong> {Order_Address.alternativePhone}
         </p>
         <p>
-          <strong>Full Address:</strong> {Order_Address.house},{" "}
-          {Order_Address.locality}, {Order_Address.city}, {Order_Address.state},{" "}
+          <strong>Full Address:</strong> {Order_Address.house},{' '}
+          {Order_Address.locality}, {Order_Address.city}, {Order_Address.state},{' '}
           {Order_Address.country} - {Order_Address.pincode}
         </p>
       </div>
@@ -134,13 +134,13 @@ const OrderSuccessPage = () => {
 
       <div className="flex justify-center gap-4 mt-8">
         <button
-          onClick={() => navigate("/my-orders")}
+          onClick={() => navigate('/my-orders')}
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg"
         >
           View My Orders
         </button>
         <button
-          onClick={() => navigate("/collection")}
+          onClick={() => navigate('/collection')}
           className="bg-gray-800 hover:bg-gray-900 text-white font-medium px-6 py-2 rounded-lg"
         >
           Continue Shopping

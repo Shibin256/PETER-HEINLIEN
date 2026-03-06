@@ -1,24 +1,24 @@
-import { useState } from "react";
-import { toast } from "react-toastify";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import usePasswordVal from "../../../usePasswordVal";
-import MainThemeButton from "../../../components/common/MainThemeButton";
-import AuthInput from "../../../components/common/AuthInput";
-import { changePassword } from "../../../features/accountSettings/accountSlice";
-import { setUser } from "../../../features/auth/authSlice";
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import usePasswordVal from '../../../usePasswordVal';
+import MainThemeButton from '../../../components/common/MainThemeButton';
+import AuthInput from '../../../components/common/AuthInput';
+import { changePassword } from '../../../features/accountSettings/accountSlice';
+import { setUser } from '../../../features/auth/authSlice';
 
 const EditPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const profileData = location.state?.profileData;
   const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const dispatch = useDispatch();
 
@@ -26,21 +26,21 @@ const EditPassword = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === "newPassword") {
+    if (name === 'newPassword') {
       const validationMsg = usePasswordVal(value);
       setError(validationMsg);
       setIsPasswordValid(!validationMsg);
     }
 
-    if (name === "confirmPassword") {
+    if (name === 'confirmPassword') {
       if (!isPasswordValid) {
-        setError("Enter a valid password first.");
+        setError('Enter a valid password first.');
         return;
       }
       if (formData.newPassword !== value) {
-        setError("Passwords do not match");
+        setError('Passwords do not match');
       } else {
-        setError("");
+        setError('');
       }
     }
   };
@@ -55,7 +55,7 @@ const EditPassword = () => {
         !formData.newPassword ||
         !formData.confirmPassword
       ) {
-        toast.error("All fields are required");
+        toast.error('All fields are required');
         return;
       }
 
@@ -67,13 +67,13 @@ const EditPassword = () => {
       }
 
       if (formData.newPassword !== formData.confirmPassword) {
-        setError("Passwords do not match");
+        setError('Passwords do not match');
         return;
       }
 
       // ✅ Use await
       const res = await dispatch(
-        changePassword({ userId: profileData.id, data: formData }),
+        changePassword({ userId: profileData.id, data: formData })
       );
 
       const message = res.payload;
@@ -84,14 +84,14 @@ const EditPassword = () => {
 
       if (updatedUser) {
         dispatch(setUser({ user: updatedUser }));
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        navigate("/my-profile");
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        navigate('/my-profile');
       }
     } catch (err) {
       const message =
         err?.response?.data?.message ||
         err?.message ||
-        "Failed to update password";
+        'Failed to update password';
       toast.error(message);
     } finally {
       setLoading(false);

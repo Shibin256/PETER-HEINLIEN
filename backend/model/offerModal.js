@@ -22,7 +22,7 @@ const offerSchema = new mongoose.Schema(
     endDate: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model('Offer', offerSchema);

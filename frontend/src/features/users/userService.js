@@ -1,10 +1,10 @@
-import adminAxiosInstance from "../../api/adminAxiosInstance";
+import adminAxiosInstance from '../../api/adminAxiosInstance';
 
 //fetch users
 const getUsers = async (page, limit, search) => {
   const params = new URLSearchParams({ page, limit });
   if (search) {
-    params.append("search", search);
+    params.append('search', search);
   }
 
   const res = await adminAxiosInstance.get(`/api/v1/admin/users`, {
@@ -15,7 +15,7 @@ const getUsers = async (page, limit, search) => {
 //block and ublock user
 const toggleUserBlock = async (userId) => {
   const res = await adminAxiosInstance.patch(
-    `/api/v1/admin/user/${userId}/block`,
+    `/api/v1/admin/user/${userId}/block`
   );
   return res.data;
 };

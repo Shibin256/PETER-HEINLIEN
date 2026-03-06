@@ -1,25 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import {
-  fetchUsers,
-  toggleUserBlock,
-} from "../../features/users/userSlice";
-import { FaUser } from "react-icons/fa";
-import Swal from "sweetalert2";
-import AuthInput from "../../components/common/AuthInput";
-import { useRef } from "react";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { fetchUsers, toggleUserBlock } from '../../features/users/userSlice';
+import { FaUser } from 'react-icons/fa';
+import Swal from 'sweetalert2';
+import AuthInput from '../../components/common/AuthInput';
+import { useRef } from 'react';
 
 const UserList = () => {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
-  const { users, loading, error, currentPage, totalPages,totalUsers,blockedUsers } = useSelector(
-    (state) => state.users,
-  );
+  const {
+    users,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    totalUsers,
+    blockedUsers,
+  } = useSelector((state) => state.users);
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -43,26 +46,26 @@ const UserList = () => {
   }, [page]);
 
   const handleToggleBlock = (user) => {
-    const action = user.isBlocked ? "unblock" : "block";
+    const action = user.isBlocked ? 'unblock' : 'block';
 
     Swal.fire({
       title: `Are you sure?`,
       text: `This will ${action} the user.`,
-      icon: "warning",
+      icon: 'warning',
       showCancelButton: true,
       confirmButtonText: `Yes, ${action}!`,
-      cancelButtonText: "Cancel",
+      cancelButtonText: 'Cancel',
       buttonsStyling: false,
       customClass: {
         confirmButton:
-          "bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2",
+          'bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded mr-2',
         cancelButton:
-          "bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded",
+          'bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded',
       },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(toggleUserBlock(user._id)).then((res) => {
-          if (res.type.endsWith("/fulfilled")) {
+          if (res.type.endsWith('/fulfilled')) {
             toast.success(`✅ User ${action}ed successfully!`);
           } else {
             toast.error(res?.error?.message || `Failed to ${action} user.`);
@@ -75,9 +78,9 @@ const UserList = () => {
   if (loading) return <p className="text-center py-4">Loading users...</p>;
   if (error) {
     const errorMessage =
-      typeof error === "string"
+      typeof error === 'string'
         ? error
-        : error?.message || "An unknown error occurred.";
+        : error?.message || 'An unknown error occurred.';
     return <p className="text-red-500 text-center">{errorMessage}</p>;
   }
 
@@ -164,11 +167,11 @@ const UserList = () => {
                       onClick={() => handleToggleBlock(user)}
                       className={`inline-flex items-center px-3 py-1 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                         user.isBlocked
-                          ? "bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500"
-                          : "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500"
+                          ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 focus:ring-green-500'
+                          : 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200 focus:ring-yellow-500'
                       }`}
                     >
-                      {user.isBlocked ? "Unblock" : "Block"}
+                      {user.isBlocked ? 'Unblock' : 'Block'}
                     </button>
                   </div>
                 </td>

@@ -1,8 +1,8 @@
-import adminAxiosInstance from "../../api/adminAxiosInstance";
-import axiosInstance from "../../api/axiosInstance";
+import adminAxiosInstance from '../../api/adminAxiosInstance';
+import axiosInstance from '../../api/axiosInstance';
 
 const createCoupons = async (data) => {
-  const response = await adminAxiosInstance.post("/api/v1/admin/coupons", data);
+  const response = await adminAxiosInstance.post('/api/v1/admin/coupons', data);
   return response.data;
 };
 
@@ -10,28 +10,28 @@ const fetchAllCoupons = async (search, page, limit) => {
   const params = new URLSearchParams({ page, limit });
 
   if (search) {
-    params.append("search", search);
+    params.append('search', search);
   }
 
-  const response = await adminAxiosInstance.get("/api/v1/admin/coupons", {
+  const response = await adminAxiosInstance.get('/api/v1/admin/coupons', {
     params: params,
   });
   return response.data;
 };
 
 const fetchAdsCoupons = async () => {
-  const response = await axiosInstance.get("/api/v1/users/coupons");
+  const response = await axiosInstance.get('/api/v1/users/coupons');
   return response.data;
 };
 
 const fetchUserCoupons = async () => {
-  const response = await axiosInstance.get("/api/v1/users/all/coupons");
+  const response = await axiosInstance.get('/api/v1/users/all/coupons');
   return response.data;
 };
 
 const deleteCoupon = async (couponId) => {
   const response = await adminAxiosInstance.delete(
-    `/api/v1/admin/coupons/${couponId}`,
+    `/api/v1/admin/coupons/${couponId}`
   );
   return response.data;
 };
@@ -47,13 +47,13 @@ const updateCoupon = async (data) => {
       maxDiscount: data.maxDiscount,
       usageLimit: data.usageLimit,
       expirationDate: data.expirationDate,
-    },
+    }
   );
   return response.data;
 };
 
 const applyCoupon = async ({ userId, couponCode }) => {
-  const response = await axiosInstance.post("/api/v1/users/coupons", {
+  const response = await axiosInstance.post('/api/v1/users/coupons', {
     userId,
     couponCode,
   });
@@ -65,7 +65,7 @@ const removeCoupon = async (userId, couponId) => {
     `/api/v1/users/coupons/${couponId}`,
     {
       data: { userId }, // this is how you pass body in axios DELETE
-    },
+    }
   );
   return response.data;
 };

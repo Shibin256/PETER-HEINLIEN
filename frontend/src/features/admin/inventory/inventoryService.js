@@ -1,7 +1,7 @@
-import adminAxiosInstance from "../../../api/adminAxiosInstance";
+import adminAxiosInstance from '../../../api/adminAxiosInstance';
 
 const addCategory = async (category) => {
-  const res = await adminAxiosInstance.post("/api/v1/admin/category", {
+  const res = await adminAxiosInstance.post('/api/v1/admin/category', {
     category,
   });
   return res.data;
@@ -19,7 +19,7 @@ const editCategory = async (id, category) => {
 };
 
 const addBrand = async (formData) => {
-  const res = await adminAxiosInstance.post("/api/v1/admin/brand", formData);
+  const res = await adminAxiosInstance.post('/api/v1/admin/brand', formData);
   return res.data;
 };
 
@@ -31,7 +31,7 @@ const deleteBrnad = async (id) => {
 const editBrand = async (id, data) => {
   const res = await adminAxiosInstance.put(`api/v1/admin/brand/${id}`, data, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
     withCredentials: true,
   });
@@ -39,7 +39,7 @@ const editBrand = async (id, data) => {
 };
 
 const addCategoryOffer = async ({ categoryId, percentage }) => {
-  const res = await adminAxiosInstance.post("/api/v1/admin/offer", {
+  const res = await adminAxiosInstance.post('/api/v1/admin/offer', {
     categoryId,
     percentage,
   });
@@ -48,7 +48,7 @@ const addCategoryOffer = async ({ categoryId, percentage }) => {
 
 const removeCategoryOffer = async (categoryId) => {
   const res = await adminAxiosInstance.delete(
-    `/api/v1/admin/offer/${categoryId}`,
+    `/api/v1/admin/offer/${categoryId}`
   );
   return res.data;
 };

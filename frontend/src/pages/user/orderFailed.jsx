@@ -1,10 +1,10 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   XCircleIcon,
   ArrowPathIcon,
   HomeIcon,
   CreditCardIcon,
-} from "@heroicons/react/24/solid";
+} from '@heroicons/react/24/solid';
 
 export default function OrderFailed() {
   const navigate = useNavigate();
@@ -28,9 +28,8 @@ export default function OrderFailed() {
         </div>
 
         <div className="space-y-4">
-
           <button
-            onClick={() => navigate("/my-orders")}
+            onClick={() => navigate('/my-orders')}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl shadow-md transition-all duration-300 transform hover:-translate-y-1"
           >
             <CreditCardIcon className="w-5 h-5" />
@@ -46,7 +45,7 @@ export default function OrderFailed() {
           </button>
 
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl transition-all duration-300"
           >
             <HomeIcon className="w-5 h-5" />
@@ -56,7 +55,7 @@ export default function OrderFailed() {
 
         <div className="mt-8 pt-6 border-t border-gray-100">
           <p className="text-sm text-gray-500">
-            Need help?{" "}
+            Need help?{' '}
             <a href="/contact" className="text-red-500 hover:underline">
               Contact support
             </a>

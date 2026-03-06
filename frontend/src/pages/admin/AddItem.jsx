@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import AuthInput from "../../components/common/AuthInput";
-import SelectInput from "../../components/common/SelectInput";
-import { toast } from "react-toastify";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import AuthInput from '../../components/common/AuthInput';
+import SelectInput from '../../components/common/SelectInput';
+import { toast } from 'react-toastify';
 import {
   addProduct,
   getBrandAndCollection,
   resetProductState,
-} from "../../features/products/productSlice";
-import CropModal from "../../components/common/CropModel";
-import { useNavigate } from "react-router-dom";
+} from '../../features/products/productSlice';
+import CropModal from '../../components/common/CropModel';
+import { useNavigate } from 'react-router-dom';
 
 function AddItem() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
-  const [productName, setProductName] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [tags, setTags] = useState("");
-  const [brand, setBrand] = useState("");
-  const [price, setPrice] = useState("");
+  const [productName, setProductName] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [tags, setTags] = useState('');
+  const [brand, setBrand] = useState('');
+  const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,21 +38,21 @@ function AddItem() {
   //handiling the images upload
   const handleImageUpload = (e) => {
     const validImageTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/jpg",
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/jpg',
     ];
     const files = Array.from(e.target.files);
     const total = images.length + files.length;
     for (let file of files) {
       if (!validImageTypes.includes(file.type)) {
-        toast.error("The file need to be a image format");
+        toast.error('The file need to be a image format');
         return;
       }
     }
     if (total > 4) {
-      toast.error("You can only upload 4 images max.");
+      toast.error('You can only upload 4 images max.');
       return;
     }
 
@@ -116,12 +116,12 @@ function AddItem() {
       !quantity ||
       images.length === 0
     ) {
-      toast.error("All fields are required and cannot be empty.");
+      toast.error('All fields are required and cannot be empty.');
       return;
     }
 
     if (images.length < 3) {
-      toast.error("The minimum of 3 images need to proceed");
+      toast.error('The minimum of 3 images need to proceed');
       return;
     }
 
@@ -132,23 +132,23 @@ function AddItem() {
       !nameRegex.test(trimmedName)
     ) {
       toast.error(
-        "Product name must be at least 3 characters and contain only letters, numbers, and spaces.",
+        'Product name must be at least 3 characters and contain only letters, numbers, and spaces.'
       );
       return;
     }
 
     const tagList = trimmedTags
-      .split(",")
+      .split(',')
       .map((tag) => tag.trim())
       .filter(Boolean);
     if (tagList.length === 0) {
-      toast.error("Please enter at least one valid tag.");
+      toast.error('Please enter at least one valid tag.');
       return;
     }
 
     const numericPrice = Number(price);
     if (isNaN(numericPrice) || numericPrice <= 0) {
-      toast.error("Price must be a valid number greater than 0.");
+      toast.error('Price must be a valid number greater than 0.');
       return;
     }
 
@@ -159,16 +159,16 @@ function AddItem() {
       !Number.isInteger(numericQuantity)
     ) {
       toast.error(
-        "Quantity must be a valid whole number greater than or equal to 0.",
+        'Quantity must be a valid whole number greater than or equal to 0.'
       );
       return;
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     for (const img of images) {
       if (!allowedTypes.includes(img.file.type)) {
         toast.error(
-          `Invalid image type: ${img.file.name}. Only JPG, PNG, and WebP are allowed.`,
+          `Invalid image type: ${img.file.name}. Only JPG, PNG, and WebP are allowed.`
         );
         return;
       }
@@ -179,27 +179,27 @@ function AddItem() {
     }
 
     const formData = new FormData();
-    formData.append("name", trimmedName);
-    formData.append("description", trimmedDescription);
-    formData.append("category", trimmedCategory);
-    formData.append("tags", tagList.join(","));
-    formData.append("brand", trimmedBrand);
-    formData.append("price", numericPrice);
-    formData.append("quantity", numericQuantity);
-    images.forEach((img) => formData.append("images", img.file));
+    formData.append('name', trimmedName);
+    formData.append('description', trimmedDescription);
+    formData.append('category', trimmedCategory);
+    formData.append('tags', tagList.join(','));
+    formData.append('brand', trimmedBrand);
+    formData.append('price', numericPrice);
+    formData.append('quantity', numericQuantity);
+    images.forEach((img) => formData.append('images', img.file));
 
     setIsSubmitting(true);
     try {
       const res = await dispatch(addProduct(formData));
-      if (res.type.endsWith("fulfilled")) {
-        toast.success("✅ Product added successfully!");
-        navigate("/admin/products");
-        setProductName("");
-        setDescription("");
-        setCategory("");
-        setTags("");
-        setBrand("");
-        setPrice("");
+      if (res.type.endsWith('fulfilled')) {
+        toast.success('✅ Product added successfully!');
+        navigate('/admin/products');
+        setProductName('');
+        setDescription('');
+        setCategory('');
+        setTags('');
+        setBrand('');
+        setPrice('');
         setQuantity(0);
         setImages([]);
         dispatch(resetProductState());
@@ -207,11 +207,11 @@ function AddItem() {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         } else {
-          toast.error(res.payload?.message || "Failed to create product");
+          toast.error(res.payload?.message || 'Failed to create product');
         }
       }
     } catch (error) {
-      toast.error(error?.message || "Failed to add product.");
+      toast.error(error?.message || 'Failed to add product.');
     } finally {
       setIsSubmitting(false);
     }
@@ -351,7 +351,7 @@ function AddItem() {
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className={`py-3 px-8 rounded-full text-white font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+          className={`py-3 px-8 rounded-full text-white font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
           {isSubmitting ? (
             <>
@@ -378,7 +378,7 @@ function AddItem() {
               Processing...
             </>
           ) : (
-            "Add Product"
+            'Add Product'
           )}
         </button>
       </div>

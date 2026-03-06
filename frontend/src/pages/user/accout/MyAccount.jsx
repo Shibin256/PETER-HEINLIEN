@@ -1,13 +1,13 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import Title from "../../../components/common/Title";
-import AccountCard from "../../../components/user/AccountCard";
-import myOrders from "../../../assets/myOrders.png";
-import password from "../../../assets/passwordAndSecurity.png";
-import address from "../../../assets/address.png";
-import coupon from "../../../assets/coupon.png";
-import wallet from "../../../assets/wallet.png";
-import contact from "../../../assets/contact.png";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Title from '../../../components/common/Title';
+import AccountCard from '../../../components/user/AccountCard';
+import myOrders from '../../../assets/myOrders.png';
+import password from '../../../assets/passwordAndSecurity.png';
+import address from '../../../assets/address.png';
+import coupon from '../../../assets/coupon.png';
+import wallet from '../../../assets/wallet.png';
+import contact from '../../../assets/contact.png';
 
 const MyAccount = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const MyAccount = () => {
     <div className="py-10 px-5 sm:px-10 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <Title text1={"My"} text2={"Account"} />
+          <Title text1={'My'} text2={'Account'} />
           <p className="text-gray-500 max-w-lg mx-auto">
             Manage your account settings, orders, and personal information
           </p>
@@ -28,7 +28,7 @@ const MyAccount = () => {
             title="MY ORDERS"
             description="Track, return, or buy things again"
             onclickFun={() => {
-              navigate("/my-orders");
+              navigate('/my-orders');
             }}
           />
 
@@ -37,7 +37,7 @@ const MyAccount = () => {
             title="PASSWORD & SECURITY"
             description="Edit login, name, and mobile number"
             onclickFun={() => {
-              navigate("/my-profile");
+              navigate('/my-profile');
             }}
           />
 
@@ -46,7 +46,7 @@ const MyAccount = () => {
             title="ADDRESS"
             description="Edit addresses for orders and gifts"
             onclickFun={() => {
-              navigate("/my-address");
+              navigate('/my-address');
             }}
           />
 
@@ -55,7 +55,7 @@ const MyAccount = () => {
             title="COUPONS"
             description="Get exciting offers and discounts"
             onclickFun={() => {
-              navigate("/coupons");
+              navigate('/coupons');
             }}
           />
 
@@ -64,7 +64,7 @@ const MyAccount = () => {
             title="CONTACT US"
             description="Reach our customer service team"
             onclickFun={() => {
-              navigate("/contact");
+              navigate('/contact');
             }}
           />
 
@@ -73,7 +73,7 @@ const MyAccount = () => {
             title="WALLET"
             description="View balance and add money"
             onclickFun={() => {
-              navigate("/wallet");
+              navigate('/wallet');
             }}
           />
         </div>

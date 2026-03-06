@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
-import Title from "../common/Title";
-import ProductCard from "../common/ProductCard";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from 'react';
+import Title from '../common/Title';
+import ProductCard from '../common/ProductCard';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCollection,
   fetchCollectionWithoutUser,
-} from "../../features/products/productSlice";
+} from '../../features/products/productSlice';
 
 const LatestCollection = () => {
   const dispatch = useDispatch();
-  const storedUser = localStorage.getItem("user");
+  const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
   const { latestCollection } = useSelector((state) => state.products);
 

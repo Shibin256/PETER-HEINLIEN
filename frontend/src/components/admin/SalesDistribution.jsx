@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   PieChart,
   Pie,
@@ -6,17 +6,17 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
-const COLORS = ["#4285F4", "#FFBB28", "#00C49F"];
+const COLORS = ['#4285F4', '#FFBB28', '#00C49F'];
 
 const SalesDistribution = ({ totalSales, totalDiscount }) => {
   const netSales = totalSales - totalDiscount;
 
   const data = [
-     { name: "Gross Sales", value: Number(totalSales.toFixed(2)) },
-    { name: "Discounts", value: Number(totalDiscount.toFixed(2)) },
-    { name: "Net Sales", value: Number(netSales.toFixed(2)) },
+    { name: 'Gross Sales', value: Number(totalSales.toFixed(2)) },
+    { name: 'Discounts', value: Number(totalDiscount.toFixed(2)) },
+    { name: 'Net Sales', value: Number(netSales.toFixed(2)) },
   ];
 
   return (

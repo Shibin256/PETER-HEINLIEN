@@ -1,32 +1,32 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import orderService from "./orderService";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import orderService from './orderService';
 
 export const placeOrder = createAsyncThunk(
-  "user/placeOrder",
+  'user/placeOrder',
   async (orderData, { rejectWithValue }) => {
     try {
       const res = await orderService.placeOrder(orderData);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const getOrders = createAsyncThunk(
-  "user/getOrders",
-  async ({ userId, search = "", page = 1, limit = 4 }, { rejectWithValue }) => {
+  'user/getOrders',
+  async ({ userId, search = '', page = 1, limit = 4 }, { rejectWithValue }) => {
     try {
       const res = await orderService.getOrders(userId, search, page, limit);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const cancelOrderItem = createAsyncThunk(
-  "user/cancelOrderItem",
+  'user/cancelOrderItem',
   async ({ itemOrderId, reason }, { rejectWithValue }) => {
     try {
       const res = await orderService.cancelOrderItem({
@@ -35,13 +35,13 @@ export const cancelOrderItem = createAsyncThunk(
       });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const cancelSingleOrderItem = createAsyncThunk(
-  "user/cancelSingleOrderItem",
+  'user/cancelSingleOrderItem',
   async ({ itemOrderId, reason }, { rejectWithValue }) => {
     try {
       const res = await orderService.cancelSingleOrderItem({
@@ -50,58 +50,58 @@ export const cancelSingleOrderItem = createAsyncThunk(
       });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const verifyCancel = createAsyncThunk(
-  "user/verifyCancel",
+  'user/verifyCancel',
   async (itemOrderId, { rejectWithValue }) => {
     try {
       const res = await orderService.cancelVerify(itemOrderId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const changeOrderStatus = createAsyncThunk(
-  "user/changestatus",
+  'user/changestatus',
   async ({ itemOrderId, data }, { rejectWithValue }) => {
     try {
       const res = await orderService.changeOrderStatus({ itemOrderId, data });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchAllOrders = createAsyncThunk(
-  "user/fetchAllOrders",
+  'user/fetchAllOrders',
   async (
-    { search = "", page = 1, limit = 8, sort = "" },
-    { rejectWithValue },
+    { search = '', page = 1, limit = 8, sort = '' },
+    { rejectWithValue }
   ) => {
     try {
       const response = await orderService.getALlOrders(
         search,
         page,
         limit,
-        sort,
+        sort
       );
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const returnOrderItem = createAsyncThunk(
-  "user/returnOrderItem",
-  async ({ itemOrderId, reason = "", deatials = "" }, { rejectWithValue }) => {
+  'user/returnOrderItem',
+  async ({ itemOrderId, reason = '', deatials = '' }, { rejectWithValue }) => {
     try {
       const res = await orderService.returnOrderItem({
         itemOrderId: itemOrderId,
@@ -110,82 +110,82 @@ export const returnOrderItem = createAsyncThunk(
       });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const retrunVerify = createAsyncThunk(
-  "user/retrunVerify",
+  'user/retrunVerify',
   async ({ itemOrderId }, { rejectWithValue }) => {
     try {
       const res = await orderService.retrunVerify(itemOrderId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const singleCancelVerify = createAsyncThunk(
-  "user/singleCancelVerify",
+  'user/singleCancelVerify',
   async ({ itemOrderId }, { rejectWithValue }) => {
     try {
       const res = await orderService.singleCancelVerify(itemOrderId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const downloadInvoice = createAsyncThunk(
-  "user/downloadInvoice",
+  'user/downloadInvoice',
   async ({ itemOrderId }, { rejectWithValue }) => {
     try {
       await orderService.downloadInvoice(itemOrderId);
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const createPaymentOrder = createAsyncThunk(
-  "order/createPaymentOrder",
+  'order/createPaymentOrder',
   async (totalPrice, thunkAPI) => {
     try {
       return await orderService.createRazorpayOrder(totalPrice);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
     }
-  },
+  }
 );
 
 export const verifyPayment = createAsyncThunk(
-  "order/verifyPayment",
+  'order/verifyPayment',
   async (paymentDetails, thunkAPI) => {
     try {
       return await orderService.verifyRazorpayPayment(paymentDetails);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
     }
-  },
+  }
 );
 
 export const verifyPaymentForWallet = createAsyncThunk(
-  "order/verifyPayment",
+  'order/verifyPayment',
   async (paymentDetails, thunkAPI) => {
     try {
       return await orderService.verifyPaymentForWallet(paymentDetails);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
     }
-  },
+  }
 );
 
 export const addReview = createAsyncThunk(
-  "user/addReview",
-  async ({ itemId, rating = 0, review = "" }, { rejectWithValue }) => {
+  'user/addReview',
+  async ({ itemId, rating = 0, review = '' }, { rejectWithValue }) => {
     try {
       const res = await orderService.submitReview({
         itemId: itemId,
@@ -194,25 +194,25 @@ export const addReview = createAsyncThunk(
       });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const updateOrderStatus = createAsyncThunk(
-  "user/updateOrderStatus",
+  'user/updateOrderStatus',
   async (orderId, { rejectWithValue }) => {
     try {
       const res = await orderService.updateOrderStatus(orderId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 const orderSlice = createSlice({
-  name: "orders",
+  name: 'orders',
   initialState: {
     orders: [],
     currentPlaceOrder: [],

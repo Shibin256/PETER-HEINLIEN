@@ -1,68 +1,68 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import bannerService from "./bannerService";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import bannerService from './bannerService';
 
 export const createBanner = createAsyncThunk(
-  "banner/add",
+  'banner/add',
   async (formData, { rejectWithValue }) => {
     try {
       const res = await bannerService.createBanner(formData);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const setActiveBanner = createAsyncThunk(
-  "banner/setActiveBanner",
+  'banner/setActiveBanner',
   async (bannerId, { rejectWithValue }) => {
     try {
       const res = await bannerService.setActiveBanner(bannerId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const deleteBanner = createAsyncThunk(
-  "banner/delete",
+  'banner/delete',
   async (bannerId, { rejectWithValue }) => {
     try {
       const res = await bannerService.deleteBanner(bannerId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchBanners = createAsyncThunk(
-  "banner/get",
+  'banner/get',
   async (_, { rejectWithValue }) => {
     try {
       const res = await bannerService.fetchBanners();
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const fetchHomeBanner = createAsyncThunk(
-  "banner/fetchHomeBanner",
+  'banner/fetchHomeBanner',
   async (_, { rejectWithValue }) => {
     try {
       const res = await bannerService.fetchHomeBanner();
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 const bannerSlice = createSlice({
-  name: "banner",
+  name: 'banner',
   initialState: {
     banners: [],
     homeBanner: {},

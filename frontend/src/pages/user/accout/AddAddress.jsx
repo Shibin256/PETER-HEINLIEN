@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import Title from "../../../components/common/Title";
-import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import { addAddress } from "../../../features/accountSettings/accountSlice";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import Title from '../../../components/common/Title';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { addAddress } from '../../../features/accountSettings/accountSlice';
+import { useNavigate } from 'react-router-dom';
 
 const AddAddress = () => {
   const [addressData, setAddressData] = useState({
-    name: "",
-    houseNo: "",
-    locality: "",
-    city: "",
-    state: "",
-    pin: "",
-    phone: "",
-    altPhone: "",
-    addressType: "home",
+    name: '',
+    houseNo: '',
+    locality: '',
+    city: '',
+    state: '',
+    pin: '',
+    phone: '',
+    altPhone: '',
+    addressType: 'home',
     defaultAddress: false,
   });
 
@@ -24,49 +24,49 @@ const AddAddress = () => {
   const { user } = useSelector((state) => state.auth);
 
   const indianStates = [
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chhattisgarh",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Lakshadweep",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal",
-    "Andaman and Nicobar Islands",
-    "Chandigarh",
-    "Dadra and Nagar Haveli and Daman and Diu",
-    "Delhi",
-    "Jammu and Kashmir",
-    "Ladakh",
-    "Puducherry",
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Lakshadweep',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
+    'Jammu and Kashmir',
+    'Ladakh',
+    'Puducherry',
   ];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setAddressData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -77,13 +77,13 @@ const AddAddress = () => {
 
     // Basic presence check
     const requiredFields = [
-      "name",
-      "houseNo",
-      "locality",
-      "city",
-      "state",
-      "pin",
-      "phone",
+      'name',
+      'houseNo',
+      'locality',
+      'city',
+      'state',
+      'pin',
+      'phone',
     ];
 
     requiredFields.forEach((field) => {
@@ -97,7 +97,7 @@ const AddAddress = () => {
       !/^[a-zA-Z\s]{2,50}$/.test(addressData.name.trim())
     ) {
       errors.push(
-        "Name should only contain letters and be 2–50 characters long",
+        'Name should only contain letters and be 2–50 characters long'
       );
     }
 
@@ -105,10 +105,10 @@ const AddAddress = () => {
       addressData.houseNo &&
       !/^[a-zA-Z0-9\s/-]{1,20}$/.test(addressData.houseNo.trim())
     ) {
-      errors.push("House number contains invalid characters");
+      errors.push('House number contains invalid characters');
     }
 
-    ["locality", "city", "state"].forEach((field) => {
+    ['locality', 'city', 'state'].forEach((field) => {
       if (
         addressData[field] &&
         !/^[a-zA-Z\s]{2,50}$/.test(addressData[field].trim())
@@ -118,24 +118,24 @@ const AddAddress = () => {
     });
 
     if (addressData.pin && !/^\d{6}$/.test(addressData.pin.trim())) {
-      errors.push("PIN code must be a 6-digit number");
+      errors.push('PIN code must be a 6-digit number');
     }
 
     if (addressData.phone && !/^\d{10}$/.test(addressData.phone.trim())) {
-      errors.push("Phone number must be a valid 10-digit number");
+      errors.push('Phone number must be a valid 10-digit number');
     }
 
     if (addressData.altPhone) {
       if (!/^\d{10}$/.test(addressData.altPhone.trim())) {
-        errors.push("Alternative phone number must be 10 digits");
+        errors.push('Alternative phone number must be 10 digits');
       }
       if (addressData.altPhone === addressData.phone) {
-        errors.push("Alternative phone number cannot be the same as primary");
+        errors.push('Alternative phone number cannot be the same as primary');
       }
     }
 
     if (errors.length > 0) {
-      toast.error(errors.join("\n"));
+      toast.error(errors.join('\n'));
       return;
     }
 
@@ -155,38 +155,38 @@ const AddAddress = () => {
 
     try {
       const res = await dispatch(
-        addAddress({ userId: user._id, data: formattedAddress }),
+        addAddress({ userId: user._id, data: formattedAddress })
       );
       console.log(res);
-      if (res.type.endsWith("/fulfilled")) {
-        toast.success("✅ Address added successfully!");
-        navigate("/my-address");
+      if (res.type.endsWith('/fulfilled')) {
+        toast.success('✅ Address added successfully!');
+        navigate('/my-address');
       } else {
         if (res.payload?.errors && Array.isArray(res.payload.errors)) {
           toast.error(res.payload.errors[0]);
         } else {
-          toast.error(res?.error?.message || "Failed to add address.");
+          toast.error(res?.error?.message || 'Failed to add address.');
         }
       }
     } catch (error) {
       if (error.response?.data?.errors) {
         error.response.data.errors.forEach((err) => toast.error(err.msg));
       } else {
-        toast.error(error.response?.data?.message || "Something went wrong");
+        toast.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
     // Reset form
     setAddressData({
-      name: "",
-      houseNo: "",
-      locality: "",
-      city: "",
-      state: "",
-      pin: "",
-      phone: "",
-      altPhone: "",
-      addressType: "home",
+      name: '',
+      houseNo: '',
+      locality: '',
+      city: '',
+      state: '',
+      pin: '',
+      phone: '',
+      altPhone: '',
+      addressType: 'home',
       defaultAddress: false,
     });
   };
@@ -198,7 +198,7 @@ const AddAddress = () => {
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
-      <Title text1={"Add New"} text2={"Address"} />
+      <Title text1={'Add New'} text2={'Address'} />
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -214,7 +214,7 @@ const AddAddress = () => {
                   id="home"
                   name="addressType"
                   value="home"
-                  checked={addressData.addressType === "home"}
+                  checked={addressData.addressType === 'home'}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
@@ -231,7 +231,7 @@ const AddAddress = () => {
                   id="work"
                   name="addressType"
                   value="work"
-                  checked={addressData.addressType === "work"}
+                  checked={addressData.addressType === 'work'}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />

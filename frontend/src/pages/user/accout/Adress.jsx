@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
-import AddressCard from "../../../components/user/AdressCard";
-import Title from "../../../components/common/Title";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from 'react';
+import AddressCard from '../../../components/user/AdressCard';
+import Title from '../../../components/common/Title';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getAllAddress,
   removeAddress,
   setDefault,
-} from "../../../features/accountSettings/accountSlice";
-import { toast } from "react-toastify";
-import EditAddressModal from "../../../components/common/EditAddress";
-import { useState } from "react";
+} from '../../../features/accountSettings/accountSlice';
+import { toast } from 'react-toastify';
+import EditAddressModal from '../../../components/common/EditAddress';
+import { useState } from 'react';
 
 const Address = () => {
   const dispatch = useDispatch();
@@ -32,36 +32,36 @@ const Address = () => {
   const handleRemove = async (addrId) => {
     try {
       const resultAction = await dispatch(
-        removeAddress({ userId: user._id, addressId: addrId }),
+        removeAddress({ userId: user._id, addressId: addrId })
       ).unwrap();
       if (resultAction) {
-        toast.success("Address removed");
+        toast.success('Address removed');
         dispatch(getAllAddress(user._id));
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to remove address");
+      toast.error('Failed to remove address');
     }
   };
 
   const handleSetDefault = async (addrId) => {
     try {
       const resultAction = await dispatch(
-        setDefault({ userId: user._id, addressId: addrId }),
+        setDefault({ userId: user._id, addressId: addrId })
       ).unwrap();
       if (resultAction) {
-        toast.success("Default address set");
+        toast.success('Default address set');
         dispatch(getAllAddress(user._id));
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to set default address");
+      toast.error('Failed to set default address');
     }
   };
 
   return (
     <div className="p-4 max-w-6xl mx-auto">
-      <Title text1={"Your"} text2={"addresses"} />
+      <Title text1={'Your'} text2={'addresses'} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {addresses.map((addr) => (
           <div key={addr._id}>
@@ -81,7 +81,7 @@ const Address = () => {
             />
           </div>
         ))}
-        <Link to={"/add-address"}>
+        <Link to={'/add-address'}>
           <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 h-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="text-gray-400 mb-2">
               <svg

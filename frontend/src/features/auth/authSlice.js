@@ -1,23 +1,23 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  user: localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
+  user: localStorage.getItem('user')
+    ? JSON.parse(localStorage.getItem('user'))
     : null,
 
-  admin: localStorage.getItem("admin")
-    ? JSON.parse(localStorage.getItem("admin"))
+  admin: localStorage.getItem('admin')
+    ? JSON.parse(localStorage.getItem('admin'))
     : null,
 
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
-  isAdmin: localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))?.isAdmin || false
+  token: localStorage.getItem('token') || null,
+  isAuthenticated: !!localStorage.getItem('token'),
+  isAdmin: localStorage.getItem('user')
+    ? JSON.parse(localStorage.getItem('user'))?.isAdmin || false
     : false,
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     setUser: (state, action) => {

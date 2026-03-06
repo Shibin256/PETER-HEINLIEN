@@ -1,38 +1,38 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import dashboardService from "./dashboardService"; // API calls for dashboard
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import dashboardService from './dashboardService'; // API calls for dashboard
 
 //Fetch dashboard stats (orders, sales, revenue, users)
 export const fetchDashboardStats = createAsyncThunk(
-  "dashboard/fetchStats",
+  'dashboard/fetchStats',
   async (_, { rejectWithValue }) => {
     try {
       const res = await dashboardService.getStats();
       return res; // Should return { totalSales, totalOrders, totalUsers, revenue }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch dashboard stats",
+        error.response?.data || 'Failed to fetch dashboard stats'
       );
     }
-  },
+  }
 );
 
 export const getBestSellers = createAsyncThunk(
-  "dashboard/getBestSellers",
+  'dashboard/getBestSellers',
   async (_, { rejectWithValue }) => {
     try {
       const res = await dashboardService.getBestSellers();
       return res;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch dashboard stats",
+        error.response?.data || 'Failed to fetch dashboard stats'
       );
     }
-  },
+  }
 );
 
 // Fetch sales report (daily, weekly, monthly, yearly, custom)
 export const fetchSalesReport = createAsyncThunk(
-  "dashboard/fetchSalesReport",
+  'dashboard/fetchSalesReport',
   async ({ type, startDate, endDate }, { rejectWithValue }) => {
     try {
       const res = await dashboardService.getSalesReport({
@@ -43,14 +43,14 @@ export const fetchSalesReport = createAsyncThunk(
       return res; // Should return detailed sales data
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch sales report",
+        error.response?.data || 'Failed to fetch sales report'
       );
     }
-  },
+  }
 );
 
 export const downloadSalesReportExcel = createAsyncThunk(
-  "dashboard/downloadSalesReportExcel",
+  'dashboard/downloadSalesReportExcel',
   async ({ type, startDate, endDate }, { rejectWithValue }) => {
     try {
       const res = await dashboardService.downloadSalesReportExcel({
@@ -61,14 +61,14 @@ export const downloadSalesReportExcel = createAsyncThunk(
       return res;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch sales report",
+        error.response?.data || 'Failed to fetch sales report'
       );
     }
-  },
+  }
 );
 
 export const downloadSalesReportPdf = createAsyncThunk(
-  "dashboard/downloadSalesReportPdf",
+  'dashboard/downloadSalesReportPdf',
   async ({ type, startDate, endDate }, { rejectWithValue }) => {
     try {
       const res = await dashboardService.downloadSalesReportPdf({
@@ -79,15 +79,15 @@ export const downloadSalesReportPdf = createAsyncThunk(
       return res;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch sales report",
+        error.response?.data || 'Failed to fetch sales report'
       );
     }
-  },
+  }
 );
 
 // Slice
 const dashboardSlice = createSlice({
-  name: "dashboard",
+  name: 'dashboard',
   initialState: {
     loading: false,
     error: null,

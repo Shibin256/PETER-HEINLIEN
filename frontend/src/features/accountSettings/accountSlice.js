@@ -1,61 +1,61 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import accountService from "./accountService";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import accountService from './accountService';
 
 export const changeName = createAsyncThunk(
-  "user/account/changeName",
+  'user/account/changeName',
   async ({ userId, data }, thunkAPI) => {
     try {
       return await accountService.changeName(userId, data);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const changeMobile = createAsyncThunk(
-  "user/account/changeMobile",
+  'user/account/changeMobile',
   async ({ userId, data }, thunkAPI) => {
     try {
       return await accountService.changeMobile(userId, data);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const changePassword = createAsyncThunk(
-  "user/account/editPassword",
+  'user/account/editPassword',
   async ({ userId, data }, thunkAPI) => {
     try {
       return await accountService.changePassword(userId, data);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const imageUpload = createAsyncThunk(
-  "user/account/editProfile",
+  'user/account/editProfile',
   async ({ userId, data }, thunkAPI) => {
     try {
       const res = await accountService.uploadImage(userId, data);
       return res.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const addAddress = createAsyncThunk(
-  "user/account/addAdress",
+  'user/account/addAdress',
   async ({ userId, data }, thunkAPI) => {
     try {
       const res = await accountService.addAddress(userId, data);
@@ -64,70 +64,70 @@ export const addAddress = createAsyncThunk(
       console.error(error);
 
       return thunkAPI.rejectWithValue(
-        error.response?.data || { message: error.message },
+        error.response?.data || { message: error.message }
       );
     }
-  },
+  }
 );
 
 export const getAllAddress = createAsyncThunk(
-  "user/account/getAllAddress",
+  'user/account/getAllAddress',
   async (userId, thunkAPI) => {
     try {
       const res = await accountService.getAllAddress(userId);
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const removeAddress = createAsyncThunk(
-  "user/account/removeAddress",
+  'user/account/removeAddress',
   async ({ userId, addressId }, thunkAPI) => {
     try {
       const res = await accountService.removeAddress(userId, addressId);
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const setDefault = createAsyncThunk(
-  "user/account/setDefault",
+  'user/account/setDefault',
   async ({ userId, addressId }, thunkAPI) => {
     try {
       const res = await accountService.setDefault(userId, addressId);
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const updateAddress = createAsyncThunk(
-  "user/account/updateAdress",
+  'user/account/updateAdress',
   async ({ addressId, data }, thunkAPI) => {
     try {
       const res = await accountService.updateAdress(addressId, data);
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 const accountSlice = createSlice({
-  name: "account",
+  name: 'account',
   initialState: {
     user: [],
     addresses: [],

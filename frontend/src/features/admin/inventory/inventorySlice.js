@@ -1,32 +1,32 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import inventoryService from "./inventoryService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import inventoryService from './inventoryService';
 
 export const addCategory = createAsyncThunk(
-  "admin/addcategory",
+  'admin/addcategory',
   async (category, { rejectWithValue }) => {
     try {
       const res = await inventoryService.addCategory(category);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const deleteCategory = createAsyncThunk(
-  "admin/deleteCategory",
+  'admin/deleteCategory',
   async (id, { rejectWithValue }) => {
     try {
       const res = await inventoryService.deleteCategory(id);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const editCategory = createAsyncThunk(
-  "admin/editBrand",
+  'admin/editBrand',
   async ({ id, category }, { rejectWithValue }) => {
     try {
       const res = await inventoryService.editCategory(id, category);
@@ -34,35 +34,35 @@ export const editCategory = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
-  },
+  }
 );
 
 export const addBrand = createAsyncThunk(
-  "admin/addBand",
+  'admin/addBand',
   async (formData, { rejectWithValue }) => {
     try {
       const res = await inventoryService.addBrand(formData);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const deleteBrand = createAsyncThunk(
-  "admin/deleteBrand",
+  'admin/deleteBrand',
   async (id, { rejectWithValue }) => {
     try {
       const res = await inventoryService.deleteBrnad(id);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const editBrand = createAsyncThunk(
-  "admin/editBrand",
+  'admin/editBrand',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const res = await inventoryService.editBrand(id, data);
@@ -70,11 +70,11 @@ export const editBrand = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
-  },
+  }
 );
 
 export const addCategoryOffer = createAsyncThunk(
-  "product/addCategoryOffer",
+  'product/addCategoryOffer',
   async ({ categoryId, percentage }, { rejectWithValue }) => {
     try {
       const res = await inventoryService.addCategoryOffer({
@@ -83,25 +83,25 @@ export const addCategoryOffer = createAsyncThunk(
       });
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 export const removeCategoryOffer = createAsyncThunk(
-  "product/removeCategoryOffer",
+  'product/removeCategoryOffer',
   async (categoryId, { rejectWithValue }) => {
     try {
       const res = await inventoryService.removeCategoryOffer(categoryId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  },
+  }
 );
 
 const inventorySlice = createSlice({
-  name: "inventory",
+  name: 'inventory',
   initialState: {},
   reducers: {
     resetProductState: (state) => {

@@ -1,34 +1,34 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import walletService from "./walletService";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import walletService from './walletService';
 
 export const addToWallet = createAsyncThunk(
-  "add/wallet",
+  'add/wallet',
   async ({ userId, amount, paymentId }, thunkAPI) => {
     try {
       return await walletService.addToWallet(userId, amount, paymentId);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const getWallet = createAsyncThunk(
-  "get/wallet",
+  'get/wallet',
   async ({ userId, page = 1, limit = 8 }, thunkAPI) => {
     try {
       return await walletService.getWallet(userId, page, limit);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 const walletSlice = createSlice({
-  name: "wallet",
+  name: 'wallet',
   initialState: {
     walletAmount: 0,
     transactions: [],

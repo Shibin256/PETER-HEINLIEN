@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from "react";
-import Title from "../../components/common/Title";
+import React, { useEffect, useState } from 'react';
+import Title from '../../components/common/Title';
 import {
   createPaymentOrder,
   verifyPaymentForWallet,
-} from "../../features/orders/ordersSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { addToWallet, getWallet } from "../../features/wallet/walletSlice";
+} from '../../features/orders/ordersSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { addToWallet, getWallet } from '../../features/wallet/walletSlice';
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 const Wallet = () => {
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   // const [transactions, setTransactions] = useState([]);
   // const [paymentId, setPaymentId] = useState("");
   const dispatch = useDispatch();
-  const user = JSON.parse(localStorage.getItem("user")) || { name: "Guest" };
+  const user = JSON.parse(localStorage.getItem('user')) || { name: 'Guest' };
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setAmount("");
+    setAmount('');
   };
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
     document.body.appendChild(script);
   }, []);
@@ -34,9 +34,8 @@ const Wallet = () => {
   }, []);
 
   const { walletAmount, page, totalPages, loading, transactions } = useSelector(
-    (state) => state.wallet,
+    (state) => state.wallet
   );
-
 
   const handlePayments = async (amount) => {
     try {
@@ -48,35 +47,35 @@ const Wallet = () => {
           key: razorpayKey,
           amount: order.amount,
           currency: order.currency,
-          name: "Peter Heinlien Watches",
-          description: "Watch Order",
+          name: 'Peter Heinlien Watches',
+          description: 'Watch Order',
           order_id: order.id,
           handler: async (response) => {
             try {
               const verifyRes = await dispatch(
-                verifyPaymentForWallet(response),
+                verifyPaymentForWallet(response)
               ).unwrap();
               if (verifyRes.success) {
                 resolve(response.razorpay_payment_id);
               } else {
-                reject("Payment verification failed");
+                reject('Payment verification failed');
               }
             } catch (err) {
               console.log(err);
-              reject("Payment verification error");
+              reject('Payment verification error');
             }
           },
           prefill: {
-            name: "Customer Name",
-            email: "customer@example.com",
-            contact: "9999999999",
+            name: 'Customer Name',
+            email: 'customer@example.com',
+            contact: '9999999999',
           },
           theme: {
-            color: "#3399cc",
+            color: '#3399cc',
           },
           modal: {
             ondismiss: () => {
-              reject("Payment was cancelled by user");
+              reject('Payment was cancelled by user');
             },
           },
           retry: {
@@ -86,16 +85,16 @@ const Wallet = () => {
 
         const rzp = new window.Razorpay(options);
 
-        rzp.on("payment.failed", function (response) {
+        rzp.on('payment.failed', function (response) {
           const errorMessage =
-            response.error?.description || "Payment failed due to an error.";
+            response.error?.description || 'Payment failed due to an error.';
           reject(errorMessage);
         });
 
         rzp.open();
       });
     } catch (err) {
-      console.error("Razorpay init failed:", err);
+      console.error('Razorpay init failed:', err);
       return false;
     }
   };
@@ -104,25 +103,25 @@ const Wallet = () => {
 
   const handlePayment = async () => {
     if (!amount || isNaN(amount) || amount <= 0) {
-      toast.warning("Please enter a valid amount");
+      toast.warning('Please enter a valid amount');
       return;
     }
     const paymentId = await handlePayments(amount);
     if (paymentId) {
       await dispatch(
-        addToWallet({ userId: user._id, amount: amount, paymentId: paymentId }),
+        addToWallet({ userId: user._id, amount: amount, paymentId: paymentId })
       );
     }
 
     setIsModalOpen(false);
-    setAmount("");
+    setAmount('');
   };
 
   return (
     <div className="container mx-auto p-4 md:p-8 min-h-screen bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe]">
       {/* Header */}
       <div className="mb-8">
-        <Title text1={"My"} text2={"Wallet"} />
+        <Title text1={'My'} text2={'Wallet'} />
         <p className="text-[#527a85] mt-2">
           Manage your funds and transactions
         </p>
@@ -206,7 +205,7 @@ const Wallet = () => {
                   className="text-white bg-gradient-to-r from-[#003543] to-[#00758a] px-4 py-2 rounded-lg font-medium hover:opacity-90 transition duration-300 shadow-md"
                   onClick={() => {
                     navigator.clipboard.writeText(user.referralCode);
-                    toast.success("Referral code copied!");
+                    toast.success('Referral code copied!');
                   }}
                 >
                   Copy Code
@@ -321,7 +320,7 @@ const Wallet = () => {
                       ₹{transaction.amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#527a85]">
-                      {transaction.createdAt.split("T")[0]}
+                      {transaction.createdAt.split('T')[0]}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#527a85]">
                       {transaction.description}
@@ -329,9 +328,9 @@ const Wallet = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
                         className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          transaction.status === "success"
-                            ? "bg-[#e6f7ee] text-[#006644]"
-                            : "bg-[#ffebee] text-[#d32f2f]"
+                          transaction.status === 'success'
+                            ? 'bg-[#e6f7ee] text-[#006644]'
+                            : 'bg-[#ffebee] text-[#d32f2f]'
                         }`}
                       >
                         {transaction.status}
@@ -349,10 +348,10 @@ const Wallet = () => {
                           userId: user._id,
                           page: page - 1,
                           limit: 10,
-                        }),
+                        })
                       )
                     }
-                    className={`px-4 py-2 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+                    className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
                   >
                     Previous
                   </button>
@@ -369,10 +368,10 @@ const Wallet = () => {
                           userId: user._id,
                           page: page + 1,
                           limit: 10,
-                        }),
+                        })
                       )
                     }
-                    className={`px-4 py-2 rounded ${page >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+                    className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
                   >
                     Next
                   </button>
@@ -448,7 +447,7 @@ const Wallet = () => {
                   onClick={handlePayment}
                   className="flex-1 px-4 py-3 bg-gradient-to-r from-[#003543] to-[#00758a] text-white rounded-lg font-medium hover:opacity-90 transition duration-300 shadow-md"
                 >
-                  {loading ? "loading" : "Proceed to Pay"}
+                  {loading ? 'loading' : 'Proceed to Pay'}
                 </button>
               </div>
             </div>

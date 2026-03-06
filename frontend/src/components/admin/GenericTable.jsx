@@ -1,5 +1,5 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const GenericTable = ({ title, columns, data, renderActions }) => {
   return (
@@ -54,7 +54,7 @@ const GenericTable = ({ title, columns, data, renderActions }) => {
                 data.map((item, index) => (
                   <tr
                     key={item._id || item.id}
-                    className={`transition-all duration-150 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50`}
+                    className={`transition-all duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}
                   >
                     {columns.map((column) => (
                       <td
@@ -119,7 +119,7 @@ GenericTable.PropTypes = {
       label: PropTypes.string.isRequired,
       sortable: PropTypes.bool,
       render: PropTypes.func,
-    }),
+    })
   ).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   renderActions: PropTypes.func,

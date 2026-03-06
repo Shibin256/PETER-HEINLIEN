@@ -3,9 +3,9 @@ const MainThemeButton = ({ loading, width, page, type }) => (
     <button
       type={type}
       className={`${width} bg-teal-700 text-white py-3 rounded-md hover:bg-teal-800 transition-colors font-medium`}
-      style={{ backgroundColor: "#266b7d" }}
+      style={{ backgroundColor: '#266b7d' }}
     >
-      {loading ? "loading" : `${page}`}
+      {loading ? 'loading' : `${page}`}
     </button>
   </div>
 );

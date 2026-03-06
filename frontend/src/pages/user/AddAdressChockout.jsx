@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import Title from "../../components/common/Title";
-import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import { addAddress } from "../../features/accountSettings/accountSlice";
+import React, { useState } from 'react';
+import Title from '../../components/common/Title';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { addAddress } from '../../features/accountSettings/accountSlice';
 
 const AddAdressChockout = () => {
   const [addressData, setAddressData] = useState({
-    name: "",
-    houseNo: "",
-    locality: "",
-    city: "",
-    state: "",
-    pin: "",
-    phone: "",
-    altPhone: "",
-    addressType: "home",
+    name: '',
+    houseNo: '',
+    locality: '',
+    city: '',
+    state: '',
+    pin: '',
+    phone: '',
+    altPhone: '',
+    addressType: 'home',
     defaultAddress: false,
   });
 
@@ -22,49 +22,49 @@ const AddAdressChockout = () => {
   const { user } = useSelector((state) => state.auth);
 
   const indianStates = [
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chhattisgarh",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Lakshadweep",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal",
-    "Andaman and Nicobar Islands",
-    "Chandigarh",
-    "Dadra and Nagar Haveli and Daman and Diu",
-    "Delhi",
-    "Jammu and Kashmir",
-    "Ladakh",
-    "Puducherry",
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Lakshadweep',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
+    'Jammu and Kashmir',
+    'Ladakh',
+    'Puducherry',
   ];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setAddressData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -72,28 +72,28 @@ const AddAdressChockout = () => {
     e.preventDefault();
 
     const requiredFields = [
-      "name",
-      "houseNo",
-      "locality",
-      "city",
-      "state",
-      "pin",
-      "phone",
+      'name',
+      'houseNo',
+      'locality',
+      'city',
+      'state',
+      'pin',
+      'phone',
     ];
     const missingFields = requiredFields.filter(
-      (field) => !addressData[field].trim(),
+      (field) => !addressData[field].trim()
     );
 
     if (missingFields.length > 0) {
       toast.error(
-        `Please fill in all required fields: ${missingFields.join(", ")}`,
+        `Please fill in all required fields: ${missingFields.join(', ')}`
       );
       return;
     }
 
     if (addressData.altPhone === addressData.phone) {
       toast.error(
-        "Alternative phone number cannot be the same as the primary phone number.",
+        'Alternative phone number cannot be the same as the primary phone number.'
       );
       return;
     }
@@ -113,30 +113,30 @@ const AddAdressChockout = () => {
 
     try {
       await dispatch(
-        addAddress({ userId: user._id, data: formattedAddress }),
+        addAddress({ userId: user._id, data: formattedAddress })
       ).then((res) => {
-        if (res.type.endsWith("/fulfilled")) {
-          toast.success("✅ address added successfully!");
+        if (res.type.endsWith('/fulfilled')) {
+          toast.success('✅ address added successfully!');
           window.history.back();
         } else {
-          toast.error(res?.error?.message || "Failed to delete user.");
+          toast.error(res?.error?.message || 'Failed to delete user.');
         }
       });
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      toast.error(error.response?.data?.message || 'error hapened');
     }
 
     setAddressData({
-      name: "",
-      houseNo: "",
-      locality: "",
-      city: "",
-      state: "",
-      pin: "",
-      phone: "",
-      altPhone: "",
-      addressType: "home",
+      name: '',
+      houseNo: '',
+      locality: '',
+      city: '',
+      state: '',
+      pin: '',
+      phone: '',
+      altPhone: '',
+      addressType: 'home',
       defaultAddress: false,
     });
   };
@@ -147,7 +147,7 @@ const AddAdressChockout = () => {
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
-      <Title text1={"Add New"} text2={"Address"} />
+      <Title text1={'Add New'} text2={'Address'} />
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -163,7 +163,7 @@ const AddAdressChockout = () => {
                   id="home"
                   name="addressType"
                   value="home"
-                  checked={addressData.addressType === "home"}
+                  checked={addressData.addressType === 'home'}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
@@ -180,7 +180,7 @@ const AddAdressChockout = () => {
                   id="work"
                   name="addressType"
                   value="work"
-                  checked={addressData.addressType === "work"}
+                  checked={addressData.addressType === 'work'}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />

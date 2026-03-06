@@ -1,50 +1,50 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-import { updateAddress } from "../../features/accountSettings/accountSlice";
-import { validateAddress } from "./AddressValidation";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { updateAddress } from '../../features/accountSettings/accountSlice';
+import { validateAddress } from './AddressValidation';
 
 const EditAddressModal = ({ address, onClose, onSuccess }) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState({ ...address });
 
   const indianStates = [
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chhattisgarh",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Lakshadweep",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal",
-    "Andaman and Nicobar Islands",
-    "Chandigarh",
-    "Dadra and Nagar Haveli and Daman and Diu",
-    "Delhi",
-    "Jammu and Kashmir",
-    "Ladakh",
-    "Puducherry",
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Lakshadweep',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
+    'Jammu and Kashmir',
+    'Ladakh',
+    'Puducherry',
   ];
 
   const handleChange = (e) => {
@@ -59,19 +59,19 @@ const EditAddressModal = ({ address, onClose, onSuccess }) => {
     });
 
     if (errors.length > 0) {
-      toast.error(errors.join("\n"));
+      toast.error(errors.join('\n'));
       return;
     }
 
     try {
       await dispatch(
-        updateAddress({ addressId: address._id, data: form }),
+        updateAddress({ addressId: address._id, data: form })
       ).unwrap();
-      toast.success("Address updated successfully");
+      toast.success('Address updated successfully');
       onSuccess();
     } catch (err) {
       console.log(err);
-      toast.error("Failed to update address");
+      toast.error('Failed to update address');
     }
   };
 

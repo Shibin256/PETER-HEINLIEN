@@ -1,60 +1,60 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import wishlistService from "./wishlistService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import wishlistService from './wishlistService';
 
 export const addToWishlist = createAsyncThunk(
-  "user/wishlist/add",
+  'user/wishlist/add',
   async ({ userId, productId }, thunkAPI) => {
     try {
       return await wishlistService.addToWishlist({ userId, productId });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const getWishlist = createAsyncThunk(
-  "user/wishlist/get",
+  'user/wishlist/get',
   async (userId, thunkAPI) => {
     try {
       return await wishlistService.getWishlist(userId);
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const getWishedProduct = createAsyncThunk(
-  "user/wishlist/check",
+  'user/wishlist/check',
   async ({ userId, productId }, thunkAPI) => {
     try {
       return await wishlistService.getWishedProduct({ userId, productId });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 export const removeFromWishlist = createAsyncThunk(
-  "user/wishlist/remove",
+  'user/wishlist/remove',
   async ({ userId, productId }, thunkAPI) => {
     try {
       return await wishlistService.removeFromWishlist({ userId, productId });
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || error.message,
+        error.response?.data?.message || error.message
       );
     }
-  },
+  }
 );
 
 const wishlistSlice = createSlice({
-  name: "wishlist",
+  name: 'wishlist',
   initialState: {
     wishlist: [],
     loading: false,
@@ -97,7 +97,7 @@ const wishlistSlice = createSlice({
       .addCase(removeFromWishlist.fulfilled, (state, action) => {
         state.loading = false;
         state.wishlist = state.wishlist.filter(
-          (item) => item.productId !== action.meta.arg.productId,
+          (item) => item.productId !== action.meta.arg.productId
         );
       })
       .addCase(removeFromWishlist.rejected, (state, action) => {

@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-import axiosInstance from "../../api/axiosInstance";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../../features/auth/authSlice";
-import AuthInput from "../../components/common/AuthInput";
-import AuthLayout from "../../components/common/AuhLayout";
-import AuthDivider from "../../components/common/AuthDivder";
-import GoogleAuthButton from "../../components/common/GoogleAuthButton";
-import MainThemeButton from "../../components/common/MainThemeButton";
+import axiosInstance from '../../api/axiosInstance';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../../features/auth/authSlice';
+import AuthInput from '../../components/common/AuthInput';
+import AuthLayout from '../../components/common/AuhLayout';
+import AuthDivider from '../../components/common/AuthDivder';
+import GoogleAuthButton from '../../components/common/GoogleAuthButton';
+import MainThemeButton from '../../components/common/MainThemeButton';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Login = () => {
   //if user is in it redirect to login page
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/", { replace: true });
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -43,19 +43,19 @@ const Login = () => {
     try {
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/login`,
-        formData,
+        formData
       );
       //getting access token & user
       const token = response.data.accessToken;
       const user = JSON.stringify(response.data.user);
       dispatch(setUser({ token, user }));
-      localStorage.setItem("accessToken", token);
-      localStorage.setItem("user", user);
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('user', user);
       toast.success(response.data.message);
-      navigate("/");
+      navigate('/');
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "error hapened");
+      toast.error(error.response?.data?.message || 'error hapened');
     } finally {
       setLoading(false);
     }
@@ -72,10 +72,10 @@ const Login = () => {
     const token = res.data.accessToken;
     const user = JSON.stringify(res.data.user);
     dispatch(setUser(token, user));
-    localStorage.setItem("accessToken", token);
-    localStorage.setItem("user", user);
-    toast.success("user register using google is successfull");
-    navigate("/");
+    localStorage.setItem('accessToken', token);
+    localStorage.setItem('user', user);
+    toast.success('user register using google is successfull');
+    navigate('/');
   };
 
   return (
@@ -128,7 +128,7 @@ const Login = () => {
 
           <div className="flex justify-between items-center text-sm text-gray-600">
             <span>
-              New to The App?{" "}
+              New to The App?{' '}
               <Link to="/register" className="text-blue-500 hover:underline">
                 Sign Up
               </Link>

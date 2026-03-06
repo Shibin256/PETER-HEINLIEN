@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ success: null, message: "" });
+  const [status, setStatus] = useState({ success: null, message: '' });
 
   //form submit for contact
   const handleSubmit = async (e) => {
@@ -15,7 +15,7 @@ const Contact = () => {
     if (!name || /\d/.test(name)) {
       setStatus({
         success: false,
-        message: "Please enter a valid name without numbers.",
+        message: 'Please enter a valid name without numbers.',
       });
       return;
     }
@@ -23,38 +23,38 @@ const Contact = () => {
     if (!email) {
       setStatus({
         success: false,
-        message: "Please enter a valid email address.",
+        message: 'Please enter a valid email address.',
       });
       return;
     }
 
     setLoading(true);
     const formData = new FormData(form);
-    formData.append("access_key", "008f1964-a55e-41b0-aa2a-39452fa2810f"); // Replace with your Web3Forms key
+    formData.append('access_key', '008f1964-a55e-41b0-aa2a-39452fa2810f'); // Replace with your Web3Forms key
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
         body: formData,
       });
 
       setLoading(false);
       if (response.ok) {
-        setStatus({ success: true, message: "✅ Message sent successfully!" });
+        setStatus({ success: true, message: '✅ Message sent successfully!' });
         form.reset();
       } else {
         setStatus({
           success: false,
-          message: "❌ Something went wrong. Please try again.",
+          message: '❌ Something went wrong. Please try again.',
         });
       }
     } catch (error) {
       setLoading(false);
       setStatus({
         success: false,
-        message: "❌ Network error. Please try again.",
+        message: '❌ Network error. Please try again.',
       });
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -77,7 +77,7 @@ const Contact = () => {
           </p>
           <div className="space-y-2 text-gray-700">
             <p>
-              📧{" "}
+              📧{' '}
               <a
                 href="mailto:peterhenlein@xai.com"
                 className="hover:text-blue-600"
@@ -131,7 +131,7 @@ const Contact = () => {
             )}
             {status.message && (
               <p
-                className={`text-sm ${status.success ? "text-green-600" : "text-red-600"}`}
+                className={`text-sm ${status.success ? 'text-green-600' : 'text-red-600'}`}
               >
                 {status.message}
               </p>

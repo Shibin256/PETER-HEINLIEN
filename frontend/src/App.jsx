@@ -1,7 +1,7 @@
-import { Route, Routes } from "react-router-dom";
-import AdminRoutes from "./routes/AdminRoutes";
-import UserRoutes from "./routes/UserRoutes";
-import { Slide, ToastContainer } from "react-toastify";
+import { Route, Routes } from 'react-router-dom';
+import AdminRoutes from './routes/AdminRoutes';
+import UserRoutes from './routes/UserRoutes';
+import { Slide, ToastContainer } from 'react-toastify';
 function App() {
   return (
     <>
