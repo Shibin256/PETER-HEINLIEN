@@ -73,6 +73,7 @@ const ProductDetails = () => {
   }, [user, singleProduct, dispatch]);
 
   const product = singleProduct;
+  let shippingCost = 0;
   const totalQuantity = product?.totalQuantity || 0;
   if (product && product.price < 500) {
     shippingCost = 50;

@@ -7,7 +7,7 @@ export const validateBrand = [
     .withMessage('Brand name is required')
     .isLength({ min: 2, max: 50 })
     .withMessage('Brand name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z0-9\s\-]+$/)
+    .matches(/^[a-zA-Z0-9\s-]+$/)
     .withMessage(
       'Brand name can only contain letters, numbers, spaces, and hyphens',
     ),

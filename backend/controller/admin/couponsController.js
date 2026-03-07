@@ -175,7 +175,7 @@ export const removeCoupon = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!coupon) {
-      return res.status(404).json({ message: COUPON_NOTFOUND });
+      return res.status(404).json({ message: MESSAGES.COUPON_NOTFOUND });
     }
 
     coupon.usersUsed = coupon.usersUsed.filter(

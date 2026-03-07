@@ -14,6 +14,7 @@ import OrdersList from '../pages/admin/OrdersList';
 import Coupons from '../pages/admin/coupons';
 import Offers from '../pages/admin/Offer';
 import ErrorBoundary from '../components/common/ErrorBoundary';
+import AdminNotFound from '../pages/notFound/adminNotFound';
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ const AdminRoutes = () => {
             <Route path="banners" element={<Banners />} />
             <Route path="coupons" element={<Coupons />} />
             <Route path="offers" element={<Offers />} />
+            
+            <Route path="*" element={<AdminNotFound/>} />
           </Route>
         </Routes>
       </ErrorBoundary>

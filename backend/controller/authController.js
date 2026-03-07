@@ -432,6 +432,7 @@ export const refreshAccessToken = async (req, res) => {
     res.json({ accessToken: newAccessToken });
 
   } catch (err) {
+    console.log(err)
     return res.sendStatus(403);
   }
 };

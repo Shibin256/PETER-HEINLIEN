@@ -49,9 +49,7 @@ import {
 } from '../controller/admin/couponsController.js';
 import { addToWallet, getWallet } from '../controller/walletController.js';
 import { fetchHomeBanner } from '../controller/admin/bannerController.js';
-import { validateUserRegistration } from '../validators/authValidators.js';
 import { validate } from '../middleware/validationMiddleware.js';
-import { validateUsernameChange } from '../validators/nameValidator.js';
 import { validateAddress } from '../validators/addressValidator.js';
 
 const router = express.Router();

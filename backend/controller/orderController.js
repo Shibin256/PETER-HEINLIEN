@@ -38,7 +38,7 @@ export const placeOrder = async (req, res) => {
     }
 
     const validatedItems = [];
-    let calculatedTotal = 0;
+    // let calculatedTotal = 0;
 
     for (const clientItem of cartItems) {
       const product = await Product.findById(clientItem.productId._id);
@@ -74,7 +74,7 @@ export const placeOrder = async (req, res) => {
         quantity: clientItem.quantity,
       });
 
-      calculatedTotal += totalPrice;
+      // calculatedTotal += totalPrice;
     }
 
     const mainOrderId = await generateOrderId();
