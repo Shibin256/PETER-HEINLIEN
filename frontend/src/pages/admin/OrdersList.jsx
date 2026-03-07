@@ -116,10 +116,12 @@ const OrdersList = () => {
     {
       key: 'OrderStatus',
       label: 'Order Status',
-      render: (status) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${
-            status === 'Processing'
+      render: (status) => {
+        const displayStatus = status === 'Processing' ? 'Placed' : status;
+
+        return (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'Processing'
               ? 'bg-yellow-100 text-yellow-800'
               : status === 'Shipped'
                 ? 'bg-blue-100 text-blue-800'
@@ -130,24 +132,24 @@ const OrdersList = () => {
                     : status === 'Failed'
                       ? 'bg-red-100 text-red-800'
                       : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {status}
-        </span>
-      ),
+              }`}
+          >
+            {displayStatus}
+          </span>
+        );
+      },
     },
     {
       key: 'PaymentStatus',
       label: 'Payment',
       render: (status) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${
-            status === 'Paid'
-              ? 'bg-green-100 text-green-800'
-              : status === 'Failed'
-                ? 'bg-red-100 text-red-800'
-                : 'bg-gray-100 text-gray-800'
-          }`}
+          className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'Paid'
+            ? 'bg-green-100 text-green-800'
+            : status === 'Failed'
+              ? 'bg-red-100 text-red-800'
+              : 'bg-gray-100 text-gray-800'
+            }`}
         >
           {status}
         </span>
@@ -228,7 +230,7 @@ const OrdersList = () => {
           </button>
         )}
 
-      {item.OrderStatus === 'Cancelled' && (
+      {/* {item.OrderStatus === 'Cancelled' && (
         <button
           onClick={() => {
             setCurrentOrder(item);
@@ -240,7 +242,7 @@ const OrdersList = () => {
         >
           {item.cancelVerified ? 'Verified' : 'Verify Cancel'}
         </button>
-      )}
+      )} */}
     </div>
   );
 
@@ -424,11 +426,10 @@ const OrdersList = () => {
                         <td className="px-4 py-3 whitespace-nowrap">
                           {item.returnReason ? (
                             <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                item.returnVerified
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-orange-100 text-orange-800'
-                              }`}
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${item.returnVerified
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-orange-100 text-orange-800'
+                                }`}
                             >
                               {item.returnVerified
                                 ? 'Return Verified'
@@ -506,8 +507,7 @@ const OrdersList = () => {
                       <div className="flex justify-between">
                         <span className="font-medium">Order Status:</span>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            orderDetails.OrderStatus === 'Processing'
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${orderDetails.OrderStatus === 'Processing'
                               ? 'bg-yellow-100 text-yellow-800'
                               : orderDetails.OrderStatus === 'Shipped'
                                 ? 'bg-blue-100 text-blue-800'
@@ -516,19 +516,20 @@ const OrdersList = () => {
                                   : orderDetails.OrderStatus === 'Cancelled'
                                     ? 'bg-red-100 text-red-800'
                                     : 'bg-gray-100 text-gray-800'
-                          }`}
+                            }`}
                         >
-                          {orderDetails.OrderStatus}
+                          {orderDetails.OrderStatus === 'Processing'
+                            ? 'Placed'
+                            : orderDetails.OrderStatus}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium">Payment:</span>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            orderDetails.PaymentStatus === 'Paid'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${orderDetails.PaymentStatus === 'Paid'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                            }`}
                         >
                           {orderDetails.PaymentStatus} (
                           {orderDetails.PaymentMethod})
@@ -583,11 +584,10 @@ const OrdersList = () => {
                                 Return Status:{' '}
                                 {item.returnReason ? (
                                   <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                      item.returnVerified
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-orange-100 text-orange-800'
-                                    }`}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${item.returnVerified
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-orange-100 text-orange-800'
+                                      }`}
                                   >
                                     {item.returnVerified
                                       ? 'Return Verified'
@@ -601,17 +601,14 @@ const OrdersList = () => {
                               </div>
                               <div>
                                 Cancel Status:{' '}
-                                {item.cancelReason ? (
+                                {orderDetails.OrderStatus=='Cancelled' ? (
                                   <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                      item.cancelVerified
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-orange-100 text-orange-800'
-                                    }`}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${item.cancelVerified
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-orange-100 text-orange-800'
+                                      }`}
                                   >
-                                    {item.cancelVerified
-                                      ? 'Cancel Verified'
-                                      : 'Cancel Requested'}
+                                    Cancelled
                                   </span>
                                 ) : (
                                   <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -702,7 +699,7 @@ const OrdersList = () => {
                     Mark Delivered
                   </button>
                 )}
-                {orderDetails.OrderStatus === 'Cancelled' &&
+                {/* {orderDetails.OrderStatus === 'Cancelled' &&
                   !orderDetails.cancelVerified && (
                     <button
                       onClick={() => {
@@ -713,14 +710,13 @@ const OrdersList = () => {
                     >
                       Verify Cancel
                     </button>
-                  )}
-                {orderDetails.OrderStatus === 'Cancelled' &&
-                  orderDetails.cancelVerified && (
+                  )} */}
+                {orderDetails.OrderStatus === 'Cancelled' && (
                     <button
                       disabled
-                      className="px-4 py-2 bg-gray-500 text-white rounded-md text-sm font-medium cursor-default"
+                      className="px-4 py-2 bg-red-500 text-white rounded-md text-sm font-medium cursor-default"
                     >
-                      Verified
+                      Cancelled
                     </button>
                   )}
               </div>

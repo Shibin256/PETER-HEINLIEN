@@ -6,6 +6,7 @@ import PDFDocument from 'pdfkit';
 import Wallet from '../model/walletModal.js';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../model/userModel.js';
+import { MESSAGES } from '../utils/messages.js';
 
 const generateOrderId = async () => {
   const year = new Date().getFullYear();
@@ -33,7 +34,7 @@ export const placeOrder = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid user' });
+      return res.status(400).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
     const validatedItems = [];
@@ -119,7 +120,7 @@ export const placeOrder = async (req, res) => {
       if (item.quantity > product.totalQuantity) {
         return res
           .status(404)
-          .json({ message: 'The product is on out of stock know' });
+          .json({ message: MESSAGES.PRODCUT_OUT_STOCK });
       }
     }
     const newOrder = await Order.create(orderData);
@@ -165,14 +166,14 @@ export const placeOrder = async (req, res) => {
     }
     res.status(201).json({
       success: true,
-      message: 'Order placed successfully',
+      message: MESSAGES.ORDER_PLACED,
       order: newOrder,
     });
   } catch (error) {
     console.error('Error placing order:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to place order',
+      message: MESSAGES.FAILD_PLACEORDER,
       error: error.message,
     });
   }
@@ -212,21 +213,25 @@ export const getOrders = async (req, res) => {
   }
 };
 
+
 export const cancelOrderItem = async (req, res) => {
   const { itemOrderId, reason } = req.body;
 
   try {
     const order = await Order.findOne({ orderId: itemOrderId }).select(
-      '-createdAt -updatedAt',
+      '-createdAt -updatedAt'
     );
+
     if (!order) {
       return res.status(404).json({ message: 'Order item not found' });
     }
+
+    // Restore product stock
     for (const item of order.Items) {
       const updatedProduct = await Product.findByIdAndUpdate(
         item.productId,
         { $inc: { totalQuantity: +item.quantity } },
-        { new: true },
+        { new: true }
       ).select('-createdAt -updatedAt');
 
       if (updatedProduct.totalQuantity >= 1) {
@@ -234,13 +239,47 @@ export const cancelOrderItem = async (req, res) => {
         await updatedProduct.save();
       }
     }
-    // Update item status
+
+    // Update order status
     order.OrderStatus = 'Cancelled';
     order.cancelReason = reason || 'No reason provided';
     await order.save();
+
+    // 🔹 WALLET REFUND LOGIC
+    if (order.PaymentMethod !== 'cod') {
+
+      const total =
+        Number(order.TotalAmount) + Number(order.DeliveryCharge || 0);
+
+      let wallet = await Wallet.findOne({ userId: order.UserID });
+
+      const transaction = {
+        userId: order.UserID,
+        amount: total,
+        paymentId: `REFUND-${Date.now()}-${uuidv4().slice(0, 8)}`,
+        status: 'success',
+        type: 'credit',
+        description: 'Order Cancelled Refund',
+      };
+
+      if (wallet) {
+        wallet.balance += total;
+        wallet.transactions.push(transaction);
+      } else {
+        wallet = new Wallet({
+          userId: order.UserID,
+          balance: total,
+          transactions: [transaction],
+        });
+      }
+
+      await wallet.save();
+    }
+
     return res
       .status(200)
-      .json({ message: 'Item cancelled successfully', order });
+      .json({ message: 'Item cancelled and refund processed', order });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Server error' });
@@ -347,7 +386,7 @@ export const singleCancelVerify = async (req, res) => {
       .json({ message: 'Return request verified successfully', order });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -356,7 +395,7 @@ export const verifyCancel = async (req, res) => {
   try {
     const order = await Order.findOne({ orderId: orderId });
     if (!order) {
-      return res.status(404).json({ message: 'Order item not found' });
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
 
     let total = Number(order.TotalAmount) + Number(order.DeliveryCharge);
@@ -394,7 +433,7 @@ export const verifyCancel = async (req, res) => {
       .json({ message: 'Item verifyed successfully', order });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -406,7 +445,7 @@ export const changeOrderStatus = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!order) {
-      return res.status(404).json({ message: 'Order item not found' });
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
     if (status == 'Delivered') {
       order.PaymentStatus = 'Paid';
@@ -418,7 +457,7 @@ export const changeOrderStatus = async (req, res) => {
       .json({ message: 'Order status updated successfully', order });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
   }
 };
 
@@ -467,7 +506,7 @@ export const returnOrderItem = async (req, res) => {
       'Items.itemOrderId': itemOrderId,
     }).select('-createdAt -updatedAt');
     if (!orderItem) {
-      return res.status(404).json({ message: 'Order item not found' });
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
     const UserID = orderItem.UserID;
 
@@ -476,7 +515,7 @@ export const returnOrderItem = async (req, res) => {
       (item) => item.itemOrderId === itemOrderId,
     );
     if (!item) {
-      return res.status(404).json({ message: 'Item not found in order' });
+      return res.status(404).json({ message: MESSAGES.ITEM_NOT_NOTFOUND });
     }
 
     // Update item status
@@ -491,7 +530,7 @@ export const returnOrderItem = async (req, res) => {
       .json({ message: 'Return request submitted successfully', order });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -503,7 +542,7 @@ export const retrunVerify = async (req, res) => {
       'Items.itemOrderId': itemOrderId,
     }).select('-createdAt -updatedAt');
     if (!orderitem) {
-      return res.status(404).json({ message: 'Order item not found' });
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
     orderitem.Items.forEach((item) => {
       if (item.itemOrderId === itemOrderId) {
@@ -546,7 +585,7 @@ export const retrunVerify = async (req, res) => {
       .json({ message: 'Return request verified successfully', order });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -557,7 +596,7 @@ export const downloadInvoice = async (req, res) => {
       .populate('UserID')
       .select('-createdAt -updatedAt');
 
-    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (!order) return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
 
     const doc = new PDFDocument({ margin: 50 });
 
@@ -658,14 +697,14 @@ export const addReview = async (req, res) => {
     }).select('-createdAt -updatedAt');
 
     if (!orderItem) {
-      return res.status(404).json({ message: 'Order item not found' });
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
 
     const userID = orderItem.UserID;
 
     const item = orderItem.Items.find((item) => item.itemOrderId === itemId);
     if (!item) {
-      return res.status(404).json({ message: 'Item not found in order' });
+      return res.status(404).json({ message: MESSAGES.ITEM_NOT_NOTFOUND });
     }
 
     item.rated = true;
@@ -676,7 +715,7 @@ export const addReview = async (req, res) => {
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: MESSAGES.ITEM_NOT_NOTFOUND });
     }
 
     const alreadyReviewed = product.reviews.find(
@@ -707,6 +746,6 @@ export const addReview = async (req, res) => {
     res.status(200).json({ message: 'Review added successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };

@@ -1,4 +1,5 @@
 import User from '../../model/userModel.js';
+import { MESSAGES } from '../../utils/messages.js';
 
 //fetching all users logged in
 export const getAllUsers = async (req, res) => {
@@ -36,7 +37,7 @@ export const getAllUsers = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching users:', error.message);
-    res.status(500).json({ message: 'Server error fetching users' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -47,7 +48,7 @@ export const toggleUserBlock = async (req, res) => {
       '-password -createdAt -updatedAt -googleId',
     );
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
 
     user.isBlocked = !user.isBlocked;
     await user.save();
@@ -60,7 +61,7 @@ export const toggleUserBlock = async (req, res) => {
       });
   } catch (error) {
     console.error('Error toggling user block status:', error.message);
-    res.status(500).json({ message: 'Server error toggling block status' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -77,6 +78,6 @@ export const deleteUser = async (req, res) => {
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error when deleting user:', error.message);
-    res.status(500).json({ message: 'Server error deleting user status' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };

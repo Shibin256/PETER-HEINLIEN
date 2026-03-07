@@ -276,7 +276,7 @@ export const googleAuth = async (req, res) => {
     res.status(200).json({ accessToken, user });
   } catch (error) {
     console.error('Google login failed:', error);
-    res.status(401).json({ error: 'Invalid Google token' });
+    res.status(401).json({ error: MESSAGES.INVALID_GOOGLE_TOKEN });
   }
 };
 
@@ -288,7 +288,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email }).select('-createdAt -updatedAt');
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: MESSAGES.INVALID_EMAIL_PASSWORD });
     }
     if (user.googleId) {
       return res
@@ -298,20 +298,20 @@ export const login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: MESSAGES.INVALID_EMAIL_PASSWORD });
     }
 
     if (user.isAdmin) {
       return res
         .status(401)
-        .json({ message: 'The user is admin, cant join thorugh this' });
+        .json({ message: MESSAGES.ADMIN_CANT_JOIN });
     }
 
     if (user.isBlocked) {
       return res
         .status(401)
         .json({
-          message: 'The user is blocked form using the site, cant join',
+          message: MESSAGES.USER_BLOCKED,
         });
     }
 
@@ -367,7 +367,7 @@ export const adminLogin = async (req, res) => {
 
     if (!user.isAdmin) {
       console.log('The user is not an admin');
-      return res.status(401).json({ message: 'user is not an admin' });
+      return res.status(401).json({ message: MESSAGES.USER_NOT_ADMIN });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -410,7 +410,7 @@ export const adminLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Error logging in' });
+    res.status(500).json({ message: MESSAGES.ERROR_LOGIN });
   }
 };
 
@@ -443,7 +443,7 @@ export const forgotPass = async (req, res) => {
 
     const userExist = await User.findOne({ email });
     if (!userExist) {
-      return res.status(400).json({ message: 'User does not exist' });
+      return res.status(400).json({ message: MESSAGES.USER_NOT_EXISTS });
     }
 
     const otp = genarateOtp();
@@ -464,7 +464,7 @@ export const forgotPass = async (req, res) => {
       .json({ message: 'The OTP has been sent to the email', email });
   } catch (error) {
     console.error('Reset password error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -484,7 +484,7 @@ export const verifyOTPForgotpass = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error logging in' });
+    res.status(500).json({ message: MESSAGES.ERROR_LOGIN });
   }
 };
 
@@ -494,7 +494,7 @@ export const changePassword = async (req, res) => {
     const { newPassword, email } = req.body;
     const user = await User.findOne({ email }).select('-createdAt -updatedAt');
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
 
     if (user.isBlocked)
       return res.status(404).json({ message: 'User cant access anything' });
@@ -516,7 +516,7 @@ export const fetchCurrentUser = async (req, res) => {
     const user = await User.findById(req.params.id).select(
       '-password -createdAt -updatedAt -googleId',
     );
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     res.status(200).json(user);
   } catch (error) {
     console.error(error.message);

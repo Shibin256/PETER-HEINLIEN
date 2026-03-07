@@ -3,6 +3,7 @@ import Category from '../../model/categoryModel.js';
 import Product from '../../model/productModel.js';
 import wishlistModel from '../../model/wishlistModel.js';
 import cloudinary from '../../utils/cloudinary.js';
+import { MESSAGES } from '../../utils/messages.js';
 
 //creating new product
 export const createProduct = async (req, res) => {
@@ -372,7 +373,7 @@ export const getRelatedProducts = async (req, res) => {
     const { productId, userId } = req.params;
     const currentProduct = await Product.findById(productId);
     if (!currentProduct)
-      return res.status(404).json({ message: 'product not found' });
+      return res.status(404).json({ message: MESSAGES.PRODUCT_NOTFOUND });
 
     const similarProducts = await Product.find({
       _id: { $ne: productId },
@@ -401,7 +402,7 @@ export const getRelatedProducts = async (req, res) => {
 
     res.status(200).json({ similarProducts: latestWithWishlist });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR, error: error });
   }
 };
 
@@ -416,14 +417,14 @@ export const addProductOffer = async (req, res) => {
     }
 
     if (percentage >= 100) {
-      return res.status(404).json({ message: 'Percentage must be less than 100' })
+      return res.status(404).json({ message: MESSAGES.PERCENTAGE_VAL})
     }
 
     const product = await Product.findById(productId).select(
       '-createdAt -updatedAt',
     );
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: MESSAGES.PRODUCT_NOTFOUND });
     }
 
     const discountAmount = (product.price * percentage) / 100;
@@ -446,7 +447,7 @@ export const addProductOffer = async (req, res) => {
     res.status(200).json({ message: 'Offer added successfully', product });
   } catch (error) {
     console.error('Error adding offer:', error);
-    res.status(500).json({ message: 'Server error while adding offer' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -460,7 +461,7 @@ export const removeProductOffer = async (req, res) => {
       .select('offerPrice category price offerPercentage')
       .select('-createdAt -updatedAt');
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: MESSAGES.PRODUCT_NOTFOUND });
     }
     const category = await Category.findById(product.category).select(
       '-createdAt -updatedAt',
@@ -478,6 +479,6 @@ export const removeProductOffer = async (req, res) => {
     res.status(200).json({ message: 'Offer removed successfully', product });
   } catch (error) {
     console.error('Error removing offer:', error);
-    res.status(500).json({ message: 'Server error while removing offer' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };

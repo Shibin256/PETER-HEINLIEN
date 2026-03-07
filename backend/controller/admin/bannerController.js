@@ -1,5 +1,6 @@
 import Banners from '../../model/bannerModel.js';
 import cloudinary from '../../utils/cloudinary.js';
+import { MESSAGES } from '../../utils/messages.js';
 
 export const createBanner = async (req, res) => {
   try {
@@ -45,10 +46,10 @@ export const createBanner = async (req, res) => {
 export const fetchBanners = async (req, res) => {
   try {
     const banners = await Banners.find().sort({ createdAt: -1 });
-    res.status(201).json({ message: 'banner fetched', banners });
+    res.status(201).json({ message: MESSAGES.BANNER_FETCHED, banners });
   } catch (error) {
     console.error('Error fetch banners:', error.message);
-    res.status(500).json({ message: 'Server error fetching banners' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -61,7 +62,7 @@ export const deleteBanner = async (req, res) => {
     res.status(201).json({ message: 'banner deleted successfully', banners });
   } catch (error) {
     console.error('Error delete banner:', error.message);
-    res.status(500).json({ message: 'Server error deleting banner' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -75,7 +76,7 @@ export const setActiveBanner = async (req, res) => {
     res.status(200).json({ message: 'Active banner set', banners });
   } catch (error) {
     console.error('Error toggle active banner:', error.message);
-    res.status(500).json({ message: 'Server error toggle active banner' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -84,9 +85,9 @@ export const fetchHomeBanner = async (req, res) => {
     const banner = await Banners.findOne({ isActive: true }).sort({
       createdAt: -1,
     });
-    res.status(201).json({ message: 'banner fetched', banner });
+    res.status(201).json({ message: MESSAGES.BANNER_FETCHED, banner });
   } catch (error) {
     console.error('Error fetch banners:', error.message);
-    res.status(500).json({ message: 'Server error fetching banners' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };

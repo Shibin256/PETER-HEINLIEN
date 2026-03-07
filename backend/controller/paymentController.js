@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import Order from '../model/orderModel.js';
 import Product from '../model/productModel.js';
 import Cart from '../model/cartModal.js';
+import { MESSAGES } from '../utils/messages.js';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -22,7 +23,7 @@ export const createRazorpayOrder = async (req, res) => {
     res.status(200).json({ success: true, order });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error generating invoice' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -72,7 +73,7 @@ export const verifyRazorpayPayment = async (req, res) => {
       .status(400)
       .json({
         success: false,
-        message: 'Invalid signature, verification failed',
+        message: MESSAGES.INVALID_SIGNATURE,
       });
   }
 };
@@ -90,7 +91,7 @@ export const verifyRazorpayPaymentForWallet = async (req, res) => {
 
   if (expectedSignature === razorpay_signature) {
     // Payment is verified
-    return res.status(200).json({ success: true, message: 'Payment verified' });
+    return res.status(200).json({ success: true, message: MESSAGES.PAYMENT_VERIFIED });
   } else {
     // Verification failed
     return res

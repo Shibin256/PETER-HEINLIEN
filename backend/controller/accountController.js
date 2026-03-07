@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import cloudinary from '../utils/cloudinary.js';
 import Address from '../model/addressModal.js';
 import mongoose from 'mongoose';
+import { MESSAGES } from '../utils/messages.js';
 const saltRounds = parseInt(process.env.SALT_ROUNDS || '10', 10);
 
 export const changeName = async (req, res) => {
@@ -11,7 +12,7 @@ export const changeName = async (req, res) => {
     const newName = req.body.name?.trim();
 
     if (!newName) {
-      return res.status(400).json({ message: 'Name is required' });
+      return res.status(400).json({ message: MESSAGES.NAME_REQUIRED });
     }
 
     if (newName.length < 3 || newName.length > 30) {
@@ -30,7 +31,7 @@ export const changeName = async (req, res) => {
       '-password -createdAt -updatedAt -googleId',
     );
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
     user.username = newName;
@@ -42,7 +43,7 @@ export const changeName = async (req, res) => {
     });
   } catch (error) {
     console.error('Error changing user name:', error.message);
-    res.status(400).json({ message: 'Server error while changing user name' });
+    res.status(400).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -66,7 +67,7 @@ export const changeOrAddMobile = async (req, res) => {
     ); // Exclude password
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
     const phoneExist = await User.findOne({ phone: newNumber }).select(
@@ -149,7 +150,7 @@ export const editPassword = async (req, res) => {
       '-createdAt -updatedAt -googleId',
     );
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -192,7 +193,7 @@ export const editImage = async (req, res) => {
     const img = req.file;
 
     if (!id) {
-      return res.status(400).json({ message: "User ID is required" });
+      return res.status(400).json({ message: MESSAGES.USER_ID_REQUIRED });
     }
 
     if (!img) {
@@ -212,7 +213,7 @@ export const editImage = async (req, res) => {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
 
@@ -225,7 +226,7 @@ export const editImage = async (req, res) => {
     console.error('Error updating image:', error.message);
     return res
       .status(500)
-      .json({ message: 'Server error while updating image' });
+      .json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -264,7 +265,7 @@ export const addAddress = async (req, res) => {
       '-password -createdAt -updatedAt -googleId',
     );
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
     await newAddress.save();
@@ -278,7 +279,7 @@ export const addAddress = async (req, res) => {
     console.error('Error updating address:', error.message);
     return res
       .status(500)
-      .json({ message: 'Server error while updating address' });
+      .json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -290,12 +291,12 @@ export const getAllAddress = async (req, res) => {
       .populate('addresses')
       .lean();
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
     }
     res.status(200).json({ user });
   } catch (error) {
     console.error('Error fetching user addresses:', error.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -306,7 +307,7 @@ export const removeAddress = async (req, res) => {
       '-password -createdAt -updatedAt -googleId',
     );
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: MESSAGES.SERVER_ERROR });
     }
 
     const addressExist = user.addresses.includes(addressId);
@@ -324,10 +325,10 @@ export const removeAddress = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: 'Address removed successfully', user: user });
+      .json({ message: MESSAGES.ADDRESS_REMOVED, user: user });
   } catch (error) {
     console.error('Error deleting user addresses:', error.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -339,7 +340,7 @@ export const SetDefaultAddress = async (req, res) => {
     const user = await User.findById(userId).select(
       '-password -createdAt -updatedAt -googleId',
     );
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: MESSAGES.USER_NOTFOUND });
 
     const belongsToUser = user.addresses.some(
       (id) => id.toString() === addressId,
@@ -359,10 +360,10 @@ export const SetDefaultAddress = async (req, res) => {
       '-createdAt -updatedAt',
     );
 
-    res.status(200).json({ message: 'Default address set successfully' });
+    res.status(200).json({ message: MESSAGES.DEFAULT_ADDRESS_SET });
   } catch (error) {
     console.error('Error setting default address:', error.message);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -403,7 +404,7 @@ export const updateAddress = async (req, res) => {
   ).select('-createdAt -updatedAt');
 
   if (!updatedAdress) {
-    return res.status(404).json({ message: 'address not found' });
+    return res.status(404).json({ message: MESSAGES.ADDRESS_NOTFOUND});
   }
 
   res.status(200).json(updateAddress);

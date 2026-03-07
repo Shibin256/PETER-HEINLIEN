@@ -1,4 +1,5 @@
 import Coupons from '../../model/couponsModal.js';
+import { MESSAGES } from '../../utils/messages.js';
 
 export const createCoupons = async (req, res) => {
   try {
@@ -35,10 +36,10 @@ export const createCoupons = async (req, res) => {
 
     // Missing await
     const allCoupons = await Coupons.find().sort({ createdAt: -1 });
-    res.status(201).json({ message: 'Coupon created', coupons: allCoupons });
+    res.status(201).json({ message: MESSAGES.COUPON_CREATED, coupons: allCoupons });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -82,14 +83,14 @@ export const deleteCoupon = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!deletedCoupon) {
-      return res.status(404).json({ message: 'Coupon not found' });
+      return res.status(404).json({ message: MESSAGES.COUPON_NOTFOUND });
     }
     res
       .status(200)
       .json({ message: 'Coupon deleted successfully', coupon: deletedCoupon });
   } catch (error) {
     console.error('Error deleting coupon:', error);
-    res.status(500).json({ message: 'Server error while deleting coupon' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -120,7 +121,7 @@ export const updateCoupon = async (req, res) => {
       { new: true },
     );
     if (!updatedCoupon) {
-      return res.status(404).json({ message: 'Coupon not found' });
+      return res.status(404).json({ message: MESSAGES.COUPON_NOTFOUND });
     }
     return res
       .status(200)
@@ -129,7 +130,7 @@ export const updateCoupon = async (req, res) => {
     console.error('Error updating coupon:', error);
     return res
       .status(500)
-      .json({ message: 'Server error while updating coupon' });
+      .json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -141,13 +142,13 @@ export const applyCoupon = async (req, res) => {
     );
 
     if (!coupon) {
-      return res.status(404).json({ message: 'Coupon not found' });
+      return res.status(404).json({ message: MESSAGES.COUPON_NOTFOUND });
     }
     if (coupon.usageLimit <= 0) {
       return res.status(400).json({ message: 'Coupon usage limit exceeded' });
     }
     if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
-      return res.status(400).json({ message: 'Coupon has expired' });
+      return res.status(400).json({ message: MESSAGES.COUPON_EXPIRED });
     }
     if ((coupon.usersUsed || []).some((user) => user.toString() === userId)) {
       return res
@@ -161,7 +162,7 @@ export const applyCoupon = async (req, res) => {
     res.status(200).json({ message: 'Coupon applied successfully', coupon });
   } catch (error) {
     console.error('Error applying coupon:', error);
-    res.status(500).json({ message: 'Server error while applying coupon' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -174,7 +175,7 @@ export const removeCoupon = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!coupon) {
-      return res.status(404).json({ message: 'Coupon not found' });
+      return res.status(404).json({ message: COUPON_NOTFOUND });
     }
 
     coupon.usersUsed = coupon.usersUsed.filter(

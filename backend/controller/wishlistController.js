@@ -1,5 +1,6 @@
 // controllers/wishlistController.js
 import Wishlist from '../model/wishlistModel.js';
+import { MESSAGES } from '../utils/messages.js';
 
 //add items to wish list
 export const addToWishlist = async (req, res) => {
@@ -21,7 +22,7 @@ export const addToWishlist = async (req, res) => {
     res.status(200).json(wishlist);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Failed to add to wishlist' });
+    res.status(500).json({ message: MESSAGES.WISHLIST_ADD_FAILED });
   }
 };
 
@@ -38,7 +39,7 @@ export const removeFromWishlist = async (req, res) => {
       );
       await wishlist.save();
     }
-    res.status(200).json({ message: 'Removed from wishlist' });
+    res.status(200).json({ message: MESSAGES.REMOVED_FROM_WISHLLIST });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Failed to remove from wishlist' });
@@ -56,7 +57,7 @@ export const getUserWishlist = async (req, res) => {
   } catch (err) {
     console.log(err);
 
-    res.status(500).json({ message: 'Failed to fetch wishlist' });
+    res.status(500).json({ message: MESSAGES.WISHLIST_FETCH_FAILED });
   }
 };
 

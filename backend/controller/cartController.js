@@ -1,6 +1,7 @@
 import Cart from '../model/cartModal.js';
 import Product from '../model/productModel.js';
 import wishlistModel from '../model/wishlistModel.js';
+import { MESSAGES } from '../utils/messages.js';
 
 // Add to cart
 export const addItemToCart = async (req, res) => {
@@ -11,9 +12,9 @@ export const addItemToCart = async (req, res) => {
       '-createdAt -updatedAt',
     );
 
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) return res.status(404).json({ message: MESSAGES.PRODUCT_NOTFOUND });
     if (product.totalQuantity <= 0)
-      return res.status(400).json({ message: 'Product is out of stock' });
+      return res.status(400).json({ message: MESSAGES.PRODCUT_OUT_STOCK });
 
     let cart = await Cart.findOne({ userId });
     if (!cart) {
@@ -30,9 +31,9 @@ export const addItemToCart = async (req, res) => {
 
     if (existingItem) {
       if (existingItem.quantity >= 4)
-        return res.status(400).json({ message: 'max quantity added' });
+        return res.status(400).json({ message: MESSAGES.MAX_QUANTITY_ADDED });
       if (existingItem.quantity >= product.totalQuantity) {
-        return res.status(400).json({ message: `Product is out of stock` });
+        return res.status(400).json({ message: MESSAGES.PRODCUT_OUT_STOCK });
       }
 
       existingItem.quantity += quantity;
@@ -83,7 +84,7 @@ export const getCart = async (req, res) => {
       .select('-createdAt -updatedAt');
 
     if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+      return res.status(404).json({ message: MESSAGES.CART_NOTFOUND });
     }
 
     let newSubTotal = 0;
@@ -119,7 +120,7 @@ export const toggleIsLocked = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+      return res.status(404).json({ message: MESSAGES.CART_NOTFOUND });
     }
 
     if (lock == 'true') {
@@ -135,7 +136,7 @@ export const toggleIsLocked = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in toggleIsLocked:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -144,12 +145,12 @@ export const updateCartItem = async (req, res) => {
     const { userId, productId, quantity } = req.body;
 
     const cart = await Cart.findOne({ userId }).select('-createdAt -updatedAt');
-    if (!cart) return res.status(404).json({ message: 'Cart not found' });
+    if (!cart) return res.status(404).json({ message: MESSAGES.CART_NOTFOUND });
 
     const product = await Product.findById(productId).select(
       '-createdAt -updatedAt',
     );
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) return res.status(404).json({ message: MESSAGES.PRODUCT_NOTFOUND });
     if (quantity > product.totalQuantity) {
       return res
         .status(400)
@@ -201,7 +202,7 @@ export const updateCartItem = async (req, res) => {
     console.error(err);
     res
       .status(500)
-      .json({ message: err.message || 'Failed to update cart item' });
+      .json({ message: err.message || MESSAGES.FAILD_UPDATE_CART });
   }
 };
 
@@ -212,10 +213,10 @@ export const removeCartItem = async (req, res) => {
     const product = await Product.findById(productId).select(
       '-createdAt -updatedAt',
     );
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) return res.status(404).json({ message: MESSAGES.PRODUCT_NOTFOUND });
 
     const cart = await Cart.findOne({ userId }).select('-createdAt -updatedAt');
-    if (!cart) return res.status(404).json({ message: 'Cart not found' });
+    if (!cart) return res.status(404).json({ message: MESSAGES.CART_NOTFOUND });
 
     cart.products = cart.products.filter(
       (p) => p.productId.toString() !== productId,
@@ -276,12 +277,12 @@ export const addFromWishlistToCart = async (req, res) => {
         if (existingItem.quantity >= 4) {
           return res
             .status(400)
-            .json({ message: 'Max quantity reached for one item' });
+            .json({ message: MESSAGES.MAX_QUANTITY_REACH});
         }
         if (product.totalQuantity <= 0) {
           return res
             .status(400)
-            .json({ message: 'Not enough stock available' });
+            .json({ message:  MESSAGES.NOT_ENOUGH_STOCK});
         }
 
         existingItem.quantity += quantity;
@@ -291,7 +292,7 @@ export const addFromWishlistToCart = async (req, res) => {
         if (quantity > product.totalQuantity) {
           return res
             .status(400)
-            .json({ message: 'Not enough stock available' });
+            .json({ message: MESSAGES.NOT_ENOUGH_STOCK });
         }
         cart.products.push({
           productId: product._id,
@@ -321,11 +322,11 @@ export const addFromWishlistToCart = async (req, res) => {
     await cart.save();
 
     return res.status(200).json({
-      message: 'Wishlist products added to cart successfully',
+      message: MESSAGES.WISHLIST_TO_CART,
       cart,
     });
   } catch (error) {
     console.error('Error adding wishlist to cart:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };

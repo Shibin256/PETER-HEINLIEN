@@ -13,7 +13,7 @@ import BestSellerChart from '../../components/common/BestSellerChart';
 import BestSellerChartSkeleton from '../../components/common/sketion/BestSellerChartSkeleton';
 
 const Dashboard = () => {
-  const [reportPeriod, setReportPeriod] = useState('Daily');
+  const [reportPeriod, setReportPeriod] = useState('Yearly');
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split('T')[0]
   );
@@ -41,7 +41,7 @@ const Dashboard = () => {
     const today = new Date().toISOString().split('T')[0];
     dispatch(
       fetchSalesReport({
-        type: 'Daily',
+        type: 'Yearly',
         startDate: today,
         endDate: '',
       })

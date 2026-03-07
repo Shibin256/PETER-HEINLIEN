@@ -3,6 +3,7 @@ import Category from '../../model/categoryModel.js';
 import Brands from '../../model/brandModel.js';
 import cloudinary from '../../utils/cloudinary.js';
 import Product from '../../model/productModel.js';
+import { MESSAGES } from '../../utils/messages.js';
 
 //create categroy section
 export const createCategory = async (req, res) => {
@@ -13,7 +14,7 @@ export const createCategory = async (req, res) => {
     }).select('-createdAt -updatedAt');
 
     if (categoryCheck)
-      return res.status(400).json({ message: 'Category already exists' });
+      return res.status(400).json({ message: MESSAGES.CATEGORY_EXISTS });
 
     const newCategory = new Category({
       _id: new mongoose.Types.ObjectId(),
@@ -28,7 +29,7 @@ export const createCategory = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: 'Category created', category: categoryResponse });
+      .json({ message: MESSAGES.CATEGORY_CREATED, category: categoryResponse });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -48,7 +49,7 @@ export const createBrand = async (req, res) => {
     }).select('-createdAt -updatedAt -image');
 
     if (brandExists)
-      return res.status(400).json({ message: 'Brand already exists' });
+      return res.status(400).json({ message:  MESSAGES.BRAND_EXISTS});
 
     const newBrand = new Brands({
       _id: new mongoose.Types.ObjectId(),
@@ -63,7 +64,7 @@ export const createBrand = async (req, res) => {
     delete brandResponse.createdAt;
     delete brandResponse.updatedAt;
 
-    res.status(201).json({ message: 'brand created', brand: newBrand });
+    res.status(201).json({ message: MESSAGES.BRAND_CREATED, brand: newBrand });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -78,7 +79,7 @@ export const deleteCategory = async (req, res) => {
     );
 
     if (!category) {
-      return res.status(404).json({ message: 'Category not found' });
+      return res.status(404).json({ message: MESSAGES.CATEGORY_NOTFOUND });
     }
 
     const updatedProducts = await Product.updateMany(
@@ -95,7 +96,7 @@ export const deleteCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating category/products:', error);
-    res.status(500).json({ message: 'Server error while deleting category' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -105,7 +106,7 @@ export const deleteBrand = async (req, res) => {
     const brand = await Brands.findById(req.params.id).select(
       '_id categoryName isList',
     );
-    if (!brand) return res.status(404).json({ message: 'Brand not found' });
+    if (!brand) return res.status(404).json({ message: MESSAGES.BRAND_NOTFOUND });
 
     const updatedProducts = await Product.updateMany(
       { brand: req.params.id },
@@ -121,7 +122,7 @@ export const deleteBrand = async (req, res) => {
     });
   } catch (error) {
     console.error('Error deleting brand:', error);
-    res.status(500).json({ message: 'Server error while deleting brand' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -145,13 +146,13 @@ export const editBrand = async (req, res) => {
     }).select('-createdAt -updatedAt');
 
     if (!updatedBrand) {
-      return res.status(404).json({ message: 'Brand not found' });
+      return res.status(404).json({ message: MESSAGES.BRAND_NOTFOUND });
     }
 
     res.status(200).json(updatedBrand);
   } catch (error) {
     console.error('Edit brand Error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -164,7 +165,7 @@ export const editCategory = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!Thecategory) {
-      return res.status(404).json({ message: 'Category not found' });
+      return res.status(404).json({ message: MESSAGES.CATEGORY_NOTFOUND });
     }
     Thecategory.categoryName = category;
     await Thecategory.save();
@@ -174,7 +175,7 @@ export const editCategory = async (req, res) => {
       .json({ message: 'Category updated successfully', category });
   } catch (error) {
     console.error('Edit category Error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -196,7 +197,7 @@ export const addCategoryOffer = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!category) {
-      return res.status(404).json({ message: 'category not found' });
+      return res.status(404).json({ message: MESSAGES.CATEGORY_NOTFOUND });
     }
     category.offerPersentage = percentage;
     category.offerAdded = true;
@@ -222,7 +223,7 @@ export const addCategoryOffer = async (req, res) => {
     res.status(200).json({ message: 'Offer added successfully' });
   } catch (error) {
     console.error('Error adding offer:', error);
-    res.status(500).json({ message: 'Server error while adding offer' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -237,7 +238,7 @@ export const removeCategoryOffer = async (req, res) => {
       '-createdAt -updatedAt',
     );
     if (!category) {
-      return res.status(404).json({ message: 'category not found' });
+      return res.status(404).json({ message: MESSAGES.CATEGORY_NOTFOUND });
     }
 
     const products = await Product.find({ category: categoryId }).select(
@@ -260,6 +261,6 @@ export const removeCategoryOffer = async (req, res) => {
     res.status(200).json({ message: 'Offer removed successfully', products });
   } catch (error) {
     console.error('Error removing offer:', error);
-    res.status(500).json({ message: 'Server error while removing offer' });
+    res.status(500).json({ message: MESSAGES.SERVER_ERROR });
   }
 };
