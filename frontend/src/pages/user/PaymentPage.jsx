@@ -20,6 +20,13 @@ const PaymentPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [date, setDate] = useState('');
+
+  // useRef to reliably access orderId in async flows without stale closure issues
+  const orderIdRef = React.useRef('');
+
+  // Store the full pending order so we can pass it to the failed page if needed
+  const [pendingOrderData, setPendingOrderData] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -33,6 +40,7 @@ const PaymentPage = () => {
     userId,
     deliveryDate,
   } = location.state || {};
+
   if (discount > 0) {
     totalPrice -= discount;
   }
@@ -67,7 +75,6 @@ const PaymentPage = () => {
   }, []);
 
   useEffect(() => {
-    // If user landed here directly without state, redirect them to cart
     if (!location.state || !address || !cartItems) {
       navigate('/cart', { replace: true });
     }
@@ -116,7 +123,7 @@ const PaymentPage = () => {
             },
           },
           retry: {
-            enabled: false, // disables auto retry popup
+            enabled: false,
           },
         };
 
@@ -139,7 +146,7 @@ const PaymentPage = () => {
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     try {
-      if (selectedPayment == 'cod') {
+      if (selectedPayment === 'cod') {
         const res = await dispatch(
           placeOrder({
             orderdata: {
@@ -153,10 +160,9 @@ const PaymentPage = () => {
             paymentMethod: selectedPayment,
           })
         ).unwrap();
+
         setOrderId(res.order.orderId);
-
         navigate('/', { replace: true });
-
         setTimeout(() => {
           navigate('/order-success', { state: { order: res.order } });
         }, 0);
@@ -184,13 +190,18 @@ const PaymentPage = () => {
           })
         ).unwrap();
 
-        setOrderId(pendingOrder.order.orderId);
+        const currentOrderId = pendingOrder.order.orderId;
+        setOrderId(currentOrderId);
+        orderIdRef.current = pendingOrder.order;
+
+        // Store the full pending order data so the catch block can access it
+        setPendingOrderData(pendingOrder.order);
 
         let totalAmount = totalPrice + (shippingCost || 0);
 
         const paymentSuccess = await handlePayment({
           totalPrice: totalAmount,
-          orderId: pendingOrder.order.orderId,
+          orderId: currentOrderId,
         });
 
         if (paymentSuccess) {
@@ -200,10 +211,25 @@ const PaymentPage = () => {
           toast.error('Payment failed');
           await dispatch(
             updateOrderStatus({
-              orderId: pendingOrder.order.orderId,
+              orderId: currentOrderId,
             })
           );
           await dispatch(toggleIsLocked({ userID: userId, lock: false }));
+
+          // Navigate to failed page with full retry data
+          navigate('/order-failed', {
+            state: {
+              orderId: orderIdRef.current.orderId || null,
+              address: orderIdRef.current.Order_Address,
+              cartItems: orderIdRef.current.Items,
+              totalPrice: orderIdRef.current.TotalAmount,
+              discount: 0,
+              appliedCoupon: null,
+              shippingCost: orderIdRef.current.DeliveryCharge,
+              userId: orderIdRef.current.UserID,
+              deliveryDate: orderIdRef.current.DeliveryDate,
+            },
+          });
         }
       } else if (selectedPayment === 'walletPay') {
         let totalAmount = totalPrice + (shippingCost || 0);
@@ -223,6 +249,7 @@ const PaymentPage = () => {
               paymentMethod: selectedPayment,
             })
           ).unwrap();
+
           setOrderId(res.order.orderId);
           const date = new Date(res.order.DeliveryDate);
           date.toLocaleDateString('en-GB', {
@@ -231,7 +258,6 @@ const PaymentPage = () => {
             year: 'numeric',
           });
           navigate('/', { replace: true });
-
           setTimeout(() => {
             navigate('/order-success', { state: { order: res.order } });
           }, 0);
@@ -242,14 +268,21 @@ const PaymentPage = () => {
     } catch (error) {
       setOrderStatus('error');
       console.log(error);
-      navigate('/order-failed', {
-        state: {
-          cartItems,
-          totalPrice,
-          shippingCost,
-          userId,
-        },
-      });
+
+      // Pass full retry-ready state to the failed page
+       navigate('/order-failed', {
+            state: {
+              orderId: orderIdRef.current.orderId || null,
+              address: orderIdRef.current.Order_Address,
+              cartItems: orderIdRef.current.Items,
+              totalPrice: orderIdRef.current.TotalAmount,
+              discount: 0,
+              appliedCoupon: null,
+              shippingCost: orderIdRef.current.DeliveryCharge,
+              userId: orderIdRef.current.UserID,
+              deliveryDate: orderIdRef.current.DeliveryDate,
+            },
+          });
     } finally {
       await dispatch(toggleIsLocked({ userID: userId, lock: false }));
       setIsProcessing(false);
@@ -272,9 +305,9 @@ const PaymentPage = () => {
       {/* Payment Methods */}
       <div className="mb-6 bg-white rounded-lg shadow overflow-hidden">
         <div className="space-y-1">
-          {/* UPI Option */}
+          {/* Razorpay Option */}
           <div
-            className={`p-4 transition-all ${selectedPayment === 'upi' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}
+            className={`p-4 transition-all ${selectedPayment === 'razorpay' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}
           >
             <label className="flex items-center cursor-pointer">
               <input
@@ -292,21 +325,16 @@ const PaymentPage = () => {
                   Pay instantly using any razorpay app
                 </span>
               </div>
-              <div className="ml-auto flex space-x-2">
-                {/* UPI app icons would go here */}
-              </div>
             </label>
           </div>
 
-          {/* Net Banking Option */}
+          {/* Wallet Option */}
           <div
             className={`p-4 transition-all ${selectedPayment === 'walletPay' ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50'}`}
           >
             <label className="flex items-center cursor-pointer">
               <input
-                disabled={
-                  walletAmount < totalPrice + shippingCost ? true : false
-                }
+                disabled={walletAmount < totalPrice + shippingCost}
                 type="radio"
                 name="payment"
                 className="h-5 w-5 text-green-600 focus:ring-green-500"
@@ -328,7 +356,7 @@ const PaymentPage = () => {
           >
             <label className="flex items-center cursor-pointer">
               <input
-                disabled={totalPrice > 1000 ? true : false}
+                disabled={totalPrice > 1000}
                 type="radio"
                 name="payment"
                 className="h-5 w-5 text-green-600 focus:ring-green-500"
@@ -371,7 +399,7 @@ const PaymentPage = () => {
           <div className="border-t border-gray-200 my-2"></div>
           <div className="flex justify-between py-2 font-bold text-lg">
             <span>Total Payable</span>
-            <span>{`${currency}${(totalPrice + shippingCost).toFixed(2)} `}</span>
+            <span>{`${currency}${(totalPrice + shippingCost).toFixed(2)}`}</span>
           </div>
         </div>
       </div>
@@ -397,72 +425,40 @@ const PaymentPage = () => {
         </button>
       </div>
 
-      {/* Order Status Modal */}
+      {/* Insufficient Wallet Balance Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="text-center">
-              {orderStatus === 'success' ? (
-                <>
-                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                    <svg
-                      className="h-6 w-6 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="mt-3 text-lg font-medium text-gray-900">
-                    Order Placed Successfully!
-                  </h3>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <p>
-                      Your order has been placed and will be delivered by {date}
-                      .
-                    </p>
-                    <p className="mt-2">Order ID: # {orderId}</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                    <svg
-                      className="h-6 w-6 text-red-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="mt-3 text-lg font-medium text-gray-900">
-                    Order Failed
-                  </h3>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <p>Your wallet balance is insufficient</p>
-                    <p>Please try again or use a different payment method.</p>
-                  </div>
-                </>
-              )}
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <svg
+                  className="h-6 w-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+              <h3 className="mt-3 text-lg font-medium text-gray-900">
+                Insufficient Wallet Balance
+              </h3>
+              <div className="mt-2 text-sm text-gray-500">
+                <p>Your wallet balance is insufficient for this order.</p>
+                <p>Please try again or use a different payment method.</p>
+              </div>
               <div className="mt-5">
                 <button
                   type="button"
-                  className={`inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white ${orderStatus === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} focus:outline-none sm:text-sm`}
+                  className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none sm:text-sm"
                   onClick={handleModalClose}
                 >
-                  {orderStatus === 'success' ? 'View Orders' : 'Try Again'}
+                  Try Again
                 </button>
               </div>
             </div>

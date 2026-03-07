@@ -305,6 +305,7 @@ const Wallet = () => {
                   </th>
                 </tr>
               </thead>
+
               <tbody className="bg-white divide-y divide-[#e6f0f3]">
                 {transactions.map((transaction) => (
                   <tr
@@ -327,57 +328,56 @@ const Wallet = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
-                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          transaction.status === 'success'
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${transaction.status === 'success'
                             ? 'bg-[#e6f7ee] text-[#006644]'
                             : 'bg-[#ffebee] text-[#d32f2f]'
-                        }`}
+                          }`}
                       >
                         {transaction.status}
                       </span>
                     </td>
                   </tr>
                 ))}
-                {/* Pagination Buttons */}
-                <div className="flex justify-center items-center gap-4 mt-6">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() =>
-                      dispatch(
-                        getWallet({
-                          userId: user._id,
-                          page: page - 1,
-                          limit: 10,
-                        })
-                      )
-                    }
-                    className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
-                  >
-                    Previous
-                  </button>
-
-                  <span className="text-sm text-gray-700">
-                    Page {page} of {totalPages}
-                  </span>
-
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() =>
-                      dispatch(
-                        getWallet({
-                          userId: user._id,
-                          page: page + 1,
-                          limit: 10,
-                        })
-                      )
-                    }
-                    className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
-                  >
-                    Next
-                  </button>
-                </div>
               </tbody>
             </table>
+            {/* Pagination Buttons */}
+            <div className="flex justify-center items-center gap-4 mt-6">
+              <button
+                disabled={page <= 1}
+                onClick={() =>
+                  dispatch(
+                    getWallet({
+                      userId: user._id,
+                      page: page - 1,
+                      limit: 10,
+                    })
+                  )
+                }
+                className={`px-4 py-2 rounded ${page <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+              >
+                Previous
+              </button>
+
+              <span className="text-sm text-gray-700">
+                Page {page} of {totalPages}
+              </span>
+
+              <button
+                disabled={page >= totalPages}
+                onClick={() =>
+                  dispatch(
+                    getWallet({
+                      userId: user._id,
+                      page: page + 1,
+                      limit: 10,
+                    })
+                  )
+                }
+                className={`px-4 py-2 rounded ${page >= totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -9,6 +9,31 @@ import {
 export default function OrderFailed() {
   const navigate = useNavigate();
   const location = useLocation();
+  const {
+    orderId,
+    address,
+    cartItems,
+    totalPrice,
+    shippingCost,
+    userId,
+    deliveryDate,
+  } = location.state || {};
+
+  const handleRetry = () => {
+    navigate('/retry-payment', {
+      state: {
+        orderId: orderId,
+        address: address,
+        cartItems: cartItems,
+        totalPrice: totalPrice,
+        discount: 0,
+        appliedCoupon: null,
+        shippingCost: shippingCost,
+        userId: userId,
+        deliveryDate: deliveryDate,
+      },
+    })
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-12">
@@ -37,7 +62,7 @@ export default function OrderFailed() {
           </button>
 
           <button
-            onClick={() => navigate(-1)}
+            onClick={handleRetry}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl shadow-sm transition-all duration-300"
           >
             <ArrowPathIcon className="w-5 h-5" />
