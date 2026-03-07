@@ -18,7 +18,6 @@ const Wishlist = () => {
 
   const { wishlist } = useSelector((state) => state.wishlist);
 
-  const [selectedAction, setSelectedAction] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState(null);
 

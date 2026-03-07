@@ -31,7 +31,7 @@ const Collection = () => {
 
   const [showFilter, setShowFilter] = useState(false);
 
-  const { products, page, totalPages, brands, categories } = useSelector(
+  const { products, totalPages, brands, categories } = useSelector(
     (state) => state.products
   );
 

@@ -30,7 +30,6 @@ const ProductDetails = () => {
   const { id } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [localCart, setLocalCart] = useState([]);
   const dispatch = useDispatch();
 
   const storedUser = localStorage.getItem('user');
@@ -74,7 +73,6 @@ const ProductDetails = () => {
   }, [user, singleProduct, dispatch]);
 
   const product = singleProduct;
-  let shippingCost = 0;
   const totalQuantity = product?.totalQuantity || 0;
   if (product && product.price < 500) {
     shippingCost = 50;
@@ -183,7 +181,6 @@ const ProductDetails = () => {
     };
 
     const updatedCart = [newCartItem];
-    setLocalCart(updatedCart);
 
     const shipping = newCartItem.productSubTotal > 1000 ? 0 : 50;
     navigate('/checkout', {

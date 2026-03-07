@@ -51,7 +51,6 @@ class ErrorBoundary extends React.Component {
               >
                 <FiRefreshCw /> Try Again
               </button>
-
             </div>
           </div>
         </div>

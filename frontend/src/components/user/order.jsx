@@ -25,7 +25,7 @@ const Order = ({ order, onCancelSuccess }) => {
     orderId,
   } = order;
 
-  console.log(OrderStatus,'order---------stat')
+  console.log(OrderStatus, 'order---------stat');
 
   const navigate = useNavigate();
 
@@ -238,7 +238,7 @@ const Order = ({ order, onCancelSuccess }) => {
             <span
               className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyles[OrderStatus] || 'bg-gray-100 text-gray-800'}`}
             >
-              {OrderStatus==='Processing' ? 'Order Placed': OrderStatus }
+              {OrderStatus === 'Processing' ? 'Order Placed' : OrderStatus}
             </span>
             <span className="text-sm text-gray-600">
               {new Date(DeliveryDate).toLocaleDateString('en-IN', {

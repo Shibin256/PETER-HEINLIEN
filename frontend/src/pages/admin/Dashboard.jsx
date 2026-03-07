@@ -58,7 +58,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setLoadingBestSellers(true);
-    dispatch(getBestSellers()).then((res) => {
+    dispatch(getBestSellers()).then(() => {
       setLoadingBestSellers(false);
     });
   }, [dispatch]);

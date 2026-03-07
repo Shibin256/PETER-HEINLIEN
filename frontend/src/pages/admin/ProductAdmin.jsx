@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   addProductOffer,
   deleteProduct,
-  fetchProducts,
   fetchProductsAdmin,
   getBrandAndCollection,
   listProdcut,

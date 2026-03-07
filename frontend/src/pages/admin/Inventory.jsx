@@ -237,7 +237,7 @@ const Inventory = () => {
         toast.warning('Brand name must be between 2 and 50 characters');
         return;
       }
-      if (!/^[a-zA-Z0-9\s\-]+$/.test(newBrand)) {
+      if (!/^[a-zA-Z0-9\s-]+$/.test(newBrand)) {
         toast.warning(
           'Brand name can only contain letters, numbers, spaces, and hyphens'
         );
@@ -311,7 +311,7 @@ const Inventory = () => {
         toast.warning('Brand name must be between 2 and 50 characters');
         return;
       }
-      if (!/^[a-zA-Z0-9\s\-]+$/.test(editingBrandName)) {
+      if (!/^[a-zA-Z0-9\s-]+$/.test(editingBrandName)) {
         toast.warning(
           'Brand name can only contain letters, numbers, spaces, and hyphens'
         );

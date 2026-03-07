@@ -145,10 +145,9 @@ const submitReview = async ({ itemId, rating, review }) => {
   return response.data;
 };
 
-const updateOrderStatus = async (orderID) => {
+const updateOrderStatus = async (itemOrderId) => {
   const response = await adminAxiosInstance.delete(
-    `/api/v1/admin/orders/${itemOrderId}`,
-    data
+    `/api/v1/admin/orders/${itemOrderId}`
   );
   return response.data;
 };

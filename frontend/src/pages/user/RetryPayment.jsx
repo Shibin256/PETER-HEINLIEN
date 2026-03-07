@@ -16,15 +16,7 @@ const RetryPayment = () => {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const {
-    orderId,
-    address,
-    cartItems,
-    totalPrice,
-    shippingCost,
-    userId,
-    deliveryDate,
-  } = location.state || {};
+  const { orderId, cartItems, totalPrice, shippingCost } = location.state || {};
 
   const totalAmount = Number(totalPrice) + Number(shippingCost || 0);
 

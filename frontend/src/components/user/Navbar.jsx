@@ -8,15 +8,12 @@ import {
 } from 'react-icons/fa';
 import navlogo from '../../assets/navlogo.png';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import { fetchCart } from '../../features/cart/cartSlice';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -31,14 +28,6 @@ const Navbar = () => {
     (total, item) => total + item.quantity,
     0
   );
-
-  const handleLogout = () => {
-    dispatch(logout());
-    localStorage.removeItem('user');
-    localStorage.removeItem('accessToken');
-    toast.success('Logged out successfully');
-    navigate('/login');
-  };
 
   return (
     <header

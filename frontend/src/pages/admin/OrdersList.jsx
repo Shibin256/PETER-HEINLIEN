@@ -121,18 +121,19 @@ const OrdersList = () => {
 
         return (
           <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'Processing'
-              ? 'bg-yellow-100 text-yellow-800'
-              : status === 'Shipped'
-                ? 'bg-blue-100 text-blue-800'
-                : status === 'Delivered'
-                  ? 'bg-green-100 text-green-800'
-                  : status === 'Cancelled'
-                    ? 'bg-red-100 text-red-800'
-                    : status === 'Failed'
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              status === 'Processing'
+                ? 'bg-yellow-100 text-yellow-800'
+                : status === 'Shipped'
+                  ? 'bg-blue-100 text-blue-800'
+                  : status === 'Delivered'
+                    ? 'bg-green-100 text-green-800'
+                    : status === 'Cancelled'
                       ? 'bg-red-100 text-red-800'
-                      : 'bg-gray-100 text-gray-800'
-              }`}
+                      : status === 'Failed'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-800'
+            }`}
           >
             {displayStatus}
           </span>
@@ -144,12 +145,13 @@ const OrdersList = () => {
       label: 'Payment',
       render: (status) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${status === 'Paid'
-            ? 'bg-green-100 text-green-800'
-            : status === 'Failed'
-              ? 'bg-red-100 text-red-800'
-              : 'bg-gray-100 text-gray-800'
-            }`}
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            status === 'Paid'
+              ? 'bg-green-100 text-green-800'
+              : status === 'Failed'
+                ? 'bg-red-100 text-red-800'
+                : 'bg-gray-100 text-gray-800'
+          }`}
         >
           {status}
         </span>
@@ -426,10 +428,11 @@ const OrdersList = () => {
                         <td className="px-4 py-3 whitespace-nowrap">
                           {item.returnReason ? (
                             <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${item.returnVerified
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-orange-100 text-orange-800'
-                                }`}
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                item.returnVerified
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-orange-100 text-orange-800'
+                              }`}
                             >
                               {item.returnVerified
                                 ? 'Return Verified'
@@ -507,7 +510,8 @@ const OrdersList = () => {
                       <div className="flex justify-between">
                         <span className="font-medium">Order Status:</span>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${orderDetails.OrderStatus === 'Processing'
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            orderDetails.OrderStatus === 'Processing'
                               ? 'bg-yellow-100 text-yellow-800'
                               : orderDetails.OrderStatus === 'Shipped'
                                 ? 'bg-blue-100 text-blue-800'
@@ -516,7 +520,7 @@ const OrdersList = () => {
                                   : orderDetails.OrderStatus === 'Cancelled'
                                     ? 'bg-red-100 text-red-800'
                                     : 'bg-gray-100 text-gray-800'
-                            }`}
+                          }`}
                         >
                           {orderDetails.OrderStatus === 'Processing'
                             ? 'Placed'
@@ -526,10 +530,11 @@ const OrdersList = () => {
                       <div className="flex justify-between">
                         <span className="font-medium">Payment:</span>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${orderDetails.PaymentStatus === 'Paid'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                            }`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            orderDetails.PaymentStatus === 'Paid'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
                         >
                           {orderDetails.PaymentStatus} (
                           {orderDetails.PaymentMethod})
@@ -584,10 +589,11 @@ const OrdersList = () => {
                                 Return Status:{' '}
                                 {item.returnReason ? (
                                   <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${item.returnVerified
-                                      ? 'bg-red-100 text-red-800'
-                                      : 'bg-orange-100 text-orange-800'
-                                      }`}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      item.returnVerified
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-orange-100 text-orange-800'
+                                    }`}
                                   >
                                     {item.returnVerified
                                       ? 'Return Verified'
@@ -601,12 +607,13 @@ const OrdersList = () => {
                               </div>
                               <div>
                                 Cancel Status:{' '}
-                                {orderDetails.OrderStatus=='Cancelled' ? (
+                                {orderDetails.OrderStatus == 'Cancelled' ? (
                                   <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${item.cancelVerified
-                                      ? 'bg-red-100 text-red-800'
-                                      : 'bg-orange-100 text-orange-800'
-                                      }`}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      item.cancelVerified
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-orange-100 text-orange-800'
+                                    }`}
                                   >
                                     Cancelled
                                   </span>
@@ -712,13 +719,13 @@ const OrdersList = () => {
                     </button>
                   )} */}
                 {orderDetails.OrderStatus === 'Cancelled' && (
-                    <button
-                      disabled
-                      className="px-4 py-2 bg-red-500 text-white rounded-md text-sm font-medium cursor-default"
-                    >
-                      Cancelled
-                    </button>
-                  )}
+                  <button
+                    disabled
+                    className="px-4 py-2 bg-red-500 text-white rounded-md text-sm font-medium cursor-default"
+                  >
+                    Cancelled
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AccountEditCard from '../../../components/user/AccountEditCard';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setUser } from '../../../features/auth/authSlice';
 import { changeMobile } from '../../../features/accountSettings/accountSlice';
 import { toast } from 'react-toastify';
@@ -9,11 +9,9 @@ import { toast } from 'react-toastify';
 const EditMobile = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
   const profileData = location.state?.profileData;
   const dispatch = useDispatch();
 
-  const user = useSelector((state) => state.auth);
   const handleBack = () => {
     navigate(-1);
   };
@@ -22,12 +20,10 @@ const EditMobile = () => {
     if (newMobile) {
       if (!/^\d{10}$/.test(newMobile)) {
         toast.error('The phone number must be 10');
-        setLoading(false);
         return;
       }
       if (newMobile === '0000000000') {
         toast.error('dont give zero');
-        setLoading(false);
         return;
       }
     }

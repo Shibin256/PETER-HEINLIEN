@@ -14,7 +14,6 @@ import {
   removeFromWishlist,
 } from '../../features/wishlist/wishlistSlice';
 import { addToCart } from '../../features/cart/cartSlice';
-import { useEffect } from 'react';
 
 const ProductCard = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(product.isWishlisted);

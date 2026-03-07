@@ -22,7 +22,10 @@ adminAxiosInstance.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
-    if ((err.response?.status === 401 || err.response?.status === 403) && !originalRequest._retry) {
+    if (
+      (err.response?.status === 401 || err.response?.status === 403) &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
       try {
         //refresh token

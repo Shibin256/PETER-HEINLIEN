@@ -19,13 +19,11 @@ const PaymentPage = () => {
   const [orderStatus, setOrderStatus] = useState(null); // 'success' or 'error'
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState('');
-  const [date, setDate] = useState('');
 
   // useRef to reliably access orderId in async flows without stale closure issues
   const orderIdRef = React.useRef('');
 
   // Store the full pending order so we can pass it to the failed page if needed
-  const [pendingOrderData, setPendingOrderData] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -194,9 +192,6 @@ const PaymentPage = () => {
         setOrderId(currentOrderId);
         orderIdRef.current = pendingOrder.order;
 
-        // Store the full pending order data so the catch block can access it
-        setPendingOrderData(pendingOrder.order);
-
         let totalAmount = totalPrice + (shippingCost || 0);
 
         const paymentSuccess = await handlePayment({
@@ -270,19 +265,19 @@ const PaymentPage = () => {
       console.log(error);
 
       // Pass full retry-ready state to the failed page
-       navigate('/order-failed', {
-            state: {
-              orderId: orderIdRef.current.orderId || null,
-              address: orderIdRef.current.Order_Address,
-              cartItems: orderIdRef.current.Items,
-              totalPrice: orderIdRef.current.TotalAmount,
-              discount: 0,
-              appliedCoupon: null,
-              shippingCost: orderIdRef.current.DeliveryCharge,
-              userId: orderIdRef.current.UserID,
-              deliveryDate: orderIdRef.current.DeliveryDate,
-            },
-          });
+      navigate('/order-failed', {
+        state: {
+          orderId: orderIdRef.current.orderId || null,
+          address: orderIdRef.current.Order_Address,
+          cartItems: orderIdRef.current.Items,
+          totalPrice: orderIdRef.current.TotalAmount,
+          discount: 0,
+          appliedCoupon: null,
+          shippingCost: orderIdRef.current.DeliveryCharge,
+          userId: orderIdRef.current.UserID,
+          deliveryDate: orderIdRef.current.DeliveryDate,
+        },
+      });
     } finally {
       await dispatch(toggleIsLocked({ userID: userId, lock: false }));
       setIsProcessing(false);

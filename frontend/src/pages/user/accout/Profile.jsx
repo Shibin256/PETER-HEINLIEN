@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../../features/auth/authSlice';
-import Swal from 'sweetalert2';
-import { deleteUser } from '../../../features/users/userSlice';
 import { toast } from 'react-toastify';
 import ProfileImageModal from '../../../components/common/ProfileImageModal';
 

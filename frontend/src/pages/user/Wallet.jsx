@@ -328,10 +328,11 @@ const Wallet = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
-                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${transaction.status === 'success'
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          transaction.status === 'success'
                             ? 'bg-[#e6f7ee] text-[#006644]'
                             : 'bg-[#ffebee] text-[#d32f2f]'
-                          }`}
+                        }`}
                       >
                         {transaction.status}
                       </span>

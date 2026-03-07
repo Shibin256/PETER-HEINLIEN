@@ -118,7 +118,6 @@ const OTPFormFrogotpass = () => {
         `${baseUrl}/api/auth/verifyOTPForgotpass`,
         { formData, otp }
       );
-      const { user } = response.data;
       toast.success(response.data.message);
       localStorage.removeItem('otpExpiry');
       navigate('/change-password', {
