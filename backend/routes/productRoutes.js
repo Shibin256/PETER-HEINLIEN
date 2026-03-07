@@ -53,7 +53,7 @@ router.get(
   verifyAccessToken,
   getAllProductsAdmin,
 );
-router.get('/products/user', verifyAccessToken, getAllProducts);
+router.get('/products/user', getAllProducts);
 router.delete(
   '/product/:id',
   authorizeRole(roles),
