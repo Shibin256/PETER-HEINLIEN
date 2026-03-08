@@ -288,7 +288,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email }).select('-createdAt -updatedAt');
 
     if (!user) {
-      return res.status(401).json({ message: MESSAGES.INVALID_EMAIL_PASSWORD });
+      return res.status(401).json({ message: 'invalid user' });
     }
     if (user.googleId) {
       return res
@@ -298,7 +298,7 @@ export const login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: MESSAGES.INVALID_EMAIL_PASSWORD });
+      return res.status(401).json({ message: 'Incorrect Password' });
     }
 
     if (user.isAdmin) {

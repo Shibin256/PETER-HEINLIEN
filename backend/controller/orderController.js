@@ -245,13 +245,12 @@ export const cancelOrderItem = async (req, res) => {
     order.cancelReason = reason || 'No reason provided';
     await order.save();
 
-    // 🔹 WALLET REFUND LOGIC
     if (order.PaymentMethod !== 'cod') {
 
       const total =
         Number(order.TotalAmount) + Number(order.DeliveryCharge || 0);
 
-      let wallet = await Wallet.findOne({ userId: order.UserID });
+        let wallet = await Wallet.findOne({ userId: order.UserID });
 
       const transaction = {
         userId: order.UserID,
@@ -261,7 +260,6 @@ export const cancelOrderItem = async (req, res) => {
         type: 'credit',
         description: 'Order Cancelled Refund',
       };
-
       if (wallet) {
         wallet.balance += total;
         wallet.transactions.push(transaction);
@@ -293,6 +291,7 @@ export const cancelOrderSingleItem = async (req, res) => {
     const orderItem = await Order.findOne({
       'Items.itemOrderId': itemOrderId,
     }).select('-createdAt -updatedAt');
+
     if (!orderItem) {
       return res.status(404).json({ message: 'Order item not found' });
     }
@@ -302,10 +301,12 @@ export const cancelOrderSingleItem = async (req, res) => {
     const item = orderItem.Items.find(
       (item) => item.itemOrderId === itemOrderId,
     );
+
     if (!item) {
       return res.status(404).json({ message: 'Item not found in order' });
     }
 
+    // Restore stock
     const updatedProduct = await Product.findByIdAndUpdate(
       item.productId,
       { $inc: { totalQuantity: +item.quantity } },
@@ -318,6 +319,7 @@ export const cancelOrderSingleItem = async (req, res) => {
     }
 
     item.cancelReason = reason || 'No reason provided';
+    item.status = 'Cancelled';
 
     if (orderItem.Items.length == 1) {
       orderItem.OrderStatus = 'Cancelled';
@@ -325,12 +327,44 @@ export const cancelOrderSingleItem = async (req, res) => {
 
     await orderItem.save();
 
+    
+    if (orderItem.PaymentMethod !== 'cod') {
+
+      const refundAmount = Number(item.productPrice) * Number(item.quantity);
+
+      let wallet = await Wallet.findOne({ userId: UserID });
+
+      const transaction = {
+        userId: UserID,
+        amount: refundAmount,
+        paymentId: `REFUND-${Date.now()}-${uuidv4().slice(0, 8)}`,
+        status: 'success',
+        type: 'credit',
+        description: 'Single Item Cancelled Refund',
+      };
+
+      if (wallet) {
+        wallet.balance += refundAmount;
+        wallet.transactions.push(transaction);
+      } else {
+        wallet = new Wallet({
+          userId: UserID,
+          balance: refundAmount,
+          transactions: [transaction],
+        });
+      }
+
+      await wallet.save();
+    }
+
     const order = await Order.find({ UserID: UserID }).select(
       '-createdAt -updatedAt',
     );
+
     return res
       .status(200)
-      .json({ message: 'Item cancelled successfully', order });
+      .json({ message: 'Item cancelled and refund processed', order });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Server error' });

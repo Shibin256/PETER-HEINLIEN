@@ -61,30 +61,12 @@ adminAxiosInstance.interceptors.response.use(
     }
 
     const status = err.response?.status;
-    console.log(status,'status')
     const message = err.response?.data?.message;
 
     switch (status) {
-      case 400:
-        showToastOnce(message || 'Bad request. Please check your input.');
-        break;
-
-      case 401:
-        showToastOnce('Session expired. Please log in again.');
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
-        break;
-
-      case 404:
-        showToastOnce(message || 'The requested resource was not found.');
-        break;
 
       case 409:
         showToastOnce(message || 'Conflict. This resource already exists.');
-        break;
-
-      case 500:
-        showToastOnce('Something went wrong on our end. Please try again later.');
         break;
 
       default:

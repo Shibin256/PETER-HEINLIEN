@@ -157,7 +157,6 @@ const AddAddress = () => {
       const res = await dispatch(
         addAddress({ userId: user._id, data: formattedAddress })
       );
-      console.log(res);
       if (res.type.endsWith('/fulfilled')) {
         toast.success('✅ Address added successfully!');
         navigate('/my-address');

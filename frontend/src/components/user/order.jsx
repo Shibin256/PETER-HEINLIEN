@@ -25,7 +25,6 @@ const Order = ({ order, onCancelSuccess }) => {
     orderId,
   } = order;
 
-  console.log(OrderStatus, 'order---------stat');
 
   const navigate = useNavigate();
 
@@ -93,6 +92,10 @@ const Order = ({ order, onCancelSuccess }) => {
       return acc;
     }, {})
   );
+
+  const hasCancelledItem = Items.some(item => item.cancelReason);
+  const hasCancelledItemEvery = Items.every(item => item.cancelReason);
+
 
   const [reviews, setReviews] = useState(
     Items.reduce((acc, item) => {
@@ -238,7 +241,13 @@ const Order = ({ order, onCancelSuccess }) => {
             <span
               className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyles[OrderStatus] || 'bg-gray-100 text-gray-800'}`}
             >
-              {OrderStatus === 'Processing' ? 'Order Placed' : OrderStatus}
+              {
+                OrderStatus === 'Processing'
+                  ? hasCancelledItemEvery
+                    ? 'Cancelled'
+                    : 'Order Placed'
+                  : OrderStatus
+              }
             </span>
             <span className="text-sm text-gray-600">
               {new Date(DeliveryDate).toLocaleDateString('en-IN', {
@@ -294,7 +303,8 @@ const Order = ({ order, onCancelSuccess }) => {
 
             {OrderStatus !== 'Cancelled' &&
               OrderStatus !== 'Delivered' &&
-              OrderStatus !== 'Failed' && (
+              OrderStatus !== 'Failed' &&
+              !hasCancelledItem && (
                 <button
                   onClick={() => (
                     setSelectedItemToCancel(orderId),
@@ -772,19 +782,19 @@ const Order = ({ order, onCancelSuccess }) => {
 
             {(returnReason === 'Other reason' ||
               returnReason === 'Item not as described') && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional details
-                </label>
-                <textarea
-                  rows="3"
-                  value={additionalDetails}
-                  onChange={(e) => setAdditionalDetails(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Please provide more information..."
-                />
-              </div>
-            )}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Additional details
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={additionalDetails}
+                    onChange={(e) => setAdditionalDetails(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Please provide more information..."
+                  />
+                </div>
+              )}
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
               <div className="flex">

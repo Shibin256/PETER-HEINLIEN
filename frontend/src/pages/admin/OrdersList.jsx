@@ -216,7 +216,7 @@ const OrdersList = () => {
           </button>
         )}
 
-      {item.OrderStatus !== 'Cancelled' &&
+      {/* {item.OrderStatus !== 'Cancelled' &&
         item.Items.some((i) => i.cancelReason && !i.cancelVerified) && (
           <button
             onClick={() => {
@@ -230,7 +230,7 @@ const OrdersList = () => {
           >
             Verify cancel
           </button>
-        )}
+        )} */}
 
       {/* {item.OrderStatus === 'Cancelled' && (
         <button
