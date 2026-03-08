@@ -14,7 +14,7 @@ import OrdersList from '../pages/admin/OrdersList';
 import Coupons from '../pages/admin/coupons';
 import Offers from '../pages/admin/Offer';
 import ErrorBoundary from '../components/common/ErrorBoundary';
-import AdminNotFound from '../pages/notFound/adminNotFound';
+import AdminNotFound from '../pages/notFound/AdminNotFound';
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
