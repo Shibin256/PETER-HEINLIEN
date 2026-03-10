@@ -18,6 +18,7 @@ export default function OrderFailed() {
     userId,
     deliveryDate,
   } = location.state || {};
+  console.log(location.state)
 
   const handleRetry = () => {
     navigate('/retry-payment', {

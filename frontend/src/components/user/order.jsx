@@ -243,9 +243,7 @@ const Order = ({ order, onCancelSuccess }) => {
             >
               {
                 OrderStatus === 'Processing'
-                  ? hasCancelledItemEvery
-                    ? 'Cancelled'
-                    : 'Order Placed'
+                    ? 'Order Placed'
                   : OrderStatus
               }
             </span>

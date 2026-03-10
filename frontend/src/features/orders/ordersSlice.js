@@ -202,6 +202,7 @@ export const addReview = createAsyncThunk(
 export const updateOrderStatus = createAsyncThunk(
   'user/updateOrderStatus',
   async (orderId, { rejectWithValue }) => {
+    console.log(orderId)
     try {
       const res = await orderService.updateOrderStatus(orderId);
       return res;

@@ -25,7 +25,7 @@ const showToastOnce = (message, type = 'error') => {
 
   activeToasts.add(message);
   toast[type](message, {
-    onClose: () => activeToasts.delete(message),  
+    onClose: () => activeToasts.delete(message),
   });
 };
 
@@ -61,12 +61,29 @@ adminAxiosInstance.interceptors.response.use(
     }
 
     const status = err.response?.status;
+    console.log(err.response, '------')
     const message = err.response?.data?.message;
+    console.log(message, '----')
 
     switch (status) {
+      case 400:
+        showToastOnce('Bad Request:', message);
+        break;
+
+      case 403:
+        showToastOnce('Forbidden:', message);
+        break;
+
+      case 404:
+        showToastOnce('Not Found:', message);
+        break;
 
       case 409:
         showToastOnce(message || 'Conflict. This resource already exists.');
+        break;
+
+      case 500:
+        showToastOnce('Server Error:', message);
         break;
 
       default:

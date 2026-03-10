@@ -35,6 +35,7 @@ import {
   getOrders,
   placeOrder,
   returnOrderItem,
+  updateStatusAfterRazorpay,
 } from '../controller/orderController.js';
 import {
   createRazorpayOrder,
@@ -109,6 +110,7 @@ router.post('/orders/item/cancel', verifyAccessToken, cancelOrderSingleItem);
 router.post('/orders/:itemOrderId/return', verifyAccessToken, returnOrderItem);
 router.get('/invoice/:orderId', verifyAccessToken, downloadInvoice);
 router.post('/orders/:itemId/review', verifyAccessToken, addReview);
+router.post('/orders/:itemId', verifyAccessToken, updateStatusAfterRazorpay);
 
 //payment
 router.post('/payments/razorpay/order', verifyAccessToken, createRazorpayOrder);

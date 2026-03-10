@@ -20,10 +20,8 @@ const PaymentPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState('');
 
-  // useRef to reliably access orderId in async flows without stale closure issues
   const orderIdRef = React.useRef('');
 
-  // Store the full pending order so we can pass it to the failed page if needed
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,7 +58,7 @@ const PaymentPage = () => {
 
   useEffect(() => {
     dispatch(getWallet({ userId: userId }));
-    dispatch(toggleIsLocked({ userID: userId, lock: false }));
+    // dispatch(toggleIsLocked({ userID: userId, lock: false }));
   }, []);
 
   const { walletAmount } = useSelector((state) => state.wallet);
@@ -171,7 +169,7 @@ const PaymentPage = () => {
           return;
         }
 
-        await dispatch(toggleIsLocked({ userID: userId, lock: true }));
+        // await dispatch(toggleIsLocked({ userID: userId, lock: true }));
 
         const pendingOrder = await dispatch(
           placeOrder({
@@ -204,14 +202,10 @@ const PaymentPage = () => {
           navigate('/order-success', { state: { order: pendingOrder.order } });
         } else {
           toast.error('Payment failed');
-          await dispatch(
-            updateOrderStatus({
-              orderId: currentOrderId,
-            })
-          );
-          await dispatch(toggleIsLocked({ userID: userId, lock: false }));
 
-          // Navigate to failed page with full retry data
+
+          // await dispatch(toggleIsLocked({ userID: userId, lock: false }));
+
           navigate('/order-failed', {
             state: {
               orderId: orderIdRef.current.orderId || null,
@@ -264,6 +258,12 @@ const PaymentPage = () => {
       setOrderStatus('error');
       console.log(error);
 
+      await dispatch(
+        updateOrderStatus({
+          orderId: orderIdRef.current.orderId,
+        })
+      )
+
       // Pass full retry-ready state to the failed page
       navigate('/order-failed', {
         state: {
@@ -279,7 +279,7 @@ const PaymentPage = () => {
         },
       });
     } finally {
-      await dispatch(toggleIsLocked({ userID: userId, lock: false }));
+      // await dispatch(toggleIsLocked({ userID: userId, lock: false }));
       setIsProcessing(false);
     }
   };

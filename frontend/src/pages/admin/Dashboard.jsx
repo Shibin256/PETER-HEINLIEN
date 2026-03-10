@@ -108,15 +108,20 @@ const Dashboard = () => {
     setAvgOrderValue(res.payload.avgOrderValue);
   };
 
-  const resetFilters = () => {
-    setReportPeriod('Custom Date Range');
-    setStartDate('');
+  const resetFilters = async() => {
+    setReportPeriod('Yearly');
+    let period='Yearly'
+    setStartDate(new Date().toISOString().split('T')[0]);
     setEndDate('');
-    setTotalSales(0);
-    setTotalOrders(0);
-    setTotalDiscounts(0);
-    setAvgOrderValue(0);
     setOrders([]);
+    const res = await dispatch(
+      fetchSalesReport({ type: period, startDate, endDate })
+    );
+    setOrders(res.payload.orders);
+    setTotalSales(res.payload.totalSales);
+    setTotalOrders(res.payload.totalOrders);
+    setTotalDiscounts(res.payload.totalDiscount);
+    setAvgOrderValue(res.payload.avgOrderValue);
   };
 
   const handleGenerateReport = () => {

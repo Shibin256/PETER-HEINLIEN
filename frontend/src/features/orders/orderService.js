@@ -146,8 +146,9 @@ const submitReview = async ({ itemId, rating, review }) => {
 };
 
 const updateOrderStatus = async (itemOrderId) => {
-  const response = await adminAxiosInstance.delete(
-    `/api/v1/admin/orders/${itemOrderId}`
+  console.log(itemOrderId,'++++')
+  const response = await axiosInstance.post(
+    `/api/v1/users/orders/${itemOrderId.orderId}`
   );
   return response.data;
 };

@@ -16,7 +16,7 @@ import RadioGroup from '../../components/common/RadioGroup';
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -41,6 +41,108 @@ const Signup = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  const validateField = (name, value) => {
+    let error = '';
+
+    switch (name) {
+      case 'name':
+        if (!value.trim()) {
+          error = 'Name is required';
+        } else if (value.trim().length < 2) {
+          error = 'Name must be at least 2 characters';
+        }
+        break;
+
+      case 'email':
+        if (!value) {
+          error = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          error = 'Please enter a valid email address';
+        }
+        break;
+
+      case 'password':
+        const validationMsg = usePasswordVal(value);
+        if (validationMsg) {
+          error = validationMsg;
+          setIsPasswordValid(false);
+        } else {
+          setIsPasswordValid(true);
+        }
+        break;
+
+      case 'confirmPassword':
+        if (!value) {
+          error = 'Please confirm your password';
+        } else if (formData.password !== value) {
+          error = 'Passwords do not match';
+        }
+        break;
+
+      case 'phone':
+        if (!value) {
+          error = 'Phone number is required';
+        }else if (!/^\d{10}$/.test(value)) {
+            error = 'Phone number must be 10 digits';
+          } else if (value === '0000000000') {
+            error = 'Phone number cannot be all zeros';
+          } else if (!/^[6-9]\d{9}$/.test(value)) {
+            error = 'Please enter a valid 10-digit phone number starting with 6-9';
+          }
+        
+        break;
+
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate all required fields
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    const passwordError = usePasswordVal(formData.password);
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (passwordError) {
+      newErrors.password = passwordError;
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    // Validate phone if provided
+    if (!formData.phone) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be 10 digits';
+    } else if (formData.phone === '0000000000') {
+      newErrors.phone = 'Phone number cannot be all zeros';
+    } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+      newErrors.phone = 'Please enter a valid 10-digit phone number starting with 6-9';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -49,97 +151,58 @@ const Signup = () => {
       [name]: files ? files[0] : value,
     }));
 
-    if (name === 'password') {
-      const validationMsg = usePasswordVal(value);
-      setError(validationMsg);
-      setIsPasswordValid(!validationMsg);
-      if (validationMsg) {
-        setFormData((prev) => ({ ...prev, confirmPassword: '' }));
-      }
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
 
-    if (name === 'confirmPassword' && isPasswordValid) {
-      if (formData.password !== value) {
-        setError('Passwords do not match');
-      } else {
-        setError('');
-      }
+    // Validate field on change
+    const fieldError = validateField(name, value);
+    if (fieldError) {
+      setErrors((prev) => ({ ...prev, [name]: fieldError }));
     }
+
+    // Special handling for password fields
+    if (name === 'password' && formData.confirmPassword) {
+      const confirmError = validateField('confirmPassword', formData.confirmPassword);
+      setErrors((prev) => ({ ...prev, confirmPassword: confirmError }));
+    }
+
+    if (name === 'confirmPassword' && formData.password) {
+      const confirmError = validateField('confirmPassword', value);
+      setErrors((prev) => ({ ...prev, confirmPassword: confirmError }));
+    }
+
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate all fields before submission
+    if (!validateForm()) {
+      // Scroll to first error
+      const firstErrorField = Object.keys(errors)[0];
+      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     setLoading(true);
     try {
-      if (
-        !formData.name ||
-        !formData.email ||
-        !formData.password ||
-        !formData.confirmPassword
-      ) {
-        toast.error('All fields are required for signup');
-        setLoading(false);
-        return;
-      }
-
-      if (!formData.name.trim()) {
-        toast.error('proper name needed');
-      }
-      //phone number validation
-      if (formData.phone) {
-        if (!/^\d{10}$/.test(formData.phone)) {
-          toast.error('The phone number must be 10');
-          setLoading(false);
-          return;
-        }
-
-        if (formData.phone === '0000000000') {
-          toast.error('The phone number not be all zeros');
-          setLoading(false);
-          return;
-        }
-
-        const validatePhoneNumber = (phone) => {
-          const regex = /^[6-9]\d{9}$/;
-          return regex.test(phone);
-        };
-
-        if (!validatePhoneNumber(formData.phone)) {
-          toast.error(
-            'Please enter a valid 10-digit phone number starting with 6-9.'
-          );
-          return;
-        }
-      }
-      //confirming password is valid
-      const validationMsg = usePasswordVal(formData.password);
-      if (validationMsg) {
-        setError(validationMsg);
-        setIsPasswordValid(false);
-        setLoading(false);
-        return;
-      }
-
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
-        setLoading(false);
-        return;
-      }
-
       const response = await axiosInstance.post(
         `${baseUrl}/api/auth/register`,
         formData
       );
+
       if (response) {
-        //navigate to verify otp with formdata
         toast.success(response.data.message);
         navigate('/verify-otp', {
           state: {
             formData,
           },
         });
-      } else {
-        toast.error('Registration failed. Please check your inputs.');
       }
     } catch (error) {
       if (error.response && error.response.data.errors) {
@@ -155,18 +218,21 @@ const Signup = () => {
   //google auth
   const handleLoginSuccess = async (credentialResponse) => {
     const idToken = credentialResponse.credential;
-    // Send Google id_token to your backend
-    const res = await axiosInstance.post(`${baseUrl}/api/auth/google`, {
-      idToken,
-    });
+    try {
+      const res = await axiosInstance.post(`${baseUrl}/api/auth/google`, {
+        idToken,
+      });
 
-    const token = res.data.accessToken;
-    const user = JSON.stringify(res.data.user);
-    dispatch(setUser(token, user));
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('user', user);
-    toast.success('user register using google is successfull');
-    navigate('/');
+      const token = res.data.accessToken;
+      const user = JSON.stringify(res.data.user);
+      dispatch(setUser(token, user));
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('user', user);
+      toast.success('User registered using Google successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error('Google sign-in failed');
+    }
   };
 
   return (
@@ -177,7 +243,7 @@ const Signup = () => {
             Create Your Account
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5 relative">
+          <form onSubmit={handleSubmit} className="space-y-4 relative">
             <AuthInput
               label="Name"
               type="text"
@@ -187,7 +253,9 @@ const Signup = () => {
               placeholder="Full name"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor="border-gray-300"
+              borderColor={errors.name ? "border-red-500" : "border-gray-300"}
+              error={errors.name}
+              required={false}
             />
 
             <AuthInput
@@ -199,28 +267,24 @@ const Signup = () => {
               placeholder="your@email.com"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor="border-gray-300"
+              borderColor={errors.email ? "border-red-500" : "border-gray-300"}
+              error={errors.email}
+              required={false}
             />
 
-            <div className="relative">
-              <AuthInput
-                label="Password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                width="w-full"
-                Textcolor="text-gray-700"
-                borderColor="border-gray-300"
-              />
-              {error && (
-                <div className="absolute left-0 top-full mt-1 bg-red-100 border border-red-400 text-red-700 text-sm rounded-md px-3 py-2 shadow-md z-10 w-full">
-                  {error}
-                  <div className="absolute top-0 left-6 -mt-2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-red-100"></div>
-                </div>
-              )}
-            </div>
+            <AuthInput
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              width="w-full"
+              Textcolor="text-gray-700"
+              borderColor={errors.password ? "border-red-500" : "border-gray-300"}
+              error={errors.password}
+              required={false}
+            />
 
             <AuthInput
               label="Confirm Password"
@@ -231,8 +295,10 @@ const Signup = () => {
               placeholder="••••••••"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor="border-gray-300"
-              disabled={!isPasswordValid}
+              borderColor={errors.confirmPassword ? "border-red-500" : "border-gray-300"}
+              error={errors.confirmPassword}
+              disabled={!isPasswordValid && formData.password.length > 0}
+              required={false}
             />
 
             <AuthInput
@@ -244,11 +310,13 @@ const Signup = () => {
               placeholder="Enter 10-digit phone number"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor="border-gray-300"
+              borderColor={errors.phone ? "border-red-500" : "border-gray-300"}
+              error={errors.phone}
+              required={false}
             />
 
             <AuthInput
-              label="Referral  code"
+              label="Referral Code"
               type="text"
               name="ReferralCode"
               value={formData.ReferralCode}
@@ -285,7 +353,7 @@ const Signup = () => {
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>
                 Already have an account?{' '}
-                <Link to="/login" className="text-blue-500">
+                <Link to="/login" className="text-blue-500 hover:underline">
                   Log in
                 </Link>
               </span>

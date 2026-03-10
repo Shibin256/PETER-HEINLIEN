@@ -125,7 +125,7 @@ export const placeOrder = async (req, res) => {
     }
     const newOrder = await Order.create(orderData);
 
-    if (paymentMethod !== 'razorpay') {
+    if (paymentMethod) {
       for (const item of newOrder.Items) {
         const updatedProduct = await Product.findByIdAndUpdate(
           item.productId,
@@ -243,6 +243,7 @@ export const cancelOrderItem = async (req, res) => {
     // Update order status
     order.OrderStatus = 'Cancelled';
     order.cancelReason = reason || 'No reason provided';
+    order.PaymentStatus = 'Refunded'
     await order.save();
 
     if (order.PaymentMethod !== 'cod') {
@@ -250,7 +251,7 @@ export const cancelOrderItem = async (req, res) => {
       const total =
         Number(order.TotalAmount) + Number(order.DeliveryCharge || 0);
 
-        let wallet = await Wallet.findOne({ userId: order.UserID });
+      let wallet = await Wallet.findOne({ userId: order.UserID });
 
       const transaction = {
         userId: order.UserID,
@@ -323,11 +324,17 @@ export const cancelOrderSingleItem = async (req, res) => {
 
     if (orderItem.Items.length == 1) {
       orderItem.OrderStatus = 'Cancelled';
+      orderItem.PaymentStatus = 'Refunded';
     }
 
     await orderItem.save();
+    if (orderItem.Items.every(item => item.cancelReason)) {
+      orderItem.OrderStatus = 'Cancelled';
+      orderItem.PaymentStatus = 'Refunded';
+      orderItem.save()
+    }
 
-    
+
     if (orderItem.PaymentMethod !== 'cod') {
 
       const refundAmount = Number(item.productPrice) * Number(item.quantity);
@@ -494,6 +501,38 @@ export const changeOrderStatus = async (req, res) => {
     return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
   }
 };
+
+export const updateStatusAfterRazorpay = async (req, res) => {
+  const orderId = req.params.itemId
+
+  try {
+    const order = await Order.findOne({ orderId: orderId }).select('-createdAt -updatedAt')
+    if (!order) {
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
+    }
+
+    for (const item of order.Items) {
+      const updatedProduct = await Product.findByIdAndUpdate(
+        item.productId,
+        { $inc: { totalQuantity: +item.quantity } },
+        { new: true },
+      );
+
+      if (updatedProduct.totalQuantity > 0) {
+        updatedProduct.stockStatus = 'In Stock';
+        await updatedProduct.save();
+      }
+    }
+    return res
+      .status(200)
+      .json({ message: 'status updated'})
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND })
+  }
+
+
+}
 
 export const getAllOrders = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
