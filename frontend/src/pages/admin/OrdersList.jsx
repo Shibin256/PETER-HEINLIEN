@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import {
   changeOrderStatus,
   fetchAllOrders,
+  rejectReturn,
   retrunVerify,
   singleCancelVerify,
   verifyCancel,
@@ -57,6 +58,17 @@ const OrdersList = () => {
     try {
       await dispatch(retrunVerify({ itemOrderId: itemId }));
       setShowReturnVerifyModal(false);
+      setOrderDetails(false)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+    const handleRejectReturn = async (orderId, itemId) => {
+    try {
+      await dispatch(rejectReturn({ itemOrderId: itemId }));
+      setShowReturnVerifyModal(false);
+      setOrderDetails(false)
     } catch (error) {
       console.log(error);
     }
@@ -912,6 +924,18 @@ const OrdersList = () => {
                 >
                   Cancel
                 </button>
+                <button
+                  onClick={() =>
+                    handleRejectReturn(
+                      currentOrder._id,
+                      selectedReturnItem.itemOrderId
+                    )
+                  }
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-sm font-medium text-white"
+                >
+                  reject Return
+                </button>
+
                 <button
                   onClick={() =>
                     handleVerifyReturn(

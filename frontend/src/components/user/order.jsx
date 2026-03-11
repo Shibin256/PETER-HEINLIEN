@@ -25,6 +25,8 @@ const Order = ({ order, onCancelSuccess }) => {
     orderId,
   } = order;
 
+  console.log(Items, '=====')
+
 
   const navigate = useNavigate();
 
@@ -243,7 +245,7 @@ const Order = ({ order, onCancelSuccess }) => {
             >
               {
                 OrderStatus === 'Processing'
-                    ? 'Order Placed'
+                  ? 'Order Placed'
                   : OrderStatus
               }
             </span>
@@ -410,7 +412,14 @@ const Order = ({ order, onCancelSuccess }) => {
                         onClick={() => openReturnModal(item.itemOrderId)}
                         className={`px-3 py-1.5  ${!item.returnReason ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 'bg-red-50 hover:bg-red-100 text-red-700'} rounded-lg text-sm font-medium transition-colors border border-gray-200`}
                       >
-                        {!item.returnReason ? 'Return' : 'Product Returned'}
+                        {
+                          !item.returnReason
+                            ? 'Return'
+                            : item.returnReason === 'return rejected'
+                              ? '! Return Rejected':
+                              item.returnVerified
+                              ? 'Product Returned':'Return Requested'
+                        }
                       </button>
                     )}
 

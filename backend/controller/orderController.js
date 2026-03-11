@@ -161,7 +161,7 @@ export const placeOrder = async (req, res) => {
       newOrder.PaymentStatus = 'Paid';
       newOrder.save();
     }
-    if (paymentMethod != 'razorpay') {
+    if (paymentMethod) {
       await Cart.findOneAndDelete({ userId });
     }
     res.status(201).json({
@@ -616,9 +616,9 @@ export const returnOrderItem = async (req, res) => {
       return res.status(404).json({ message: MESSAGES.ITEM_NOT_NOTFOUND });
     }
 
-    // Update item status
+    
     item.returnReason = reason || 'No reason provided';
-    item.returnVerified = false; // Set to false initially
+    item.returnVerified = false; 
     await orderItem.save();
 
     const order = await Order.find({ UserID: UserID });
@@ -681,6 +681,43 @@ export const retrunVerify = async (req, res) => {
     return res
       .status(200)
       .json({ message: 'Return request verified successfully', order });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: MESSAGES.SERVER_ERROR });
+  }
+};
+export const rejectReturn = async (req, res) => {
+  const { itemOrderId } = req.params;
+
+  try {
+    const order = await Order.findOne({
+      'Items.itemOrderId': itemOrderId,
+    }).select('-createdAt -updatedAt');
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
+    }
+
+    order.Items.forEach((item) => {
+      if (item.itemOrderId === itemOrderId) {
+        item.returnReason = 'return rejected';
+        item.returnVerified = true;   // optional (based on your flow)
+      }
+    });
+
+    await order.save();
+
+    const updatedOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .select('-createdAt -updatedAt');
+
+    return res.status(200).json({
+      message: 'Return request rejected successfully',
+      order: updatedOrders,
+    });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: MESSAGES.SERVER_ERROR });

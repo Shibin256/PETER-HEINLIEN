@@ -149,7 +149,9 @@ const ProductDetails = () => {
         toast.warning('Maximum quantity reached');
       } else if (res.payload === 'Product is out of stock') {
         toast.warning('Product is out of stock');
-      } else {
+      }else if(res.payload=='You can add a maximum of 4 units of this product.'){
+        toast.warning('You can add a maximum of 4 units of this product.')
+      }else {
         toast.success(`${quantity} item(s) added to cart`);
         // Optionally reset quantity to 1 after adding to cart
         // setQuantity(1);

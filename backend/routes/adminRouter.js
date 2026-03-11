@@ -29,6 +29,7 @@ import {
 import {
   changeOrderStatus,
   getAllOrders,
+  rejectReturn,
   retrunVerify,
   singleCancelVerify,
   verifyCancel,
@@ -147,6 +148,13 @@ router.post(
   verifyAccessToken,
   retrunVerify,
 );
+router.post(
+  '/orders/:itemOrderId/rejectReturn',
+  authorizeRole(roles),
+  verifyAccessToken,
+  rejectReturn,
+);
+
 router.post(
   '/orders/:orderId/cancel',
   authorizeRole(roles),

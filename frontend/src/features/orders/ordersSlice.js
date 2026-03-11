@@ -127,6 +127,19 @@ export const retrunVerify = createAsyncThunk(
   }
 );
 
+export const rejectReturn = createAsyncThunk(
+  'user/rejectReturn',
+  async ({ itemOrderId }, { rejectWithValue }) => {
+    console.log(itemOrderId)
+    try {
+      const res = await orderService.rejectReturn(itemOrderId);
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
 export const singleCancelVerify = createAsyncThunk(
   'user/singleCancelVerify',
   async ({ itemOrderId }, { rejectWithValue }) => {
@@ -327,6 +340,19 @@ const orderSlice = createSlice({
         state.orders = action.payload.order;
       })
       .addCase(retrunVerify.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+       .addCase(rejectReturn.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(rejectReturn.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.orders = action.payload.order;
+      })
+      .addCase(rejectReturn.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

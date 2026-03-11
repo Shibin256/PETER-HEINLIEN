@@ -84,6 +84,13 @@ const retrunVerify = async (itemId) => {
   return response.data;
 };
 
+const rejectReturn = async (itemId) => {
+  const response = await adminAxiosInstance.post(
+    `/api/v1/admin/orders/${itemId}/rejectReturn`
+  );
+  return response.data;
+};
+
 const singleCancelVerify = async (itemId) => {
   const response = await adminAxiosInstance.post(
     `/api/v1/admin/orders/item/${itemId}/verify`
@@ -173,6 +180,7 @@ const orderService = {
   getALlOrders,
   returnOrderItem,
   retrunVerify,
+  rejectReturn,
   downloadInvoice,
   createRazorpayOrder,
   verifyRazorpayPayment,

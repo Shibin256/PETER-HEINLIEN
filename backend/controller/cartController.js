@@ -35,6 +35,9 @@ export const addItemToCart = async (req, res) => {
       if (existingItem.quantity >= product.totalQuantity) {
         return res.status(400).json({ message: MESSAGES.PRODCUT_OUT_STOCK });
       }
+       if (existingItem.quantity+quantity>4) {
+        return res.status(400).json({ message:`You can add a maximum of 4 units of this product.`});
+      }
 
       existingItem.quantity += quantity;
       existingItem.productSubTotal = existingItem.quantity * existingItem.price;
