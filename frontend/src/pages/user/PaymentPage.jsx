@@ -92,6 +92,7 @@ const PaymentPage = () => {
           order_id: order.id,
           handler: async (response) => {
             try {
+              
               const verifyRes = await dispatch(
                 verifyPayment({ paymentDetails: response, orderId: orderId })
               ).unwrap();

@@ -153,6 +153,15 @@ const updateOrderStatus = async (itemOrderId) => {
   return response.data;
 };
 
+
+const checkOrderAvail = async (itemOrderId) => {
+  console.log(itemOrderId,'++++')
+  const response = await axiosInstance.get(
+    `/api/v1/users/orders/${itemOrderId.orderId}/availability`
+  );
+  return response.data;
+};
+
 const orderService = {
   verifyPaymentForWallet,
   updateOrderStatus,
@@ -170,6 +179,7 @@ const orderService = {
   cancelSingleOrderItem,
   singleCancelVerify,
   submitReview,
+  checkOrderAvail
 };
 
 export default orderService;

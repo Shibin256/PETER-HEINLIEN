@@ -212,6 +212,20 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
+export const checkAvailablity=createAsyncThunk(
+  'user/checkAvailablity',
+  async(orderId,{rejectWithValue})=>{
+    try {
+      console.log(orderId,'=====')
+      const res=await orderService.checkOrderAvail(orderId)
+      console.log(res,'---------')
+      return res
+    } catch (error) {
+      return rejectWithValue(error.response?.data|| 'something went wrong')
+    }
+  }
+)
+
 const orderSlice = createSlice({
   name: 'orders',
   initialState: {

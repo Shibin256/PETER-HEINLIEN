@@ -31,6 +31,7 @@ import {
   addReview,
   cancelOrderItem,
   cancelOrderSingleItem,
+  checkAvailablity,
   downloadInvoice,
   getOrders,
   placeOrder,
@@ -111,6 +112,7 @@ router.post('/orders/:itemOrderId/return', verifyAccessToken, returnOrderItem);
 router.get('/invoice/:orderId', verifyAccessToken, downloadInvoice);
 router.post('/orders/:itemId/review', verifyAccessToken, addReview);
 router.post('/orders/:itemId', verifyAccessToken, updateStatusAfterRazorpay);
+router.get('/orders/:itemId/availability',verifyAccessToken,checkAvailablity)
 
 //payment
 router.post('/payments/razorpay/order', verifyAccessToken, createRazorpayOrder);

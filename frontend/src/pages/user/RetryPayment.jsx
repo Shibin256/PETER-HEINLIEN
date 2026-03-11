@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
+  checkAvailablity,
   createPaymentOrder,
   verifyPayment,
 } from '../../features/orders/ordersSlice';
@@ -38,7 +39,11 @@ const RetryPayment = () => {
   const handlePayment = async () => {
     try {
       setIsProcessing(true);
-      
+      const check=await dispatch(checkAvailablity({orderId:orderId}))
+      console.log(check,'----')
+      if(check.payload.message == 'Product out of stoke'){
+        toast.error(check.payload.message)
+      }else{
       const result = await dispatch(createPaymentOrder(totalAmount)).unwrap();
 
       const { order } = result;
@@ -93,6 +98,7 @@ const RetryPayment = () => {
       });
 
       rzp.open();
+      }
     } catch (error) {
       console.error(error);
       toast.error('Unable to start payment');

@@ -525,7 +525,7 @@ export const updateStatusAfterRazorpay = async (req, res) => {
     }
     return res
       .status(200)
-      .json({ message: 'status updated'})
+      .json({ message: 'status updated' })
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND })
@@ -533,7 +533,32 @@ export const updateStatusAfterRazorpay = async (req, res) => {
 
 
 }
+export const checkAvailablity = async (req, res) => {
+  const orderId = req.params.itemId
+  console.log(orderId)
+  try {
+    const order = await Order.findOne({ orderId: orderId }).select('-createdAt -updatedAt')
+    if (!order) {
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
+    }
 
+    for (const item of order.Items) {
+      const updatedProduct = await Product.findById(item.productId);
+      console.log(updatedProduct)
+      if (updatedProduct.totalQuantity <= 0) {
+        console.log('avialability')
+        return res.status(500).json({ message: 'Product out of stoke' })
+      }
+    }
+
+    return res.status(200).json({message:''})
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND })
+  }
+
+
+}
 export const getAllOrders = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 8;
