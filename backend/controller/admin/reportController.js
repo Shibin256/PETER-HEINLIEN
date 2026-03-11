@@ -8,7 +8,7 @@ export const getSalesReport = async (req, res) => {
   try {
     const { type, startDate, endDate } = req.query;
 
-    let matchQuery = { Status: { $nin: ['Cancelled', 'Returned'] } }; // Exclude Cancelled & Returned
+    let matchQuery = { OrderStatus: { $nin: ['Cancelled', 'Returned'] } }; // Exclude Cancelled & Returned
 
     const now = new Date();
     if (startDate && endDate) {

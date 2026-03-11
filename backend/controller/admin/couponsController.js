@@ -156,8 +156,6 @@ export const applyCoupon = async (req, res) => {
         .json({ message: 'You have already used this coupon' });
     }
 
-    coupon.usageLimit -= 1;
-    coupon.usersUsed.push(userId);
     await coupon.save();
     res.status(200).json({ message: 'Coupon applied successfully', coupon });
   } catch (error) {

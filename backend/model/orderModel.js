@@ -32,6 +32,7 @@ const itemSchema = new mongoose.Schema([
     rated: { type: Boolean, default: false },
     rating: { type: String, default: '' },
     comment: { type: String, default: '' },
+    couponDiscount: { type: Number, default: 0 }
   },
   { _id: false },
 ]);

@@ -4,6 +4,7 @@ import Order from '../model/orderModel.js';
 import Product from '../model/productModel.js';
 import Cart from '../model/cartModal.js';
 import { MESSAGES } from '../utils/messages.js';
+import Coupons from '../model/couponsModal.js';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -59,6 +60,13 @@ export const verifyRazorpayPayment = async (req, res) => {
       }
     }
     order.save();
+    
+    let coupon= await Coupons.findOne({code:order.CouponName}).select('-createdAt -update')
+    
+    coupon.usageLimit -= 1;
+    coupon.usersUsed.push(order.UserID.toString());
+    await coupon.save();
+  
     return res.status(200).json({
       success: true,
       message: 'Payment verified',

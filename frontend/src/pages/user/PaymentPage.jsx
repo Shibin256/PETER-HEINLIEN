@@ -10,6 +10,7 @@ import {
 import { toast } from 'react-toastify';
 import { resetCart, toggleIsLocked } from '../../features/cart/cartSlice';
 import { getWallet } from '../../features/wallet/walletSlice';
+import { removeCoupon } from '../../features/coupons/couponsSlice';
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 const PaymentPage = () => {
@@ -35,6 +36,7 @@ const PaymentPage = () => {
     shippingCost,
     userId,
     deliveryDate,
+    appliedCoupon
   } = location.state || {};
 
   if (discount > 0) {
@@ -53,6 +55,17 @@ const PaymentPage = () => {
       setShowCODMessage(true);
     } else {
       setShowCODMessage(false);
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    if (appliedCoupon) {
+      const res = await dispatch(
+        removeCoupon({
+          userId: userId,
+          couponCode: appliedCoupon.code,
+        })
+      );
     }
   };
 
@@ -92,7 +105,7 @@ const PaymentPage = () => {
           order_id: order.id,
           handler: async (response) => {
             try {
-              
+
               const verifyRes = await dispatch(
                 verifyPayment({ paymentDetails: response, orderId: orderId })
               ).unwrap();
@@ -149,6 +162,7 @@ const PaymentPage = () => {
             orderdata: {
               address,
               cartItems,
+              appliedCoupon,
               totalPrice,
               shippingCost,
               userId,
@@ -170,13 +184,12 @@ const PaymentPage = () => {
           return;
         }
 
-        // await dispatch(toggleIsLocked({ userID: userId, lock: true }));
-
         const pendingOrder = await dispatch(
           placeOrder({
             orderdata: {
               address,
               cartItems,
+              appliedCoupon,
               totalPrice,
               shippingCost,
               userId,
@@ -206,7 +219,7 @@ const PaymentPage = () => {
 
 
           // await dispatch(toggleIsLocked({ userID: userId, lock: false }));
-
+          handleRemoveCoupon()
           navigate('/order-failed', {
             state: {
               orderId: orderIdRef.current.orderId || null,
@@ -231,6 +244,7 @@ const PaymentPage = () => {
               orderdata: {
                 address,
                 cartItems,
+                appliedCoupon,
                 totalPrice,
                 shippingCost,
                 userId,
@@ -264,6 +278,8 @@ const PaymentPage = () => {
           orderId: orderIdRef.current.orderId,
         })
       )
+
+      handleRemoveCoupon()
 
       // Pass full retry-ready state to the failed page
       navigate('/order-failed', {

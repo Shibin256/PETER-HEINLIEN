@@ -7,6 +7,7 @@ import Wallet from '../model/walletModal.js';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../model/userModel.js';
 import { MESSAGES } from '../utils/messages.js';
+import Coupons from '../model/couponsModal.js';
 
 const generateOrderId = async () => {
   const year = new Date().getFullYear();
@@ -26,30 +27,35 @@ export const placeOrder = async (req, res) => {
       userId,
       address,
       cartItems,
+      appliedCoupon,
       totalPrice,
       shippingCost,
       deliveryDate,
     } = req.body.orderdata;
-    const { paymentMethod } = req.body;
-    const user = await User.findById(userId);
 
+    const { paymentMethod } = req.body;
+
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({ message: MESSAGES.USER_NOTFOUND });
     }
 
-    const validatedItems = [];
-    // let calculatedTotal = 0;
+    const hasCoupon = appliedCoupon && appliedCoupon.code;
 
-    for (const clientItem of cartItems) {
-      const product = await Product.findById(clientItem.productId._id);
+
+    let productTotal = 0;
+    const validatedItems = [];
+
+    for (const item of cartItems) {
+      const product = await Product.findById(item.productId._id);
 
       if (!product) {
         return res
           .status(400)
-          .json({ message: `Product not found: ${clientItem.productId._id}` });
+          .json({ message: `Product not found ${item.productId._id}` });
       }
 
-      if (clientItem.quantity > product.totalQuantity) {
+      if (item.quantity > product.totalQuantity) {
         return res
           .status(400)
           .json({ message: `${product.name} is out of stock` });
@@ -57,31 +63,55 @@ export const placeOrder = async (req, res) => {
 
       const currentPrice = product.offerPrice || product.price;
 
-      if (clientItem.price !== currentPrice) {
+      if (item.price !== currentPrice) {
         return res.status(400).json({
-          message: `Price mismatch for ${product.name}. Please refresh your cart.`,
+          message: `Price changed for ${product.name}. Please refresh cart.`,
         });
       }
 
-      const itemOrderId = `${await generateOrderId()}-${validatedItems.length + 1}`;
-      validatedItems.push({
-        itemOrderId,
-        productId: product._id,
-        productImage: product.images,
-        productName: product.name,
-        productPrice: currentPrice,
-        subTotal: currentPrice * clientItem.quantity,
-        quantity: clientItem.quantity,
-      });
+      const subTotal = currentPrice * item.quantity;
+      productTotal += subTotal;
 
-      // calculatedTotal += totalPrice;
+      validatedItems.push({
+        product,
+        quantity: item.quantity,
+        price: currentPrice,
+        subTotal,
+      });
     }
 
+
+    let totalCouponDiscount = 0;
+
+    if (hasCoupon) {
+      totalCouponDiscount = productTotal - totalPrice;
+      if (totalCouponDiscount < 0) totalCouponDiscount = 0;
+    }
+
+
     const mainOrderId = await generateOrderId();
-    const itemsWithIds = cartItems.map((item, index) => ({
-      ...item,
-      itemOrderId: `${mainOrderId}-${index + 1}`,
-    }));
+
+
+    const refinedItems = validatedItems.map((item, index) => {
+      let couponShare = 0;
+
+      if (hasCoupon && productTotal > 0) {
+        couponShare =
+          (item.subTotal / productTotal) * totalCouponDiscount;
+      }
+
+      return {
+        itemOrderId: `${mainOrderId}-${index + 1}`,
+        productId: item.product._id,
+        productImage: item.product.images,
+        productName: item.product.name,
+        productPrice: item.price,
+        subTotal: item.subTotal,
+        quantity: item.quantity,
+        couponDiscount: Math.round(couponShare),
+      };
+    });
+
 
     const refinedAddress = {
       name: address.name,
@@ -95,17 +125,9 @@ export const placeOrder = async (req, res) => {
       phone: address.phone,
     };
 
-    const refinedItems = itemsWithIds.map((item) => ({
-      itemOrderId: item.itemOrderId,
-      productId: item.productId._id,
-      productImage: item.productId.images,
-      productName: item.productId.name,
-      productPrice: item.price,
-      subTotal: item.productSubTotal,
-      quantity: item.quantity,
-    }));
 
     const orderData = {
+      orderId: mainOrderId,
       UserID: userId,
       Order_Address: refinedAddress,
       Items: refinedItems,
@@ -113,65 +135,73 @@ export const placeOrder = async (req, res) => {
       DeliveryCharge: shippingCost,
       DeliveryDate: deliveryDate,
       PaymentMethod: paymentMethod,
-      orderId: mainOrderId,
+      CouponName: hasCoupon ? appliedCoupon.code : "",
+      TotalDiscount: totalCouponDiscount,
     };
-    for (const item of orderData.Items) {
-      const product = await Product.findOne({ _id: item.productId });
-      if (item.quantity > product.totalQuantity) {
-        return res
-          .status(404)
-          .json({ message: MESSAGES.PRODCUT_OUT_STOCK });
-      }
-    }
+
     const newOrder = await Order.create(orderData);
 
-    if (paymentMethod) {
-      for (const item of newOrder.Items) {
-        const updatedProduct = await Product.findByIdAndUpdate(
-          item.productId,
-          { $inc: { totalQuantity: -item.quantity } },
-          { new: true },
-        );
 
-        if (updatedProduct.totalQuantity <= 0) {
-          updatedProduct.stockStatus = 'Out of Stock';
-          await updatedProduct.save();
-        }
+    for (const item of refinedItems) {
+      const updatedProduct = await Product.findByIdAndUpdate(
+        item.productId,
+        { $inc: { totalQuantity: -item.quantity } },
+        { new: true }
+      );
+
+      if (updatedProduct.totalQuantity <= 0) {
+        updatedProduct.stockStatus = "Out of Stock";
+        await updatedProduct.save();
       }
     }
 
-    if (paymentMethod == 'razorpay') {
-      newOrder.PaymentStatus = 'Failed';
-      newOrder.OrderStatus = 'Failed';
-      newOrder.save();
-    } else if (paymentMethod == 'walletPay') {
+
+    if (paymentMethod === "razorpay") {
+      newOrder.PaymentStatus = "Failed";
+      newOrder.OrderStatus = "Failed";
+      await newOrder.save();
+    }
+
+    if(paymentMethod!=='razorpay' && hasCoupon){
+        let coupon= await Coupons.findOne({code:appliedCoupon.code}).select('-createdAt -update')
+          
+          coupon.usageLimit -= 1;
+          coupon.usersUsed.push(userId);
+          await coupon.save();
+    }
+
+    if (paymentMethod === "walletPay") {
       const wallet = await Wallet.findOne({ userId });
+
       wallet.balance -= totalPrice + shippingCost;
-      const transactions = {
+
+      wallet.transactions.push({
         userId,
         amount: totalPrice + shippingCost,
-        paymentId: `WALLET-${Date.now()}-${uuidv4().slice(0, 8)}`,
-        status: 'success',
-        type: 'debit',
-        description: 'Purchace Through Wallet',
-      };
+        paymentId: `WALLET-${Date.now()}`,
+        status: "success",
+        type: "debit",
+        description: "Purchase Through Wallet",
+      });
 
-      wallet.save();
-      wallet.transactions.push(transactions);
-      newOrder.PaymentStatus = 'Paid';
-      newOrder.save();
+      await wallet.save();
+
+      newOrder.PaymentStatus = "Paid";
+      await newOrder.save();
     }
-    if (paymentMethod) {
-      await Cart.findOneAndDelete({ userId });
-    }
-    res.status(201).json({
+
+
+    await Cart.findOneAndDelete({ userId });
+
+    return res.status(201).json({
       success: true,
       message: MESSAGES.ORDER_PLACED,
       order: newOrder,
     });
+
   } catch (error) {
-    console.error('Error placing order:', error);
-    res.status(500).json({
+    console.error("Place Order Error:", error);
+    return res.status(500).json({
       success: false,
       message: MESSAGES.FAILD_PLACEORDER,
       error: error.message,
@@ -307,7 +337,6 @@ export const cancelOrderSingleItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found in order' });
     }
 
-    // Restore stock
     const updatedProduct = await Product.findByIdAndUpdate(
       item.productId,
       { $inc: { totalQuantity: +item.quantity } },
@@ -336,9 +365,8 @@ export const cancelOrderSingleItem = async (req, res) => {
 
 
     if (orderItem.PaymentMethod !== 'cod') {
-
-      const refundAmount = Number(item.productPrice) * Number(item.quantity);
-
+      const refundAmount = Number(item.productPrice) * Number(item.quantity)-item.couponDiscount;
+      console.log(refundAmount)
       let wallet = await Wallet.findOne({ userId: UserID });
 
       const transaction = {
@@ -533,13 +561,33 @@ export const updateStatusAfterRazorpay = async (req, res) => {
 
 
 }
+
 export const checkAvailablity = async (req, res) => {
   const orderId = req.params.itemId
   console.log(orderId)
   try {
     const order = await Order.findOne({ orderId: orderId }).select('-createdAt -updatedAt')
+    console.log(order)
     if (!order) {
       return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
+    }
+    const coupon=await Coupons.findOne({code:order.CouponName}).select( '-createdAt -updatedAt',)
+     console.log(coupon,'_____')
+     console.log(order.UserID,'++++++')
+    if (!coupon) {
+      return res.status(404).json({ message: 'The coupon you applied not exists anymore' });
+    }
+    if (coupon.usageLimit <= 0) {
+      return res.status(400).json({ message: 'Coupon usage limit exceeded Please order Once again' });
+    }
+    if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+      return res.status(400).json({ message: `The coupon you applied for this order has ${MESSAGES.COUPON_EXPIRED}` });
+    }
+    if ((coupon.usersUsed || []).some((user) => user.toString() === order.UserID.toString())) {
+      console.log('hjjii')
+      return res
+        .status(500)
+        .json({ message: 'You have already used the coupon you applied for this order' });
     }
 
     for (const item of order.Items) {
@@ -556,9 +604,8 @@ export const checkAvailablity = async (req, res) => {
     console.log(error)
     return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND })
   }
-
-
 }
+
 export const getAllOrders = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 8;

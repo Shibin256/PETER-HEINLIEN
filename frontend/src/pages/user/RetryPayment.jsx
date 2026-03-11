@@ -41,7 +41,7 @@ const RetryPayment = () => {
       setIsProcessing(true);
       const check=await dispatch(checkAvailablity({orderId:orderId}))
       console.log(check,'----')
-      if(check.payload.message == 'Product out of stoke'){
+      if(check.payload.message){
         toast.error(check.payload.message)
       }else{
       const result = await dispatch(createPaymentOrder(totalAmount)).unwrap();

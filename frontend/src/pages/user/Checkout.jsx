@@ -40,6 +40,7 @@ const Checkout = () => {
       dispatch(fetchUserCoupons());
     }
   }, [dispatch, user?._id]);
+  
 
   useEffect(() => {
     if (!location.state || !cartItems || cartItems.length === 0) {
@@ -70,7 +71,21 @@ const Checkout = () => {
     }
   }, [from, location.state?.totalPrice]);
 
-  // Filter available coupons based on cart subtotal
+//   useEffect(() => {
+//   const handleUnload = () => {
+//     if (appliedCoupon) {
+//       dispatch(removeCoupon({
+//         userId: user._id,
+//         couponCode: appliedCoupon.code,
+//       }));
+//     }
+//   };
+
+//   window.addEventListener('beforeunload', handleUnload);
+//   return () => window.removeEventListener('beforeunload', handleUnload);
+// }, [appliedCoupon]); 
+
+  
   const availableCoupons =
     userCoupons?.filter((coupon) => {
       const isActive = new Date(coupon.expiresAt) > new Date();
@@ -398,6 +413,7 @@ const Checkout = () => {
                         state: {
                           address: selectedAddress,
                           cartItems: cartItems,
+                          appliedCoupon:appliedCoupon ? appliedCoupon:null,
                           totalPrice: total,
                           discount: discount,
                           appliedCoupon: appliedCoupon,

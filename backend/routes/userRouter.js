@@ -127,6 +127,7 @@ router.post(
   verifyRazorpayPaymentForWallet,
 );
 
+//coupon management
 router.post('/coupons', verifyAccessToken, applyCoupon);
 router.delete('/coupons/:couponId', verifyAccessToken, removeCoupon);
 router.get('/coupons', fetchAdsCoupons);
