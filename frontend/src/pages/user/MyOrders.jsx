@@ -30,6 +30,7 @@ const MyOrders = () => {
   };
 
   const { orders, page, totalPage } = useSelector((state) => state.orders);
+  
 
   return (
     <div className="px-4 md:px-10 py-6">
@@ -46,6 +47,7 @@ const MyOrders = () => {
             width="w-full md:w-96"
             Textcolor="text-gray-700"
             borderColor="border-gray-300"
+            required={false}
           />
           <button
             type="submit"

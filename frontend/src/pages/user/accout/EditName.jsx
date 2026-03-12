@@ -19,7 +19,7 @@ const EditName = () => {
   const handleSave = (newName) => {
     const formData = new FormData();
     if (!newName.trim()) {
-      toast.error('proper name needed');
+      toast.error('Valid name needed');
     } else {
       formData.append('name', newName);
       dispatch(changeName({ userId: profileData.id, data: formData }))

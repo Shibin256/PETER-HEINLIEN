@@ -378,7 +378,7 @@ const Order = ({ order, onCancelSuccess }) => {
                     </div>
                     <div>
                       <span className="font-medium">Subtotal:</span> ₹
-                      {item.subTotal}
+                      {item.subTotal-item.couponDiscount}
                     </div>
                     <div>
                       <span className="font-medium">Status:</span>{' '}

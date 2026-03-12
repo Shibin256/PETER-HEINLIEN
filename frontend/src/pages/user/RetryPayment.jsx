@@ -40,7 +40,6 @@ const RetryPayment = () => {
     try {
       setIsProcessing(true);
       const check=await dispatch(checkAvailablity({orderId:orderId}))
-      console.log(check,'----')
       if(check.payload.message){
         toast.error(check.payload.message)
       }else{

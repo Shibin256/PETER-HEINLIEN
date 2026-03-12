@@ -175,7 +175,7 @@ const PaymentPage = () => {
         setOrderId(res.order.orderId);
         navigate('/', { replace: true });
         setTimeout(() => {
-          navigate('/order-success', { state: { order: res.order } });
+          navigate('/order-success', { replace: true, state: { order: res.order } });
         }, 0);
       } else if (selectedPayment === 'razorpay') {
         if (isLocked) {
@@ -213,7 +213,7 @@ const PaymentPage = () => {
 
         if (paymentSuccess) {
           dispatch(resetCart());
-          navigate('/order-success', { state: { order: pendingOrder.order } });
+          navigate('/order-success', { replace: true, state: { order: res.order } });
         } else {
           toast.error('Payment failed');
 
@@ -263,7 +263,7 @@ const PaymentPage = () => {
           });
           navigate('/', { replace: true });
           setTimeout(() => {
-            navigate('/order-success', { state: { order: res.order } });
+            navigate('/order-success', { replace: true, state: { order: res.order } });
           }, 0);
         }
       } else {

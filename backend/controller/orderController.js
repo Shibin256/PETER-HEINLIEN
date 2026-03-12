@@ -571,6 +571,7 @@ export const checkAvailablity = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
+    if(order.CouponName){
     const coupon=await Coupons.findOne({code:order.CouponName}).select( '-createdAt -updatedAt',)
      console.log(coupon,'_____')
      console.log(order.UserID,'++++++')
@@ -588,6 +589,7 @@ export const checkAvailablity = async (req, res) => {
       return res
         .status(500)
         .json({ message: 'You have already used the coupon you applied for this order' });
+    }
     }
 
     for (const item of order.Items) {

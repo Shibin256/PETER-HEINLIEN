@@ -416,7 +416,7 @@ const Checkout = () => {
                           appliedCoupon:appliedCoupon ? appliedCoupon:null,
                           totalPrice: total,
                           discount: discount,
-                          appliedCoupon: appliedCoupon,
+                          appliedCoupon,
                           shippingCost: shippingCost,
                           userId: user._id,
                           deliveryDate: formattedDeliveryDate,

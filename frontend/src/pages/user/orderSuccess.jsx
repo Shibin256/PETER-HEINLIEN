@@ -6,23 +6,35 @@ const OrderSuccessPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Replace current history so user can’t go back
-    window.history.replaceState(null, '', window.location.href);
-
-    const handlePopState = () => {
-      navigate('/', { replace: true }); // Always go to home on back
+    const handleBack = () => {
+      navigate('/', { replace: true });
     };
 
-    // Listen to back/forward navigation
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleBack);
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('popstate', handleBack);
     };
   }, [navigate]);
 
+
   const { currentPlaceOrder } = useSelector((state) => state.orders);
-  const order = currentPlaceOrder;
+
+  const order = (currentPlaceOrder && Object.keys(currentPlaceOrder).length > 0)
+    ? currentPlaceOrder
+    : JSON.parse(localStorage.getItem('lastOrder'));
+
+  useEffect(() => {
+    if (!order) {
+      navigate('/', { replace: true });
+    }
+  }, [order, navigate]);
+
+ 
+
+
+  if (!order) return null;
+
   const {
     orderId,
     Order_Address,

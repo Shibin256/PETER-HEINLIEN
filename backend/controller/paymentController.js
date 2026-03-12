@@ -61,11 +61,13 @@ export const verifyRazorpayPayment = async (req, res) => {
     }
     order.save();
     
-    let coupon= await Coupons.findOne({code:order.CouponName}).select('-createdAt -update')
+    if(order.CouponName){
+      let coupon= await Coupons.findOne({code:order.CouponName}).select('-createdAt -update')
     
     coupon.usageLimit -= 1;
     coupon.usersUsed.push(order.UserID.toString());
     await coupon.save();
+  }
   
     return res.status(200).json({
       success: true,

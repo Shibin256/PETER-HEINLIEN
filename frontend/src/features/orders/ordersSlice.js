@@ -268,6 +268,7 @@ const orderSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.currentPlaceOrder = action.payload.order;
+        localStorage.setItem('lastOrder', JSON.stringify(action.payload.order));
       })
       .addCase(placeOrder.rejected, (state, action) => {
         state.loading = false;

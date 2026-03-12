@@ -11,6 +11,10 @@ export const changeName = async (req, res) => {
     const { id } = req.params;
     const newName = req.body.name?.trim();
 
+    if(!newName.trim()){
+      return res.status(400).json({message:MESSAGES.NAME_REQUIRED})
+    }
+    
     if (!newName) {
       return res.status(400).json({ message: MESSAGES.NAME_REQUIRED });
     }
@@ -21,9 +25,9 @@ export const changeName = async (req, res) => {
       });
     }
 
-    if (!/^[a-zA-Z0-9\s]+$/.test(newName)) {
+    if (!/^[a-zA-Z\s]+$/.test(newName)) {
       return res.status(400).json({
-        message: 'Name can only contain letters, numbers, and spaces',
+        message: 'Name can only contain letters, and spaces',
       });
     }
 

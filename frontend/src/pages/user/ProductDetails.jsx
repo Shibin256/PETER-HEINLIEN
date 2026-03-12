@@ -39,6 +39,7 @@ const ProductDetails = () => {
     (state) => state.products
   );
 
+  console.log(singleProduct, '------')
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id)).then((res) => {
@@ -149,9 +150,9 @@ const ProductDetails = () => {
         toast.warning('Maximum quantity reached');
       } else if (res.payload === 'Product is out of stock') {
         toast.warning('Product is out of stock');
-      }else if(res.payload=='You can add a maximum of 4 units of this product.'){
+      } else if (res.payload == 'You can add a maximum of 4 units of this product.') {
         toast.warning('You can add a maximum of 4 units of this product.')
-      }else {
+      } else {
         toast.success(`${quantity} item(s) added to cart`);
         // Optionally reset quantity to 1 after adding to cart
         // setQuantity(1);
@@ -221,11 +222,10 @@ const ProductDetails = () => {
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${
-                  currentImageIndex === index
+                className={`w-20 h-20 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${currentImageIndex === index
                     ? 'border-blue-500'
                     : 'border-gray-200'
-                }`}
+                  }`}
               >
                 <img
                   src={img}
@@ -260,8 +260,11 @@ const ProductDetails = () => {
         {/* Right - Product Info */}
         <div className="w-full lg:w-1/2">
           <div className="mb-6">
-            <span className="text-sm font-medium text-blue-600">
-              {product.category?.categoryName}
+            <span className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+              <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                {product.brand?.name}
+              </span>
             </span>
             <h1 className="text-3xl md:text-4xl font-bold mt-1 mb-2">
               {product.name}
@@ -296,7 +299,7 @@ const ProductDetails = () => {
                       (
                       {Math.round(
                         ((product.price - product.offerPrice) / product.price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </span>
@@ -337,9 +340,8 @@ const ProductDetails = () => {
                 <div className="flex items-center gap-4 border border-gray-300 rounded-lg px-4 py-2 w-fit">
                   <button
                     onClick={() => handleQuantityChange(false)}
-                    className={`text-xl text-gray-600 hover:text-gray-900 ${
-                      quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    className={`text-xl text-gray-600 hover:text-gray-900 ${quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     disabled={quantity <= 1}
                   >
                     -
@@ -371,22 +373,20 @@ const ProductDetails = () => {
             <button
               onClick={handleAddCart}
               disabled={isOutOfStock}
-              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors shadow-md ${
-                isOutOfStock
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors shadow-md ${isOutOfStock
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-teal-700 hover:bg-teal-700 text-white'
-              }`}
+                }`}
             >
               {isOutOfStock ? 'OUT OF STOCK' : 'ADD TO CART'}
             </button>
             <button
               onClick={handleBuyNow}
               disabled={isOutOfStock}
-              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors shadow-md ${
-                isOutOfStock
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors shadow-md ${isOutOfStock
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gray-900 hover:bg-gray-800 text-white'
-              }`}
+                }`}
             >
               {isOutOfStock ? 'OUT OF STOCK' : 'BUY NOW'}
             </button>
@@ -395,9 +395,8 @@ const ProductDetails = () => {
           {/* Wishlist */}
           <button
             onClick={handlewishClick}
-            className={`flex items-center gap-2 mb-8 ${
-              isWishlisted ? 'text-red-500' : 'text-gray-600'
-            } transition-colors`}
+            className={`flex items-center gap-2 mb-8 ${isWishlisted ? 'text-red-500' : 'text-gray-600'
+              } transition-colors`}
           >
             <FaHeart className={isWishlisted ? 'fill-current' : ''} />
             <span>

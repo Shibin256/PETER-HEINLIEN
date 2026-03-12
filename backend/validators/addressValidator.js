@@ -23,7 +23,10 @@ export const validateAddress = [
     .notEmpty()
     .withMessage('Locality is required')
     .isLength({ min: 2, max: 100 })
-    .withMessage('Locality must be between 2 and 100 characters'),
+    .withMessage('Locality must be between 2 and 100 characters')
+    .not()
+    .isNumeric()
+    .withMessage('Locality cannot contain only numbers'),
 
   body('city')
     .trim()
