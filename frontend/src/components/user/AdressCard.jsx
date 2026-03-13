@@ -21,7 +21,7 @@ const AddressCard = ({
           </span>
         )}
       </div>
-      <div className="mt-2 flex-grow">
+      <div className="mt-2 flex-1 py-10">
         <p className="font-bold">{name}</p>
         <p>
           {address} ({po})

@@ -39,7 +39,6 @@ const ProductDetails = () => {
     (state) => state.products
   );
 
-  console.log(singleProduct, '------')
   useEffect(() => {
     if (id) {
       dispatch(getProducById(id)).then((res) => {

@@ -273,7 +273,7 @@ const Checkout = () => {
                             : 'border-gray-200'
                         } p-4 rounded-md flex items-start justify-between transition-colors duration-200`}
                       >
-                        <div className="flex-grow">
+                        <div className="flex-1 py-10">
                           <label className="flex items-center space-x-2 cursor-pointer">
                             <input
                               type="radio"

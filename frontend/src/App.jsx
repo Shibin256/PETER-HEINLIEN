@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import AdminRoutes from './routes/AdminRoutes';
 import UserRoutes from './routes/UserRoutes';
 import { Slide, ToastContainer } from 'react-toastify';
+import ScrollToTop from './components/user/ScrollTop';
 function App() {
   return (
     <>
@@ -11,6 +12,7 @@ function App() {
         autoClose={2500}
         transition={Slide}
       />
+      <ScrollToTop/>
       <Routes>
         {/* User Routes */}
         <Route path="/*" element={<UserRoutes />} />

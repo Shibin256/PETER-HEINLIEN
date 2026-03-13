@@ -92,7 +92,7 @@ const ChangePass = () => {
   };
 
   return (
-    <main className="flex-grow flex items-center justify-center py-12 px-4">
+    <main className="flex-1 py-10 flex items-center justify-center py-12 px-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
           Set a new password
