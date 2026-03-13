@@ -58,17 +58,17 @@ const OrdersList = () => {
     try {
       await dispatch(retrunVerify({ itemOrderId: itemId }));
       setShowReturnVerifyModal(false);
-      setOrderDetails(false)
+      setOrderDetails(false);
     } catch (error) {
       console.log(error);
     }
   };
 
-    const handleRejectReturn = async (orderId, itemId) => {
+  const handleRejectReturn = async (orderId, itemId) => {
     try {
       await dispatch(rejectReturn({ itemOrderId: itemId }));
       setShowReturnVerifyModal(false);
-      setOrderDetails(false)
+      setOrderDetails(false);
     } catch (error) {
       console.log(error);
     }

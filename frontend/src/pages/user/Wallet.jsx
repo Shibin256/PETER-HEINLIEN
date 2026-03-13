@@ -113,6 +113,7 @@ const Wallet = () => {
       );
     }
 
+    await dispatch(getWallet({ userId: user._id, page: 1, limit: 10 }));
     setIsModalOpen(false);
     setAmount('');
   };

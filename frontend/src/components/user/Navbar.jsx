@@ -7,7 +7,7 @@ import {
   FaUser,
 } from 'react-icons/fa';
 import navlogo from '../../assets/navlogo.png';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCart } from '../../features/cart/cartSlice';
 

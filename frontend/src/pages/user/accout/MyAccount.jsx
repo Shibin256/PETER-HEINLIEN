@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 
 const MyAccount = () => {
   const navigate = useNavigate();
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -26,12 +26,9 @@ const MyAccount = () => {
 
   return (
     <div className="py-10 px-5 sm:px-10 bg-gray-50 min-h-screen">
-
       <div className="max-w-6xl mx-auto">
-
         {/* HEADER */}
         <div className="flex items-center justify-between flex-wrap gap-4 mb-12">
-
           {/* Title Section */}
           <div>
             <Title text1={'My'} text2={'Account'} />
@@ -72,12 +69,10 @@ const MyAccount = () => {
               Logout
             </span>
           </button>
-
         </div>
 
         {/* CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
           <AccountCard
             icon={<img src={myOrders} alt="Orders" className="rounded-md" />}
             title="MY ORDERS"
@@ -119,11 +114,8 @@ const MyAccount = () => {
             description="View balance and add money"
             onclickFun={() => navigate('/wallet')}
           />
-
         </div>
-
       </div>
-
     </div>
   );
 };

@@ -237,12 +237,12 @@ const Inventory = () => {
         toast.warning('Brand name must be between 2 and 50 characters');
         return;
       }
-      if (!/^[a-zA-Z0-9\s-]+$/.test(newBrand)) {
-        toast.warning(
-          'Brand name can only contain letters, numbers, spaces, and hyphens'
-        );
-        return;
-      }
+      // if (!/^[a-zA-Z0-9\s-]+$/.test(newBrand)) {
+      //   toast.warning(
+      //     'Brand name can only contain letters, numbers, spaces, and hyphens'
+      //   );
+      //   return;
+      // }
       if (brandDescription && brandDescription.length > 200) {
         toast.warning('Description must not exceed 200 characters');
         return;

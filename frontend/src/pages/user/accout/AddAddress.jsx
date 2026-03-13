@@ -27,14 +27,42 @@ const AddAddress = () => {
   const { user } = useSelector((state) => state.auth);
 
   const indianStates = [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-    'Karnataka', 'Kerala', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra',
-    'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-    'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-    'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
-    'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi',
-    'Jammu and Kashmir', 'Ladakh', 'Puducherry',
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Lakshadweep',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
+    'Jammu and Kashmir',
+    'Ladakh',
+    'Puducherry',
   ];
 
   const handleInputChange = (e) => {
@@ -55,15 +83,20 @@ const AddAddress = () => {
 
     // Presence Check
     if (!addressData.name.trim()) newErrors.name = 'Full name is required';
-    if (!addressData.houseNo.trim()) newErrors.houseNo = 'House/Building No is required';
-    if (!addressData.locality.trim()) newErrors.locality = 'Locality is required';
+    if (!addressData.houseNo.trim())
+      newErrors.houseNo = 'House/Building No is required';
+    if (!addressData.locality.trim())
+      newErrors.locality = 'Locality is required';
     if (!addressData.city.trim()) newErrors.city = 'City is required';
     if (!addressData.state) newErrors.state = 'Please select a state';
     if (!addressData.pin.trim()) newErrors.pin = 'Pincode is required';
     if (!addressData.phone.trim()) newErrors.phone = 'Phone number is required';
 
     // Format Checks
-    if (addressData.name && !/^[a-zA-Z\s]{2,50}$/.test(addressData.name.trim())) {
+    if (
+      addressData.name &&
+      !/^[a-zA-Z\s]{2,50}$/.test(addressData.name.trim())
+    ) {
       newErrors.name = 'Name should only contain letters (2-50 chars)';
     }
 
@@ -102,14 +135,17 @@ const AddAddress = () => {
     };
 
     try {
-      const res = await dispatch(addAddress({ userId: user._id, data: formattedAddress }));
+      const res = await dispatch(
+        addAddress({ userId: user._id, data: formattedAddress })
+      );
       if (res.type.endsWith('/fulfilled')) {
         toast.success('✅ Address added successfully!');
         navigate('/my-address');
       } else {
         toast.error(res.payload?.errors?.[0] || 'Failed to add address.');
       }
-    } catch (error) {
+    } catch (err) {
+      console.log(err);
       toast.error('Something went wrong');
     }
   };
@@ -117,9 +153,10 @@ const AddAddress = () => {
   const handleCancel = () => window.history.back();
 
   // Helper component for Error Display
-  const ErrorMsg = ({ name }) => (
-    errors[name] ? <p className="text-red-500 text-xs mt-1">{errors[name]}</p> : null
-  );
+  const ErrorMsg = ({ name }) =>
+    errors[name] ? (
+      <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+    ) : null;
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
@@ -129,7 +166,9 @@ const AddAddress = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Address Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Address Type
+            </label>
             <div className="flex space-x-6">
               {['home', 'work'].map((type) => (
                 <div key={type} className="flex items-center">
@@ -142,7 +181,12 @@ const AddAddress = () => {
                     onChange={handleInputChange}
                     className="h-4 w-4 text-blue-600"
                   />
-                  <label htmlFor={type} className="ml-2 text-sm text-gray-700 capitalize">{type}</label>
+                  <label
+                    htmlFor={type}
+                    className="ml-2 text-sm text-gray-700 capitalize"
+                  >
+                    {type}
+                  </label>
                 </div>
               ))}
             </div>
@@ -150,7 +194,9 @@ const AddAddress = () => {
 
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name *
+            </label>
             <input
               type="text"
               name="name"
@@ -165,7 +211,9 @@ const AddAddress = () => {
           {/* House & Locality */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">House/Building No *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                House/Building No *
+              </label>
               <input
                 type="text"
                 name="houseNo"
@@ -176,7 +224,9 @@ const AddAddress = () => {
               <ErrorMsg name="houseNo" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Locality/Area *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Locality/Area *
+              </label>
               <input
                 type="text"
                 name="locality"
@@ -191,7 +241,9 @@ const AddAddress = () => {
           {/* City & State */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                City *
+              </label>
               <input
                 type="text"
                 name="city"
@@ -202,7 +254,9 @@ const AddAddress = () => {
               <ErrorMsg name="city" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                State *
+              </label>
               <select
                 name="state"
                 value={addressData.state}
@@ -210,7 +264,11 @@ const AddAddress = () => {
                 className={`w-full p-3 border rounded-md ${errors.state ? 'border-red-500' : 'border-gray-300'}`}
               >
                 <option value="">Select State</option>
-                {indianStates.map((s) => <option key={s} value={s}>{s}</option>)}
+                {indianStates.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
               <ErrorMsg name="state" />
             </div>
@@ -218,7 +276,9 @@ const AddAddress = () => {
 
           {/* Pincode */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Pincode *
+            </label>
             <input
               type="text"
               name="pin"
@@ -233,7 +293,9 @@ const AddAddress = () => {
           {/* Phones */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number *
+              </label>
               <input
                 type="tel"
                 name="phone"
@@ -245,7 +307,9 @@ const AddAddress = () => {
               <ErrorMsg name="phone" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Alternative Phone</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Alternative Phone
+              </label>
               <input
                 type="tel"
                 name="altPhone"
@@ -259,10 +323,17 @@ const AddAddress = () => {
           </div>
 
           <div className="flex justify-end space-x-4 pt-6 border-t">
-            <button type="button" onClick={handleCancel} className="px-6 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-6 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+            >
               Cancel
             </button>
-            <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button
+              type="submit"
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
               Save Address
             </button>
           </div>

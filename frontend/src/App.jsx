@@ -12,7 +12,7 @@ function App() {
         autoClose={2500}
         transition={Slide}
       />
-      <ScrollToTop/>
+      <ScrollToTop />
       <Routes>
         {/* User Routes */}
         <Route path="/*" element={<UserRoutes />} />

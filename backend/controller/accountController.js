@@ -136,7 +136,7 @@ export const editPassword = async (req, res) => {
       errors.push("one number");
     }
 
-    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(newPassword)) {
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
       errors.push("one special character (!@#$%^&*)");
     }
 

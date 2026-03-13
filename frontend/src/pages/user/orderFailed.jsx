@@ -18,7 +18,6 @@ export default function OrderFailed() {
     userId,
     deliveryDate,
   } = location.state || {};
-  console.log(location.state)
 
   const handleRetry = () => {
     navigate('/retry-payment', {
@@ -48,8 +47,8 @@ export default function OrderFailed() {
             Payment Failed
           </h1>
           <p className="text-gray-600">
-            We couldn't process your payment. Please check your details or try
-            another payment method.
+            We couldn&apos;t process your payment. Please check your details or
+            try another payment method.
           </p>
         </div>
 

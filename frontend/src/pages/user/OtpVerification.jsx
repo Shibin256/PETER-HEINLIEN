@@ -163,7 +163,7 @@ const OTPForm = () => {
           </button>
           <div className="text-center text-sm ">
             {sendcount ? (
-              <p className="cursor-pointer">"OTP limit exceeded"</p>
+              <p className="cursor-pointer">&quot;OTP limit exceeded&quot;</p>
             ) : (
               <a
                 onClick={handleResend}

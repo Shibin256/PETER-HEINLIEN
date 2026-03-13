@@ -25,7 +25,7 @@ const showToastOnce = (message, type = 'error') => {
 
   activeToasts.add(message);
   toast[type](message, {
-    onClose: () => activeToasts.delete(message),  // allow it again after dismissed
+    onClose: () => activeToasts.delete(message), // allow it again after dismissed
   });
 };
 
@@ -55,24 +55,22 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    const status  = err.response?.status;
+    const status = err.response?.status;
     const message = err.response?.data?.message;
 
     switch (status) {
-
       case 409:
         showToastOnce(message || 'Conflict. This resource already exists.');
         break;
 
       default:
         if (!err.response) {
-          showToastOnce('Network error. Please check your internet connection.');
+          showToastOnce(
+            'Network error. Please check your internet connection.'
+          );
         }
         break;
     }
-
-
-
 
     return Promise.reject(err);
   }

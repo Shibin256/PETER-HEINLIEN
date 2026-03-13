@@ -54,8 +54,8 @@ const AdminRoutes = () => {
             <Route path="banners" element={<Banners />} />
             <Route path="coupons" element={<Coupons />} />
             <Route path="offers" element={<Offers />} />
-            
-            <Route path="*" element={<AdminNotFound/>} />
+
+            <Route path="*" element={<AdminNotFound />} />
           </Route>
         </Routes>
       </ErrorBoundary>

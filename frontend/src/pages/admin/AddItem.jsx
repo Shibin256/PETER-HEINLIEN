@@ -101,7 +101,8 @@ function AddItem() {
         } else {
           const numericQuantity = Number(value);
           if (isNaN(numericQuantity) || numericQuantity < 0) {
-            error = 'Quantity must be a valid number greater than or equal to 0';
+            error =
+              'Quantity must be a valid number greater than or equal to 0';
           } else if (!Number.isInteger(numericQuantity)) {
             error = 'Quantity must be a whole number';
           }
@@ -178,7 +179,7 @@ function AddItem() {
     ];
     const files = Array.from(e.target.files);
     const total = images.length + files.length;
-    
+
     // Clear previous image error
     if (errors.images) {
       setErrors((prev) => ({ ...prev, images: '' }));
@@ -186,18 +187,18 @@ function AddItem() {
 
     for (let file of files) {
       if (!validImageTypes.includes(file.type)) {
-        setErrors((prev) => ({ 
-          ...prev, 
-          images: 'The file needs to be an image format (JPG, PNG, WebP)' 
+        setErrors((prev) => ({
+          ...prev,
+          images: 'The file needs to be an image format (JPG, PNG, WebP)',
         }));
         return;
       }
     }
-    
+
     if (total > 4) {
-      setErrors((prev) => ({ 
-        ...prev, 
-        images: 'You can only upload 4 images max.' 
+      setErrors((prev) => ({
+        ...prev,
+        images: 'You can only upload 4 images max.',
       }));
       return;
     }
@@ -215,7 +216,7 @@ function AddItem() {
     const newImages = [...images];
     newImages.splice(index, 1);
     setImages(newImages);
-    
+
     // Clear image error when user removes images
     if (errors.images) {
       setErrors((prev) => ({ ...prev, images: '' }));
@@ -234,7 +235,7 @@ function AddItem() {
       setShowCropper(false);
       setCurrentFileURL(null);
     }
-    
+
     // Clear image error when images are added
     if (errors.images) {
       setErrors((prev) => ({ ...prev, images: '' }));
@@ -257,12 +258,12 @@ function AddItem() {
   const handleInputChange = (setter, fieldName) => (e) => {
     const value = e.target.value;
     setter(value);
-    
+
     // Clear error for this field when user starts typing
     if (errors[fieldName]) {
       setErrors((prev) => ({ ...prev, [fieldName]: '' }));
     }
-    
+
     // Optional: Real-time validation
     const fieldError = validateField(fieldName, value);
     if (fieldError) {
@@ -276,7 +277,9 @@ function AddItem() {
     if (!validateForm()) {
       // Scroll to first error
       const firstErrorField = Object.keys(errors)[0];
-      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      const errorElement = document.querySelector(
+        `[name="${firstErrorField}"]`
+      );
       if (errorElement) {
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -369,15 +372,15 @@ function AddItem() {
         />
         {errors.images && (
           <p className="mt-1 text-sm text-red-600 flex items-start">
-            <svg 
-              className="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" 
-              fill="currentColor" 
+            <svg
+              className="w-4 h-4 mr-1 mt-0.5 flex-shrink-0"
+              fill="currentColor"
               viewBox="0 0 20 20"
             >
-              <path 
-                fillRule="evenodd" 
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" 
-                clipRule="evenodd" 
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
               />
             </svg>
             {errors.images}
@@ -411,7 +414,7 @@ function AddItem() {
         placeholder="Enter product name"
         width="w-full"
         Textcolor="text-gray-700"
-        borderColor={errors.productName ? "border-red-500" : "border-gray-300"}
+        borderColor={errors.productName ? 'border-red-500' : 'border-gray-300'}
         error={errors.productName}
         required={true}
       />
@@ -433,15 +436,15 @@ function AddItem() {
         />
         {errors.description && (
           <p className="mt-1 text-sm text-red-600 flex items-start">
-            <svg 
-              className="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" 
-              fill="currentColor" 
+            <svg
+              className="w-4 h-4 mr-1 mt-0.5 flex-shrink-0"
+              fill="currentColor"
               viewBox="0 0 20 20"
             >
-              <path 
-                fillRule="evenodd" 
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" 
-                clipRule="evenodd" 
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
               />
             </svg>
             {errors.description}
@@ -498,7 +501,7 @@ function AddItem() {
           placeholder="e.g., new, sale, trendy"
           width="w-full"
           Textcolor="text-gray-700"
-          borderColor={errors.tags ? "border-red-500" : "border-gray-300"}
+          borderColor={errors.tags ? 'border-red-500' : 'border-gray-300'}
           error={errors.tags}
           required={true}
         />
@@ -511,7 +514,7 @@ function AddItem() {
           placeholder="Enter the amount"
           width="w-full"
           Textcolor="text-gray-700"
-          borderColor={errors.price ? "border-red-500" : "border-gray-300"}
+          borderColor={errors.price ? 'border-red-500' : 'border-gray-300'}
           error={errors.price}
           icon={currency}
           required={true}
@@ -526,7 +529,7 @@ function AddItem() {
           placeholder="Enter the Quantity"
           width="w-full"
           Textcolor="text-gray-700"
-          borderColor={errors.quantity ? "border-red-500" : "border-gray-300"}
+          borderColor={errors.quantity ? 'border-red-500' : 'border-gray-300'}
           error={errors.quantity}
           required={true}
         />
@@ -538,7 +541,9 @@ function AddItem() {
           onClick={handleSubmit}
           disabled={isSubmitting}
           className={`py-3 px-8 rounded-full text-white font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-            isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            isSubmitting
+              ? 'bg-blue-400 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700'
           }`}
         >
           {isSubmitting ? (
@@ -570,7 +575,7 @@ function AddItem() {
           )}
         </button>
       </div>
-      
+
       {showCropper && currentFileURL && (
         <CropModal
           imageSrc={currentFileURL}

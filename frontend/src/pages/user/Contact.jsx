@@ -8,7 +8,6 @@ const Contact = () => {
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-
   //form submit for contact
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,8 +75,8 @@ const Contact = () => {
             Contact Us
           </h2>
           <p className="text-lg mb-4">
-            We're here to assist you—whether it's about sizing, styling, your
-            order status, or anything in between.
+            We&apos;re here to assist you—whether it&apos;s about sizing,
+            styling, your order status, or anything in between.
           </p>
           <p className="text-lg mb-6">
             At Peter Henlein, we believe in timeless service to match our

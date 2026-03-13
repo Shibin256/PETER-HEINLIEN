@@ -17,21 +17,18 @@ const OrderSuccessPage = () => {
     };
   }, [navigate]);
 
-
   const { currentPlaceOrder } = useSelector((state) => state.orders);
 
-  const order = (currentPlaceOrder && Object.keys(currentPlaceOrder).length > 0)
-    ? currentPlaceOrder
-    : JSON.parse(localStorage.getItem('lastOrder'));
+  const order =
+    currentPlaceOrder && Object.keys(currentPlaceOrder).length > 0
+      ? currentPlaceOrder
+      : JSON.parse(localStorage.getItem('lastOrder'));
 
   useEffect(() => {
     if (!order) {
       navigate('/', { replace: true });
     }
   }, [order, navigate]);
-
- 
-
 
   if (!order) return null;
 

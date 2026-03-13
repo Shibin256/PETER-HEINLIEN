@@ -8,7 +8,7 @@ import {
   verifyPayment,
 } from '../../features/orders/ordersSlice';
 import { toast } from 'react-toastify';
-import { resetCart, toggleIsLocked } from '../../features/cart/cartSlice';
+import { resetCart } from '../../features/cart/cartSlice';
 import { getWallet } from '../../features/wallet/walletSlice';
 import { removeCoupon } from '../../features/coupons/couponsSlice';
 const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
@@ -23,7 +23,6 @@ const PaymentPage = () => {
 
   const orderIdRef = React.useRef('');
 
-
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -36,7 +35,7 @@ const PaymentPage = () => {
     shippingCost,
     userId,
     deliveryDate,
-    appliedCoupon
+    appliedCoupon,
   } = location.state || {};
 
   if (discount > 0) {
@@ -60,7 +59,7 @@ const PaymentPage = () => {
 
   const handleRemoveCoupon = async () => {
     if (appliedCoupon) {
-      const res = await dispatch(
+      await dispatch(
         removeCoupon({
           userId: userId,
           couponCode: appliedCoupon.code,
@@ -105,7 +104,6 @@ const PaymentPage = () => {
           order_id: order.id,
           handler: async (response) => {
             try {
-
               const verifyRes = await dispatch(
                 verifyPayment({ paymentDetails: response, orderId: orderId })
               ).unwrap();
@@ -175,7 +173,10 @@ const PaymentPage = () => {
         setOrderId(res.order.orderId);
         navigate('/', { replace: true });
         setTimeout(() => {
-          navigate('/order-success', { replace: true, state: { order: res.order } });
+          navigate('/order-success', {
+            replace: true,
+            state: { order: res.order },
+          });
         }, 0);
       } else if (selectedPayment === 'razorpay') {
         if (isLocked) {
@@ -213,13 +214,15 @@ const PaymentPage = () => {
 
         if (paymentSuccess) {
           dispatch(resetCart());
-          navigate('/order-success', { replace: true, state: { order: pendingOrder.order } });
+          navigate('/order-success', {
+            replace: true,
+            state: { order: pendingOrder.order },
+          });
         } else {
           toast.error('Payment failed');
 
-
           // await dispatch(toggleIsLocked({ userID: userId, lock: false }));
-          handleRemoveCoupon()
+          handleRemoveCoupon();
           navigate('/order-failed', {
             state: {
               orderId: orderIdRef.current.orderId || null,
@@ -263,7 +266,10 @@ const PaymentPage = () => {
           });
           navigate('/', { replace: true });
           setTimeout(() => {
-            navigate('/order-success', { replace: true, state: { order: res.order } });
+            navigate('/order-success', {
+              replace: true,
+              state: { order: res.order },
+            });
           }, 0);
         }
       } else {
@@ -277,9 +283,9 @@ const PaymentPage = () => {
         updateOrderStatus({
           orderId: orderIdRef.current.orderId,
         })
-      )
+      );
 
-      handleRemoveCoupon()
+      handleRemoveCoupon();
 
       // Pass full retry-ready state to the failed page
       navigate('/order-failed', {

@@ -61,7 +61,7 @@ const Signup = () => {
         }
         break;
 
-      case 'password':
+      case 'password': {
         const validationMsg = usePasswordVal(value);
         if (validationMsg) {
           error = validationMsg;
@@ -70,6 +70,7 @@ const Signup = () => {
           setIsPasswordValid(true);
         }
         break;
+      }
 
       case 'confirmPassword':
         if (!value) {
@@ -82,14 +83,15 @@ const Signup = () => {
       case 'phone':
         if (!value) {
           error = 'Phone number is required';
-        }else if (!/^\d{10}$/.test(value)) {
-            error = 'Phone number must be 10 digits';
-          } else if (value === '0000000000') {
-            error = 'Phone number cannot be all zeros';
-          } else if (!/^[6-9]\d{9}$/.test(value)) {
-            error = 'Please enter a valid 10-digit phone number starting with 6-9';
-          }
-        
+        } else if (!/^\d{10}$/.test(value)) {
+          error = 'Phone number must be 10 digits';
+        } else if (value === '0000000000') {
+          error = 'Phone number cannot be all zeros';
+        } else if (!/^[6-9]\d{9}$/.test(value)) {
+          error =
+            'Please enter a valid 10-digit phone number starting with 6-9';
+        }
+
         break;
 
       default:
@@ -136,7 +138,8 @@ const Signup = () => {
     } else if (formData.phone === '0000000000') {
       newErrors.phone = 'Phone number cannot be all zeros';
     } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid 10-digit phone number starting with 6-9';
+      newErrors.phone =
+        'Please enter a valid 10-digit phone number starting with 6-9';
     }
 
     setErrors(newErrors);
@@ -164,7 +167,10 @@ const Signup = () => {
 
     // Special handling for password fields
     if (name === 'password' && formData.confirmPassword) {
-      const confirmError = validateField('confirmPassword', formData.confirmPassword);
+      const confirmError = validateField(
+        'confirmPassword',
+        formData.confirmPassword
+      );
       setErrors((prev) => ({ ...prev, confirmPassword: confirmError }));
     }
 
@@ -172,7 +178,6 @@ const Signup = () => {
       const confirmError = validateField('confirmPassword', value);
       setErrors((prev) => ({ ...prev, confirmPassword: confirmError }));
     }
-
   };
 
   const handleSubmit = async (e) => {
@@ -182,7 +187,9 @@ const Signup = () => {
     if (!validateForm()) {
       // Scroll to first error
       const firstErrorField = Object.keys(errors)[0];
-      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      const errorElement = document.querySelector(
+        `[name="${firstErrorField}"]`
+      );
       if (errorElement) {
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -253,7 +260,7 @@ const Signup = () => {
               placeholder="Full name"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor={errors.name ? "border-red-500" : "border-gray-300"}
+              borderColor={errors.name ? 'border-red-500' : 'border-gray-300'}
               error={errors.name}
               required={false}
             />
@@ -267,7 +274,7 @@ const Signup = () => {
               placeholder="your@email.com"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor={errors.email ? "border-red-500" : "border-gray-300"}
+              borderColor={errors.email ? 'border-red-500' : 'border-gray-300'}
               error={errors.email}
               required={false}
             />
@@ -281,7 +288,9 @@ const Signup = () => {
               placeholder="••••••••"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor={errors.password ? "border-red-500" : "border-gray-300"}
+              borderColor={
+                errors.password ? 'border-red-500' : 'border-gray-300'
+              }
               error={errors.password}
               required={false}
             />
@@ -295,7 +304,9 @@ const Signup = () => {
               placeholder="••••••••"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor={errors.confirmPassword ? "border-red-500" : "border-gray-300"}
+              borderColor={
+                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              }
               error={errors.confirmPassword}
               disabled={!isPasswordValid && formData.password.length > 0}
               required={false}
@@ -310,7 +321,7 @@ const Signup = () => {
               placeholder="Enter 10-digit phone number"
               width="w-full"
               Textcolor="text-gray-700"
-              borderColor={errors.phone ? "border-red-500" : "border-gray-300"}
+              borderColor={errors.phone ? 'border-red-500' : 'border-gray-300'}
               error={errors.phone}
               required={false}
             />

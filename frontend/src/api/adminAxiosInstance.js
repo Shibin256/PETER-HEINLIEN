@@ -29,7 +29,6 @@ const showToastOnce = (message, type = 'error') => {
   });
 };
 
-
 //  Response Interceptor Refresh Access Token
 adminAxiosInstance.interceptors.response.use(
   (res) => res,
@@ -61,9 +60,7 @@ adminAxiosInstance.interceptors.response.use(
     }
 
     const status = err.response?.status;
-    console.log(err.response, '------')
     const message = err.response?.data?.message;
-    console.log(message, '----')
 
     switch (status) {
       case 400:
@@ -88,7 +85,9 @@ adminAxiosInstance.interceptors.response.use(
 
       default:
         if (!err.response) {
-          showToastOnce('Network error. Please check your internet connection.');
+          showToastOnce(
+            'Network error. Please check your internet connection.'
+          );
         }
         break;
     }

@@ -92,9 +92,7 @@ const Order = ({ order, onCancelSuccess }) => {
     }, {})
   );
 
-  const hasCancelledItem = Items.some(item => item.cancelReason);
-  const hasCancelledItemEvery = Items.every(item => item.cancelReason);
-
+  const hasCancelledItem = Items.some((item) => item.cancelReason);
 
   const [reviews, setReviews] = useState(
     Items.reduce((acc, item) => {
@@ -240,11 +238,7 @@ const Order = ({ order, onCancelSuccess }) => {
             <span
               className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyles[OrderStatus] || 'bg-gray-100 text-gray-800'}`}
             >
-              {
-                OrderStatus === 'Processing'
-                  ? 'Order Placed'
-                  : OrderStatus
-              }
+              {OrderStatus === 'Processing' ? 'Order Placed' : OrderStatus}
             </span>
             <span className="text-sm text-gray-600">
               {new Date(DeliveryDate).toLocaleDateString('en-IN', {
@@ -375,7 +369,7 @@ const Order = ({ order, onCancelSuccess }) => {
                     </div>
                     <div>
                       <span className="font-medium">Subtotal:</span> ₹
-                      {item.subTotal-item.couponDiscount}
+                      {item.subTotal - item.couponDiscount}
                     </div>
                     <div>
                       <span className="font-medium">Status:</span>{' '}
@@ -409,14 +403,13 @@ const Order = ({ order, onCancelSuccess }) => {
                         onClick={() => openReturnModal(item.itemOrderId)}
                         className={`px-3 py-1.5  ${!item.returnReason ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 'bg-red-50 hover:bg-red-100 text-red-700'} rounded-lg text-sm font-medium transition-colors border border-gray-200`}
                       >
-                        {
-                          !item.returnReason
-                            ? 'Return'
-                            : item.returnReason === 'return rejected'
-                              ? '! Return Rejected':
-                              item.returnVerified
-                              ? 'Product Returned':'Return Requested'
-                        }
+                        {!item.returnReason
+                          ? 'Return'
+                          : item.returnReason === 'return rejected'
+                            ? '! Return Rejected'
+                            : item.returnVerified
+                              ? 'Product Returned'
+                              : 'Return Requested'}
                       </button>
                     )}
 
@@ -786,19 +779,19 @@ const Order = ({ order, onCancelSuccess }) => {
 
             {(returnReason === 'Other reason' ||
               returnReason === 'Item not as described') && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional details
-                  </label>
-                  <textarea
-                    rows="3"
-                    value={additionalDetails}
-                    onChange={(e) => setAdditionalDetails(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Please provide more information..."
-                  />
-                </div>
-              )}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional details
+                </label>
+                <textarea
+                  rows="3"
+                  value={additionalDetails}
+                  onChange={(e) => setAdditionalDetails(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Please provide more information..."
+                />
+              </div>
+            )}
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
               <div className="flex">

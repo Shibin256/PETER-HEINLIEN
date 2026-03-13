@@ -45,7 +45,7 @@ const UserLayout = () => {
   return (
     <div className="flex flex-col font-serif min-h-screen">
       <Navbar />
-      <main className="flex-1 py-10">
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />

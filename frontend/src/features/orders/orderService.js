@@ -153,16 +153,13 @@ const submitReview = async ({ itemId, rating, review }) => {
 };
 
 const updateOrderStatus = async (itemOrderId) => {
-  console.log(itemOrderId,'++++')
   const response = await axiosInstance.post(
     `/api/v1/users/orders/${itemOrderId.orderId}`
   );
   return response.data;
 };
 
-
 const checkOrderAvail = async (itemOrderId) => {
-  console.log(itemOrderId,'++++')
   const response = await axiosInstance.get(
     `/api/v1/users/orders/${itemOrderId.orderId}/availability`
   );
@@ -187,7 +184,7 @@ const orderService = {
   cancelSingleOrderItem,
   singleCancelVerify,
   submitReview,
-  checkOrderAvail
+  checkOrderAvail,
 };
 
 export default orderService;

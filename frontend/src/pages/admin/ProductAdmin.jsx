@@ -844,7 +844,8 @@ const ProductAdmin = () => {
               Confirm {listAction === 'list' ? 'List' : 'Unlist'} Product
             </h3>
             <p className="mb-4">
-              Are you sure you want to {listAction} "{productToList.name}"?
+              Are you sure you want to {listAction} &quot;{productToList.name}
+              &quot;?
             </p>
             <div className="flex justify-end gap-2">
               <button

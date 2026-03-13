@@ -39,64 +39,64 @@ const RetryPayment = () => {
   const handlePayment = async () => {
     try {
       setIsProcessing(true);
-      const check=await dispatch(checkAvailablity({orderId:orderId}))
-      if(check.payload.message){
-        toast.error(check.payload.message)
-      }else{
-      const result = await dispatch(createPaymentOrder(totalAmount)).unwrap();
+      const check = await dispatch(checkAvailablity({ orderId: orderId }));
+      if (check.payload.message) {
+        toast.error(check.payload.message);
+      } else {
+        const result = await dispatch(createPaymentOrder(totalAmount)).unwrap();
 
-      const { order } = result;
+        const { order } = result;
 
-      const options = {
-        key: razorpayKey,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Peter Heinlien Watches',
-        description: 'Retry Order Payment',
-        order_id: order.id,
+        const options = {
+          key: razorpayKey,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'Peter Heinlien Watches',
+          description: 'Retry Order Payment',
+          order_id: order.id,
 
-        handler: async function (response) {
-          try {
-            const verifyRes = await dispatch(
-              verifyPayment({
-                paymentDetails: response,
-                orderId: orderId,
-              })
-            ).unwrap();
+          handler: async function (response) {
+            try {
+              const verifyRes = await dispatch(
+                verifyPayment({
+                  paymentDetails: response,
+                  orderId: orderId,
+                })
+              ).unwrap();
 
-            if (verifyRes.success) {
-              toast.success('Payment Successful');
+              if (verifyRes.success) {
+                toast.success('Payment Successful');
 
-              navigate('/my-orders');
-            } else {
-              toast.error('Payment verification failed');
+                navigate('/my-orders');
+              } else {
+                toast.error('Payment verification failed');
+              }
+            } catch (error) {
+              console.error(error);
+              toast.error('Payment verification error');
             }
-          } catch (error) {
-            console.error(error);
-            toast.error('Payment verification error');
-          }
-        },
-
-        modal: {
-          ondismiss: () => {
-            toast.error('Payment cancelled');
           },
-        },
 
-        theme: {
-          color: '#3399cc',
-        },
-      };
+          modal: {
+            ondismiss: () => {
+              toast.error('Payment cancelled');
+            },
+          },
 
-      const rzp = new window.Razorpay(options);
+          theme: {
+            color: '#3399cc',
+          },
+        };
 
-      rzp.on('payment.failed', function (response) {
-        toast.error(
-          response.error?.description || 'Payment failed. Please try again.'
-        );
-      });
+        const rzp = new window.Razorpay(options);
 
-      rzp.open();
+        rzp.on('payment.failed', function (response) {
+          toast.error(
+            response.error?.description || 'Payment failed. Please try again.'
+          );
+        });
+
+        rzp.open();
       }
     } catch (error) {
       console.error(error);

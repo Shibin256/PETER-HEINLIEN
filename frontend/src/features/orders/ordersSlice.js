@@ -130,7 +130,6 @@ export const retrunVerify = createAsyncThunk(
 export const rejectReturn = createAsyncThunk(
   'user/rejectReturn',
   async ({ itemOrderId }, { rejectWithValue }) => {
-    console.log(itemOrderId)
     try {
       const res = await orderService.rejectReturn(itemOrderId);
       return res;
@@ -215,7 +214,6 @@ export const addReview = createAsyncThunk(
 export const updateOrderStatus = createAsyncThunk(
   'user/updateOrderStatus',
   async (orderId, { rejectWithValue }) => {
-    console.log(orderId)
     try {
       const res = await orderService.updateOrderStatus(orderId);
       return res;
@@ -225,19 +223,17 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
-export const checkAvailablity=createAsyncThunk(
+export const checkAvailablity = createAsyncThunk(
   'user/checkAvailablity',
-  async(orderId,{rejectWithValue})=>{
+  async (orderId, { rejectWithValue }) => {
     try {
-      console.log(orderId,'=====')
-      const res=await orderService.checkOrderAvail(orderId)
-      console.log(res,'---------')
-      return res
+      const res = await orderService.checkOrderAvail(orderId);
+      return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data|| 'something went wrong')
+      return rejectWithValue(error.response?.data || 'something went wrong');
     }
   }
-)
+);
 
 const orderSlice = createSlice({
   name: 'orders',
@@ -345,7 +341,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-       .addCase(rejectReturn.pending, (state) => {
+      .addCase(rejectReturn.pending, (state) => {
         state.loading = true;
       })
       .addCase(rejectReturn.fulfilled, (state, action) => {

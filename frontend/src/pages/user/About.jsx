@@ -42,9 +42,9 @@ const About = () => {
             <p>
               At Peter Henlein, we bring together a diverse range of watches
               that reflect style, functionality, and lasting quality. Whether
-              you're looking for a refined dress watch, a bold chronograph, or a
-              reliable everyday timepiece, our collection is designed to meet
-              every taste and lifestyle.
+              you&apos;re looking for a refined dress watch, a bold chronograph,
+              or a reliable everyday timepiece, our collection is designed to
+              meet every taste and lifestyle.
             </p>
             <p>
               Each product is sourced from trusted brands and skilled
@@ -53,8 +53,8 @@ const About = () => {
             <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
             <p>
               Our mission is to empower customers with choice, trust, and
-              convenience. At Peter Henlein, we're committed to delivering a
-              seamless shopping experience—from browsing and selection to
+              convenience. At Peter Henlein, we&apos;re committed to delivering
+              a seamless shopping experience—from browsing and selection to
               checkout and delivery.
             </p>
             <p>

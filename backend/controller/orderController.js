@@ -366,7 +366,6 @@ export const cancelOrderSingleItem = async (req, res) => {
 
     if (orderItem.PaymentMethod !== 'cod') {
       const refundAmount = Number(item.productPrice) * Number(item.quantity) - item.couponDiscount;
-      console.log(refundAmount)
       let wallet = await Wallet.findOne({ userId: UserID });
 
       const transaction = {
@@ -564,17 +563,13 @@ export const updateStatusAfterRazorpay = async (req, res) => {
 
 export const checkAvailablity = async (req, res) => {
   const orderId = req.params.itemId
-  console.log(orderId)
   try {
     const order = await Order.findOne({ orderId: orderId }).select('-createdAt -updatedAt')
-    console.log(order)
     if (!order) {
       return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
     if (order.CouponName) {
       const coupon = await Coupons.findOne({ code: order.CouponName }).select('-createdAt -updatedAt',)
-      console.log(coupon, '_____')
-      console.log(order.UserID, '++++++')
       if (!coupon) {
         return res.status(404).json({ message: 'The coupon you applied not exists anymore' });
       }
@@ -585,7 +580,6 @@ export const checkAvailablity = async (req, res) => {
         return res.status(400).json({ message: `The coupon you applied for this order has ${MESSAGES.COUPON_EXPIRED}` });
       }
       if ((coupon.usersUsed || []).some((user) => user.toString() === order.UserID.toString())) {
-        console.log('hjjii')
         return res
           .status(500)
           .json({ message: 'You have already used the coupon you applied for this order' });
@@ -594,9 +588,7 @@ export const checkAvailablity = async (req, res) => {
 
     for (const item of order.Items) {
       const updatedProduct = await Product.findById(item.productId);
-      console.log(updatedProduct)
       if (updatedProduct.totalQuantity <= 0) {
-        console.log('avialability')
         return res.status(500).json({ message: 'Product out of stoke' })
       }
     }

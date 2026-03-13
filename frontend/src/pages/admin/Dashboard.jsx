@@ -108,9 +108,9 @@ const Dashboard = () => {
     setAvgOrderValue(res.payload.avgOrderValue);
   };
 
-  const resetFilters = async() => {
+  const resetFilters = async () => {
     setReportPeriod('Yearly');
-    let period='Yearly'
+    let period = 'Yearly';
     setStartDate(new Date().toISOString().split('T')[0]);
     setEndDate('');
     setOrders([]);
