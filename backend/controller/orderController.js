@@ -162,12 +162,12 @@ export const placeOrder = async (req, res) => {
       await newOrder.save();
     }
 
-    if(paymentMethod!=='razorpay' && hasCoupon){
-        let coupon= await Coupons.findOne({code:appliedCoupon.code}).select('-createdAt -update')
-          
-          coupon.usageLimit -= 1;
-          coupon.usersUsed.push(userId);
-          await coupon.save();
+    if (paymentMethod !== 'razorpay' && hasCoupon) {
+      let coupon = await Coupons.findOne({ code: appliedCoupon.code }).select('-createdAt -update')
+
+      coupon.usageLimit -= 1;
+      coupon.usersUsed.push(userId);
+      await coupon.save();
     }
 
     if (paymentMethod === "walletPay") {
@@ -365,7 +365,7 @@ export const cancelOrderSingleItem = async (req, res) => {
 
 
     if (orderItem.PaymentMethod !== 'cod') {
-      const refundAmount = Number(item.productPrice) * Number(item.quantity)-item.couponDiscount;
+      const refundAmount = Number(item.productPrice) * Number(item.quantity) - item.couponDiscount;
       console.log(refundAmount)
       let wallet = await Wallet.findOne({ userId: UserID });
 
@@ -571,25 +571,25 @@ export const checkAvailablity = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
     }
-    if(order.CouponName){
-    const coupon=await Coupons.findOne({code:order.CouponName}).select( '-createdAt -updatedAt',)
-     console.log(coupon,'_____')
-     console.log(order.UserID,'++++++')
-    if (!coupon) {
-      return res.status(404).json({ message: 'The coupon you applied not exists anymore' });
-    }
-    if (coupon.usageLimit <= 0) {
-      return res.status(400).json({ message: 'Coupon usage limit exceeded Please order Once again' });
-    }
-    if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
-      return res.status(400).json({ message: `The coupon you applied for this order has ${MESSAGES.COUPON_EXPIRED}` });
-    }
-    if ((coupon.usersUsed || []).some((user) => user.toString() === order.UserID.toString())) {
-      console.log('hjjii')
-      return res
-        .status(500)
-        .json({ message: 'You have already used the coupon you applied for this order' });
-    }
+    if (order.CouponName) {
+      const coupon = await Coupons.findOne({ code: order.CouponName }).select('-createdAt -updatedAt',)
+      console.log(coupon, '_____')
+      console.log(order.UserID, '++++++')
+      if (!coupon) {
+        return res.status(404).json({ message: 'The coupon you applied not exists anymore' });
+      }
+      if (coupon.usageLimit <= 0) {
+        return res.status(400).json({ message: 'Coupon usage limit exceeded Please order Once again' });
+      }
+      if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+        return res.status(400).json({ message: `The coupon you applied for this order has ${MESSAGES.COUPON_EXPIRED}` });
+      }
+      if ((coupon.usersUsed || []).some((user) => user.toString() === order.UserID.toString())) {
+        console.log('hjjii')
+        return res
+          .status(500)
+          .json({ message: 'You have already used the coupon you applied for this order' });
+      }
     }
 
     for (const item of order.Items) {
@@ -601,7 +601,7 @@ export const checkAvailablity = async (req, res) => {
       }
     }
 
-    return res.status(200).json({message:''})
+    return res.status(200).json({ message: '' })
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND })
@@ -665,9 +665,9 @@ export const returnOrderItem = async (req, res) => {
       return res.status(404).json({ message: MESSAGES.ITEM_NOT_NOTFOUND });
     }
 
-    
+
     item.returnReason = reason || 'No reason provided';
-    item.returnVerified = false; 
+    item.returnVerified = false;
     await orderItem.save();
 
     const order = await Order.find({ UserID: UserID });
@@ -776,93 +776,167 @@ export const rejectReturn = async (req, res) => {
 export const downloadInvoice = async (req, res) => {
   try {
     const { orderId } = req.params;
+
     const order = await Order.findOne({ orderId })
       .populate('UserID')
-      .select('-createdAt -updatedAt');
+      .select('-updatedAt');
 
-    if (!order) return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
+    if (!order)
+      return res.status(404).json({ message: MESSAGES.ORDER_ITEM_NOTFOUND });
 
     const doc = new PDFDocument({ margin: 50 });
 
-    // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename=invoice-${order.orderId}.pdf`,
+      `attachment; filename=invoice-${order.orderId}.pdf`
     );
+
     doc.pipe(res);
 
-    // === HEADER ===
+    // HEADER  
+
     doc
       .fontSize(24)
       .font('Helvetica-Bold')
       .text('INVOICE', { align: 'center' });
-    doc.moveDown(1);
 
-    // === ORDER DETAILS ===
+    doc.moveDown();
+
+    //  ORDER SUMMARY  
+
     doc
       .fontSize(12)
       .font('Helvetica-Bold')
       .text('Order Summary:', { underline: true });
+
     doc.moveDown(0.5);
-    doc.font('Helvetica').text(`Order ID: ${order.orderId}`);
+
+    doc.font('Helvetica');
+
+    doc.text(`Order ID: ${order.orderId}`);
     doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
-    doc.text(`Customer: ${order.UserID.username || 'N/A'}`);
+    doc.text(`Customer: ${order.UserID?.username || 'N/A'}`);
     doc.text(`Payment Method: ${order.PaymentMethod}`);
     doc.text(`Payment Status: ${order.PaymentStatus}`);
+
     doc.moveDown();
 
-    // === ADDRESS ===
+    // ADDRESS  
+
     const addr = order.Order_Address;
+
     doc.font('Helvetica-Bold').text('Delivery Address:', { underline: true });
+
     doc.moveDown(0.5);
-    doc.font('Helvetica').text(`${addr.name}`);
-    doc.text(`${addr.house}(ho), ${addr.city}`);
-    doc.text(`${addr.state}, ${addr.country},- ${addr.pincode}(pin)`);
+
+    doc.font('Helvetica');
+
+    doc.text(addr?.name || '');
+    doc.text(`${addr?.house || ''}, ${addr?.city || ''}`);
+    doc.text(`${addr?.state || ''}, ${addr?.country || ''} - ${addr?.pincode || ''}`);
+
     doc.moveDown();
 
-    // === ITEMS TABLE ===
+    //  ITEMS TABLE  
+
     doc.font('Helvetica-Bold').text('Items:', { underline: true });
+
     doc.moveDown(0.5);
 
-    // Table Header
+    const tableTop = doc.y;
+
     doc.font('Helvetica-Bold');
-    doc.text('No.', 50, doc.y, { continued: true });
-    doc.text('Item', 90, doc.y, { continued: true });
-    doc.text('Qty', 300, doc.y, { continued: true });
-    doc.text('Price', 350, doc.y, { continued: true });
-    doc.text('Subtotal', 380);
-    doc.moveDown(0.3);
-    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(0.5);
 
-    // Table Rows
+    doc.text('No.', 50, tableTop, { width: 40 });
+    doc.text('Item', 90, tableTop, { width: 190 });
+    doc.text('Qty', 280, tableTop, { width: 50, align: 'center' });
+    doc.text('Price', 330, tableTop, { width: 80, align: 'right' });
+    doc.text('Subtotal', 410, tableTop, { width: 100, align: 'right' });
+
+    doc.moveTo(50, tableTop + 18).lineTo(550, tableTop + 18).stroke();
+
+    doc.moveDown();
+
+    // ROWS 
+
     doc.font('Helvetica');
+
     order.Items.forEach((item, idx) => {
-      doc.text(`${idx + 1}`, 50, doc.y, { continued: true });
-      doc.text(`${item.productName}`, 90, doc.y, { continued: true });
-      doc.text(`${item.quantity}`, 300, doc.y, { continued: true });
-      doc.text(`Rs.${item.productPrice}`, 350, doc.y, { continued: true });
-      doc.text(`Rs.${item.subTotal}`, 380);
+      const y = doc.y;
+
+      if (y > 730) {
+        doc.addPage();
+      }
+
+      doc.text(`${idx + 1}`, 50, y, {
+        width: 40,
+        lineBreak: false,
+      });
+
+      doc.text(item.productName, 90, y, {
+        width: 190,
+        ellipsis: true,
+        lineBreak: false,
+      });
+
+      doc.text(`${item.quantity}`, 280, y, {
+        width: 50,
+        align: 'center',
+        lineBreak: false,
+      });
+
+      doc.text(`Rs.${Number(item.productPrice).toFixed(2)}`, 330, y, {
+        width: 80,
+        align: 'right',
+        lineBreak: false,
+      });
+
+      doc.text(`Rs.${Number(item.subTotal).toFixed(2)}`, 410, y, {
+        width: 100,
+        align: 'right',
+      });
+
+      doc.moveDown();
     });
 
-    doc.moveDown(1);
-    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(1);
+    // TOTAL SECTION  
 
-    // === AMOUNTS ===
+    doc.moveDown();
+
+    doc.moveTo(350, doc.y).lineTo(550, doc.y).stroke();
+
+    doc.moveDown(0.5);
+
+    doc.font('Helvetica');
+
+    doc.text(
+      `Delivery Charge: Rs.${Number(order.DeliveryCharge).toFixed(2)}`,
+      350,
+      doc.y,
+      { width: 200, align: 'right' }
+    );
+
+    doc.moveDown(0.5);
+
     doc.font('Helvetica-Bold');
-    doc.text(`Delivery Charge: Rs.${order.DeliveryCharge}`, { align: 'right' });
-    doc.text(`Total Amount: Rs.${order.TotalAmount}`, { align: 'right' });
 
-    // === FOOTER ===
+    doc.text(
+      `Grand Total Paid: Rs.${Number(order.TotalAmount).toFixed(2)}`,
+      350,
+      doc.y,
+      { width: 200, align: 'right' }
+    );
+
+
     doc.moveDown(2);
+    // Footer
     doc
       .fontSize(10)
       .font('Helvetica-Oblique')
-      .text('Thank you for shopping with us!', {
-        align: 'center',
-      });
+      .text('Thank you for shopping with us!', { align: 'center' })
+      .text('Peter-Heinlien.Ltd', { align: 'center' });
+
 
     doc.end();
   } catch (error) {

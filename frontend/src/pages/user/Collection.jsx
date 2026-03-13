@@ -321,6 +321,7 @@ const Collection = () => {
                   width="w-full md:w-64"
                   Textcolor="text-gray-700"
                   borderColor="border-gray-300"
+                  required={false}
                 />
                 <button
                   type="submit"

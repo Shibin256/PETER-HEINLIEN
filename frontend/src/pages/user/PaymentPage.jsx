@@ -213,7 +213,7 @@ const PaymentPage = () => {
 
         if (paymentSuccess) {
           dispatch(resetCart());
-          navigate('/order-success', { replace: true, state: { order: res.order } });
+          navigate('/order-success', { replace: true, state: { order: pendingOrder.order } });
         } else {
           toast.error('Payment failed');
 

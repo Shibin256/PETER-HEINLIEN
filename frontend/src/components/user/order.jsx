@@ -25,9 +25,6 @@ const Order = ({ order, onCancelSuccess }) => {
     orderId,
   } = order;
 
-  console.log(Items, '=====')
-
-
   const navigate = useNavigate();
 
   const [isExpanded, setIsExpanded] = useState(false);

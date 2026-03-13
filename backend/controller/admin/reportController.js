@@ -151,7 +151,7 @@ export const exelReport = async (req, res) => {
         createdAt: new Date(order.createdAt).toLocaleDateString(),
         TotalAmount: order.TotalAmount,
         PaymentMethod: order.PaymentMethod,
-        Status: order.Status,
+        Status: order.Status=='Processing'? 'Placed':order.Status,
       });
     });
 

@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ success: null, message: '' });
 
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+
   //form submit for contact
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      toast.warning('Please login to contact us');
+      return;
+    }
     const form = e.target;
 
     const name = form.name.value.trim();
