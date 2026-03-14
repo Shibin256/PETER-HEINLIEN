@@ -251,48 +251,124 @@ export const listProduct = async (req, res) => {
 };
 
 // product updating section
+// export const updateProduct = async (req, res) => {
+//   try {
+//     let available = true;
+//     const { id } = req.params;
+
+//     if (req.body.quantity <= 0) available = false;
+
+//     let existingImages = [];
+//     if (req.body.existingImages) {
+//       if (Array.isArray(req.body.existingImages)) {
+//         existingImages = req.body.existingImages;
+//       } else {
+//         existingImages = [req.body.existingImages];
+//       }
+//     }
+
+//     const uploadImage = [];
+
+//     if (req.files && req.files.length > 0) {
+//       for (const file of req.files) {
+//         const result = await cloudinary.uploader.upload(file.path);
+//         uploadImage.push(result.secure_url);
+//       }
+//     }
+
+//     const finalImages = [...existingImages, ...uploadImage];
+
+//     const updatedData = {
+//       name: req.body.name,
+//       description: req.body.description,
+//       category: req.body.category,
+//       tags: req.body.tags,
+//       brand: req.body.brand,
+//       price: req.body.price,
+//       totalQuantity: req.body.quantity,
+//       availability: available,
+//       images: finalImages,
+//     };
+
+//     const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
+//       new: true,
+//     }).select('-createdAt -updatedAt');
+
+//     if (!updatedProduct) {
+//       return res.status(404).json({ message: 'Product not found' });
+//     }
+
+//     res.status(200).json(updatedProduct);
+//   } catch (error) {
+//     console.error('Update Product Error:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+
 export const updateProduct = async (req, res) => {
   try {
-    let available = true;
     const { id } = req.params;
+    const available = req.body.quantity > 0;
 
-    if (req.body.quantity <= 0) available = false;
+    // Parse existing images with their positions
+    const existingImages = Array.isArray(req.body.existingImages)
+      ? req.body.existingImages
+      : req.body.existingImages ? [req.body.existingImages] : [];
 
-    let existingImages = [];
-    if (req.body.existingImages) {
-      if (Array.isArray(req.body.existingImages)) {
-        existingImages = req.body.existingImages;
-      } else {
-        existingImages = [req.body.existingImages];
-      }
-    }
+    const existingIndexes = Array.isArray(req.body.existingImageIndexes)
+      ? req.body.existingImageIndexes.map(Number)
+      : req.body.existingImageIndexes !== undefined
+        ? [Number(req.body.existingImageIndexes)]
+        : [];
 
-    const uploadImage = [];
+    // Parse new images with their positions
+    const newIndexes = Array.isArray(req.body.newImageIndexes)
+      ? req.body.newImageIndexes.map(Number)
+      : req.body.newImageIndexes !== undefined
+        ? [Number(req.body.newImageIndexes)]
+        : [];
 
+    // Upload new images to Cloudinary
+    const uploadedUrls = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const result = await cloudinary.uploader.upload(file.path);
-        uploadImage.push(result.secure_url);
+        uploadedUrls.push(result.secure_url);
       }
     }
 
-    const finalImages = [...existingImages, ...uploadImage];
+    // ✅ Rebuild the 4-slot array with correct positions
+    const finalImages = new Array(4).fill(null);
 
-    const updatedData = {
-      name: req.body.name,
-      description: req.body.description,
-      category: req.body.category,
-      tags: req.body.tags,
-      brand: req.body.brand,
-      price: req.body.price,
-      totalQuantity: req.body.quantity,
-      availability: available,
-      images: finalImages,
-    };
+    existingImages.forEach((url, i) => {
+      const slot = existingIndexes[i];
+      if (slot !== undefined) finalImages[slot] = url;
+    });
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    }).select('-createdAt -updatedAt');
+    uploadedUrls.forEach((url, i) => {
+      const slot = newIndexes[i];
+      if (slot !== undefined) finalImages[slot] = url;
+    });
+
+    // Remove nulls (empty slots) before saving
+    const cleanedImages = finalImages.filter(Boolean);
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        name: req.body.name,
+        description: req.body.description,
+        category: req.body.category,
+        tags: req.body.tags,
+        brand: req.body.brand,
+        price: req.body.price,
+        totalQuantity: req.body.quantity,
+        availability: available,
+        images: cleanedImages,  // ✅ ordered correctly
+      },
+      { new: true }
+    ).select('-createdAt -updatedAt');
 
     if (!updatedProduct) {
       return res.status(404).json({ message: 'Product not found' });
@@ -304,6 +380,7 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 //get all brands and collection form db
 export const getBrandsAndCollection = async (req, res) => {

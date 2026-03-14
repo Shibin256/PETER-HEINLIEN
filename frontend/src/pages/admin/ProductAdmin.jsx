@@ -177,8 +177,28 @@ const ProductAdmin = () => {
     }
   };
 
+  // const handleEdit = (product) => {
+  //   setSelectedProduct(product);
+  //   setEditForm({
+  //     name: product.name || '',
+  //     description: product.description || '',
+  //     quantity: product.totalQuantity || 0,
+  //     price: product.price || '',
+  //     category: product.category._id || '',
+  //     brand: product.brand._id || '',
+  //     tags: product.tags || '',
+  //     images: product.images,
+  //     newImages: [],
+  //   });
+  //   setShowEditModal(true);
+  // };
+
+
   const handleEdit = (product) => {
     setSelectedProduct(product);
+    const imageSlots = new Array(4).fill(null);
+    product.images?.forEach((img, i) => { if (i < 4) imageSlots[i] = img; });
+
     setEditForm({
       name: product.name || '',
       description: product.description || '',
@@ -187,8 +207,8 @@ const ProductAdmin = () => {
       category: product.category._id || '',
       brand: product.brand._id || '',
       tags: product.tags || '',
-      images: product.images,
-      newImages: [],
+      images: imageSlots,  // always 4 slots
+      newImages: [],       // no longer needed but keep for compat
     });
     setShowEditModal(true);
   };
@@ -227,9 +247,21 @@ const ProductAdmin = () => {
       formData.append('newImages', file);
     });
 
-    editForm.images.forEach((url) => {
-      if (typeof url === 'string') {
-        formData.append('existingImages', url);
+    // editForm.images.forEach((url) => {
+    //   if (typeof url === 'string') {
+    //     formData.append('existingImages', url);
+    //   }
+    // });
+
+    // In handleEditSubmit, replace your image loop with this:
+    editForm.images.forEach((img, index) => {
+      if (!img) return;
+      if (typeof img === 'string') {
+        formData.append('existingImages', img);
+        formData.append('existingImageIndexes', index);  // ✅ send position
+      } else {
+        formData.append(`newImages`, img);
+        formData.append('newImageIndexes', index);        // ✅ send position
       }
     });
 
@@ -416,22 +448,20 @@ const ProductAdmin = () => {
                 </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      product.availability
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${product.availability
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}
                   >
                     {product.availability ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      !product.isList
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-orange-100 text-orange-800'
-                    }`}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${!product.isList
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-orange-100 text-orange-800'
+                      }`}
                   >
                     {!product.isList ? 'Listed' : 'Unlisted'}
                   </span>
@@ -518,11 +548,10 @@ const ProductAdmin = () => {
                 })
               )
             }
-            className={`px-4 py-2 rounded ${
-              page <= 1
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-500 text-white'
-            }`}
+            className={`px-4 py-2 rounded ${page <= 1
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-blue-500 text-white'
+              }`}
           >
             Previous
           </button>
@@ -542,11 +571,10 @@ const ProductAdmin = () => {
                 })
               )
             }
-            className={`px-4 py-2 rounded ${
-              page >= totalPages
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-500 text-white'
-            }`}
+            className={`px-4 py-2 rounded ${page >= totalPages
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-blue-500 text-white'
+              }`}
           >
             Next
           </button>
@@ -596,30 +624,48 @@ const ProductAdmin = () => {
                   Product Images
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {editForm.images?.map((image, index) => (
-                    <div key={`existing-${index}`} className="relative">
-                      <img
-                        src={
-                          typeof image === 'string'
-                            ? image
-                            : URL.createObjectURL(image)
-                        }
-                        alt={`Existing product image ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updatedImages = [...editForm.images];
-                          updatedImages.splice(index, 1);
-                          setEditForm({ ...editForm, images: updatedImages });
-                        }}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                      >
-                        ×
-                      </button>
+                  {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-3"> */}
+                  {editForm.images.map((image, index) => (
+                    <div key={index} className="relative">
+                      {image ? (
+                        <>
+                          <img
+                            src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                            alt={`Product ${index}`}
+                            className="w-full h-32 object-cover rounded-lg border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...editForm.images];
+                              updated[index] = null;
+                              setEditForm({ ...editForm, images: updated });
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full"
+                          >
+                            ×
+                          </button>
+                        </>
+                      ) : (
+                        <label className="w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer text-gray-400 hover:bg-gray-50">
+                          +
+                          <input
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (!file) return;
+                              const updated = [...editForm.images];
+                              updated[index] = file;  // ✅ replace at exact position
+                              setEditForm({ ...editForm, images: updated });
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   ))}
+                  {/* </div> */}
 
                   {editForm.newImages?.map((image, index) => (
                     <div key={`new-${index}`} className="relative">
@@ -674,7 +720,7 @@ const ProductAdmin = () => {
                             const newFile = e.target.files[0];
                             if (
                               editForm.images.length +
-                                editForm.newImages.length <
+                              editForm.newImages.length <
                               4
                             ) {
                               setEditForm({
@@ -860,11 +906,10 @@ const ProductAdmin = () => {
               </button>
               <button
                 onClick={confirmListToggle}
-                className={`px-4 py-2 text-white rounded ${
-                  listAction === 'list'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-orange-600 hover:bg-orange-700'
-                }`}
+                className={`px-4 py-2 text-white rounded ${listAction === 'list'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-orange-600 hover:bg-orange-700'
+                  }`}
               >
                 {listAction === 'list' ? 'List Product' : 'Unlist Product'}
               </button>

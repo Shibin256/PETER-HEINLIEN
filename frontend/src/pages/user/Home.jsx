@@ -14,7 +14,7 @@ const Home = () => {
         <LatestCollection />
         <CategoryProducts />
         <AdBanner />
-        {/* <TopRated /> */}
+        <TopRated />
       </div>
     </div>
   );

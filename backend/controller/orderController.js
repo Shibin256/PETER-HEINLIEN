@@ -686,7 +686,7 @@ export const retrunVerify = async (req, res) => {
     orderitem.Items.forEach((item) => {
       if (item.itemOrderId === itemOrderId) {
         item.returnVerified = true;
-        total = item.productPrice;
+        total = (item.productPrice * item.quantity)-item.couponDiscount;
       }
     });
     await orderitem.save();
@@ -700,7 +700,7 @@ export const retrunVerify = async (req, res) => {
         paymentId: `REFUND-${Date.now()}-${uuidv4().slice(0, 8)}`,
         status: 'success',
         type: 'credit',
-        description: 'Order Canceled Refund',
+        description: 'Order Returned Refund',
       };
 
       if (wallet) {

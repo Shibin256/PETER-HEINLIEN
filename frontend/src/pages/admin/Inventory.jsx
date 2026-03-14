@@ -171,7 +171,7 @@ const Inventory = () => {
       }
 
       const res = await dispatch(addCategory(newCategory.trim()));
-
+      console.log(res.payload,'==')
       if (res.payload?.message === 'Category created') {
         toast.success('Category created successfully');
         dispatch(getBrandAndCategory({ page: page, limit: 4 }));
@@ -237,12 +237,6 @@ const Inventory = () => {
         toast.warning('Brand name must be between 2 and 50 characters');
         return;
       }
-      // if (!/^[a-zA-Z0-9\s-]+$/.test(newBrand)) {
-      //   toast.warning(
-      //     'Brand name can only contain letters, numbers, spaces, and hyphens'
-      //   );
-      //   return;
-      // }
       if (brandDescription && brandDescription.length > 200) {
         toast.warning('Description must not exceed 200 characters');
         return;
