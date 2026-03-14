@@ -1,0 +1,491 @@
+[33mcommit 776afb9adc82a39fecff3fe7998927658045f1f6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Mar 13 13:43:02 2026 +0530
+
+    The lint errors fixed
+
+[33mcommit 43a6c9d1e0a02116906c81e15a921f01465ac597[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Mar 13 12:36:22 2026 +0530
+
+    The scrolling issue fixed
+
+[33mcommit 997d4149a4e536a59e18d2b77577fada54a5bd73[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Mar 13 10:29:06 2026 +0530
+
+    The Invoice Alignment corrected
+
+[33mcommit 9aa817690f715cc67d136fc73ace4ed774ded7bc[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Mar 13 00:22:27 2026 +0530
+
+    The errors in the order success side and retry payment side fixed
+
+[33mcommit f4dd76f45a0df987d6c1f6364ddd52354ad85a96[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Mar 11 22:34:35 2026 +0530
+
+    The coupon removing issues solved
+
+[33mcommit 59e98f21ae11e7702745b76ea5d40cace0542fa8[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Mar 11 14:53:25 2026 +0530
+
+    The order return issue solved
+
+[33mcommit 0441e1e71ee04e562c0ad2f60a6be111edf1fd3a[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Mar 11 10:37:06 2026 +0530
+
+    The retry payment quantitiy checking enabeld
+
+[33mcommit c72c92446e4670aa2d52bc1daeb41e1d70ebc048[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Mar 10 16:53:47 2026 +0530
+
+    Payment with two user ordering same time using razorpay fixed
+
+[33mcommit 3339249787b1af53db9141d8746f620f4e04a14e[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sun Mar 8 21:34:59 2026 +0530
+
+    Name error happend in production time fixed
+
+[33mcommit 4b979ee9e59124bbc41c05c43e6532d062e1e129[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sun Mar 8 21:24:20 2026 +0530
+
+    Extra errros from user side find and solved
+
+[33mcommit 8146a4db1391e982db64135b3a2c86d2c089bcd7[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Mar 7 21:17:12 2026 +0530
+
+    every changes in the pendings are done includes error handling interceptor
+
+[33mcommit 19d4ade56b3cd1f936526198d6ba742e12e5bde0[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Mar 7 20:51:25 2026 +0530
+
+    The lint errors are fixed
+
+[33mcommit 121015de99fee7f40f691f63ee298b3f38b17d13[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Mar 7 20:34:27 2026 +0530
+
+    change cancel order setups and more message constants added
+
+[33mcommit 067a6bdf2d8a964d4ea94cbff28e3b136facda71[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Mar 7 18:53:09 2026 +0530
+
+    The pendings like coupons,wallet and retry payment done
+
+[33mcommit a4434998a0f10b36d159025c88a793614e67067c[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Mar 7 08:59:05 2026 +0530
+
+    The problem faced when fetching products without user fixed
+
+[33mcommit 88f2c48f9576b455305a8235035336f31ce99d7a[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Mar 6 19:55:47 2026 +0530
+
+    The simple errors and bugs in backend fixed
+
+[33mcommit 3b26bca6e1c431cdfa3c1ad32104e5456f2ef5d9[m[33m ([m[1;31morigin/code-formatting[m[33m, [m[1;32mcode-formatting[m[33m)[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Mar 6 14:13:38 2026 +0530
+
+    fix some jwt token issues happend in admin refreshToken
+
+[33mcommit 59d5e0bc5968128b6256d1a6e2f7ee0aaeff61fd[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Mar 5 23:23:22 2026 +0530
+
+    Apply ESLint and Prettier coding standards
+
+[33mcommit 31e1bada81394c1e3fb508d1c16ef1172c9669a6[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Mar 5 18:29:00 2026 +0530
+
+    Final clean up unwanted codes are deleted manually
+
+[33mcommit 33281bc72c4f887c391639eabea89ffb95dfafd6[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Mar 5 18:02:11 2026 +0530
+
+    The userlist section have some changes done and product fetching error fixed
+
+[33mcommit 4a740df68af034c216ab491d725cf9ea02311978[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Mar 5 16:10:52 2026 +0530
+
+    The errors fixed by eslint and the logger function added to backend and made some other changes
+
+[33mcommit 02c4d76ac1d485c0b5e87d791404508c1f913d5c[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Mar 4 22:08:48 2026 +0530
+
+    The errors find by another member are fixed
+
+[33mcommit c34c7f8af49c91f80d2c8e4f99c7cab16fd4616a[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Mar 3 22:27:11 2026 +0530
+
+    The type mistake of sketion solved
+
+[33mcommit fc642a9ef990087efa55fe60db9067e537bc73da[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Mar 3 20:48:04 2026 +0530
+
+    the errors are fixed in last stage
+
+[33mcommit 82bf677b0a1baef3b86d04879ec7030e44ae7164[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Mar 3 20:31:18 2026 +0530
+
+    The issues with graph and google auth etc fixed and updated
+
+[33mcommit 5ce6842bac846f9d075b3182a8df75daf1ead378[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Dec 8 14:27:55 2025 +0530
+
+    The bugs happend related to products fixed
+
+[33mcommit eaaa8c8a3867e6e56c8d0993b25a834563531db3[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Dec 6 20:03:18 2025 +0530
+
+     the bug in the payment page and others fixed after deploy
+
+[33mcommit 0b241821a8eb03cc1e92babbb33b7f1bab89647a[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Dec 6 15:18:14 2025 +0530
+
+    the banner error fixed
+
+[33mcommit dcf88c17a32a7b54bfc1b99981284a2de869c76d[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Dec 4 18:27:08 2025 +0530
+
+    some bugs fixed for hosting
+
+[33mcommit ced79ebc638a0d44e907d95d3a469ae801f1ee58[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Dec 3 20:43:29 2025 +0530
+
+    sample push
+
+[33mcommit 9b8f6f59bb656a37d12710256c2ca07f907b2db2[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Dec 3 15:32:23 2025 +0530
+
+    some changes added
+
+[33mcommit 3d37ca89891800173ba9704a00609b05972ee7f7[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Nov 27 20:47:21 2025 +0530
+
+    The backend server add the dns 0.0.0.0
+
+[33mcommit 2529cd6f2cbb16e77db4a121affdb79867701037[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Oct 16 13:36:39 2025 +0530
+
+    name changed to allow cors second time to check
+
+[33mcommit 8be53dfc165f0e5156f0e0126f0839171a04c330[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Oct 16 13:34:45 2025 +0530
+
+    name changed to allow cors
+
+[33mcommit 45392955a969eaee8e20849f93722ee2d4d690bf[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Oct 16 13:19:27 2025 +0530
+
+    vercel app allowed in cors
+
+[33mcommit 6fd708056bb35234e7920adca25e297a73e8b229[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Oct 16 13:09:40 2025 +0530
+
+    checout error fixed
+
+[33mcommit 4048871fa998d2eed62734686073cc6b58bd98c4[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Oct 16 13:03:23 2025 +0530
+
+    react Image magnify changed to react image zoom
+
+[33mcommit 6e5f6ad237c5a214f65a370c99b5aa8841008809[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Oct 15 15:53:30 2025 +0530
+
+    new version added
+
+[33mcommit e9c8a4d3c34e62c8852bb4664907a6d5ffb3c7f1[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Oct 15 15:44:41 2025 +0530
+
+     skip the legacy-peer-deps
+
+[33mcommit bd467e9318c852874da1f19bb1d306fc84dc550b[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Oct 15 15:28:46 2025 +0530
+
+    update the image magnify
+
+[33mcommit b8c6c639ba5a175e9bfaeff29d9a06819f387685[m[33m ([m[1;31morigin/feature/backendIssues[m[33m, [m[1;32mfeature/backendIssues[m[33m)[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Oct 15 15:07:13 2025 +0530
+
+    the package.josn changed
+
+[33mcommit 2d3cf54835728d2bd9feb757c6828be6b5f9a1fa[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Aug 20 12:48:09 2025 +0530
+
+    The coupon issue and some bugs solved
+
+[33mcommit 516490fc6172cbd5caff565ce6d7ec0dd62e37f6[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 15 15:45:38 2025 +0530
+
+    The bug happen in the buyknow section cleared
+
+[33mcommit 7131c753c5772f18b8182a31e94326544012eafb[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 15 12:40:37 2025 +0530
+
+    The problem related to latest collection and top-rated product fixed
+
+[33mcommit c3d56c5daf434513f6e4211af77ade9d5dfbc595[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 15 01:24:53 2025 +0530
+
+    The razorpay backend verify method changed
+
+[33mcommit 1385ee59efb946483158a43ce9d8dc1cac895b81[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 15 00:15:43 2025 +0530
+
+     the razorpay backend verify is done
+
+[33mcommit a0130b7b706dc44cfaf0714f017267527462a10a[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Aug 14 21:33:38 2025 +0530
+
+    repeated call of wishedlist problem solved and the offer management make smoother
+
+[33mcommit 06f7a904d7d0efee0e8f00d453eac8b530575b1e[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Aug 14 03:26:21 2025 +0530
+
+    The Inverntory validations make more strong
+
+[33mcommit 4f2cf3d3a3564ed557fe4a498b950e8dcdb15b9f[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Aug 14 02:37:34 2025 +0530
+
+    some backend validation and checout/cart pages connected
+
+[33mcommit d95deb567f740a47c5afb9d37a9e62ba7daba4eb[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Aug 13 15:54:45 2025 +0530
+
+    The signUp manipulation in the otp verify page problem solved
+
+[33mcommit b35d125a2f7d2fcd7c02f6220735bfe576af70d0[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Aug 13 12:43:38 2025 +0530
+
+    the bugs in the checkout page cleared
+
+[33mcommit 91415ae2934398848d3845ee4bffa40eafbe922d[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Aug 12 15:05:10 2025 +0530
+
+    The backend validation of singup done
+
+[33mcommit fde8a45a846087acfba5a0ff4f446ee81cae6331[m[33m ([m[1;31morigin/feature/ApiIssue[m[33m, [m[1;32mfeature/ApiIssue[m[33m)[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 8 14:17:19 2025 +0530
+
+    The small changes are made
+
+[33mcommit 4eb4f45c04ae3d8860454b4e2c6c3421e0890ca2[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 8 13:36:22 2025 +0530
+
+    some of the bug fixed and coupons showing page created at userSide
+
+[33mcommit 6b192b691a360e288f7e809a3647e87f06ac71bb[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 8 11:10:03 2025 +0530
+
+    The review adding created
+
+[33mcommit 243705fc2e168ca1db9e93c46eafb2ad6f100f13[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 8 00:12:43 2025 +0530
+
+    Bug in cancel order fixed
+
+[33mcommit cd1036f536baa8cc82ff7c981d76b766e33968f8[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Aug 8 00:06:05 2025 +0530
+
+    Bug in update coupon fixed
+
+[33mcommit f64fb0a56d163becdcf0b7de1c062a6aa6888f2b[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Aug 7 23:35:19 2025 +0530
+
+    The rest api names are changed
+
+[33mcommit 51401456649081d48ac51d9098f26649290f2299[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Aug 7 15:29:13 2025 +0530
+
+    The errorboundy component created and the status code object used correctly
+
+[33mcommit f1a223d1d171e122248b4bfcc437b2f534d85b8b[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Aug 7 13:20:40 2025 +0530
+
+    banner added  and some of the bug fixed
+
+[33mcommit a465e4e63bef4eef6d7de4512bcb3ebca020cee5[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Aug 5 00:35:51 2025 +0530
+
+    The ad management is done
+
+[33mcommit 63d4b2c1af2bb78ca80080060f193027db237df2[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Aug 4 23:51:11 2025 +0530
+
+    The eslint errors fixed, propType added, and the wallet error fixed
+
+[33mcommit 32c0e52deb0604176f4460a4c939cbe187a1775e[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Aug 4 01:24:33 2025 +0530
+
+    The brand pagination added
+
+[33mcommit 6e62df346fbb21022594bdaea22f6b0861ddee56[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Jul 31 19:48:57 2025 +0530
+
+    the Error fixed
+
+[33mcommit 97469bf3a666b0873e2bcfea1f04bc4435580444[m[33m ([m[1;31morigin/feature/payment-gateway[m[33m, [m[1;32mfeature/payment-gateway[m[33m)[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Jul 31 13:54:46 2025 +0530
+
+    Week 13 completed
+
+[33mcommit 7ec92d42d8ae265851337c79a44d15b50564f5b8[m[33m ([m[1;31morigin/feature/coupon-management[m[33m, [m[1;32mfeature/coupon-management[m[33m)[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat Jul 12 01:31:49 2025 +0530
+
+    the cancel order button with veryfy added
+
+[33mcommit c149c37677690029cf952dc641040f554b56206b[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Jul 11 03:56:27 2025 +0530
+
+    The stable version of project with cod is done
+
+[33mcommit ef00faf2a976947bc40dce802a90f9e3d8c916bd[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Jul 7 00:02:25 2025 +0530
+
+    the order list is added
+
+[33mcommit 4d6f88f1f7a32a1ab2941d65639343fbfa14dc00[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Jul 2 16:11:11 2025 +0530
+
+    the cart is done
+
+[33mcommit e026096228526ed0d2f25daace0bbd266e0ae1d8[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Jun 25 20:33:03 2025 +0530
+
+    MyAccount section Frontend created
+
+[33mcommit 62dce28f16a52b8bae2b17b97a426c461a565a88[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Jun 23 23:45:08 2025 +0530
+
+    Jwt tokens and some parts added
+
+[33mcommit 7f74313b5e2557b488abc7190f0886200b3c9a2d[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Jun 23 04:10:48 2025 +0530
+
+    some comments are added
+
+[33mcommit 8a4af2db6e50bed96c5e3437e6100d4e57f5aaa7[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon Jun 23 03:05:56 2025 +0530
+
+    The favorate is added
+
+[33mcommit b785e75d0e73248f9ae78cb46600a9426c48dc55[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri Jun 20 04:02:41 2025 +0530
+
+    The brand and category added option is done
+
+[33mcommit 2d0f9c0d5760763a18e9b482a2eebf92e1bd7f68[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed Jun 18 13:02:12 2025 +0530
+
+    the project week 1 review complete with some missing functions
+
+[33mcommit 6ec4dedd918c3d2029a125ce325d226b5bef1651[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu Jun 12 22:01:48 2025 +0530
+
+    the additem page is created and product added
+
+[33mcommit e98a854e50585b50a3a605b8df0b89e2bd30e35b[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Tue Jun 3 12:12:09 2025 +0530
+
+    The Login and signUp are done
+
+[33mcommit 6de23478996872a498962aa3870233ac7e848d70[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Sat May 31 01:01:01 2025 +0530
+
+    The jwt cofiguration is done
+
+[33mcommit 7d56f67d2abfa346b75c043cbb281e476b6cb2b1[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Fri May 30 10:59:32 2025 +0530
+
+    admin panel format and design created
+
+[33mcommit bf18dcb566f500bf50c0d11fb7fdc176540bf8d1[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Thu May 29 21:35:22 2025 +0530
+
+    The user signup and login created
+
+[33mcommit d59fd57e03258f1ccd97d06365206241313e1d47[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Wed May 28 21:54:41 2025 +0530
+
+    register action is just created and stored in the mongodb
+
+[33mcommit 34f463875c38a2cf2c5b544608870db466606128[m
+Author: shibin kp <shibinkp1012@gmail.com>
+Date:   Mon May 26 21:48:48 2025 +0530
+
+    First commit sample structure created
